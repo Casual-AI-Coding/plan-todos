@@ -482,36 +482,52 @@ React Context
 
 ## 十、里程碑规划
 
-### Phase 1: 核心框架
+### Phase 1: 核心框架 ✅ 已完成 (2026-02-13)
 
-- [ ] Tauri 项目初始化
-- [ ] SQLite 数据库集成
-- [ ] 基础 CRUD API
+- [x] Tauri 项目初始化
+- [x] SQLite 数据库集成
+- [x] 基础 CRUD API
 
-### Phase 2: 数据模型实现
+### Phase 2: 数据模型实现 ✅ 已完成 (2026-02-14)
 
-- [ ] Plan/Task CRUD
-- [ ] Target/Step CRUD
-- [ ] Todo CRUD  
-- [ ] Milestone CRUD
+- [x] Plan/Task CRUD
+- [x] Target/Step CRUD + 进度自动计算 + 权重校验
+- [x] Todo CRUD
+- [x] Milestone CRUD + 三选一关联验证
 
-### Phase 3: 前端开发
+### Phase 3: 前端开发 ✅ 已完成 (2026-02-14)
 
-- [ ] 列表视图
-- [ ] 日历视图
-- [ ] 时间轴视图
-- [ ] 响应式布局
+- [x] 列表视图 (Todos/Plans/Targets/Milestones)
+- [x] 日历视图
+- [x] 看板视图
+- [x] 时间轴视图
+- [x] 响应式布局
+- [x] Dashboard 今日总览
 
-### Phase 4: 通知系统
+### Phase 4: API 优化 🚧 进行中
+
+- [ ] 添加数据库索引
+- [ ] 实现统计 API (`get_statistics`)
+- [ ] 实现 Dashboard API (`get_dashboard`)
+- [ ] 添加单个实体查询 API
+- [ ] 实现批量操作 API
+
+### Phase 5: 通知系统 📋 待规划
 
 - [ ] 通知核心架构
 - [ ] 飞书/钉钉/邮件/Webhook 插件
 - [ ] 定时任务
 
-### Phase 5: 移动端
+### Phase 6: 移动端 📋 待规划
 
 - [ ] Tauri iOS 构建
 - [ ] Tauri Android 构建
+
+### Phase 7: 数据同步 📋 待规划
+
+- [ ] iCloud/Google Drive/OneDrive 同步
+- [ ] 本地文件导入导出
+- [ ] 冲突解决策略
 
 ---
 
