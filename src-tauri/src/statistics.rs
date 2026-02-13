@@ -1,5 +1,6 @@
 // Statistics and analytics commands
 
+use crate::log_command;
 use crate::AppState;
 use serde::Serialize;
 
@@ -59,18 +60,20 @@ pub struct EfficiencyStats {
 
 #[tauri::command]
 pub fn get_statistics(state: tauri::State<AppState>) -> Result<Statistics, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    log_command!("get_statistics", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-    let counts = get_counts(&conn)?;
-    let completion = get_completion_stats(&conn)?;
-    let trends = get_trend_stats(&conn)?;
-    let efficiency = get_efficiency_stats(&conn)?;
+        let counts = get_counts(&conn)?;
+        let completion = get_completion_stats(&conn)?;
+        let trends = get_trend_stats(&conn)?;
+        let efficiency = get_efficiency_stats(&conn)?;
 
-    Ok(Statistics {
-        counts,
-        completion,
-        trends,
-        efficiency,
+        Ok(Statistics {
+            counts,
+            completion,
+            trends,
+            efficiency,
+        })
     })
 }
 

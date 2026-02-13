@@ -1,5 +1,6 @@
 // Dashboard API for today overview
 
+use crate::log_command;
 use crate::AppState;
 use serde::Serialize;
 
@@ -49,40 +50,42 @@ pub struct TodaySummary {
 
 #[tauri::command]
 pub fn get_dashboard(state: tauri::State<AppState>) -> Result<Dashboard, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let today = chrono::Local::now().format("%Y-%m-%d").to_string();
+    log_command!("get_dashboard", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let today = chrono::Local::now().format("%Y-%m-%d").to_string();
 
-    // Get today's todos
-    let today_todos = get_today_todos(&conn, &today)?;
+        // Get today's todos
+        let today_todos = get_today_todos(&conn, &today)?;
 
-    // Get upcoming todos (3 days)
-    let upcoming_todos = get_upcoming_todos(&conn, &today)?;
+        // Get upcoming todos (3 days)
+        let upcoming_todos = get_upcoming_todos(&conn, &today)?;
 
-    // Get completed today
-    let completed_today = get_completed_today(&conn, &today)?;
+        // Get completed today
+        let completed_today = get_completed_today(&conn, &today)?;
 
-    // Get active plans with progress
-    let active_plans = get_active_plans(&conn)?;
+        // Get active plans with progress
+        let active_plans = get_active_plans(&conn)?;
 
-    // Get active targets with progress
-    let active_targets = get_active_targets(&conn)?;
+        // Get active targets with progress
+        let active_targets = get_active_targets(&conn)?;
 
-    // Calculate summary
-    let today_summary = TodaySummary {
-        total_todos: today_todos.len() as i32,
-        completed_todos: completed_today.len() as i32,
-        upcoming_count: upcoming_todos.len() as i32,
-        active_plans_count: active_plans.len() as i32,
-        active_targets_count: active_targets.len() as i32,
-    };
+        // Calculate summary
+        let today_summary = TodaySummary {
+            total_todos: today_todos.len() as i32,
+            completed_todos: completed_today.len() as i32,
+            upcoming_count: upcoming_todos.len() as i32,
+            active_plans_count: active_plans.len() as i32,
+            active_targets_count: active_targets.len() as i32,
+        };
 
-    Ok(Dashboard {
-        today_todos,
-        upcoming_todos,
-        completed_today,
-        active_plans,
-        active_targets,
-        today_summary,
+        Ok(Dashboard {
+            today_todos,
+            upcoming_todos,
+            completed_today,
+            active_plans,
+            active_targets,
+            today_summary,
+        })
     })
 }
 

@@ -1,5 +1,6 @@
 // Batch operations commands
 
+use crate::log_command;
 use crate::AppState;
 use serde::Serialize;
 
@@ -21,32 +22,34 @@ pub fn bulk_update_todo_status(
     ids: Vec<String>,
     status: String,
 ) -> Result<BatchUpdateResult, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let now = chrono::Utc::now().to_rfc3339();
+    log_command!("bulk_update_todo_status", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let now = chrono::Utc::now().to_rfc3339();
 
-    let mut updated = 0;
-    let mut failed: Vec<BatchFailedItem> = Vec::new();
+        let mut updated = 0;
+        let mut failed: Vec<BatchFailedItem> = Vec::new();
 
-    for id in ids {
-        let result = conn.execute(
-            "UPDATE todos SET status = ?, updated_at = ? WHERE id = ?",
-            rusqlite::params![status, now, id],
-        );
+        for id in ids {
+            let result = conn.execute(
+                "UPDATE todos SET status = ?, updated_at = ? WHERE id = ?",
+                rusqlite::params![status, now, id],
+            );
 
-        match result {
-            Ok(rows) if rows > 0 => updated += 1,
-            Ok(_) => failed.push(BatchFailedItem {
-                id,
-                error: "Not found".to_string(),
-            }),
-            Err(e) => failed.push(BatchFailedItem {
-                id,
-                error: e.to_string(),
-            }),
+            match result {
+                Ok(rows) if rows > 0 => updated += 1,
+                Ok(_) => failed.push(BatchFailedItem {
+                    id,
+                    error: "Not found".to_string(),
+                }),
+                Err(e) => failed.push(BatchFailedItem {
+                    id,
+                    error: e.to_string(),
+                }),
+            }
         }
-    }
 
-    Ok(BatchUpdateResult { updated, failed })
+        Ok(BatchUpdateResult { updated, failed })
+    })
 }
 
 #[tauri::command]
@@ -55,32 +58,34 @@ pub fn bulk_update_task_status(
     ids: Vec<String>,
     status: String,
 ) -> Result<BatchUpdateResult, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let now = chrono::Utc::now().to_rfc3339();
+    log_command!("bulk_update_task_status", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let now = chrono::Utc::now().to_rfc3339();
 
-    let mut updated = 0;
-    let mut failed: Vec<BatchFailedItem> = Vec::new();
+        let mut updated = 0;
+        let mut failed: Vec<BatchFailedItem> = Vec::new();
 
-    for id in ids {
-        let result = conn.execute(
-            "UPDATE tasks SET status = ?, updated_at = ? WHERE id = ?",
-            rusqlite::params![status, now, id],
-        );
+        for id in ids {
+            let result = conn.execute(
+                "UPDATE tasks SET status = ?, updated_at = ? WHERE id = ?",
+                rusqlite::params![status, now, id],
+            );
 
-        match result {
-            Ok(rows) if rows > 0 => updated += 1,
-            Ok(_) => failed.push(BatchFailedItem {
-                id,
-                error: "Not found".to_string(),
-            }),
-            Err(e) => failed.push(BatchFailedItem {
-                id,
-                error: e.to_string(),
-            }),
+            match result {
+                Ok(rows) if rows > 0 => updated += 1,
+                Ok(_) => failed.push(BatchFailedItem {
+                    id,
+                    error: "Not found".to_string(),
+                }),
+                Err(e) => failed.push(BatchFailedItem {
+                    id,
+                    error: e.to_string(),
+                }),
+            }
         }
-    }
 
-    Ok(BatchUpdateResult { updated, failed })
+        Ok(BatchUpdateResult { updated, failed })
+    })
 }
 
 #[tauri::command]
@@ -89,32 +94,34 @@ pub fn bulk_update_step_status(
     ids: Vec<String>,
     status: String,
 ) -> Result<BatchUpdateResult, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let now = chrono::Utc::now().to_rfc3339();
+    log_command!("bulk_update_step_status", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let now = chrono::Utc::now().to_rfc3339();
 
-    let mut updated = 0;
-    let mut failed: Vec<BatchFailedItem> = Vec::new();
+        let mut updated = 0;
+        let mut failed: Vec<BatchFailedItem> = Vec::new();
 
-    for id in ids {
-        let result = conn.execute(
-            "UPDATE steps SET status = ?, updated_at = ? WHERE id = ?",
-            rusqlite::params![status, now, id],
-        );
+        for id in ids {
+            let result = conn.execute(
+                "UPDATE steps SET status = ?, updated_at = ? WHERE id = ?",
+                rusqlite::params![status, now, id],
+            );
 
-        match result {
-            Ok(rows) if rows > 0 => updated += 1,
-            Ok(_) => failed.push(BatchFailedItem {
-                id,
-                error: "Not found".to_string(),
-            }),
-            Err(e) => failed.push(BatchFailedItem {
-                id,
-                error: e.to_string(),
-            }),
+            match result {
+                Ok(rows) if rows > 0 => updated += 1,
+                Ok(_) => failed.push(BatchFailedItem {
+                    id,
+                    error: "Not found".to_string(),
+                }),
+                Err(e) => failed.push(BatchFailedItem {
+                    id,
+                    error: e.to_string(),
+                }),
+            }
         }
-    }
 
-    Ok(BatchUpdateResult { updated, failed })
+        Ok(BatchUpdateResult { updated, failed })
+    })
 }
 
 #[tauri::command]
@@ -122,30 +129,32 @@ pub fn bulk_delete_todos(
     state: tauri::State<AppState>,
     ids: Vec<String>,
 ) -> Result<BatchUpdateResult, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    log_command!("bulk_delete_todos", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-    let mut deleted = 0;
-    let mut failed: Vec<BatchFailedItem> = Vec::new();
+        let mut deleted = 0;
+        let mut failed: Vec<BatchFailedItem> = Vec::new();
 
-    for id in ids {
-        let result = conn.execute("DELETE FROM todos WHERE id = ?", [&id]);
+        for id in ids {
+            let result = conn.execute("DELETE FROM todos WHERE id = ?", [&id]);
 
-        match result {
-            Ok(rows) if rows > 0 => deleted += 1,
-            Ok(_) => failed.push(BatchFailedItem {
-                id,
-                error: "Not found".to_string(),
-            }),
-            Err(e) => failed.push(BatchFailedItem {
-                id,
-                error: e.to_string(),
-            }),
+            match result {
+                Ok(rows) if rows > 0 => deleted += 1,
+                Ok(_) => failed.push(BatchFailedItem {
+                    id,
+                    error: "Not found".to_string(),
+                }),
+                Err(e) => failed.push(BatchFailedItem {
+                    id,
+                    error: e.to_string(),
+                }),
+            }
         }
-    }
 
-    Ok(BatchUpdateResult {
-        updated: deleted,
-        failed,
+        Ok(BatchUpdateResult {
+            updated: deleted,
+            failed,
+        })
     })
 }
 
@@ -154,29 +163,31 @@ pub fn bulk_delete_tasks(
     state: tauri::State<AppState>,
     ids: Vec<String>,
 ) -> Result<BatchUpdateResult, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    log_command!("bulk_delete_tasks", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-    let mut deleted = 0;
-    let mut failed: Vec<BatchFailedItem> = Vec::new();
+        let mut deleted = 0;
+        let mut failed: Vec<BatchFailedItem> = Vec::new();
 
-    for id in ids {
-        let result = conn.execute("DELETE FROM tasks WHERE id = ?", [&id]);
+        for id in ids {
+            let result = conn.execute("DELETE FROM tasks WHERE id = ?", [&id]);
 
-        match result {
-            Ok(rows) if rows > 0 => deleted += 1,
-            Ok(_) => failed.push(BatchFailedItem {
-                id,
-                error: "Not found".to_string(),
-            }),
-            Err(e) => failed.push(BatchFailedItem {
-                id,
-                error: e.to_string(),
-            }),
+            match result {
+                Ok(rows) if rows > 0 => deleted += 1,
+                Ok(_) => failed.push(BatchFailedItem {
+                    id,
+                    error: "Not found".to_string(),
+                }),
+                Err(e) => failed.push(BatchFailedItem {
+                    id,
+                    error: e.to_string(),
+                }),
+            }
         }
-    }
 
-    Ok(BatchUpdateResult {
-        updated: deleted,
-        failed,
+        Ok(BatchUpdateResult {
+            updated: deleted,
+            failed,
+        })
     })
 }
