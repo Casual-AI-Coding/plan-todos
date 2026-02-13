@@ -46,17 +46,20 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             // Plan
+            plans::get_plan,
             plans::get_plans,
             plans::create_plan,
             plans::update_plan,
             plans::delete_plan,
             // Task
+            tasks::get_task,
             tasks::get_tasks,
             tasks::get_tasks_by_plan,
             tasks::create_task,
             tasks::update_task,
             tasks::delete_task,
             // Target
+            targets::get_target,
             targets::get_targets,
             targets::create_target,
             targets::update_target,
@@ -67,11 +70,13 @@ fn main() {
             steps::update_step,
             steps::delete_step,
             // Todo
+            todos::get_todo,
             todos::get_todos,
             todos::create_todo,
             todos::update_todo,
             todos::delete_todo,
             // Milestone
+            milestones::get_milestone,
             milestones::get_milestones,
             milestones::create_milestone,
             milestones::update_milestone,

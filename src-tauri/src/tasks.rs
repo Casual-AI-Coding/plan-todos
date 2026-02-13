@@ -4,6 +4,30 @@ use crate::models::Task;
 use crate::AppState;
 
 #[tauri::command]
+pub fn get_task(state: tauri::State<AppState>, id: String) -> Result<Task, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    let mut stmt = conn
+        .prepare("SELECT id, plan_id, title, description, start_date, end_date, status, created_at, updated_at FROM tasks WHERE id = ?")
+        .map_err(|e| e.to_string())?;
+
+    stmt.query_row([&id], |row| {
+        Ok(Task {
+            id: row.get(0)?,
+            plan_id: row.get(1)?,
+            title: row.get(2)?,
+            description: row.get(3)?,
+            start_date: row.get(4)?,
+            end_date: row.get(5)?,
+            status: row.get(6)?,
+            created_at: row.get(7)?,
+            updated_at: row.get(8)?,
+        })
+    })
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn get_tasks(state: tauri::State<AppState>) -> Result<Vec<Task>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 

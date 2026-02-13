@@ -97,6 +97,14 @@ export function isTauri(): boolean {
 // API Functions - Plan
 // ============================================================================
 
+export async function getPlan(id: string): Promise<Plan> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to get plan');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Plan>('get_plan', { id });
+}
+
 export async function getPlans(): Promise<Plan[]> {
   if (!isTauri()) {
     console.warn('Running outside Tauri - data not available');
@@ -156,6 +164,14 @@ export async function deletePlan(id: string): Promise<void> {
 // ============================================================================
 // API Functions - Task
 // ============================================================================
+
+export async function getTask(id: string): Promise<Task> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to get task');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Task>('get_task', { id });
+}
 
 export async function getTasks(): Promise<Task[]> {
   if (!isTauri()) {
@@ -227,6 +243,14 @@ export async function deleteTask(id: string): Promise<void> {
 // ============================================================================
 // API Functions - Target
 // ============================================================================
+
+export async function getTarget(id: string): Promise<Target> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to get target');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Target>('get_target', { id });
+}
 
 export async function getTargets(): Promise<Target[]> {
   if (!isTauri()) {
@@ -338,6 +362,14 @@ export async function deleteStep(id: string): Promise<void> {
 // API Functions - Todo
 // ============================================================================
 
+export async function getTodo(id: string): Promise<Todo> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to get todo');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Todo>('get_todo', { id });
+}
+
 export async function getTodos(): Promise<Todo[]> {
   if (!isTauri()) {
     console.warn('Running outside Tauri - data not available');
@@ -393,6 +425,14 @@ export async function deleteTodo(id: string): Promise<void> {
 // ============================================================================
 // API Functions - Milestone
 // ============================================================================
+
+export async function getMilestone(id: string): Promise<Milestone> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to get milestone');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Milestone>('get_milestone', { id });
+}
 
 export async function getMilestones(): Promise<Milestone[]> {
   if (!isTauri()) {

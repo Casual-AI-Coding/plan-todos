@@ -4,6 +4,29 @@ use crate::models::Plan;
 use crate::AppState;
 
 #[tauri::command]
+pub fn get_plan(state: tauri::State<AppState>, id: String) -> Result<Plan, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    let mut stmt = conn
+        .prepare("SELECT id, title, description, start_date, end_date, status, created_at, updated_at FROM plans WHERE id = ?")
+        .map_err(|e| e.to_string())?;
+
+    stmt.query_row([&id], |row| {
+        Ok(Plan {
+            id: row.get(0)?,
+            title: row.get(1)?,
+            description: row.get(2)?,
+            start_date: row.get(3)?,
+            end_date: row.get(4)?,
+            status: row.get(5)?,
+            created_at: row.get(6)?,
+            updated_at: row.get(7)?,
+        })
+    })
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn get_plans(state: tauri::State<AppState>) -> Result<Vec<Plan>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 

@@ -4,6 +4,28 @@ use crate::models::Todo;
 use crate::AppState;
 
 #[tauri::command]
+pub fn get_todo(state: tauri::State<AppState>, id: String) -> Result<Todo, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    let mut stmt = conn
+        .prepare("SELECT id, title, content, due_date, status, created_at, updated_at FROM todos WHERE id = ?")
+        .map_err(|e| e.to_string())?;
+
+    stmt.query_row([&id], |row| {
+        Ok(Todo {
+            id: row.get(0)?,
+            title: row.get(1)?,
+            content: row.get(2)?,
+            due_date: row.get(3)?,
+            status: row.get(4)?,
+            created_at: row.get(5)?,
+            updated_at: row.get(6)?,
+        })
+    })
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn get_todos(state: tauri::State<AppState>) -> Result<Vec<Todo>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 

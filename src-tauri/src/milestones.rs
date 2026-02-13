@@ -46,6 +46,39 @@ pub fn calculate_milestone_progress(
 }
 
 #[tauri::command]
+pub fn get_milestone(state: tauri::State<AppState>, id: String) -> Result<Milestone, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    let mut stmt = conn
+        .prepare("SELECT id, title, target_date, plan_id, task_id, target_id, status, created_at, updated_at FROM milestones WHERE id = ?")
+        .map_err(|e| e.to_string())?;
+
+    let milestone: Milestone = stmt
+        .query_row([&id], |row| {
+            Ok(Milestone {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                target_date: row.get(2)?,
+                plan_id: row.get(3)?,
+                task_id: row.get(4)?,
+                target_id: row.get(5)?,
+                status: row.get(6)?,
+                progress: 0,
+                created_at: row.get(7)?,
+                updated_at: row.get(8)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    // Calculate progress
+    let progress = calculate_milestone_progress(&conn, &milestone)?;
+    Ok(Milestone {
+        progress,
+        ..milestone
+    })
+}
+
+#[tauri::command]
 pub fn get_milestones(state: tauri::State<AppState>) -> Result<Vec<Milestone>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 

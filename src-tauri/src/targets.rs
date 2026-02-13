@@ -35,6 +35,34 @@ pub fn calculate_target_progress(
 }
 
 #[tauri::command]
+pub fn get_target(state: tauri::State<AppState>, id: String) -> Result<Target, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    let mut stmt = conn
+        .prepare("SELECT id, title, description, due_date, status, created_at, updated_at FROM targets WHERE id = ?")
+        .map_err(|e| e.to_string())?;
+
+    let target: Target = stmt
+        .query_row([&id], |row| {
+            Ok(Target {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                description: row.get(2)?,
+                due_date: row.get(3)?,
+                status: row.get(4)?,
+                progress: 0,
+                created_at: row.get(5)?,
+                updated_at: row.get(6)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    // Calculate progress
+    let progress = calculate_target_progress(&conn, &id)?;
+    Ok(Target { progress, ..target })
+}
+
+#[tauri::command]
 pub fn get_targets(state: tauri::State<AppState>) -> Result<Vec<Target>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 
