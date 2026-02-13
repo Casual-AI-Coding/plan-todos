@@ -147,10 +147,93 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     )
     .ok();
 
+    // Create indexes for performance optimization
+    create_indexes(conn)?;
+
     // Seed initial data
     seed_data(conn).ok();
 
     info!("Database initialized successfully");
+    Ok(())
+}
+
+fn create_indexes(conn: &Connection) -> Result<(), rusqlite::Error> {
+    // Indexes for tasks
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_tasks_plan_id ON tasks(plan_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_tasks_dates ON tasks(start_date, end_date)",
+        [],
+    )?;
+
+    // Indexes for steps
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_steps_target_id ON steps(target_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_steps_status ON steps(status)",
+        [],
+    )?;
+
+    // Indexes for todos
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_todos_due_date ON todos(due_date)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_todos_status ON todos(status)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_todos_status_due ON todos(status, due_date)",
+        [],
+    )?;
+
+    // Indexes for plans
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_plans_status ON plans(status)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_plans_dates ON plans(start_date, end_date)",
+        [],
+    )?;
+
+    // Indexes for targets
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_targets_status ON targets(status)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_targets_due_date ON targets(due_date)",
+        [],
+    )?;
+
+    // Indexes for milestones
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_milestones_plan_id ON milestones(plan_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_milestones_task_id ON milestones(task_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_milestones_target_id ON milestones(target_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_milestones_status ON milestones(status)",
+        [],
+    )?;
+
     Ok(())
 }
 

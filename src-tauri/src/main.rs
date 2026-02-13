@@ -12,6 +12,7 @@ mod db;
 mod milestones;
 mod models;
 mod plans;
+mod statistics;
 mod steps;
 mod targets;
 mod tasks;
@@ -74,6 +75,8 @@ fn main() {
             milestones::create_milestone,
             milestones::update_milestone,
             milestones::delete_milestone,
+            // Statistics
+            statistics::get_statistics,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

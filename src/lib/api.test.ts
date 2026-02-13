@@ -249,3 +249,29 @@ describe('API Functions - Milestone Write Operations (non-Tauri)', () => {
     await expect(deleteMilestone('id')).rejects.toThrow('This app must run in Tauri to delete milestones');
   });
 });
+
+// ============================================================================
+// API Functions - Statistics (non-Tauri)
+// ============================================================================
+import { getStatistics } from '@/lib/api';
+
+describe('API Functions - Statistics (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getStatistics returns mock data when not in Tauri', async () => {
+    const stats = await getStatistics();
+    expect(stats).toHaveProperty('counts');
+    expect(stats).toHaveProperty('completion');
+    expect(stats).toHaveProperty('trends');
+    expect(stats).toHaveProperty('efficiency');
+    expect(stats.counts).toHaveProperty('todo');
+    expect(stats.counts).toHaveProperty('plan');
+    expect(stats.completion).toHaveProperty('todo_completion_rate');
+    expect(stats.efficiency).toHaveProperty('productivity_score');
+  });
+});

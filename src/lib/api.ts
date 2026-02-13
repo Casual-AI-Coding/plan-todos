@@ -447,3 +447,64 @@ export async function deleteMilestone(id: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<void>('delete_milestone', { id });
 }
+
+// ============================================================================
+// Statistics
+// ============================================================================
+
+export interface Statistics {
+  counts: {
+    todo: number;
+    plan: number;
+    task: number;
+    target: number;
+    step: number;
+    milestone: number;
+  };
+  completion: {
+    todo_done: number;
+    todo_total: number;
+    task_done: number;
+    task_total: number;
+    step_completed: number;
+    step_total: number;
+    milestone_done: number;
+    milestone_total: number;
+    todo_completion_rate: number;
+    task_completion_rate: number;
+    step_completion_rate: number;
+    milestone_completion_rate: number;
+  };
+  trends: {
+    daily: Array<{
+      date: string;
+      completed: number;
+    }>;
+  };
+  efficiency: {
+    streak_days: number;
+    today_completed: number;
+    week_completed: number;
+    month_completed: number;
+    productivity_score: number;
+  };
+}
+
+export async function getStatistics(): Promise<Statistics> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - returning mock data');
+    return {
+      counts: { todo: 0, plan: 0, task: 0, target: 0, step: 0, milestone: 0 },
+      completion: {
+        todo_done: 0, todo_total: 0, task_done: 0, task_total: 0,
+        step_completed: 0, step_total: 0, milestone_done: 0, milestone_total: 0,
+        todo_completion_rate: 0, task_completion_rate: 0,
+        step_completion_rate: 0, milestone_completion_rate: 0
+      },
+      trends: { daily: [] },
+      efficiency: { streak_days: 0, today_completed: 0, week_completed: 0, month_completed: 0, productivity_score: 0 }
+    };
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Statistics>('get_statistics');
+}
