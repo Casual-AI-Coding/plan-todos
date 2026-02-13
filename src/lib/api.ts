@@ -615,3 +615,64 @@ export async function getDashboard(): Promise<Dashboard> {
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<Dashboard>('get_dashboard');
 }
+
+// ============================================================================
+// Batch Operations
+// ============================================================================
+
+export interface BatchUpdateResult {
+  updated: number;
+  failed: Array<{
+    id: string;
+    error: string;
+  }>;
+}
+
+export async function bulkUpdateTodoStatus(
+  ids: string[],
+  status: string
+): Promise<BatchUpdateResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<BatchUpdateResult>('bulk_update_todo_status', { ids, status });
+}
+
+export async function bulkUpdateTaskStatus(
+  ids: string[],
+  status: string
+): Promise<BatchUpdateResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<BatchUpdateResult>('bulk_update_task_status', { ids, status });
+}
+
+export async function bulkUpdateStepStatus(
+  ids: string[],
+  status: string
+): Promise<BatchUpdateResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<BatchUpdateResult>('bulk_update_step_status', { ids, status });
+}
+
+export async function bulkDeleteTodos(ids: string[]): Promise<BatchUpdateResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<BatchUpdateResult>('bulk_delete_todos', { ids });
+}
+
+export async function bulkDeleteTasks(ids: string[]): Promise<BatchUpdateResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<BatchUpdateResult>('bulk_delete_tasks', { ids });
+}

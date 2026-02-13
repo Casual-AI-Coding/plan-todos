@@ -8,6 +8,7 @@ use std::sync::Mutex;
 pub use crate::models::AppState;
 
 // Module declarations
+mod batch;
 mod dashboard;
 mod db;
 mod milestones;
@@ -85,6 +86,12 @@ fn main() {
             statistics::get_statistics,
             // Dashboard
             dashboard::get_dashboard,
+            // Batch operations
+            batch::bulk_update_todo_status,
+            batch::bulk_update_task_status,
+            batch::bulk_update_step_status,
+            batch::bulk_delete_todos,
+            batch::bulk_delete_tasks,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
