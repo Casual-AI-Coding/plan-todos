@@ -762,8 +762,8 @@ function ViewsView() {
   // Calendar navigation state
   const [calendarDate, setCalendarDate] = useState(new Date());
   
-  // Gantt timeline zoom state
-  const [ganttZoom, setGanttZoom] = useState(100);
+  // Gantt timeline zoom state (number of months)
+  const [ganttZoom, setGanttZoom] = useState(3);
   
   // Data states
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -1325,8 +1325,10 @@ function ViewsView() {
   // ========== GANTT/TIMELINE VIEW ==========
   const renderGanttView = () => {
     const today = new Date();
+    // Calculate date range based on zoom (number of months)
+    const monthsToShow = ganttZoom;
     const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    const endDate = new Date(today.getFullYear(), today.getMonth() + 3, 0);
+    const endDate = new Date(today.getFullYear(), today.getMonth() + monthsToShow - 1, 0);
     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     
     // Generate month headers
@@ -1456,18 +1458,18 @@ function ViewsView() {
 
     return (
       <div className="w-full">
-        {/* Zoom Control */}
+        {/* Time Range Control */}
         <div className="flex items-center gap-3 mb-4 px-2">
-          <span className="text-xs text-gray-500">缩放:</span>
+          <span className="text-xs text-gray-500">显示范围:</span>
           <input
             type="range"
-            min="50"
-            max="200"
+            min="1"
+            max="12"
             value={ganttZoom}
             onChange={(e) => setGanttZoom(Number(e.target.value))}
             className="w-32 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
           />
-          <span className="text-xs text-gray-600 w-10">{ganttZoom}%</span>
+          <span className="text-xs text-gray-600 w-12">{ganttZoom} 个月</span>
         </div>
 
         {/* Timeline with dynamic width */}
@@ -1486,19 +1488,20 @@ function ViewsView() {
               ))}
             </div>
 
-            {/* Grid lines - weekly */}
-            <div className="relative h-4 mb-4">
-              {Array.from({ length: Math.ceil(totalDays / 7) + 1 }).map((_, i) => (
-                <div 
-                  key={i}
-                  className="absolute top-0 bottom-0 border-l border-gray-200"
-                  style={{ left: `${(i * 7 / totalDays) * 100}%` }}
-                ></div>
-              ))}
-            </div>
+            {/* Grid Background */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+                  linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
+                `,
+                backgroundSize: `${100 / (monthsToShow * 4)}% 24px`,
+              }}
+            ></div>
 
             {/* Items */}
-            <div className="space-y-1">
+            <div className="relative space-y-1 z-10">
           {allItems.map((item, idx) => {
             const startPos = item.start ? getPosition(item.start) : (item.due ? getPosition(item.due) : null);
             const width = item.start && item.end ? getWidth(item.start, item.end) : 5;
