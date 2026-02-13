@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -338,7 +338,7 @@ describe('Input', () => {
   });
 
   it('forwards ref', () => {
-    const ref = { current: null };
+    const ref: { current: HTMLInputElement | null } = { current: null };
     render(<Input ref={(el) => { ref.current = el; }} />);
     expect(ref.current).not.toBeNull();
   });
@@ -387,7 +387,7 @@ describe('Checkbox', () => {
   });
 
   it('forwards ref', () => {
-    const ref = { current: null };
+    const ref: { current: HTMLInputElement | null } = { current: null };
     render(<Checkbox ref={(el) => { ref.current = el; }} />);
     expect(ref.current).not.toBeNull();
   });
