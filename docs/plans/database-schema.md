@@ -1,14 +1,15 @@
 # Plan Todos - 数据库设计
 
-> 状态：进行中
+> 状态：已完成
 
 ---
 
 ## 一、数据库概述
 
 - **数据库类型**：SQLite
-- **存储位置**：本地文件 (`~/.plan-todos/data.db`)
-- **ORM**：Prisma
+- **存储位置**：本地文件 (`%LOCALAPPDATA%\plan-todos\data.db`)
+- **访问方式**：rusqlite (直接 SQL，无 ORM)
+- **迁移**：应用启动时自动执行 `CREATE TABLE IF NOT EXISTS` + `ALTER TABLE` 迁移
 
 ---
 
@@ -140,10 +141,22 @@ CREATE TABLE targets (
   due_date    TEXT,
   status      TEXT NOT NULL DEFAULT 'active'
               CHECK(status IN ('active', 'completed', 'archived')),
+  progress    INTEGER NOT NULL DEFAULT 0,
   created_at  TEXT NOT NULL,
   updated_at  TEXT NOT NULL
 );
 ```
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | TEXT | PK | UUID |
+| title | TEXT | NOT NULL | 目标标题 |
+| description | TEXT | | 描述 |
+| due_date | TEXT | | 截止日期 |
+| status | TEXT | DEFAULT 'active' | 状态 |
+| progress | INTEGER | DEFAULT 0 | 进度 (0-100，从 Steps 自动计算) |
+| created_at | TEXT | NOT NULL | 创建时间 |
+| updated_at | TEXT | NOT NULL | 更新时间 |
 
 ---
 
@@ -205,20 +218,33 @@ CREATE TABLE milestones (
   target_id    TEXT,
   status       TEXT NOT NULL DEFAULT 'pending'
                CHECK(status IN ('pending', 'completed')),
+  progress     INTEGER NOT NULL DEFAULT 0,
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL,
   FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE SET NULL,
   FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE SET NULL,
-  FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE SET NULL,
-  CONSTRAINT chk_milestone_target CHECK (
-    (plan_id IS NOT NULL)::int + 
-    (task_id IS NOT NULL)::int + 
-    (target_id IS NOT NULL)::int = 1
-  )
+  FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE SET NULL
 );
 ```
 
-**约束说明**：
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | TEXT | PK | UUID |
+| title | TEXT | NOT NULL | 里程碑标题 |
+| target_date | TEXT | | 目标日期 |
+| plan_id | TEXT | FK → plans | 关联计划 (可选) |
+| task_id | TEXT | FK → tasks | 关联任务 (可选) |
+| target_id | TEXT | FK → targets | 关联目标 (可选) |
+| status | TEXT | DEFAULT 'pending' | 状态 |
+| progress | INTEGER | DEFAULT 0 | 进度 (0-100，从关联实体自动计算) |
+| created_at | TEXT | NOT NULL | 创建时间 |
+| updated_at | TEXT | NOT NULL | 更新时间 |
+
+**关联说明**：plan_id、task_id、target_id 三选一关联（仅能有一个有值）
+
+---
+
+## 四、索引设计
 - `chk_milestone_target`：确保三选一关联（plan_id/task_id/target_id 必须且仅能有一个）
 
 ---
@@ -258,9 +284,16 @@ END;
 
 ## 六、迁移策略
 
-- 使用 Prisma Migrate 管理Schema版本
-- 每次模型变更创建新迁移
-- 保留迁移历史
+应用启动时自动执行迁移（`init_db` 函数）：
+1. `CREATE TABLE IF NOT EXISTS` - 创建表（仅在表不存在时）
+2. `ALTER TABLE ADD COLUMN IF NOT EXISTS` - 添加新列（向后兼容）
+3. 种子数据初始化（仅在表为空时）
+
+```rust
+// 迁移示例
+conn.execute("ALTER TABLE plans ADD COLUMN IF NOT EXISTS start_date TEXT", []).ok();
+conn.execute("ALTER TABLE targets ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0", []).ok();
+```
 
 ---
 

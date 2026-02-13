@@ -421,3 +421,38 @@ Before marking any work as complete:
 - [ ] No ESLint errors (`npm run lint`)
 - [ ] Code is formatted (`npm run format`)
 - [ ] Build succeeds (`npm run build`)
+
+---
+
+## Documentation Guidelines
+
+### File Location
+
+**设计文档**保存在 `docs/plans/` 目录：
+- `docs/plans/*.md` - 各模块最新设计文档
+- `docs/plans/v1/` - 历史版本归档
+
+### Version Control Rules
+
+1. **更新独立设计文档**
+   - 各模块设计文档保持在根目录
+   - 如 `database-schema.md`、`api-design.md` 等
+
+2. **历史归档到子目录**
+   - 创建版本子目录如 `v1/`, `v2/`
+   - 将完整旧版本设计移动到归档目录
+   - 文件名包含版本号如 `2026-02-13-todo-plan-design-v1.md`
+
+### Example
+
+```
+docs/plans/
+├── navigation-ui-design.md    # 最新 UI 设计
+├── core-concepts.md          # 最新核心概念
+├── database-schema.md       # 最新数据库设计
+├── api-design.md            # 最新 API 设计
+├── component-design.md      # 最新组件设计
+├── v1/
+│   └── 2026-02-13-todo-plan-design-v1.md  # 旧版归档
+└── v2/                      # 未来版本
+```
