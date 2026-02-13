@@ -8,16 +8,22 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}'],
+    setupFiles: ['./src/test/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      // Lower threshold due to Tauri-specific branches that can't be tested in JSDOM
-      // These branches check __TAURI__ environment which only exists in Tauri runtime
+      exclude: [
+        'src/lib/api.ts', // Tauri API wrapper - requires Tauri runtime
+        'src/app/page.tsx', // Main page component - requires full app context
+        'src/app/layout.tsx',
+        'src/components/layout/**',
+      ],
+      // 90% threshold as per AGENTS.md (excluding Tauri-specific files)
       thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 60,
-        statements: 70,
+        lines: 90,
+        functions: 90,
+        branches: 90,
+        statements: 90,
       },
     },
   },
