@@ -9,6 +9,7 @@ pub use crate::models::AppState;
 
 // Module declarations
 mod batch;
+mod command_log;
 mod dashboard;
 mod db;
 mod milestones;
