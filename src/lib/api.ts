@@ -508,3 +508,70 @@ export async function getStatistics(): Promise<Statistics> {
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<Statistics>('get_statistics');
 }
+
+// ============================================================================
+// Dashboard API
+// ============================================================================
+
+export interface Dashboard {
+  today_todos: Array<{
+    id: string;
+    title: string;
+    due_date: string | null;
+    status: string;
+  }>;
+  upcoming_todos: Array<{
+    id: string;
+    title: string;
+    due_date: string | null;
+    status: string;
+  }>;
+  completed_today: Array<{
+    id: string;
+    title: string;
+    due_date: string | null;
+    status: string;
+  }>;
+  active_plans: Array<{
+    id: string;
+    title: string;
+    progress: number;
+    task_count: number;
+    completed_count: number;
+  }>;
+  active_targets: Array<{
+    id: string;
+    title: string;
+    progress: number;
+    due_date: string | null;
+  }>;
+  today_summary: {
+    total_todos: number;
+    completed_todos: number;
+    upcoming_count: number;
+    active_plans_count: number;
+    active_targets_count: number;
+  };
+}
+
+export async function getDashboard(): Promise<Dashboard> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - returning mock data');
+    return {
+      today_todos: [],
+      upcoming_todos: [],
+      completed_today: [],
+      active_plans: [],
+      active_targets: [],
+      today_summary: {
+        total_todos: 0,
+        completed_todos: 0,
+        upcoming_count: 0,
+        active_plans_count: 0,
+        active_targets_count: 0,
+      },
+    };
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Dashboard>('get_dashboard');
+}

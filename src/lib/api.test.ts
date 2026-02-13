@@ -253,7 +253,7 @@ describe('API Functions - Milestone Write Operations (non-Tauri)', () => {
 // ============================================================================
 // API Functions - Statistics (non-Tauri)
 // ============================================================================
-import { getStatistics } from '@/lib/api';
+import { getStatistics, getDashboard } from '@/lib/api';
 
 describe('API Functions - Statistics (non-Tauri)', () => {
   beforeEach(() => {
@@ -273,5 +273,29 @@ describe('API Functions - Statistics (non-Tauri)', () => {
     expect(stats.counts).toHaveProperty('plan');
     expect(stats.completion).toHaveProperty('todo_completion_rate');
     expect(stats.efficiency).toHaveProperty('productivity_score');
+  });
+});
+
+// ============================================================================
+// API Functions - Dashboard (non-Tauri)
+// ============================================================================
+describe('API Functions - Dashboard (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getDashboard returns mock data when not in Tauri', async () => {
+    const dashboard = await getDashboard();
+    expect(dashboard).toHaveProperty('today_todos');
+    expect(dashboard).toHaveProperty('upcoming_todos');
+    expect(dashboard).toHaveProperty('completed_today');
+    expect(dashboard).toHaveProperty('active_plans');
+    expect(dashboard).toHaveProperty('active_targets');
+    expect(dashboard).toHaveProperty('today_summary');
+    expect(dashboard.today_summary).toHaveProperty('total_todos');
+    expect(dashboard.today_summary).toHaveProperty('completed_todos');
   });
 });

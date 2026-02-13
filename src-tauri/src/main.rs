@@ -8,6 +8,7 @@ use std::sync::Mutex;
 pub use crate::models::AppState;
 
 // Module declarations
+mod dashboard;
 mod db;
 mod milestones;
 mod models;
@@ -77,6 +78,8 @@ fn main() {
             milestones::delete_milestone,
             // Statistics
             statistics::get_statistics,
+            // Dashboard
+            dashboard::get_dashboard,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
