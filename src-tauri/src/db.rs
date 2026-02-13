@@ -100,6 +100,48 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
+    // Notification settings table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS notification_settings (
+            id TEXT PRIMARY KEY,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            reminder_minutes INTEGER NOT NULL DEFAULT 30,
+            reminder_sent INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(entity_type, entity_id)
+        )",
+        [],
+    )?;
+
+    // Daily summary settings
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS daily_summary_settings (
+            id TEXT PRIMARY KEY,
+            enabled INTEGER NOT NULL DEFAULT 1,
+            time TEXT NOT NULL DEFAULT '09:00',
+            include_pending INTEGER NOT NULL DEFAULT 1,
+            include_overdue INTEGER NOT NULL DEFAULT 1,
+            include_completed INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // Seed default daily summary settings
+    let count: i32 = conn.query_row("SELECT COUNT(*) FROM daily_summary_settings", [], |row| {
+        row.get(0)
+    })?;
+    if count == 0 {
+        let now = chrono::Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["default", 1, "09:00", 1, 1, 1, &now, &now],
+        )?;
+    }
+
     // Migration: Add missing columns
     conn.execute(
         "ALTER TABLE targets ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0",
@@ -231,6 +273,16 @@ fn create_indexes(conn: &Connection) -> Result<(), rusqlite::Error> {
     )?;
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_milestones_status ON milestones(status)",
+        [],
+    )?;
+
+    // Indexes for notification settings
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_notification_entity ON notification_settings(entity_type, entity_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_notification_due ON notification_settings(reminder_sent, reminder_minutes)",
         [],
     )?;
 

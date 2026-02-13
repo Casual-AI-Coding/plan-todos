@@ -508,15 +508,18 @@ React Context
 
 - [x] 添加数据库索引 (16个索引)
 - [x] 实现统计 API (`get_statistics`)
-- [ ] 实现 Dashboard API (`get_dashboard`)
-- [ ] 添加单个实体查询 API
-- [ ] 实现批量操作 API
+- [x] 实现 Dashboard API (`get_dashboard`)
+- [x] 添加单个实体查询 API
+- [x] 实现批量操作 API
 
-### Phase 5: 通知系统 📋 待规划
+### Phase 5: 通知系统 ✅ 已完成
 
-- [ ] 通知核心架构
-- [ ] 飞书/钉钉/邮件/Webhook 插件
-- [ ] 定时任务
+- [x] 通知核心架构
+- [x] 定时提醒 API (`get_due_reminders`)
+- [x] 每日汇总 API (`get_daily_summary`)
+- [x] 通知设置 CRUD (`get_notification_settings`, `set_notification_settings`, `delete_notification_settings`)
+- [x] 每日汇总设置 (`get_daily_summary_settings`, `update_daily_summary_settings`)
+- [ ] 飞书/钉钉/邮件/Webhook 插件 (Phase 5.2)
 
 ### Phase 6: 移动端 📋 待规划
 

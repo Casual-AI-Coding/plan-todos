@@ -676,3 +676,146 @@ export async function bulkDeleteTasks(ids: string[]): Promise<BatchUpdateResult>
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<BatchUpdateResult>('bulk_delete_tasks', { ids });
 }
+
+// ============================================================================
+// Notifications
+// ============================================================================
+
+export interface NotificationSettings {
+  id: string;
+  entity_type: string;
+  entity_id: string;
+  reminder_minutes: number;
+  reminder_sent: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DailySummarySettings {
+  id: string;
+  enabled: boolean;
+  time: string;
+  include_pending: boolean;
+  include_overdue: boolean;
+  include_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DueReminder {
+  entity_type: string;
+  entity_id: string;
+  title: string;
+  due_date: string;
+  minutes_until_due: number;
+}
+
+export interface DailySummary {
+  date: string;
+  pending_count: number;
+  overdue_count: number;
+  completed_count: number;
+  upcoming_count: number;
+}
+
+export async function getNotificationSettings(
+  entityType: string,
+  entityId: string
+): Promise<NotificationSettings | null> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<NotificationSettings | null>('get_notification_settings', {
+    entityType,
+    entityId,
+  });
+}
+
+export async function setNotificationSettings(
+  entityType: string,
+  entityId: string,
+  reminderMinutes: number
+): Promise<NotificationSettings> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<NotificationSettings>('set_notification_settings', {
+    entityType,
+    entityId,
+    reminderMinutes,
+  });
+}
+
+export async function deleteNotificationSettings(
+  entityType: string,
+  entityId: string
+): Promise<boolean> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<boolean>('delete_notification_settings', {
+    entityType,
+    entityId,
+  });
+}
+
+export async function getDailySummarySettings(): Promise<DailySummarySettings> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<DailySummarySettings>('get_daily_summary_settings');
+}
+
+export async function updateDailySummarySettings(
+  enabled: boolean,
+  time: string,
+  includePending: boolean,
+  includeOverdue: boolean,
+  includeCompleted: boolean
+): Promise<DailySummarySettings> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<DailySummarySettings>('update_daily_summary_settings', {
+    enabled,
+    time,
+    includePending,
+    includeOverdue,
+    includeCompleted,
+  });
+}
+
+export async function getDueReminders(): Promise<DueReminder[]> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<DueReminder[]>('get_due_reminders');
+}
+
+export async function markReminderSent(
+  entityType: string,
+  entityId: string
+): Promise<boolean> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<boolean>('mark_reminder_sent', {
+    entityType,
+    entityId,
+  });
+}
+
+export async function getDailySummary(): Promise<DailySummary> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<DailySummary>('get_daily_summary');
+}

@@ -13,6 +13,7 @@ mod dashboard;
 mod db;
 mod milestones;
 mod models;
+mod notifications;
 mod plans;
 mod statistics;
 mod steps;
@@ -92,6 +93,15 @@ fn main() {
             batch::bulk_update_step_status,
             batch::bulk_delete_todos,
             batch::bulk_delete_tasks,
+            // Notifications
+            notifications::get_notification_settings,
+            notifications::set_notification_settings,
+            notifications::delete_notification_settings,
+            notifications::get_daily_summary_settings,
+            notifications::update_daily_summary_settings,
+            notifications::get_due_reminders,
+            notifications::mark_reminder_sent,
+            notifications::get_daily_summary,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

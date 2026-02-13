@@ -299,3 +299,55 @@ describe('API Functions - Dashboard (non-Tauri)', () => {
     expect(dashboard.today_summary).toHaveProperty('completed_todos');
   });
 });
+
+// ============================================================================
+// API Functions - Notifications (non-Tauri)
+// ============================================================================
+describe('API Functions - Notifications (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getNotificationSettings throws error when not in Tauri', async () => {
+    const { getNotificationSettings } = await import('@/lib/api');
+    await expect(getNotificationSettings('todo', 'test-1')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('setNotificationSettings throws error when not in Tauri', async () => {
+    const { setNotificationSettings } = await import('@/lib/api');
+    await expect(setNotificationSettings('todo', 'test-1', 30)).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('deleteNotificationSettings throws error when not in Tauri', async () => {
+    const { deleteNotificationSettings } = await import('@/lib/api');
+    await expect(deleteNotificationSettings('todo', 'test-1')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('getDailySummarySettings throws error when not in Tauri', async () => {
+    const { getDailySummarySettings } = await import('@/lib/api');
+    await expect(getDailySummarySettings()).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('updateDailySummarySettings throws error when not in Tauri', async () => {
+    const { updateDailySummarySettings } = await import('@/lib/api');
+    await expect(updateDailySummarySettings(true, '09:00', true, true, true)).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('getDueReminders throws error when not in Tauri', async () => {
+    const { getDueReminders } = await import('@/lib/api');
+    await expect(getDueReminders()).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('markReminderSent throws error when not in Tauri', async () => {
+    const { markReminderSent } = await import('@/lib/api');
+    await expect(markReminderSent('todo', 'test-1')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('getDailySummary throws error when not in Tauri', async () => {
+    const { getDailySummary } = await import('@/lib/api');
+    await expect(getDailySummary()).rejects.toThrow('This app must run in Tauri');
+  });
+});
