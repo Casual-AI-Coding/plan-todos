@@ -42,7 +42,6 @@ export default function Home() {
     try {
       await createTodo({
         title: newTodoTitle,
-        plan_ids: [],
       });
       setNewTodoTitle('');
       setShowTodoForm(false);
@@ -336,9 +335,9 @@ export default function Home() {
                       {plan.description}
                     </p>
                   )}
-                  {plan.target_date && (
+                  {plan.start_date && (
                     <div className="mt-3 text-sm" style={{ color: '#14B8A6' }}>
-                      🎯 Target: {new Date(plan.target_date).toLocaleDateString()}
+                      🎯 Target: {new Date(plan.start_date).toLocaleDateString()}
                     </div>
                   )}
                 </div>
