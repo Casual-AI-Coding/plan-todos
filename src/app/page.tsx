@@ -762,6 +762,9 @@ function ViewsView() {
   // Calendar navigation state
   const [calendarDate, setCalendarDate] = useState(new Date());
   
+  // Gantt timeline zoom state
+  const [ganttZoom, setGanttZoom] = useState(100);
+  
   // Data states
   const [todos, setTodos] = useState<Todo[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -1126,16 +1129,16 @@ function ViewsView() {
                 {col.label}
                 <span className="ml-auto text-sm text-gray-500">{getItemsByStatus(col.id).length}</span>
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {getItemsByStatus(col.id).map((item, idx) => (
                   <div
                     key={`${item.type}-${idx}`}
                     onMouseEnter={(e) => handleMouseEnter(e, item)}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <Card className="p-3 cursor-pointer hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs px-1.5 py-0.5 rounded ${
+                    <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className={`text-[10px] px-1 py-0.5 rounded ${
                           item.type === 'todo' ? 'bg-blue-100 text-blue-700' :
                           item.type === 'task' ? 'bg-teal-100 text-teal-700' :
                           item.type === 'plan' ? 'bg-purple-100 text-purple-700' :
@@ -1143,11 +1146,11 @@ function ViewsView() {
                           'bg-gray-100 text-gray-700'
                         }`}>{item.type}</span>
                       </div>
-                      <div className="font-medium text-sm">
+                      <div className="font-medium text-xs">
                         {'title' in item.data ? item.data.title : ''}
                       </div>
                       {'progress' in item.data && (
-                        <div className="mt-2">
+                        <div className="mt-1.5">
                           <ProgressBar value={item.data.progress} color={col.color === 'green' ? 'teal' : col.color as 'gray' | 'orange' | 'teal'} size="sm" />
                         </div>
                       )}
@@ -1448,34 +1451,54 @@ function ViewsView() {
       return 'bg-gray-400';
     };
 
+    // Calculate dynamic width based on zoom
+    const timelineWidth = Math.max(800, 100 * ganttZoom);
+
     return (
-      <div className="overflow-x-auto">
-        {/* Timeline Header */}
-        <div className="relative h-8 border-b border-gray-200 mb-2 min-w-[800px]">
-          {months.map((month, i) => (
-            <div 
-              key={i}
-              className="absolute text-xs text-gray-500 border-l border-gray-200 pl-1"
-              style={{ left: `${month.startPercent}%`, width: `${month.widthPercent}%` }}
-            >
-              {month.label}
+      <div className="w-full">
+        {/* Zoom Control */}
+        <div className="flex items-center gap-3 mb-4 px-2">
+          <span className="text-xs text-gray-500">缩放:</span>
+          <input
+            type="range"
+            min="50"
+            max="200"
+            value={ganttZoom}
+            onChange={(e) => setGanttZoom(Number(e.target.value))}
+            className="w-32 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
+          />
+          <span className="text-xs text-gray-600 w-10">{ganttZoom}%</span>
+        </div>
+
+        {/* Timeline with dynamic width */}
+        <div className="overflow-hidden">
+          <div style={{ width: `${timelineWidth}px` }}>
+            {/* Timeline Header */}
+            <div className="relative h-8 border-b border-gray-300 mb-2">
+              {months.map((month, i) => (
+                <div 
+                  key={i}
+                  className="absolute text-xs text-gray-600 border-l border-gray-300 pl-1 font-medium"
+                  style={{ left: `${month.startPercent}%`, width: `${month.widthPercent}%` }}
+                >
+                  {month.label}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Grid lines */}
-        <div className="relative h-4 mb-4 min-w-[800px]">
-          {[0, 25, 50, 75, 100].map(percent => (
-            <div 
-              key={percent}
-              className="absolute top-0 bottom-0 border-l border-gray-100"
-              style={{ left: `${percent}%` }}
-            ></div>
-          ))}
-        </div>
+            {/* Grid lines - weekly */}
+            <div className="relative h-4 mb-4">
+              {Array.from({ length: Math.ceil(totalDays / 7) + 1 }).map((_, i) => (
+                <div 
+                  key={i}
+                  className="absolute top-0 bottom-0 border-l border-gray-200"
+                  style={{ left: `${(i * 7 / totalDays) * 100}%` }}
+                ></div>
+              ))}
+            </div>
 
-        {/* Items */}
-        <div className="space-y-1 min-w-[800px]">
+            {/* Items */}
+            <div className="space-y-1">
           {allItems.map((item, idx) => {
             const startPos = item.start ? getPosition(item.start) : (item.due ? getPosition(item.due) : null);
             const width = item.start && item.end ? getWidth(item.start, item.end) : 5;
@@ -1483,22 +1506,22 @@ function ViewsView() {
             if (startPos === null) return null;
             
             return (
-              <div key={`${item.type}-${idx}`} className="flex items-center h-8 group">
-                <div className="w-32 flex-shrink-0 text-xs truncate pr-2 text-gray-600">{item.title}</div>
+              <div key={`${item.type}-${idx}`} className="flex items-center h-6 group">
+                <div className="w-28 flex-shrink-0 text-xs truncate pr-2 text-gray-600">{item.title}</div>
                 <div className="flex-1 h-full relative">
                   {/* Bar */}
                   <div 
-                    className={`absolute h-5 top-1.5 rounded-md shadow-sm ${getTypeColor(item.type, item.status)}`}
+                    className={`absolute h-4 top-1 rounded-sm ${getTypeColor(item.type, item.status)}`}
                     style={{ 
                       left: `${startPos}%`, 
                       width: `${Math.max(width || 3, 3)}%`,
-                      minWidth: '20px'
+                      minWidth: '16px'
                     }}
                   >
                     {/* Progress indicator */}
                     {item.progress !== undefined && item.progress < 100 && (
                       <div 
-                        className="absolute h-full bg-white/30 rounded-md"
+                        className="absolute h-full bg-white/30 rounded-sm"
                         style={{ width: `${100 - item.progress}%`, right: 0 }}
                       ></div>
                     )}
@@ -1514,8 +1537,8 @@ function ViewsView() {
         </div>
 
         {/* Today indicator */}
-        <div className="flex items-center mt-6 text-xs text-gray-500 min-w-[800px]">
-          <div className="w-32 flex-shrink-0">📅 今日</div>
+        <div className="flex items-center mt-4 text-xs text-gray-500">
+          <div className="w-28 flex-shrink-0">📅 今日</div>
           <div className="flex-1 relative h-4">
             <div 
               className="absolute w-0.5 bg-red-500 top-0 bottom-0 flex flex-col items-center"
@@ -1547,6 +1570,8 @@ function ViewsView() {
           <div className="flex items-center gap-1">
             <span className="w-3 h-1 rounded bg-red-500"></span>
             <span className="text-gray-600">今日</span>
+          </div>
+        </div>
           </div>
         </div>
       </div>
