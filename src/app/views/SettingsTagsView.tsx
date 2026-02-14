@@ -10,6 +10,7 @@ export function SettingsTagsView() {
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [name, setName] = useState('');
   const [color, setColor] = useState('#3B82F6');
+  const [description, setDescription] = useState('');
 
   const colorOptions = [
     '#EF4444', '#F59E0B', '#10B981', '#3B82F6', 
@@ -41,15 +42,17 @@ export function SettingsTagsView() {
       return;
     }
     try {
+      const desc = description.trim() || undefined;
       if (editingTag) {
-        await updateTag(editingTag.id, { name: trimmedName, color });
+        await updateTag(editingTag.id, { name: trimmedName, color, description: desc });
       } else {
-        await createTag(trimmedName, color);
+        await createTag(trimmedName, color, desc);
       }
       setShowForm(false);
       setEditingTag(null);
       setName('');
       setColor('#3B82F6');
+      setDescription('');
       loadTags();
     } catch (e) { console.error(e); }
   }
@@ -66,6 +69,15 @@ export function SettingsTagsView() {
     setEditingTag(tag);
     setName(tag.name);
     setColor(tag.color);
+    setDescription(tag.description || '');
+    setShowForm(true);
+  }
+
+  function handleNew() {
+    setEditingTag(null);
+    setName('');
+    setColor('#3B82F6');
+    setDescription('');
     setShowForm(true);
   }
 
@@ -75,7 +87,7 @@ export function SettingsTagsView() {
         <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
           设置 &gt; 标签管理
         </h2>
-        <Button onClick={() => { setShowForm(true); setEditingTag(null); setName(''); setColor('#3B82F6'); }}>
+        <Button onClick={handleNew}>
           + 新建标签
         </Button>
       </div>
@@ -93,6 +105,16 @@ export function SettingsTagsView() {
               onChange={e => setName(e.target.value)}
               placeholder="输入标签名称..."
             />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+              <textarea 
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="输入标签描述（可选）..."
+                className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                rows={2}
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">颜色</label>
               <div className="flex gap-2">
@@ -131,7 +153,12 @@ export function SettingsTagsView() {
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: tag.color }}
                   />
-                  <span className="font-medium">{tag.name}</span>
+                  <div>
+                    <span className="font-medium">{tag.name}</span>
+                    {tag.description && (
+                      <span className="ml-2 text-sm text-gray-500">- {tag.description}</span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button

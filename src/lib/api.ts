@@ -26,6 +26,7 @@ export interface Tag {
   id: string;
   name: string;
   color: string;
+  description: string | null;
   created_at: string;
 }
 
@@ -988,18 +989,19 @@ export async function getTags(): Promise<Tag[]> {
 
 export async function createTag(
   name: string,
-  color?: string
+  color?: string,
+  description?: string
 ): Promise<Tag> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri');
   }
   const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Tag>('create_tag', { name, color: color || null });
+  return invoke<Tag>('create_tag', { name, color: color || null, description: description || null });
 }
 
 export async function updateTag(
   id: string,
-  data: { name?: string; color?: string }
+  data: { name?: string; color?: string; description?: string }
 ): Promise<Tag> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri');
@@ -1009,6 +1011,7 @@ export async function updateTag(
     id,
     name: data.name || null,
     color: data.color || null,
+    description: data.description || null,
   });
 }
 

@@ -4,6 +4,9 @@ use log::info;
 use rusqlite::Connection;
 
 pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
+    // Enable foreign keys
+    conn.execute("PRAGMA foreign_keys = ON", [])?;
+
     // Plans table
     conn.execute(
         "CREATE TABLE IF NOT EXISTS plans (
@@ -124,10 +127,14 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL UNIQUE,
             color TEXT NOT NULL DEFAULT '#3B82F6',
+            description TEXT,
             created_at TEXT NOT NULL
         )",
         [],
     )?;
+
+    // Add description column if it doesn't exist (migration)
+    add_column_if_not_exists(conn, "tags", "description", "TEXT")?;
 
     // Entity tags (many-to-many)
     conn.execute(

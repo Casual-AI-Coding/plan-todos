@@ -8,6 +8,7 @@ pub struct Tag {
     pub id: String,
     pub name: String,
     pub color: String,
+    pub description: Option<String>,
     pub created_at: String,
 }
 
@@ -24,7 +25,7 @@ pub fn get_tags(state: tauri::State<AppState>) -> Result<Vec<Tag>, String> {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, name, color, created_at FROM tags ORDER BY name")
+            .prepare("SELECT id, name, color, description, created_at FROM tags ORDER BY name")
             .map_err(|e| e.to_string())?;
 
         let tag_iter = stmt
@@ -33,7 +34,8 @@ pub fn get_tags(state: tauri::State<AppState>) -> Result<Vec<Tag>, String> {
                     id: row.get(0)?,
                     name: row.get(1)?,
                     color: row.get(2)?,
-                    created_at: row.get(3)?,
+                    description: row.get(3)?,
+                    created_at: row.get(4)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -47,6 +49,7 @@ pub fn create_tag(
     state: tauri::State<AppState>,
     name: String,
     color: Option<String>,
+    description: Option<String>,
 ) -> Result<Tag, String> {
     log_command!("create_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -69,8 +72,8 @@ pub fn create_tag(
         };
 
         conn.execute(
-            "INSERT INTO tags (id, name, color, created_at) VALUES (?, ?, ?, ?)",
-            rusqlite::params![id, name, color, now],
+            "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params![id, name, color, description, now],
         )
         .map_err(|e| e.to_string())?;
 
@@ -78,6 +81,7 @@ pub fn create_tag(
             id,
             name,
             color,
+            description,
             created_at: now,
         })
     })
@@ -89,12 +93,13 @@ pub fn update_tag(
     id: String,
     name: Option<String>,
     color: Option<String>,
+    description: Option<String>,
 ) -> Result<Tag, String> {
     log_command!("update_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, name, color, created_at FROM tags WHERE id = ?")
+            .prepare("SELECT id, name, color, description, created_at FROM tags WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let tag: Tag = stmt
@@ -103,7 +108,8 @@ pub fn update_tag(
                     id: row.get(0)?,
                     name: row.get(1)?,
                     color: row.get(2)?,
-                    created_at: row.get(3)?,
+                    description: row.get(3)?,
+                    created_at: row.get(4)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -127,9 +133,12 @@ pub fn update_tag(
         });
         let new_color = new_color.unwrap_or(tag.color);
 
+        // Description can be cleared (None) or set
+        let new_description = description;
+
         conn.execute(
-            "UPDATE tags SET name = ?, color = ? WHERE id = ?",
-            rusqlite::params![new_name, new_color, id],
+            "UPDATE tags SET name = ?, color = ?, description = ? WHERE id = ?",
+            rusqlite::params![new_name, new_color, new_description, id],
         )
         .map_err(|e| e.to_string())?;
 
@@ -137,6 +146,7 @@ pub fn update_tag(
             id: tag.id,
             name: new_name,
             color: new_color,
+            description: new_description,
             created_at: tag.created_at,
         })
     })
@@ -163,7 +173,7 @@ pub fn get_entity_tags(
 
         let mut stmt = conn
             .prepare(
-                "SELECT t.id, t.name, t.color, t.created_at 
+                "SELECT t.id, t.name, t.color, t.description, t.created_at 
                  FROM tags t 
                  INNER JOIN entity_tags et ON t.id = et.tag_id 
                  WHERE et.entity_type = ? AND et.entity_id = ?",
@@ -176,7 +186,8 @@ pub fn get_entity_tags(
                     id: row.get(0)?,
                     name: row.get(1)?,
                     color: row.get(2)?,
-                    created_at: row.get(3)?,
+                    description: row.get(3)?,
+                    created_at: row.get(4)?,
                 })
             })
             .map_err(|e| e.to_string())?;
