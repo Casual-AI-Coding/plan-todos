@@ -339,20 +339,20 @@ fn seed_data(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Seed Todos
     conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-1", "完成项目设计稿", "需要给UI设计稿添加注释", "2026-02-15", "pending", &now, &now],
+        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["todo-1", "完成项目设计稿", "需要给UI设计稿添加注释", "2026-02-15", "pending", "P1", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-2", "准备周报", "总结本周工作进展", "2026-02-14", "in-progress", &now, &now],
+        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["todo-2", "准备周报", "总结本周工作进展", "2026-02-14", "in-progress", "P2", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-3", "团队会议", "讨论Q1目标", "2026-02-13", "done", &now, &now],
+        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["todo-3", "团队会议", "讨论Q1目标", "2026-02-13", "done", "P2", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-4", "代码审查", "Review PR #123", "2026-02-20", "pending", &now, &now],
+        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["todo-4", "代码审查", "Review PR #123", "2026-02-20", "pending", "P0", &now, &now],
     )?;
 
     // Seed Plans
@@ -371,20 +371,20 @@ fn seed_data(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Seed Tasks
     conn.execute(
-        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["task-1", "plan-1", "准备发布文档", "撰写V2.0功能说明", "2026-02-10", "2026-02-20", "in-progress", &now, &now],
+        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["task-1", "plan-1", "准备发布文档", "撰写V2.0功能说明", "2026-02-10", "2026-02-20", "in-progress", "P1", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["task-2", "plan-1", "测试回归", "执行完整测试套件", "2026-02-25", "2026-03-10", "pending", &now, &now],
+        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["task-2", "plan-1", "测试回归", "执行完整测试套件", "2026-02-25", "2026-03-10", "pending", "P2", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["task-3", "plan-2", "重构数据库层", "优化SQL查询", "2026-01-20", "2026-02-10", "done", &now, &now],
+        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["task-3", "plan-2", "重构数据库层", "优化SQL查询", "2026-01-20", "2026-02-10", "done", "P1", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["task-4", "plan-2", "优化前端构建", "减少打包体积", "2026-02-15", "2026-02-25", "pending", &now, &now],
+        "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["task-4", "plan-2", "优化前端构建", "减少打包体积", "2026-02-15", "2026-02-25", "pending", "P3", &now, &now],
     )?;
 
     // Seed Targets
@@ -403,32 +403,32 @@ fn seed_data(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Seed Steps
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-1", "target-1", "代码审查流程", 25, "completed", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-1", "target-1", "代码审查流程", 25, "completed", "P1", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-2", "target-1", "单元测试覆盖", 25, "completed", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-2", "target-1", "单元测试覆盖", 25, "completed", "P2", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-3", "target-1", "重构核心模块", 30, "in-progress", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-3", "target-1", "重构核心模块", 30, "in-progress", "P0", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-4", "target-1", "性能优化", 20, "pending", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-4", "target-1", "性能优化", 20, "pending", "P3", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-5", "target-3", "API文档", 30, "completed", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-5", "target-3", "API文档", 30, "completed", "P1", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-6", "target-3", "开发指南", 30, "completed", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-6", "target-3", "开发指南", 30, "completed", "P2", &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["step-7", "target-3", "部署文档", 40, "pending", &now, &now],
+        "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["step-7", "target-3", "部署文档", 40, "pending", "P2", &now, &now],
     )?;
 
     // Seed Milestones
