@@ -28,8 +28,9 @@ const menus: MenuItem[] = [
     label: '设置',
     children: [
       { id: 'settings-general', icon: '🎨', label: '通用' },
+      { id: 'settings-tags', icon: '🏷️', label: '标签管理' },
       { 
-        id: 'settings-notifications', 
+        id: 'settings-notifications',
         icon: '🔔', 
         label: '通知',
         children: [

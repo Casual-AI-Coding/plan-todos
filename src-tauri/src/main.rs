@@ -21,6 +21,7 @@ mod plans;
 mod search;
 mod statistics;
 mod steps;
+mod tags;
 mod targets;
 mod tasks;
 #[cfg(test)]
@@ -130,6 +131,14 @@ fn main() {
             notification_plugins::send_notification,
             // Search
             search::search_all,
+            // Tags
+            tags::get_tags,
+            tags::create_tag,
+            tags::update_tag,
+            tags::delete_tag,
+            tags::get_entity_tags,
+            tags::set_entity_tags,
+            tags::get_entities_by_tag,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

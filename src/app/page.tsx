@@ -15,6 +15,7 @@ import {
   SettingsChannelsView,
   SettingsDailySummaryView,
   SettingsAboutView,
+  SettingsTagsView,
 } from './views';
 
 // Main App
@@ -40,6 +41,7 @@ export default function Home() {
       case 'statistics': return <StatisticsView />;
       case 'settings': return <SettingsGeneralView />;
       case 'settings-general': return <SettingsGeneralView />;
+      case 'settings-tags': return <SettingsTagsView />;
       case 'settings-channels': return <SettingsChannelsView />;
       case 'settings-daily-summary': return <SettingsDailySummaryView />;
       case 'settings-about': return <SettingsAboutView />;

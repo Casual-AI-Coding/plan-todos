@@ -7,7 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.2] - 2026-02-14
+## [0.4.0] - 2026-02-14
+
+### Added
+- Tags 标签功能: 支持给 Todo/Plan/Target 添加标签
+- 后端: 创建 tags 表和 entity_tags 关联表
+- 后端: Rust tags API (get_tags, create_tag, update_tag, delete_tag)
+- 后端: Entity tags API (get_entity_tags, set_entity_tags, get_entities_by_tag)
+- 前端: 设置页面添加标签管理 (Settings > 标签管理)
+- 前端: Todo 列表显示标签徽章
+- 前端: Todo 创建/编辑表单添加标签选择器
+- 前端: Todo 列表添加标签筛选器
+- 侧边栏: 添加标签管理导航入口 (设置 > 通用和通知之间)
+
+### Changed
+- 更新 iteration-plan.md Phase 2 状态
+
+---
+
+## [0.3.5] - 2026-02-14
 
 ### Added
 - Priority 优先级功能: 给 Todo/Task/Step 添加 P0-P3 优先级

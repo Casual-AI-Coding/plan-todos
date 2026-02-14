@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Modal, Input, Checkbox } from '@/components/ui';
 import { Calendar } from '@/components/ui/Calendar';
-import { getTodos, createTodo, updateTodo, deleteTodo, Todo, Priority } from '@/lib/api';
+import { getTodos, createTodo, updateTodo, deleteTodo, Todo, Priority, Tag, getTags, getEntityTags, setEntityTags } from '@/lib/api';
 
 interface CalendarEvent {
   id: string;
@@ -14,8 +14,10 @@ interface CalendarEvent {
 
 export function TodosView() {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [allTags, setAllTags] = useState<Tag[]>([]);
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
+  const [tagFilter, setTagFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showForm, setShowForm] = useState(false);
@@ -24,15 +26,31 @@ export function TodosView() {
   const [content, setContent] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState<Priority>('P2');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   async function loadTodos() {
     try {
       const data = await getTodos();
-      setTodos(data);
+      // Load tags for each todo
+      const todosWithTags = await Promise.all(
+        data.map(async (todo) => {
+          const tags = await getEntityTags('todo', todo.id);
+          return { ...todo, tags };
+        })
+      );
+      setTodos(todosWithTags);
+    } catch (e) { console.error(e); }
+  }
+
+  async function loadTags() {
+    try {
+      const tags = await getTags();
+      setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
   useEffect(() => { loadTodos(); }, []);
+  useEffect(() => { loadTags(); }, []);
 
   // Convert todos to calendar events
   const calendarEvents: CalendarEvent[] = todos
@@ -57,6 +75,11 @@ export function TodosView() {
     if (priorityFilter !== 'all' && t.priority !== priorityFilter) {
       return false;
     }
+    // Tag filter
+    if (tagFilter !== 'all') {
+      const hasTag = t.tags?.some(tag => tag.id === tagFilter);
+      if (!hasTag) return false;
+    }
     // Status filter
     const today = new Date().toISOString().split('T')[0];
     if (filter === 'today') return t.due_date?.startsWith(today);
@@ -68,17 +91,23 @@ export function TodosView() {
   async function handleSubmit() {
     if (!title.trim()) return;
     try {
+      let todoId: string;
       if (editingTodo) {
         await updateTodo(editingTodo.id, { title, content: content || undefined, due_date: dueDate || undefined, priority });
+        todoId = editingTodo.id;
       } else {
-        await createTodo({ title, content: content || undefined, due_date: dueDate || undefined, priority });
+        const newTodo = await createTodo({ title, content: content || undefined, due_date: dueDate || undefined, priority });
+        todoId = newTodo.id;
       }
+      // Save tags
+      await setEntityTags('todo', todoId, selectedTags);
       setShowForm(false);
       setEditingTodo(null);
       setTitle('');
       setContent('');
       setDueDate('');
       setPriority('P2');
+      setSelectedTags([]);
       loadTodos();
     } catch (e) { console.error(e); }
   }
@@ -148,6 +177,31 @@ export function TodosView() {
         ))}
       </div>
 
+      {/* Tag filter */}
+      <div className="flex gap-2 mb-4 flex-wrap">
+        <span className="text-sm text-gray-600 py-2">标签:</span>
+        <button
+          onClick={() => setTagFilter('all')}
+          className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+            tagFilter === 'all' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          全部
+        </button>
+        {allTags.map(tag => (
+          <button
+            key={tag.id}
+            onClick={() => setTagFilter(tag.id)}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              tagFilter === tag.id ? 'text-white' : ''
+            }`}
+            style={{ backgroundColor: tagFilter === tag.id ? tag.color : `${tag.color}20`, color: tagFilter === tag.id ? 'white' : tag.color }}
+          >
+            {tag.name}
+          </button>
+        ))}
+      </div>
+
       {/* Search input */}
       <div className="mb-4">
         <input
@@ -184,7 +238,7 @@ export function TodosView() {
         /* List */
         <div className="space-y-2">
         {filteredTodos.map(todo => (
-          <Card key={todo.id} hoverable onClick={() => { setEditingTodo(todo); setTitle(todo.title); setContent(todo.content || ''); setDueDate(todo.due_date || ''); setPriority(todo.priority); setShowForm(true); }}>
+          <Card key={todo.id} hoverable onClick={() => { setEditingTodo(todo); setTitle(todo.title); setContent(todo.content || ''); setDueDate(todo.due_date || ''); setPriority(todo.priority); setSelectedTags(todo.tags?.map(t => t.id) || []); setShowForm(true); }}>
             <div className="flex items-center gap-3">
               <Checkbox 
                 checked={todo.status === 'done'} 
@@ -204,6 +258,20 @@ export function TodosView() {
                 <div className={todo.status === 'done' ? 'line-through text-gray-400' : ''}>
                   {todo.title}
                 </div>
+                {/* Tags display */}
+                {todo.tags && todo.tags.length > 0 && (
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {todo.tags.map(tag => (
+                      <span 
+                        key={tag.id}
+                        className="px-2 py-0.5 rounded text-xs"
+                        style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {todo.due_date && (
                   <div className="text-xs text-gray-500 mt-1">
                     📅 {new Date(todo.due_date).toLocaleDateString()}
@@ -237,10 +305,10 @@ export function TodosView() {
       <Modal 
         open={showForm} 
         title={editingTodo ? '编辑 Todo' : '新建 Todo'} 
-        onClose={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); setPriority('P2'); }}
+        onClose={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); setPriority('P2'); setSelectedTags([]); }}
         footer={
           <>
-            <Button variant="secondary" onClick={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); setPriority('P2'); }}>取消</Button>
+            <Button variant="secondary" onClick={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); setPriority('P2'); setSelectedTags([]); }}>取消</Button>
             <Button onClick={handleSubmit}>{editingTodo ? '保存' : '创建'}</Button>
           </>
         }
@@ -281,6 +349,38 @@ export function TodosView() {
               <option value="P2">P2 - 普通</option>
               <option value="P3">P3 - 低优先级</option>
             </select>
+          </div>
+          {/* Tag selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">标签</label>
+            <div className="flex gap-2 flex-wrap">
+              {allTags.map(tag => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTags(prev => 
+                      prev.includes(tag.id) 
+                        ? prev.filter(id => id !== tag.id)
+                        : [...prev, tag.id]
+                    );
+                  }}
+                  className={`px-3 py-1 rounded text-sm transition-colors ${
+                    selectedTags.includes(tag.id) ? 'text-white' : ''
+                  }`}
+                  style={{ 
+                    backgroundColor: selectedTags.includes(tag.id) ? tag.color : `${tag.color}20`, 
+                    color: selectedTags.includes(tag.id) ? 'white' : tag.color,
+                    border: `1px solid ${tag.color}`
+                  }}
+                >
+                  {tag.name}
+                </button>
+              ))}
+              {allTags.length === 0 && (
+                <span className="text-sm text-gray-400">暂无标签，请在设置中创建</span>
+              )}
+            </div>
           </div>
         </div>
       </Modal>

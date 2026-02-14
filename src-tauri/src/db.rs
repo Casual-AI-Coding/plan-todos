@@ -118,6 +118,29 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
+    // Tags table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS tags (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE,
+            color TEXT NOT NULL DEFAULT '#3B82F6',
+            created_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // Entity tags (many-to-many)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS entity_tags (
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            tag_id TEXT NOT NULL,
+            PRIMARY KEY (entity_type, entity_id, tag_id),
+            FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        )",
+        [],
+    )?;
+
     // Daily summary settings
     conn.execute(
         "CREATE TABLE IF NOT EXISTS daily_summary_settings (

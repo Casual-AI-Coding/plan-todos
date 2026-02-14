@@ -10,3 +10,4 @@ export { SettingsGeneralView } from './SettingsGeneralView';
 export { SettingsChannelsView } from './SettingsChannelsView';
 export { SettingsDailySummaryView } from './SettingsDailySummaryView';
 export { SettingsAboutView } from './SettingsAboutView';
+export { SettingsTagsView } from './SettingsTagsView';

@@ -19,6 +19,18 @@ export interface Plan {
 // ============================================================================
 export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
 
+// ============================================================================
+// Tag - 标签
+// ============================================================================
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+  created_at: string;
+}
+
+export type EntityType = 'todo' | 'plan' | 'target';
+
 export interface Task {
   id: string;
   plan_id: string;
@@ -72,6 +84,7 @@ export interface Todo {
   priority: Priority;
   created_at: string;
   updated_at: string;
+  tags?: Tag[];
 }
 
 // ============================================================================
@@ -958,4 +971,85 @@ export async function sendNotification(
     title,
     content,
   });
+}
+
+// ============================================================================
+// Tags
+// ============================================================================
+
+export async function getTags(): Promise<Tag[]> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - returning empty');
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Tag[]>('get_tags');
+}
+
+export async function createTag(
+  name: string,
+  color?: string
+): Promise<Tag> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Tag>('create_tag', { name, color: color || null });
+}
+
+export async function updateTag(
+  id: string,
+  data: { name?: string; color?: string }
+): Promise<Tag> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Tag>('update_tag', {
+    id,
+    name: data.name || null,
+    color: data.color || null,
+  });
+}
+
+export async function deleteTag(id: string): Promise<void> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<void>('delete_tag', { id });
+}
+
+export async function getEntityTags(
+  entityType: EntityType,
+  entityId: string
+): Promise<Tag[]> {
+  if (!isTauri()) {
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Tag[]>('get_entity_tags', { entityType, entityId });
+}
+
+export async function setEntityTags(
+  entityType: EntityType,
+  entityId: string,
+  tagIds: string[]
+): Promise<void> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<void>('set_entity_tags', { entityType, entityId, tagIds });
+}
+
+export async function getEntitiesByTag(
+  entityType: EntityType,
+  tagIds: string[]
+): Promise<string[]> {
+  if (!isTauri()) {
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<string[]>('get_entities_by_tag', { entityType, tagIds });
 }

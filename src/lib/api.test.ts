@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority } from '@/lib/api';
+import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority, Tag, EntityType, getTags, createTag, updateTag, deleteTag, getEntityTags, setEntityTags, getEntitiesByTag } from '@/lib/api';
 
 // ============================================================================
 // isTauri Function Tests
@@ -388,5 +388,117 @@ describe('API Functions - Priority in Create/Update (non-Tauri)', () => {
 
   it('updateStep accepts priority parameter', async () => {
     await expect(updateStep('id', { priority: 'P1' })).rejects.toThrow('This app must run in Tauri to update steps');
+  });
+});
+
+// ============================================================================
+// Tag Type Tests
+// ============================================================================
+describe('Tag Type', () => {
+  it('Tag interface has required fields', () => {
+    const tag: Tag = {
+      id: 'tag-1',
+      name: 'Important',
+      color: '#ff0000',
+      created_at: '2026-01-01T00:00:00Z',
+    };
+    expect(tag.id).toBe('tag-1');
+    expect(tag.name).toBe('Important');
+    expect(tag.color).toBe('#ff0000');
+  });
+
+  it('Tag color accepts hex format', () => {
+    const tag: Tag = {
+      id: 'tag-2',
+      name: 'Work',
+      color: '#FF5733',
+      created_at: '2026-01-01T00:00:00Z',
+    };
+    expect(tag.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
+  });
+});
+
+// ============================================================================
+// EntityType Tests
+// ============================================================================
+describe('EntityType', () => {
+  it('EntityType accepts todo', () => {
+    const entityType: EntityType = 'todo';
+    expect(entityType).toBe('todo');
+  });
+
+  it('EntityType accepts plan', () => {
+    const entityType: EntityType = 'plan';
+    expect(entityType).toBe('plan');
+  });
+
+  it('EntityType accepts target', () => {
+    const entityType: EntityType = 'target';
+    expect(entityType).toBe('target');
+  });
+});
+
+// ============================================================================
+// API Functions - Tags (non-Tauri)
+// ============================================================================
+describe('API Functions - Tags (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getTags returns empty array when not in Tauri', async () => {
+    const tags = await getTags();
+    expect(tags).toEqual([]);
+  });
+
+  it('createTag rejects when not in Tauri', async () => {
+    await expect(createTag('Test', '#ff0000')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('updateTag rejects when not in Tauri', async () => {
+    await expect(updateTag('tag-1', { name: 'Updated' })).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('deleteTag rejects when not in Tauri', async () => {
+    await expect(deleteTag('tag-1')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('getEntityTags returns empty array when not in Tauri', async () => {
+    const tags = await getEntityTags('todo', 'entity-1');
+    expect(tags).toEqual([]);
+  });
+
+  it('setEntityTags rejects when not in Tauri', async () => {
+    await expect(setEntityTags('todo', 'entity-1', ['tag-1'])).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('getEntitiesByTag returns empty array when not in Tauri', async () => {
+    const entities = await getEntitiesByTag('todo', ['tag-1']);
+    expect(entities).toEqual([]);
+  });
+});
+
+// ============================================================================
+// API Functions - Todo with Tags (non-Tauri)
+// ============================================================================
+describe('API Functions - Todo with Tags (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getTodos returns empty array when not in Tauri', async () => {
+    const todos = await getTodos();
+    expect(todos).toEqual([]);
+  });
+
+  it('createTodo does not accept tags parameter (handled separately)', async () => {
+    // Tags are set via setEntityTags after creation
+    await expect(createTodo({ title: 'Test' })).rejects.toThrow('This app must run in Tauri to create todos');
   });
 });
