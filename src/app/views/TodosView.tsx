@@ -251,7 +251,7 @@ export function TodosView() {
         </div>
 
         {/* Search input */}
-        <div className="w-48 relative">
+        <div className="w-64 relative ml-auto">
           <input
             type="text"
             value={searchQuery}
