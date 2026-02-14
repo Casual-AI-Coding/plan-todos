@@ -194,7 +194,7 @@ export function TodosView() {
             <span className="text-xs">▼</span>
           </button>
           {showPriorityDropdown && (
-            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
+            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 min-w-[120px] overflow-visible">
               {(['all', 'P0', 'P1', 'P2', 'P3'] as const).map(p => (
                 <button
                   key={p}
@@ -224,7 +224,7 @@ export function TodosView() {
             <span className="text-xs">▼</span>
           </button>
           {showTagDropdown && (
-            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[150px]">
+            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 min-w-[150px] overflow-visible">
               {allTags.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-gray-400">暂无标签</div>
               ) : (
@@ -251,14 +251,22 @@ export function TodosView() {
         </div>
 
         {/* Search input */}
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="搜索待办..."
-            className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-full px-3 py-1.5 pr-8 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
