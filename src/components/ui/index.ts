@@ -4,3 +4,4 @@ export { ProgressBar } from './ProgressBar';
 export { Input } from './Input';
 export { Card } from './Card';
 export { Checkbox } from './Checkbox';
+export { SearchBar } from './SearchBar';

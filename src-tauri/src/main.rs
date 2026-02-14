@@ -18,6 +18,7 @@ mod models;
 mod notification_plugins;
 mod notifications;
 mod plans;
+mod search;
 mod statistics;
 mod steps;
 mod targets;
@@ -127,6 +128,8 @@ fn main() {
             notification_plugins::update_notification_plugin,
             notification_plugins::delete_notification_plugin,
             notification_plugins::send_notification,
+            // Search
+            search::search_all,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

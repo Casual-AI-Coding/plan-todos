@@ -291,4 +291,360 @@ mod tests {
             .unwrap();
         assert_eq!(cnt, 1);
     }
+
+    // Search tests
+    #[test]
+    fn test_search_todos_by_title() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, content, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["s1", "Buy milk", "Get 2 liters", "pending", &now, &now],
+        ).unwrap();
+
+        let mut stmt = conn
+            .prepare("SELECT id, title FROM todos WHERE title LIKE ?")
+            .unwrap();
+        let pattern = "%Buy%";
+        let results: Vec<(String, String)> = stmt
+            .query_map([pattern], |row| Ok((row.get(0)?, row.get(1)?)))
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].1, "Buy milk");
+    }
+
+    #[test]
+    fn test_search_todos_by_content() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, content, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["s2", "Shopping", "Buy milk and eggs", "pending", &now, &now],
+        ).unwrap();
+
+        let mut stmt = conn
+            .prepare("SELECT id, title FROM todos WHERE content LIKE ?")
+            .unwrap();
+        let pattern = "%milk%";
+        let results: Vec<(String, String)> = stmt
+            .query_map([pattern], |row| Ok((row.get(0)?, row.get(1)?)))
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].1, "Shopping");
+    }
+
+    #[test]
+    fn test_search_plans() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO plans (id, title, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["p1", "Learn Rust", "Master Rust programming", "active", &now, &now],
+        ).unwrap();
+
+        let mut stmt = conn
+            .prepare("SELECT id, title FROM plans WHERE title LIKE ? OR description LIKE ?")
+            .unwrap();
+        let pattern = "%Rust%";
+        let results: Vec<(String, String)> = stmt
+            .query_map(rusqlite::params![pattern, pattern], |row| {
+                Ok((row.get(0)?, row.get(1)?))
+            })
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect();
+        assert_eq!(results.len(), 1);
+    }
+
+    #[test]
+    fn test_search_tasks() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO plans (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["p-search", "Plan", "active", &now, &now],
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO tasks (id, plan_id, title, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["t1", "p-search", "Write code", "Implement features", "pending", &now, &now],
+        ).unwrap();
+
+        let mut stmt = conn
+            .prepare("SELECT id, title FROM tasks WHERE title LIKE ? OR description LIKE ?")
+            .unwrap();
+        let pattern = "%Write%";
+        let results: Vec<(String, String)> = stmt
+            .query_map(rusqlite::params![pattern, pattern], |row| {
+                Ok((row.get(0)?, row.get(1)?))
+            })
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect();
+        assert_eq!(results.len(), 1);
+    }
+
+    #[test]
+    fn test_search_targets() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO targets (id, title, description, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["tgt1", "Get fit", "Exercise daily", "active", 0, &now, &now],
+        ).unwrap();
+
+        let mut stmt = conn
+            .prepare("SELECT id, title FROM targets WHERE title LIKE ? OR description LIKE ?")
+            .unwrap();
+        let pattern = "%fit%";
+        let results: Vec<(String, String)> = stmt
+            .query_map(rusqlite::params![pattern, pattern], |row| {
+                Ok((row.get(0)?, row.get(1)?))
+            })
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect();
+        assert_eq!(results.len(), 1);
+    }
+
+    #[test]
+    fn test_search_milestones() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO milestones (id, title, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["m1", "First Release", "pending", 0, &now, &now],
+        ).unwrap();
+
+        let mut stmt = conn
+            .prepare("SELECT id, title FROM milestones WHERE title LIKE ?")
+            .unwrap();
+        let pattern = "%Release%";
+        let results: Vec<(String, String)> = stmt
+            .query_map([pattern], |row| Ok((row.get(0)?, row.get(1)?)))
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .collect();
+        assert_eq!(results.len(), 1);
+    }
+
+    // Statistics tests
+    #[test]
+    fn test_statistics_todo_counts() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["stat-t1", "Task 1", "pending", &now, &now],
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["stat-t2", "Task 2", "done", &now, &now],
+        )
+        .unwrap();
+
+        let total: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM todos WHERE id LIKE 'stat-%'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let done: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM todos WHERE id LIKE 'stat-%' AND status = 'done'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(total, 2);
+        assert_eq!(done, 1);
+    }
+
+    #[test]
+    fn test_statistics_task_counts() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO plans (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["stat-p1", "Plan", "active", &now, &now],
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO tasks (id, plan_id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["stat-task1", "stat-p1", "Task 1", "pending", &now, &now],
+        ).unwrap();
+        conn.execute(
+            "INSERT INTO tasks (id, plan_id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["stat-task2", "stat-p1", "Task 2", "done", &now, &now],
+        ).unwrap();
+
+        let total: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM tasks WHERE id LIKE 'stat-%'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let done: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM tasks WHERE id LIKE 'stat-%' AND status = 'done'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(total, 2);
+        assert_eq!(done, 1);
+    }
+
+    // Batch operations tests
+    #[test]
+    fn test_batch_update_todos() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["batch-b1", "Task 1", "pending", &now, &now],
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["batch-b2", "Task 2", "pending", &now, &now],
+        )
+        .unwrap();
+
+        // Batch update
+        conn.execute(
+            "UPDATE todos SET status = 'done' WHERE id IN ('batch-b1', 'batch-b2')",
+            [],
+        )
+        .unwrap();
+
+        let done_count: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM todos WHERE id LIKE 'batch-%' AND status = 'done'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(done_count, 2);
+    }
+
+    #[test]
+    fn test_batch_delete_todos() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["batch-d1", "Task 1", "pending", &now, &now],
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["batch-d2", "Task 2", "pending", &now, &now],
+        )
+        .unwrap();
+
+        // Batch delete
+        conn.execute("DELETE FROM todos WHERE id IN ('batch-d1', 'batch-d2')", [])
+            .unwrap();
+
+        let remaining: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM todos WHERE id LIKE 'batch-%'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+
+        assert_eq!(remaining, 0);
+    }
+
+    // Edge case tests
+    #[test]
+    fn test_null_handling() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        // Insert with null fields
+        conn.execute(
+            "INSERT INTO todos (id, title, content, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["null1", "No content todo", None::<String>, None::<String>, "pending", &now, &now],
+        ).unwrap();
+
+        let title: String = conn
+            .query_row("SELECT title FROM todos WHERE id = 'null1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(title, "No content todo");
+    }
+
+    #[test]
+    fn test_status_transitions() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            rusqlite::params!["trans1", "Task", "pending", &now, &now],
+        )
+        .unwrap();
+
+        // pending -> in-progress
+        conn.execute(
+            "UPDATE todos SET status = 'in-progress', updated_at = ? WHERE id = 'trans1'",
+            [&now],
+        )
+        .unwrap();
+        let status: String = conn
+            .query_row("SELECT status FROM todos WHERE id = 'trans1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(status, "in-progress");
+
+        // in-progress -> done
+        conn.execute(
+            "UPDATE todos SET status = 'done', updated_at = ? WHERE id = 'trans1'",
+            [&now],
+        )
+        .unwrap();
+        let status: String = conn
+            .query_row("SELECT status FROM todos WHERE id = 'trans1'", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(status, "done");
+    }
 }

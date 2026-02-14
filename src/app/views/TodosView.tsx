@@ -2,11 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Card, Button, Modal, Input, Checkbox } from '@/components/ui';
+import { Calendar } from '@/components/ui/Calendar';
 import { getTodos, createTodo, updateTodo, deleteTodo, Todo } from '@/lib/api';
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  type: 'todo' | 'task' | 'plan' | 'milestone';
+}
 
 export function TodosView() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showForm, setShowForm] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [title, setTitle] = useState('');
@@ -22,7 +32,26 @@ export function TodosView() {
 
   useEffect(() => { loadTodos(); }, []);
 
+  // Convert todos to calendar events
+  const calendarEvents: CalendarEvent[] = todos
+    .filter(t => t.due_date)
+    .map(t => ({
+      id: t.id,
+      title: t.title,
+      date: t.due_date!,
+      type: 'todo' as const
+    }));
+
   const filteredTodos = todos.filter(t => {
+    // Search filter
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!t.title.toLowerCase().includes(q) && 
+          !(t.content?.toLowerCase().includes(q))) {
+        return false;
+      }
+    }
+    // Status filter
     const today = new Date().toISOString().split('T')[0];
     if (filter === 'today') return t.due_date?.startsWith(today);
     if (filter === 'upcoming') return t.due_date && t.due_date > today;
@@ -74,7 +103,7 @@ export function TodosView() {
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-4">
         {filters.map(f => (
           <button
             key={f.id}
@@ -90,8 +119,41 @@ export function TodosView() {
         ))}
       </div>
 
-      {/* List */}
-      <div className="space-y-2">
+      {/* Search input */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="搜索..."
+          className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+      </div>
+
+      {/* View mode toggle */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setViewMode('list')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            viewMode === 'list' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
+          }`}
+        >
+          列表
+        </button>
+        <button
+          onClick={() => setViewMode('calendar')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            viewMode === 'calendar' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
+          }`}
+        >
+          日历
+        </button>
+      </div>
+
+      {/* Content */}
+      {viewMode === 'list' ? (
+        /* List */
+        <div className="space-y-2">
         {filteredTodos.map(todo => (
           <Card key={todo.id} hoverable onClick={() => { setEditingTodo(todo); setTitle(todo.title); setContent(todo.content || ''); setDueDate(todo.due_date || ''); setShowForm(true); }}>
             <div className="flex items-center gap-3">
@@ -123,6 +185,15 @@ export function TodosView() {
           <p className="text-gray-400 text-center py-8">暂无数据</p>
         )}
       </div>
+      ) : (
+        /* Calendar */
+        <Card>
+          <Calendar 
+            events={calendarEvents} 
+            onEventClick={(e) => console.log('Clicked:', e)}
+          />
+        </Card>
+      )}
 
       {/* Modal */}
       <Modal 
