@@ -211,22 +211,11 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     )
     .ok();
 
-    // Migration: Add priority columns
-    conn.execute(
-        "ALTER TABLE todos ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'P2'",
-        [],
-    )
-    .ok();
-    conn.execute(
-        "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'P2'",
-        [],
-    )
-    .ok();
-    conn.execute(
-        "ALTER TABLE steps ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'P2'",
-        [],
-    )
-    .ok();
+    // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
+    // Check if column exists first, then add if not
+    add_column_if_not_exists(conn, "todos", "priority", "TEXT DEFAULT 'P2'")?;
+    add_column_if_not_exists(conn, "tasks", "priority", "TEXT DEFAULT 'P2'")?;
+    add_column_if_not_exists(conn, "steps", "priority", "TEXT DEFAULT 'P2'")?;
 
     // Create indexes for performance optimization
     create_indexes(conn)?;
@@ -235,6 +224,30 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     seed_data(conn).ok();
 
     info!("Database initialized successfully");
+    Ok(())
+}
+
+// Helper function to add column if it doesn't exist
+fn add_column_if_not_exists(
+    conn: &Connection,
+    table: &str,
+    column: &str,
+    definition: &str,
+) -> Result<(), rusqlite::Error> {
+    // Check if column exists
+    let pragma_result: Result<String, _> = conn.query_row(
+        &format!("SELECT {} FROM {} LIMIT 0", column, table),
+        [],
+        |_| Ok("".to_string()),
+    );
+
+    if pragma_result.is_err() {
+        // Column doesn't exist, add it
+        conn.execute(
+            &format!("ALTER TABLE {} ADD COLUMN {} {}", table, column, definition),
+            [],
+        )?;
+    }
     Ok(())
 }
 
