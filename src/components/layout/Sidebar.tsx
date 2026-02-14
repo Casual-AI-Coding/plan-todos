@@ -84,7 +84,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             }
           }}
           className={`
-            w-full flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-all mb-0.5
+            w-full flex items-center gap-1.5 px-2 py-2 rounded-md transition-all mb-0.5
             ${level === 0 ? '' : 'ml-4'}
             ${level === 1 ? 'ml-6' : ''}
             ${level === 2 ? 'ml-8' : ''}
@@ -94,7 +94,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             }
           `}
           style={{ 
-            fontSize: level === 0 ? '14px' : '13px',
+            fontSize: level === 0 ? '15px' : '14px',
           }}
         >
           {hasChildren && (
@@ -109,7 +109,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             </span>
           )}
           {!hasChildren && level > 0 && <span className="w-3"></span>}
-          <span className="text-sm">{menu.icon}</span>
+          <span className="text-base">{menu.icon}</span>
           <span className="font-medium truncate">{menu.label}</span>
         </button>
         
@@ -128,9 +128,9 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
       style={{ borderColor: '#CCFBF1' }}
     >
       {/* Logo */}
-      <div className="p-3 border-b border-teal-100">
+      <div className="p-4 border-b border-teal-100">
         <h1 
-          className="text-lg font-bold"
+          className="text-xl font-bold"
           style={{ color: '#134E4A', fontFamily: 'Fira Code, monospace' }}
         >
           Plan Todos
