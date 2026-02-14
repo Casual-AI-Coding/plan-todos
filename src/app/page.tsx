@@ -2,7 +2,20 @@
 
 import { useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
-import { Dashboard, TodosView, PlansView, TargetsView, MilestonesView, ViewsView, StatisticsView, SettingsView } from './views';
+import { 
+  Dashboard, 
+  TodosView, 
+  PlansView, 
+  TargetsView, 
+  MilestonesView, 
+  ViewsView, 
+  StatisticsView, 
+  SettingsView,
+  SettingsGeneralView,
+  SettingsChannelsView,
+  SettingsDailySummaryView,
+  SettingsAboutView,
+} from './views';
 
 // Main App
 export default function Home() {
@@ -25,7 +38,11 @@ export default function Home() {
       case 'milestones': return <MilestonesView />;
       case 'views': return <ViewsView />;
       case 'statistics': return <StatisticsView />;
-      case 'settings': return <SettingsView />;
+      case 'settings': return <SettingsGeneralView />;
+      case 'settings-general': return <SettingsGeneralView />;
+      case 'settings-channels': return <SettingsChannelsView />;
+      case 'settings-daily-summary': return <SettingsDailySummaryView />;
+      case 'settings-about': return <SettingsAboutView />;
       default: return <Dashboard />;
     }
   };

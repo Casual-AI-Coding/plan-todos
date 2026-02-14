@@ -22,6 +22,8 @@ mod statistics;
 mod steps;
 mod targets;
 mod tasks;
+#[cfg(test)]
+mod tests;
 mod todos;
 
 fn main() {

@@ -819,3 +819,90 @@ export async function getDailySummary(): Promise<DailySummary> {
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<DailySummary>('get_daily_summary');
 }
+
+// ============================================================================
+// Notification Plugins (External Channels)
+// ============================================================================
+
+export interface NotificationPlugin {
+  id: string;
+  name: string;
+  plugin_type: string;
+  enabled: boolean;
+  config: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SendNotificationResult {
+  success: boolean;
+  message: string;
+  external_id?: string;
+}
+
+export async function getNotificationPlugins(): Promise<NotificationPlugin[]> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - data not available');
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<NotificationPlugin[]>('get_notification_plugins');
+}
+
+export async function createNotificationPlugin(
+  name: string,
+  pluginType: string,
+  config: string
+): Promise<NotificationPlugin> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<NotificationPlugin>('create_notification_plugin', {
+    name,
+    pluginType,
+    config,
+  });
+}
+
+export async function updateNotificationPlugin(
+  id: string,
+  name: string,
+  enabled: boolean,
+  config: string
+): Promise<NotificationPlugin> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<NotificationPlugin>('update_notification_plugin', {
+    id,
+    name,
+    enabled,
+    config,
+  });
+}
+
+export async function deleteNotificationPlugin(id: string): Promise<void> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<void>('delete_notification_plugin', { id });
+}
+
+export async function sendNotification(
+  pluginId: string,
+  title: string,
+  content: string
+): Promise<SendNotificationResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<SendNotificationResult>('send_notification', {
+    pluginId,
+    title,
+    content,
+  });
+}

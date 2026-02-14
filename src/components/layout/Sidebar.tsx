@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
+
 interface MenuItem {
   id: string;
   icon: string;
   label: string;
+  children?: MenuItem[];
 }
 
 interface SidebarProps {
@@ -19,10 +22,98 @@ const menus: MenuItem[] = [
   { id: 'milestones', icon: '🏆', label: 'MILESTONES' },
   { id: 'views', icon: '👁️', label: '视图查看' },
   { id: 'statistics', icon: '📈', label: '数据统计' },
-  { id: 'settings', icon: '⚙️', label: '设置' },
+  { 
+    id: 'settings', 
+    icon: '⚙️', 
+    label: '设置',
+    children: [
+      { id: 'settings-general', icon: '🎨', label: '通用' },
+      { 
+        id: 'settings-notifications', 
+        icon: '🔔', 
+        label: '通知',
+        children: [
+          { id: 'settings-channels', icon: '📢', label: '通知渠道' },
+          { id: 'settings-daily-summary', icon: '📅', label: '每日汇总' },
+        ]
+      },
+      { id: 'settings-about', icon: 'ℹ️', label: '关于' },
+    ]
+  },
 ];
 
 export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['settings']));
+
+  const toggleExpand = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedMenus(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const isActive = (id: string) => activeMenu === id;
+  const isChildOfActive = () => {
+    // Check if current menu is a child of settings
+    if (activeMenu.startsWith('settings')) return true;
+    return false;
+  };
+
+  const renderMenuItem = (menu: MenuItem, level: number = 0) => {
+    const hasChildren = menu.children && menu.children.length > 0;
+    const isExpanded = expandedMenus.has(menu.id);
+    const isCurrentActive = isActive(menu.id);
+    const isParentOfActive = hasChildren && menu.children!.some(child => 
+      activeMenu === child.id || (child.children?.some(c => activeMenu === c.id))
+    );
+
+    return (
+      <div key={menu.id}>
+        <button
+          onClick={(e) => {
+            if (hasChildren) {
+              toggleExpand(menu.id, e);
+            } else {
+              onMenuChange(menu.id);
+            }
+          }}
+          className={`
+            w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors mb-1
+            ${level > 0 ? 'ml-4' : ''}
+            ${isCurrentActive ? 'bg-teal-100' : 'hover:bg-teal-50'}
+          `}
+          style={{ 
+            color: '#134E4A',
+            fontSize: level > 0 ? '13px' : '14px',
+          }}
+        >
+          {hasChildren && (
+            <span 
+              className="text-xs transition-transform"
+              style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+            >
+              ▶
+            </span>
+          )}
+          <span className="text-lg">{menu.icon}</span>
+          <span className="font-medium">{menu.label}</span>
+        </button>
+        
+        {hasChildren && isExpanded && (
+          <div className="mb-1">
+            {menu.children!.map(child => renderMenuItem(child, level + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <aside 
       className="w-60 bg-white border-r border-teal-100 flex flex-col h-screen"
@@ -40,20 +131,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2">
-        {menus.map(menu => (
-          <button
-            key={menu.id}
-            onClick={() => onMenuChange(menu.id)}
-            className={`
-              w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors mb-1
-              ${activeMenu === menu.id ? 'bg-teal-100' : 'hover:bg-teal-50'}
-            `}
-            style={{ color: '#134E4A' }}
-          >
-            <span className="text-lg">{menu.icon}</span>
-            <span className="text-sm font-medium">{menu.label}</span>
-          </button>
-        ))}
+        {menus.map(menu => renderMenuItem(menu))}
       </nav>
     </aside>
   );

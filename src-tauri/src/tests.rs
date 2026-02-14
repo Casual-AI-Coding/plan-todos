@@ -1,0 +1,294 @@
+#[cfg(test)]
+mod tests {
+    use crate::db::init_db;
+    use crate::models::{Milestone, Plan, Step, Target, Task, Todo};
+    use rusqlite::Connection;
+
+    #[test]
+    fn test_plan_model() {
+        let plan = Plan {
+            id: "test-1".to_string(),
+            title: "Test".to_string(),
+            description: None,
+            start_date: None,
+            end_date: None,
+            status: "active".to_string(),
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+        };
+        assert_eq!(plan.status, "active");
+    }
+
+    #[test]
+    fn test_todo_model() {
+        let todo = Todo {
+            id: "t1".to_string(),
+            title: "Test".to_string(),
+            content: None,
+            due_date: None,
+            status: "pending".to_string(),
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+        };
+        assert_eq!(todo.status, "pending");
+    }
+
+    #[test]
+    fn test_task_model() {
+        let task = Task {
+            id: "t1".to_string(),
+            plan_id: "p1".to_string(),
+            title: "Test".to_string(),
+            description: None,
+            start_date: None,
+            end_date: None,
+            status: "pending".to_string(),
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+        };
+        assert_eq!(task.plan_id, "p1");
+    }
+
+    #[test]
+    fn test_target_model() {
+        let target = Target {
+            id: "t1".to_string(),
+            title: "Test".to_string(),
+            description: None,
+            due_date: None,
+            status: "active".to_string(),
+            progress: 0,
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+        };
+        assert_eq!(target.progress, 0);
+    }
+
+    #[test]
+    fn test_step_model() {
+        let step = Step {
+            id: "s1".to_string(),
+            target_id: "t1".to_string(),
+            title: "Test".to_string(),
+            weight: 25,
+            status: "pending".to_string(),
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+        };
+        assert_eq!(step.weight, 25);
+    }
+
+    #[test]
+    fn test_milestone_model() {
+        let m = Milestone {
+            id: "m1".to_string(),
+            title: "Test".to_string(),
+            target_date: None,
+            plan_id: Some("p1".to_string()),
+            task_id: None,
+            target_id: None,
+            status: "pending".to_string(),
+            progress: 0,
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+        };
+        assert_eq!(m.plan_id, Some("p1".to_string()));
+    }
+
+    #[test]
+    fn test_init_db() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+    }
+
+    #[test]
+    fn test_tables_exist() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+
+        let tables = [
+            "plans",
+            "todos",
+            "tasks",
+            "targets",
+            "steps",
+            "milestones",
+            "notification_settings",
+            "daily_summary_settings",
+            "notification_plugins",
+        ];
+
+        for table in tables {
+            let sql = format!(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='{}'",
+                table
+            );
+            conn.query_row(&sql, [], |_| Ok(())).unwrap();
+        }
+    }
+
+    #[test]
+    fn test_todo_crud() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            ["test-todo-1", "Test", "pending", &now, &now],
+        )
+        .unwrap();
+
+        let title: String = conn
+            .query_row(
+                "SELECT title FROM todos WHERE id = 'test-todo-1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(title, "Test");
+
+        conn.execute(
+            "UPDATE todos SET status = 'done' WHERE id = 'test-todo-1'",
+            [],
+        )
+        .unwrap();
+
+        let status: String = conn
+            .query_row(
+                "SELECT status FROM todos WHERE id = 'test-todo-1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(status, "done");
+
+        conn.execute("DELETE FROM todos WHERE id = 'test-todo-1'", [])
+            .unwrap();
+
+        let cnt: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM todos WHERE id = 'test-todo-1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(cnt, 0);
+    }
+
+    #[test]
+    fn test_plan_with_tasks() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO plans (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            ["test-plan-1", "Plan", "active", &now, &now],
+        )
+        .unwrap();
+        conn.execute("INSERT INTO tasks (id, plan_id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)", ["test-task-1", "test-plan-1", "Task", "pending", &now, &now]).unwrap();
+
+        let cnt: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM tasks WHERE plan_id = 'test-plan-1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(cnt, 1);
+    }
+
+    #[test]
+    fn test_target_steps() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute("INSERT INTO targets (id, title, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)", rusqlite::params!["test-target-1", "Target", "active", 0, &now, &now]).unwrap();
+        conn.execute("INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-step-1", "test-target-1", "Step1", 30, "completed", &now, &now]).unwrap();
+        conn.execute("INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-step-2", "test-target-1", "Step2", 70, "pending", &now, &now]).unwrap();
+
+        let w: i32 = conn
+            .query_row(
+                "SELECT COALESCE(SUM(weight), 0) FROM steps WHERE target_id = 'test-target-1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(w, 100);
+    }
+
+    #[test]
+    fn test_milestone() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO plans (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+            ["test-ms-plan", "Plan", "active", &now, &now],
+        )
+        .unwrap();
+        conn.execute("INSERT INTO milestones (id, title, plan_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-ms-1", "Milestone", "test-ms-plan", "pending", 0, &now, &now]).unwrap();
+
+        let pid: String = conn
+            .query_row(
+                "SELECT plan_id FROM milestones WHERE id = 'test-ms-1'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(pid, "test-ms-plan");
+    }
+
+    #[test]
+    fn test_notification_settings() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute("INSERT INTO notification_settings (id, entity_type, entity_id, reminder_minutes, reminder_sent, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-ns-1", "todo", "t1", 30, 0, &now, &now]).unwrap();
+
+        let cnt: i32 = conn
+            .query_row("SELECT COUNT(*) FROM notification_settings", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(cnt, 1);
+    }
+
+    #[test]
+    fn test_daily_summary() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute("INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-dss-1", 1, "09:00", 1, 1, 1, &now, &now]).unwrap();
+
+        let en: i32 = conn
+            .query_row("SELECT enabled FROM daily_summary_settings", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(en, 1);
+    }
+
+    #[test]
+    fn test_plugins() {
+        let conn = Connection::open_in_memory().unwrap();
+        init_db(&conn).unwrap();
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute("INSERT INTO notification_plugins (id, name, plugin_type, enabled, config, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-np-1", "飞书", "feishu", 1, "{}", &now, &now]).unwrap();
+
+        let cnt: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notification_plugins WHERE enabled = 1",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(cnt, 1);
+    }
+}
