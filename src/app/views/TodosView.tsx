@@ -18,6 +18,8 @@ export function TodosView() {
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
   const [tagFilters, setTagFilters] = useState<string[]>([]);
+  const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
+  const [showTagDropdown, setShowTagDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showForm, setShowForm] = useState(false);
@@ -134,107 +136,139 @@ export function TodosView() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>TODOS</h2>
         <Button onClick={() => setShowForm(true)}>+ 新建</Button>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-4">
-        {filters.map(f => (
+      {/* Row 1: Status tabs + View toggle */}
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex gap-1">
+          {filters.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id as typeof filter)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                filter === f.id 
+                  ? 'bg-teal-100 text-teal-700' 
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-1">
           <button
-            key={f.id}
-            onClick={() => setFilter(f.id as typeof filter)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filter === f.id 
-                ? 'bg-teal-100 text-teal-700' 
-                : 'text-gray-600 hover:bg-gray-100'
+            onClick={() => setViewMode('list')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              viewMode === 'list' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
             }`}
           >
-            {f.label}
+            列表
           </button>
-        ))}
-      </div>
-
-      {/* Priority filter */}
-      <div className="flex gap-2 mb-4">
-        <span className="text-sm text-gray-600 py-2">优先级:</span>
-        {(['all', 'P0', 'P1', 'P2', 'P3'] as const).map(p => (
           <button
-            key={p}
-            onClick={() => setPriorityFilter(p)}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-              priorityFilter === p 
-                ? p === 'all' ? 'bg-teal-500 text-white' :
-                  p === 'P0' ? 'bg-red-500 text-white' :
-                  p === 'P1' ? 'bg-orange-500 text-white' :
-                  p === 'P2' ? 'bg-gray-500 text-white' :
-                  'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            onClick={() => setViewMode('calendar')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              viewMode === 'calendar' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
             }`}
           >
-            {p === 'all' ? '全部' : p}
+            日历
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* Tag filter */}
-      <div className="flex gap-2 mb-4 flex-wrap">
-        <span className="text-sm text-gray-600 py-2">标签:</span>
-        <button
-          onClick={() => setTagFilters([])}
-          className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-            tagFilters.length === 0 ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
-        >
-          全部
-        </button>
-        {allTags.map(tag => (
+      {/* Row 2: Priority dropdown + Tag dropdown + Search */}
+      <div className="flex gap-2 mb-4 items-center">
+        {/* Priority dropdown */}
+        <div className="relative">
           <button
-            key={tag.id}
-            onClick={() => setTagFilters(prev => 
-              prev.includes(tag.id) ? prev.filter(t => t !== tag.id) : [...prev, tag.id]
-            )}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-              tagFilters.includes(tag.id) ? 'text-white' : ''
+            onClick={() => { setShowPriorityDropdown(!showPriorityDropdown); setShowTagDropdown(false); }}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 ${
+              priorityFilter !== 'all' 
+                ? 'border-teal-500 bg-teal-50 text-teal-700' 
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
-            style={{ backgroundColor: tagFilters.includes(tag.id) ? tag.color : `${tag.color}20`, color: tagFilters.includes(tag.id) ? 'white' : tag.color }}
           >
-            {tag.name}
+            {priorityFilter === 'all' ? '优先级' : priorityFilter}
+            <span className="text-xs">▼</span>
           </button>
-        ))}
+          {showPriorityDropdown && (
+            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
+              {(['all', 'P0', 'P1', 'P2', 'P3'] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => { setPriorityFilter(p); setShowPriorityDropdown(false); }}
+                  className={`w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 ${
+                    priorityFilter === p ? 'text-teal-600 font-medium' : 'text-gray-600'
+                  }`}
+                >
+                  {p === 'all' ? '全部' : p === 'P0' ? 'P0 紧急' : p === 'P1' ? 'P1 重要' : p === 'P2' ? 'P2 普通' : 'P3 低'}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Tag dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => { setShowTagDropdown(!showTagDropdown); setShowPriorityDropdown(false); }}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 ${
+              tagFilters.length > 0 
+                ? 'border-teal-500 bg-teal-50 text-teal-700' 
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            {tagFilters.length === 0 ? '标签' : `+${tagFilters.length} 标签`}
+            <span className="text-xs">▼</span>
+          </button>
+          {showTagDropdown && (
+            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[150px]">
+              {allTags.length === 0 ? (
+                <div className="px-3 py-2 text-sm text-gray-400">暂无标签</div>
+              ) : (
+                allTags.map(tag => (
+                  <button
+                    key={tag.id}
+                    onClick={() => setTagFilters(prev => 
+                      prev.includes(tag.id) ? prev.filter(t => t !== tag.id) : [...prev, tag.id]
+                    )}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <span className={`w-4 h-4 rounded border flex items-center justify-center ${
+                      tagFilters.includes(tag.id) ? 'bg-teal-500 border-teal-500' : 'border-gray-300'
+                    }`}>
+                      {tagFilters.includes(tag.id) && <span className="text-white text-xs">✓</span>}
+                    </span>
+                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                    <span className={tagFilters.includes(tag.id) ? 'font-medium' : ''}>{tag.name}</span>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Search input */}
+        <div className="flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="搜索待办..."
+            className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+        </div>
       </div>
 
-      {/* Search input */}
-      <div className="mb-4">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="搜索..."
-          className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+      {/* Click outside to close dropdowns */}
+      {(showPriorityDropdown || showTagDropdown) && (
+        <div 
+          className="fixed inset-0 z-0" 
+          onClick={() => { setShowPriorityDropdown(false); setShowTagDropdown(false); }}
         />
-      </div>
-
-      {/* View mode toggle */}
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => setViewMode('list')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            viewMode === 'list' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          列表
-        </button>
-        <button
-          onClick={() => setViewMode('calendar')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            viewMode === 'calendar' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
-          }`}
-        >
-          日历
-        </button>
-      </div>
+      )}
 
       {/* Content */}
       {viewMode === 'list' ? (
