@@ -2,6 +2,7 @@
 
 use crate::AppState;
 use serde::{Deserialize, Serialize};
+use std::time::Instant;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NotificationSettings {
@@ -52,6 +53,7 @@ pub fn get_notification_settings(
     entity_type: String,
     entity_id: String,
 ) -> Result<Option<NotificationSettings>, String> {
+    let start = Instant::now();
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 
     let result = conn.query_row(
@@ -70,6 +72,16 @@ pub fn get_notification_settings(
             })
         },
     );
+
+    let elapsed = start.elapsed().as_millis();
+    match &result {
+        Ok(_) => log::info!("[API] get_notification_settings - {}ms - ok", elapsed),
+        Err(e) => log::info!(
+            "[API] get_notification_settings - {}ms - err: {}",
+            elapsed,
+            e
+        ),
+    }
 
     match result {
         Ok(settings) => Ok(Some(settings)),

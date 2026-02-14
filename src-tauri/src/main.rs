@@ -14,6 +14,7 @@ mod dashboard;
 mod db;
 mod milestones;
 mod models;
+mod notification_plugins;
 mod notifications;
 mod plans;
 mod statistics;
@@ -103,6 +104,12 @@ fn main() {
             notifications::get_due_reminders,
             notifications::mark_reminder_sent,
             notifications::get_daily_summary,
+            // Notification Plugins
+            notification_plugins::get_notification_plugins,
+            notification_plugins::create_notification_plugin,
+            notification_plugins::update_notification_plugin,
+            notification_plugins::delete_notification_plugin,
+            notification_plugins::send_notification,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

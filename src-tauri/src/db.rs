@@ -142,6 +142,25 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         )?;
     }
 
+    // Notification plugins table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS notification_plugins (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            plugin_type TEXT NOT NULL,
+            enabled INTEGER NOT NULL DEFAULT 1,
+            config TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_notification_plugins_type ON notification_plugins(plugin_type)",
+        [],
+    )?;
+
     // Migration: Add missing columns
     conn.execute(
         "ALTER TABLE targets ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0",
