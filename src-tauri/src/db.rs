@@ -257,15 +257,14 @@ fn add_column_if_not_exists(
     column: &str,
     definition: &str,
 ) -> Result<(), rusqlite::Error> {
-    // Check if column exists
-    let pragma_result: Result<String, _> = conn.query_row(
-        &format!("SELECT {} FROM {} LIMIT 0", column, table),
-        [],
-        |_| Ok("".to_string()),
-    );
+    // Check if column exists using PRAGMA table_info
+    let mut stmt = conn.prepare(&format!("PRAGMA table_info({})", table))?;
+    let columns: Vec<String> = stmt
+        .query_map([], |row| row.get(1))?
+        .filter_map(|r| r.ok())
+        .collect();
 
-    if pragma_result.is_err() {
-        // Column doesn't exist, add it
+    if !columns.contains(&column.to_string()) {
         conn.execute(
             &format!("ALTER TABLE {} ADD COLUMN {} {}", table, column, definition),
             [],
