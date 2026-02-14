@@ -84,29 +84,30 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             }
           }}
           className={`
-            w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors mb-1
-            ${level > 0 ? 'ml-4' : ''}
-            ${isCurrentActive ? 'bg-teal-100' : 'hover:bg-teal-50'}
+            w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors mb-0.5
+            ${level > 0 ? 'ml-3 border-l-2 border-teal-200 pl-3' : ''}
+            ${level > 1 ? 'ml-2' : ''}
+            ${isCurrentActive ? 'bg-teal-500 text-white' : 'hover:bg-teal-100'}
+            ${!isCurrentActive && level > 0 ? 'text-gray-600' : ''}
           `}
           style={{ 
-            color: '#134E4A',
-            fontSize: level > 0 ? '13px' : '14px',
+            fontSize: level > 0 ? '12px' : '13px',
           }}
         >
           {hasChildren && (
             <span 
-              className="text-xs transition-transform"
+              className="text-xs transition-transform w-3"
               style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
             >
               ▶
             </span>
           )}
-          <span className="text-lg">{menu.icon}</span>
-          <span className="font-medium">{menu.label}</span>
+          <span className="text-sm">{menu.icon}</span>
+          <span className="font-medium truncate">{menu.label}</span>
         </button>
         
         {hasChildren && isExpanded && (
-          <div className="mb-1">
+          <div className="mb-0.5">
             {menu.children!.map(child => renderMenuItem(child, level + 1))}
           </div>
         )}
@@ -116,13 +117,13 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
 
   return (
     <aside 
-      className="w-60 bg-white border-r border-teal-100 flex flex-col h-screen"
+      className="w-52 bg-white border-r border-teal-100 flex flex-col h-screen"
       style={{ borderColor: '#CCFBF1' }}
     >
       {/* Logo */}
-      <div className="p-4 border-b border-teal-100">
+      <div className="p-3 border-b border-teal-100">
         <h1 
-          className="text-xl font-bold"
+          className="text-lg font-bold"
           style={{ color: '#134E4A', fontFamily: 'Fira Code, monospace' }}
         >
           Plan Todos
@@ -130,9 +131,18 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-2">
+      <nav className="flex-1 overflow-y-auto p-2 scrollbar-hide">
         {menus.map(menu => renderMenuItem(menu))}
       </nav>
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </aside>
   );
 }
