@@ -84,24 +84,31 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             }
           }}
           className={`
-            w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors mb-0.5
-            ${level > 0 ? 'ml-3 border-l-2 border-teal-200 pl-3' : ''}
-            ${level > 1 ? 'ml-2' : ''}
-            ${isCurrentActive ? 'bg-teal-500 text-white' : 'hover:bg-teal-100'}
-            ${!isCurrentActive && level > 0 ? 'text-gray-600' : ''}
+            w-full flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-all mb-0.5
+            ${level === 0 ? '' : 'ml-4'}
+            ${level === 1 ? 'ml-6' : ''}
+            ${level === 2 ? 'ml-8' : ''}
+            ${isCurrentActive 
+              ? 'bg-teal-500 text-white shadow-sm' 
+              : 'hover:bg-teal-100 text-gray-700'
+            }
           `}
           style={{ 
-            fontSize: level > 0 ? '12px' : '13px',
+            fontSize: level === 0 ? '14px' : '13px',
           }}
         >
           {hasChildren && (
             <span 
-              className="text-xs transition-transform w-3"
-              style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+              className="text-xs transition-transform w-3 flex-shrink-0"
+              style={{ 
+                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                color: isCurrentActive ? 'white' : '#134E4A'
+              }}
             >
               ▶
             </span>
           )}
+          {!hasChildren && level > 0 && <span className="w-3"></span>}
           <span className="text-sm">{menu.icon}</span>
           <span className="font-medium truncate">{menu.label}</span>
         </button>
