@@ -51,9 +51,22 @@ pub fn create_tag(
     log_command!("create_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
+        // Validate name is not empty
+        let name = name.trim().to_string();
+        if name.is_empty() {
+            return Err("Tag name cannot be empty".to_string());
+        }
+
         let id = uuid::Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();
+
+        // Validate and use default color
         let color = color.unwrap_or_else(|| "#3B82F6".to_string());
+        let color = if color.starts_with('#') && color.len() == 7 {
+            color
+        } else {
+            "#3B82F6".to_string()
+        };
 
         conn.execute(
             "INSERT INTO tags (id, name, color, created_at) VALUES (?, ?, ?, ?)",
@@ -95,8 +108,24 @@ pub fn update_tag(
             })
             .map_err(|e| e.to_string())?;
 
-        let new_name = name.unwrap_or(tag.name);
-        let new_color = color.unwrap_or(tag.color);
+        // Validate name if provided
+        let new_name = name.map(|n| n.trim().to_string());
+        if let Some(ref n) = new_name {
+            if n.is_empty() {
+                return Err("Tag name cannot be empty".to_string());
+            }
+        }
+        let new_name = new_name.unwrap_or(tag.name);
+
+        // Validate color if provided
+        let new_color = color.map(|c| {
+            if c.starts_with('#') && c.len() == 7 {
+                c
+            } else {
+                tag.color.clone()
+            }
+        });
+        let new_color = new_color.unwrap_or(tag.color);
 
         conn.execute(
             "UPDATE tags SET name = ?, color = ? WHERE id = ?",
@@ -166,8 +195,11 @@ pub fn set_entity_tags(
     log_command!("set_entity_tags", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
+        // Use transaction for data safety
+        let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
+
         // Delete existing tags for this entity
-        conn.execute(
+        tx.execute(
             "DELETE FROM entity_tags WHERE entity_type = ? AND entity_id = ?",
             rusqlite::params![entity_type, entity_id],
         )
@@ -175,12 +207,14 @@ pub fn set_entity_tags(
 
         // Insert new tags
         for tag_id in tag_ids {
-            conn.execute(
+            tx.execute(
                 "INSERT INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
                 rusqlite::params![entity_type, entity_id, tag_id],
             )
             .map_err(|e| e.to_string())?;
         }
+
+        tx.commit().map_err(|e| e.to_string())?;
 
         Ok(())
     })

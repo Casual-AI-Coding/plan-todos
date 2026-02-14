@@ -17,7 +17,7 @@ export function TodosView() {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
-  const [tagFilter, setTagFilter] = useState<string>('all');
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showForm, setShowForm] = useState(false);
@@ -75,9 +75,10 @@ export function TodosView() {
     if (priorityFilter !== 'all' && t.priority !== priorityFilter) {
       return false;
     }
-    // Tag filter
-    if (tagFilter !== 'all') {
-      const hasTag = t.tags?.some(tag => tag.id === tagFilter);
+    // Tag filter (OR logic - multiple tags)
+    if (tagFilters.length > 0) {
+      const todoTagIds = (t.tags || []).map(tag => tag.id);
+      const hasTag = tagFilters.some(tagId => todoTagIds.includes(tagId));
       if (!hasTag) return false;
     }
     // Status filter
@@ -181,9 +182,9 @@ export function TodosView() {
       <div className="flex gap-2 mb-4 flex-wrap">
         <span className="text-sm text-gray-600 py-2">标签:</span>
         <button
-          onClick={() => setTagFilter('all')}
+          onClick={() => setTagFilters([])}
           className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-            tagFilter === 'all' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            tagFilters.length === 0 ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
           全部
@@ -191,11 +192,13 @@ export function TodosView() {
         {allTags.map(tag => (
           <button
             key={tag.id}
-            onClick={() => setTagFilter(tag.id)}
+            onClick={() => setTagFilters(prev => 
+              prev.includes(tag.id) ? prev.filter(t => t !== tag.id) : [...prev, tag.id]
+            )}
             className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-              tagFilter === tag.id ? 'text-white' : ''
+              tagFilters.includes(tag.id) ? 'text-white' : ''
             }`}
-            style={{ backgroundColor: tagFilter === tag.id ? tag.color : `${tag.color}20`, color: tagFilter === tag.id ? 'white' : tag.color }}
+            style={{ backgroundColor: tagFilters.includes(tag.id) ? tag.color : `${tag.color}20`, color: tagFilters.includes(tag.id) ? 'white' : tag.color }}
           >
             {tag.name}
           </button>

@@ -26,12 +26,25 @@ export function SettingsTagsView() {
   useEffect(() => { loadTags(); }, []);
 
   async function handleSubmit() {
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      alert('标签名称不能为空');
+      return;
+    }
+    // Check for duplicate name
+    const trimmedName = name.trim();
+    const exists = tags.some(t => 
+      t.name.toLowerCase() === trimmedName.toLowerCase() && 
+      (!editingTag || t.id !== editingTag.id)
+    );
+    if (exists) {
+      alert('标签名称已存在');
+      return;
+    }
     try {
       if (editingTag) {
-        await updateTag(editingTag.id, { name, color });
+        await updateTag(editingTag.id, { name: trimmedName, color });
       } else {
-        await createTag(name, color);
+        await createTag(trimmedName, color);
       }
       setShowForm(false);
       setEditingTag(null);
