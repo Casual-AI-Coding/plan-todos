@@ -251,20 +251,69 @@ CREATE TABLE milestones (
 
 ---
 
-## 四、索引设计
+## 四、索引设计 (已实现)
+
+### 4.1 索引列表
+
+| 表 | 索引名 | 字段 | 用途 |
+|----|--------|------|------|
+| tasks | idx_tasks_plan_id | plan_id | 按计划查询任务 |
+| tasks | idx_tasks_status | status | 状态筛选 |
+| tasks | idx_tasks_dates | start_date, end_date | 日期范围查询 |
+| steps | idx_steps_target_id | target_id | 按目标查询步骤 |
+| steps | idx_steps_status | status | 状态筛选 |
+| todos | idx_todos_due_date | due_date | 今日/即将到期查询 |
+| todos | idx_todos_status | status | 状态筛选 |
+| todos | idx_todos_status_due | status, due_date | Dashboard综合查询 |
+| plans | idx_plans_status | status | 状态筛选 |
+| plans | idx_plans_dates | start_date, end_date | 日期范围查询 |
+| targets | idx_targets_status | status | 状态筛选 |
+| targets | idx_targets_due_date | due_date | 截止日期查询 |
+| milestones | idx_milestones_plan_id | plan_id | 进度计算 |
+| milestones | idx_milestones_task_id | task_id | 进度计算 |
+| milestones | idx_milestones_target_id | target_id | 进度计算 |
+| milestones | idx_milestones_status | status | 状态筛选 |
+
+### 4.2 性能提升预期
+
+- **按 Plan 加载 Task**: ~10x 提升
+- **Dashboard 查询**: ~5x 提升 (复合索引)
+- **日历视图**: ~3x 提升 (日期索引)
+- **状态筛选**: ~5x 提升
+
+### 4.3 实现代码
 
 ```sql
--- 加速查询
-CREATE INDEX idx_tasks_plan_id ON tasks(plan_id);
-CREATE INDEX idx_steps_target_id ON steps(target_id);
-CREATE INDEX idx_todos_status ON todos(status);
-CREATE INDEX idx_todos_due_date ON todos(due_date);
-CREATE INDEX idx_milestones_status ON milestones(status);
+-- 任务表索引
+CREATE INDEX IF NOT EXISTS idx_tasks_plan_id ON tasks(plan_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_dates ON tasks(start_date, end_date);
 
--- 时间范围查询
-CREATE INDEX idx_plans_date ON plans(start_date, end_date);
-CREATE INDEX idx_tasks_date ON tasks(start_date, end_date);
+-- 步骤表索引
+CREATE INDEX IF NOT EXISTS idx_steps_target_id ON steps(target_id);
+CREATE INDEX IF NOT EXISTS idx_steps_status ON steps(status);
+
+-- 待办表索引
+CREATE INDEX IF NOT EXISTS idx_todos_due_date ON todos(due_date);
+CREATE INDEX IF NOT EXISTS idx_todos_status ON todos(status);
+CREATE INDEX IF NOT EXISTS idx_todos_status_due ON todos(status, due_date);
+
+-- 计划表索引
+CREATE INDEX IF NOT EXISTS idx_plans_status ON plans(status);
+CREATE INDEX IF NOT EXISTS idx_plans_dates ON plans(start_date, end_date);
+
+-- 目标表索引
+CREATE INDEX IF NOT EXISTS idx_targets_status ON targets(status);
+CREATE INDEX IF NOT EXISTS idx_targets_due_date ON targets(due_date);
+
+-- 里程碑表索引
+CREATE INDEX IF NOT EXISTS idx_milestones_plan_id ON milestones(plan_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_task_id ON milestones(task_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_target_id ON milestones(target_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_status ON milestones(status);
 ```
+
+> **注意**: 所有索引使用 `CREATE INDEX IF NOT EXISTS`，确保在已有数据库上安全迁移
 
 ---
 

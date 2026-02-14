@@ -2,7 +2,7 @@
 
 > 状态：✅ 已实现（2026-02-14）
 > 
-> **实际状态**：UI 组件库和视图组件已全部实现
+> **实际状态**：UI 组件库和视图组件已全部实现，包含搜索和日历功能
 
 ---
 
@@ -20,7 +20,8 @@ src/components/
 │   ├── ProgressBar/
 │   ├── Checkbox/
 │   ├── DatePicker/
-│   └── SearchBar/
+│   ├── SearchBar/
+│   └── Calendar/
 │
 ├── layout/                   # 布局组件
 │   ├── Sidebar/

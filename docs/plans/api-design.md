@@ -452,13 +452,13 @@
 
 ---
 
-## 九、统计 API
+## 九、统计 API (已实现)
 
-### 9.1 获取统计数据
+### 9.1 获取统计数据 get_statistics
 
 ```typescript
 // 请求
-{ "cmd": "get_statistics", "payload": { period?: "day" | "week" | "month" | "all" } }
+{ "cmd": "get_statistics" }
 
 // 响应
 {
@@ -474,24 +474,36 @@
     },
     "completion": {
       "todo_done": 30,
+      "todo_total": 45,
+      "todo_completion_rate": 66.67,
       "task_done": 18,
-      "step_done": 22,
-      "milestone_done": 2
+      "task_total": 28,
+      "task_completion_rate": 64.29,
+      "step_completed": 22,
+      "step_total": 35,
+      "step_completion_rate": 62.86,
+      "milestone_done": 2,
+      "milestone_total": 5,
+      "milestone_completion_rate": 40.00
     },
     "trends": {
-      // 日/周/月 完成趋势
+      "daily": [
+        { "date": "2026-02-14", "completed": 5 },
+        { "date": "2026-02-13", "completed": 3 }
+      ]
     },
     "efficiency": {
       "streak_days": 5,
       "today_completed": 3,
       "week_completed": 15,
-      "productivity_score": 85
+      "month_completed": 42,
+      "productivity_score": 78
     }
   }
 }
 ```
 
-### 9.2 获取今日概览
+### 9.2 获取今日概览 get_dashboard
 
 ```typescript
 // 请求
