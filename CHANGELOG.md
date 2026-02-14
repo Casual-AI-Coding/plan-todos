@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.2] - 2026-02-14
+
+### Added
+- Priority 优先级功能: 给 Todo/Task/Step 添加 P0-P3 优先级
+- 后端: 数据库添加 priority 字段 (默认 P2)
+- 后端: Rust models 和 CRUD 操作支持 priority
+- 前端: Todo 创建/编辑表单添加优先级选择器
+- 前端: Todo 列表显示优先级颜色徽章
+- 前端: Todo 列表添加优先级筛选器
+- 添加 Priority 类型测试
+
+### Changed
+- 更新 iteration-plan.md Phase 2 状态
+
+---
+
 ## [0.3.1] - 2026-02-14
 
 ### Added

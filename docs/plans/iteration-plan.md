@@ -133,7 +133,7 @@ const dashboard = await getDashboard(); // 包含所有数据
 
 | 序号 | 功能 | 说明 | 状态 |
 |------|------|------|------|
-| 2.1 | 优先级 (Priority) | 给 Todo/Task/Step 添加 P0-P3 优先级 | **实现中** |
+| 2.1 | 优先级 (Priority) | 给 Todo/Task/Step 添加 P0-P3 优先级 | **已完成** |
 | 2.2 | 标签系统 (Tags) | 给 Todo/Plan/Target 添加标签，支持筛选 | 待实现 |
 | 2.3 | 导入/导出 | JSON 格式导入导出所有数据 (含 settings) | 待实现 |
 

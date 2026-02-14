@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard } from '@/lib/api';
+import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority } from '@/lib/api';
 
 // ============================================================================
 // isTauri Function Tests
@@ -326,5 +326,67 @@ describe('API Functions - Notifications (non-Tauri)', () => {
   it('getDailySummary throws error when not in Tauri', async () => {
     const { getDailySummary } = await import('@/lib/api');
     await expect(getDailySummary()).rejects.toThrow('This app must run in Tauri');
+  });
+});
+
+// ============================================================================
+// Priority Type Tests
+// ============================================================================
+describe('Priority Type', () => {
+  it('Priority type accepts P0', () => {
+    const priority: Priority = 'P0';
+    expect(priority).toBe('P0');
+  });
+
+  it('Priority type accepts P1', () => {
+    const priority: Priority = 'P1';
+    expect(priority).toBe('P1');
+  });
+
+  it('Priority type accepts P2', () => {
+    const priority: Priority = 'P2';
+    expect(priority).toBe('P2');
+  });
+
+  it('Priority type accepts P3', () => {
+    const priority: Priority = 'P3';
+    expect(priority).toBe('P3');
+  });
+});
+
+// ============================================================================
+// API Functions - Priority in Create/Update (non-Tauri)
+// ============================================================================
+describe('API Functions - Priority in Create/Update (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('createTodo accepts priority parameter', async () => {
+    // Should not throw - priority is optional
+    await expect(createTodo({ title: 'Test', priority: 'P0' })).rejects.toThrow('This app must run in Tauri to create todos');
+  });
+
+  it('updateTodo accepts priority parameter', async () => {
+    await expect(updateTodo('id', { priority: 'P1' })).rejects.toThrow('This app must run in Tauri to update todos');
+  });
+
+  it('createTask accepts priority parameter', async () => {
+    await expect(createTask({ plan_id: 'plan-1', title: 'Test', priority: 'P0' })).rejects.toThrow('This app must run in Tauri to create tasks');
+  });
+
+  it('updateTask accepts priority parameter', async () => {
+    await expect(updateTask('id', { priority: 'P1' })).rejects.toThrow('This app must run in Tauri to update tasks');
+  });
+
+  it('createStep accepts priority parameter', async () => {
+    await expect(createStep({ target_id: 'target-1', title: 'Test', weight: 50, priority: 'P0' })).rejects.toThrow('This app must run in Tauri to create steps');
+  });
+
+  it('updateStep accepts priority parameter', async () => {
+    await expect(updateStep('id', { priority: 'P1' })).rejects.toThrow('This app must run in Tauri to update steps');
   });
 });
