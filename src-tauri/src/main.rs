@@ -2,6 +2,7 @@
 
 use log::info;
 use rusqlite::Connection;
+use std::io::Write;
 use std::sync::Mutex;
 
 // Re-export AppState for use in modules
@@ -24,7 +25,21 @@ mod tasks;
 mod todos;
 
 fn main() {
-    env_logger::init();
+    // Initialize logger with info level
+    env_logger::Builder::from_default_env()
+        .filter_level(log::LevelFilter::Info)
+        .format(|buf, record| {
+            writeln!(
+                buf,
+                "[{} {} {}] {}",
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                record.level(),
+                record.target(),
+                record.args()
+            )
+        })
+        .init();
+
     info!("Starting Plan Todos application");
 
     // Initialize database

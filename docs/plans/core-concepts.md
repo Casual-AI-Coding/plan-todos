@@ -519,7 +519,10 @@ React Context
 - [x] 每日汇总 API (`get_daily_summary`)
 - [x] 通知设置 CRUD (`get_notification_settings`, `set_notification_settings`, `delete_notification_settings`)
 - [x] 每日汇总设置 (`get_daily_summary_settings`, `update_daily_summary_settings`)
-- [ ] 飞书/钉钉/邮件/Webhook 插件 (Phase 5.2)
+- [x] 飞书/钉钉/邮件/Webhook 插件 (`notification_plugins`)
+  - [x] 插件 CRUD API
+  - [x] 发送通知 API (`send_notification`)
+  - [ ] UI 界面 (待实现)
 
 ### Phase 6: 移动端 📋 待规划
 
