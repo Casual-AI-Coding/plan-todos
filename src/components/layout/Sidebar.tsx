@@ -97,8 +97,10 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             fontSize: level === 0 ? '15px' : '14px',
           }}
         >
-          {/* Arrow - always on far left */}
-          {hasChildren ? (
+          <span className="text-base">{menu.icon}</span>
+          <span className="font-medium truncate flex-1 text-left">{menu.label}</span>
+          {/* Arrow on the right */}
+          {hasChildren && (
             <span 
               className="text-xs transition-transform w-3 flex-shrink-0"
               style={{ 
@@ -108,11 +110,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             >
               ▶
             </span>
-          ) : (
-            <span className="text-xs w-3 flex-shrink-0 text-transparent">▶</span>
           )}
-          <span className="text-base">{menu.icon}</span>
-          <span className="font-medium truncate">{menu.label}</span>
         </button>
         
         {hasChildren && isExpanded && (
