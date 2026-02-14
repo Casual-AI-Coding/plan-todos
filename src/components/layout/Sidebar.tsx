@@ -22,6 +22,7 @@ const menus: MenuItem[] = [
   { id: 'milestones', icon: '🏆', label: 'MILESTONES' },
   { id: 'views', icon: '👁️', label: '视图查看' },
   { id: 'statistics', icon: '📈', label: '数据统计' },
+  { id: 'settings-about', icon: 'ℹ️', label: '关于' },
   { 
     id: 'settings', 
     icon: '⚙️', 
@@ -37,7 +38,6 @@ const menus: MenuItem[] = [
           { id: 'settings-daily-summary', icon: '📅', label: '每日汇总' },
         ]
       },
-      { id: 'settings-about', icon: 'ℹ️', label: '关于' },
     ]
   },
 ];
