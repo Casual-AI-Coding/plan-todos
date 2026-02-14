@@ -97,9 +97,6 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             fontSize: level === 0 ? '15px' : '14px',
           }}
         >
-          <span className="text-base">{menu.icon}</span>
-          <span className="font-medium truncate flex-1 text-left">{menu.label}</span>
-          {/* Arrow on the right */}
           {hasChildren && (
             <span 
               className="text-xs transition-transform w-3 flex-shrink-0"
@@ -111,6 +108,9 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
               ▶
             </span>
           )}
+          {!hasChildren && level > 0 && <span className="w-3"></span>}
+          <span className="text-base">{menu.icon}</span>
+          <span className="font-medium truncate">{menu.label}</span>
         </button>
         
         {hasChildren && isExpanded && (
