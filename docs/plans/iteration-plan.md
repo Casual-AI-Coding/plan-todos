@@ -133,38 +133,53 @@ const dashboard = await getDashboard(); // 包含所有数据
 
 | 序号 | 功能 | 说明 | 状态 |
 |------|------|------|------|
-| 2.1 | 导入/导出 | JSON 格式导入导出所有数据 | 待讨论 |
-| 2.2 | 标签系统 | 给 Todo/Task 添加标签，支持筛选 | 待讨论 |
-| 2.3 | 优先级 | 高/中/低优先级 | 待讨论 |
+| 2.1 | 优先级 (Priority) | 给 Todo/Task/Step 添加 P0-P3 优先级 | **实现中** |
+| 2.2 | 标签系统 (Tags) | 给 Todo/Plan/Target 添加标签，支持筛选 | 待实现 |
+| 2.3 | 导入/导出 | JSON 格式导入导出所有数据 (含 settings) | 待实现 |
 
-### 2.1 导入/导出
+### 实现顺序
+1. **Priority** (优先级) - 最简单，收益明显
+2. **Tags** (标签系统) - 中等复杂度
+3. **Import/Export** (导入导出) - 最后实现
 
-**需求**：
-- 导出：所有数据导出为 JSON 文件
-- 导入：从 JSON 文件导入数据（可选择合并或替换）
+---
 
-**数据结构**：
-```json
-{
-  "version": "1.0",
-  "exported_at": "2026-02-14T12:00:00Z",
-  "data": {
-    "todos": [...],
-    "plans": [...],
-    "tasks": [...],
-    "targets": [...],
-    "steps": [...],
-    "milestones": [...]
-  }
-}
+### 2.1 优先级 (Priority)
+
+**设计决策**：
+- 优先级加在最细节的事项上：**Todo、Task、Step**
+- 枚举值：**P0、P1、P2、P3** (P0 最高)
+- 默认值：**P2**
+
+**枚举说明**：
+
+| 优先级 | 说明 | 颜色 |
+|--------|------|------|
+| P0 | 紧急重要 | 红色 #EF4444 |
+| P1 | 重要 | 橙色 #F59E0B |
+| P2 | 普通 (默认) | 灰色 #6B7280 |
+| P3 | 低优先级 | 蓝色 #3B82F6 |
+
+**数据库扩展**：
+```sql
+ALTER TABLE todos ADD COLUMN priority TEXT DEFAULT 'P2';
+ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'P2';
+ALTER TABLE steps ADD COLUMN priority TEXT DEFAULT 'P2';
 ```
 
-### 2.2 标签系统
+**前端展示**：
+- Todo/Task/Step 列表显示优先级图标
+- 筛选器支持按优先级筛选
+- 排序可选: 优先级靠前
 
-**需求**：
-- 给 Todo 和 Task 添加标签
-- 支持多标签
-- 支持按标签筛选
+---
+
+### 2.2 标签系统 (Tags)
+
+**设计决策**：
+- 标签加在上层概念：**Todo、Plan、Target**
+- Todo 支持优先级 + 标签筛选
+- Plan 和 Target 支持标签筛选
 
 **数据库扩展**：
 ```sql
@@ -172,29 +187,81 @@ const dashboard = await getDashboard(); // 包含所有数据
 CREATE TABLE tags (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
-  color TEXT,
+  color TEXT NOT NULL DEFAULT '#3B82F6',
   created_at TEXT NOT NULL
 );
 
--- Todo 标签关联
-CREATE TABLE todo_tags (
-  todo_id TEXT REFERENCES todos(id) ON DELETE CASCADE,
-  tag_id TEXT REFERENCES tags(id) ON DELETE CASCADE,
-  PRIMARY KEY (todo_id, tag_id)
+-- 实体标签关联表 (多对多)
+CREATE TABLE entity_tags (
+  entity_type TEXT NOT NULL,  -- 'todo' | 'plan' | 'target'
+  entity_id TEXT NOT NULL,
+  tag_id TEXT NOT NULL,
+  PRIMARY KEY (entity_type, entity_id, tag_id),
+  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 ```
 
-### 2.3 优先级
+**UI 设计**：
+- 位置：**Settings > Tags Management** (通用和通知之间)
+- 功能：创建/编辑/删除标签 (名称 + 颜色)
+- 筛选：Todo/Plan/Target 列表页支持按标签筛选 (多选 = OR 关系)
 
-**需求**：
-- Todo 和 Task 支持优先级设置
-- 优先级：high / medium / low
-- 支持按优先级排序和筛选
+---
 
-**数据库扩展**：
-```sql
-ALTER TABLE todos ADD COLUMN priority TEXT DEFAULT 'medium';
-ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'medium';
+### 2.3 导入/导出
+
+**设计决策**：
+- 导出包含 **settings** (notification_settings, daily_summary_settings, notification_plugins)
+
+**导出数据格式**：
+```json
+{
+  "version": "1.0",
+  "exported_at": "2026-02-14T12:00:00Z",
+  "data": {
+    "todos": [...],
+    "tasks": [...],
+    "plans": [...],
+    "targets": [...],
+    "steps": [...],
+    "milestones": [...],
+    "tags": [...],
+    "entity_tags": [...],
+    "settings": {
+      "notification_settings": [...],
+      "daily_summary_settings": [...],
+      "notification_plugins": [...]
+    }
+  }
+}
+```
+
+**导入策略**：
+
+| 模式 | 说明 | 场景 |
+|------|------|------|
+| merge | 合并 (id 冲突则跳过) | 增量导入 |
+| replace | 替换 (清空后导入) | 完全覆盖 |
+| update | 更新 (id 相同则更新) | 同步更新 |
+
+**前端 UI**：
+- 位置：Settings 新增 **Import/Export** 标签页
+- 导出：点击按钮 → 下载 JSON 文件
+- 导入：选择文件 + 模式选择 → 上传解析 → 导入结果
+
+---
+
+### 2.4 Settings 页面结构更新
+
+```
+Settings
+├── General          (通用)
+├── Tags Management  (标签管理) ← 新增
+├── Notifications    (通知)
+├── Channels         (渠道)
+└── Daily Summary   (每日汇总)
+├── Import/Export   (导入导出) ← 新增
+└── About           (关于)
 ```
 
 ---
@@ -270,3 +337,4 @@ CREATE TABLE circulation_logs (
 | 日期 | 操作 |
 |------|------|
 | 2026-02-14 | 创建文档 |
+| 2026-02-14 | Phase 2 详细设计: Priority(P0-P3), Tags(Todo/Plan/Target), Import/Export(含settings) |
