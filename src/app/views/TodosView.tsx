@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Modal, Input, Checkbox } from '@/components/ui';
 import { Calendar } from '@/components/ui/Calendar';
-import { getTodos, createTodo, updateTodo, deleteTodo, Todo } from '@/lib/api';
+import { getTodos, createTodo, updateTodo, deleteTodo, Todo, Priority } from '@/lib/api';
 
 interface CalendarEvent {
   id: string;
@@ -15,6 +15,7 @@ interface CalendarEvent {
 export function TodosView() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
+  const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [showForm, setShowForm] = useState(false);
@@ -22,6 +23,7 @@ export function TodosView() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState<Priority>('P2');
 
   async function loadTodos() {
     try {
@@ -51,6 +53,10 @@ export function TodosView() {
         return false;
       }
     }
+    // Priority filter
+    if (priorityFilter !== 'all' && t.priority !== priorityFilter) {
+      return false;
+    }
     // Status filter
     const today = new Date().toISOString().split('T')[0];
     if (filter === 'today') return t.due_date?.startsWith(today);
@@ -63,15 +69,16 @@ export function TodosView() {
     if (!title.trim()) return;
     try {
       if (editingTodo) {
-        await updateTodo(editingTodo.id, { title, content: content || undefined, due_date: dueDate || undefined });
+        await updateTodo(editingTodo.id, { title, content: content || undefined, due_date: dueDate || undefined, priority });
       } else {
-        await createTodo({ title, content: content || undefined, due_date: dueDate || undefined });
+        await createTodo({ title, content: content || undefined, due_date: dueDate || undefined, priority });
       }
       setShowForm(false);
       setEditingTodo(null);
       setTitle('');
       setContent('');
       setDueDate('');
+      setPriority('P2');
       loadTodos();
     } catch (e) { console.error(e); }
   }
@@ -119,6 +126,28 @@ export function TodosView() {
         ))}
       </div>
 
+      {/* Priority filter */}
+      <div className="flex gap-2 mb-4">
+        <span className="text-sm text-gray-600 py-2">优先级:</span>
+        {(['all', 'P0', 'P1', 'P2', 'P3'] as const).map(p => (
+          <button
+            key={p}
+            onClick={() => setPriorityFilter(p)}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              priorityFilter === p 
+                ? p === 'all' ? 'bg-teal-500 text-white' :
+                  p === 'P0' ? 'bg-red-500 text-white' :
+                  p === 'P1' ? 'bg-orange-500 text-white' :
+                  p === 'P2' ? 'bg-gray-500 text-white' :
+                  'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {p === 'all' ? '全部' : p}
+          </button>
+        ))}
+      </div>
+
       {/* Search input */}
       <div className="mb-4">
         <input
@@ -155,13 +184,22 @@ export function TodosView() {
         /* List */
         <div className="space-y-2">
         {filteredTodos.map(todo => (
-          <Card key={todo.id} hoverable onClick={() => { setEditingTodo(todo); setTitle(todo.title); setContent(todo.content || ''); setDueDate(todo.due_date || ''); setShowForm(true); }}>
+          <Card key={todo.id} hoverable onClick={() => { setEditingTodo(todo); setTitle(todo.title); setContent(todo.content || ''); setDueDate(todo.due_date || ''); setPriority(todo.priority); setShowForm(true); }}>
             <div className="flex items-center gap-3">
               <Checkbox 
                 checked={todo.status === 'done'} 
                 onChange={() => handleToggle(todo)}
                 onClick={e => e.stopPropagation()}
               />
+              {/* Priority badge */}
+              <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                todo.priority === 'P0' ? 'bg-red-100 text-red-700' :
+                todo.priority === 'P1' ? 'bg-orange-100 text-orange-700' :
+                todo.priority === 'P2' ? 'bg-gray-100 text-gray-600' :
+                'bg-blue-100 text-blue-700'
+              }`}>
+                {todo.priority}
+              </span>
               <div className="flex-1">
                 <div className={todo.status === 'done' ? 'line-through text-gray-400' : ''}>
                   {todo.title}
@@ -199,10 +237,10 @@ export function TodosView() {
       <Modal 
         open={showForm} 
         title={editingTodo ? '编辑 Todo' : '新建 Todo'} 
-        onClose={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); }}
+        onClose={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); setPriority('P2'); }}
         footer={
           <>
-            <Button variant="secondary" onClick={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); }}>取消</Button>
+            <Button variant="secondary" onClick={() => { setShowForm(false); setEditingTodo(null); setTitle(''); setContent(''); setDueDate(''); setPriority('P2'); }}>取消</Button>
             <Button onClick={handleSubmit}>{editingTodo ? '保存' : '创建'}</Button>
           </>
         }
@@ -231,6 +269,19 @@ export function TodosView() {
             value={dueDate}
             onChange={e => setDueDate(e.target.value)}
           />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+            <select 
+              value={priority}
+              onChange={e => setPriority(e.target.value as Priority)}
+              className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              <option value="P0">P0 - 紧急重要</option>
+              <option value="P1">P1 - 重要</option>
+              <option value="P2">P2 - 普通</option>
+              <option value="P3">P3 - 低优先级</option>
+            </select>
+          </div>
         </div>
       </Modal>
     </div>

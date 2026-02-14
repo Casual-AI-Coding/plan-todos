@@ -29,6 +29,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             start_date TEXT,
             end_date TEXT,
             status TEXT NOT NULL DEFAULT 'pending',
+            priority TEXT NOT NULL DEFAULT 'P2',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE CASCADE
@@ -59,6 +60,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             title TEXT NOT NULL,
             weight INTEGER NOT NULL DEFAULT 0,
             status TEXT NOT NULL DEFAULT 'pending',
+            priority TEXT NOT NULL DEFAULT 'P2',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE CASCADE
@@ -74,6 +76,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             content TEXT,
             due_date TEXT,
             status TEXT NOT NULL DEFAULT 'pending',
+            priority TEXT NOT NULL DEFAULT 'P2',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )",

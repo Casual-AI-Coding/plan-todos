@@ -17,6 +17,8 @@ export interface Plan {
 // ============================================================================
 // Task - 短期任务
 // ============================================================================
+export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
+
 export interface Task {
   id: string;
   plan_id: string;
@@ -25,6 +27,7 @@ export interface Task {
   start_date: string | null;
   end_date: string | null;
   status: 'pending' | 'in-progress' | 'done';
+  priority: Priority;
   created_at: string;
   updated_at: string;
 }
@@ -52,6 +55,7 @@ export interface Step {
   title: string;
   weight: number; // 0-100
   status: 'pending' | 'completed';
+  priority: Priority;
   created_at: string;
   updated_at: string;
 }
@@ -65,6 +69,7 @@ export interface Todo {
   content: string | null;
   due_date: string | null;
   status: 'pending' | 'in-progress' | 'done';
+  priority: Priority;
   created_at: string;
   updated_at: string;
 }
@@ -197,6 +202,7 @@ export async function createTask(data: {
   description?: string;
   start_date?: string;
   end_date?: string;
+  priority?: Priority;
 }): Promise<Task> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to create tasks');
@@ -208,6 +214,7 @@ export async function createTask(data: {
     description: data.description || null,
     startDate: data.start_date || null,
     endDate: data.end_date || null,
+    priority: data.priority || null,
   });
 }
 
@@ -217,6 +224,7 @@ export async function updateTask(id: string, data: {
   start_date?: string;
   end_date?: string;
   status?: 'pending' | 'in-progress' | 'done';
+  priority?: Priority;
 }): Promise<Task> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to update tasks');
@@ -229,6 +237,7 @@ export async function updateTask(id: string, data: {
     startDate: data.start_date,
     endDate: data.end_date,
     status: data.status,
+    priority: data.priority,
   });
 }
 
@@ -321,6 +330,7 @@ export async function createStep(data: {
   target_id: string;
   title: string;
   weight: number;
+  priority?: Priority;
 }): Promise<Step> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to create steps');
@@ -330,6 +340,7 @@ export async function createStep(data: {
     targetId: data.target_id,
     title: data.title,
     weight: data.weight,
+    priority: data.priority || null,
   });
 }
 
@@ -337,6 +348,7 @@ export async function updateStep(id: string, data: {
   title?: string;
   weight?: number;
   status?: 'pending' | 'completed';
+  priority?: Priority;
 }): Promise<Step> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to update steps');
@@ -347,6 +359,7 @@ export async function updateStep(id: string, data: {
     title: data.title,
     weight: data.weight,
     status: data.status,
+    priority: data.priority,
   });
 }
 
@@ -383,6 +396,7 @@ export async function createTodo(data: {
   title: string;
   content?: string;
   due_date?: string;
+  priority?: Priority;
 }): Promise<Todo> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to create todos');
@@ -392,6 +406,7 @@ export async function createTodo(data: {
     title: data.title,
     content: data.content || null,
     dueDate: data.due_date || null,
+    priority: data.priority || null,
   });
 }
 
@@ -400,6 +415,7 @@ export async function updateTodo(id: string, data: {
   content?: string;
   due_date?: string;
   status?: 'pending' | 'in-progress' | 'done';
+  priority?: Priority;
 }): Promise<Todo> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to update todos');
@@ -411,6 +427,7 @@ export async function updateTodo(id: string, data: {
     content: data.content,
     dueDate: data.due_date,
     status: data.status,
+    priority: data.priority,
   });
 }
 

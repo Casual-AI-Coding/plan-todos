@@ -10,7 +10,7 @@ pub fn get_steps(state: tauri::State<AppState>, target_id: String) -> Result<Vec
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, target_id, title, weight, status, created_at, updated_at FROM steps WHERE target_id = ?")
+            .prepare("SELECT id, target_id, title, weight, status, priority, created_at, updated_at FROM steps WHERE target_id = ?")
             .map_err(|e| e.to_string())?;
 
         let step_iter = stmt
@@ -21,8 +21,9 @@ pub fn get_steps(state: tauri::State<AppState>, target_id: String) -> Result<Vec
                     title: row.get(2)?,
                     weight: row.get(3)?,
                     status: row.get(4)?,
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    priority: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -37,6 +38,7 @@ pub fn create_step(
     target_id: String,
     title: String,
     weight: i32,
+    priority: Option<String>,
 ) -> Result<Step, String> {
     log_command!("create_step", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -59,10 +61,11 @@ pub fn create_step(
 
         let id = uuid::Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();
+        let priority = priority.unwrap_or_else(|| "P2".to_string());
 
         conn.execute(
-            "INSERT INTO steps (id, target_id, title, weight, status, created_at, updated_at) VALUES (?, ?, ?, ?, 'pending', ?, ?)",
-            rusqlite::params![id, target_id, title, weight, now, now],
+            "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)",
+            rusqlite::params![id, target_id, title, weight, priority, now, now],
         ).map_err(|e| e.to_string())?;
 
         Ok(Step {
@@ -71,6 +74,7 @@ pub fn create_step(
             title,
             weight,
             status: "pending".to_string(),
+            priority,
             created_at: now.clone(),
             updated_at: now,
         })
@@ -85,13 +89,14 @@ pub fn update_step(
     title: Option<String>,
     weight: Option<i32>,
     status: Option<String>,
+    priority: Option<String>,
 ) -> Result<Step, String> {
     log_command!("update_step", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
 
         let mut stmt = conn
-            .prepare("SELECT id, target_id, title, weight, status, created_at, updated_at FROM steps WHERE id = ?")
+            .prepare("SELECT id, target_id, title, weight, status, priority, created_at, updated_at FROM steps WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let step: Step = stmt
@@ -102,8 +107,9 @@ pub fn update_step(
                     title: row.get(2)?,
                     weight: row.get(3)?,
                     status: row.get(4)?,
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    priority: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -111,6 +117,7 @@ pub fn update_step(
         let new_title = title.unwrap_or(step.title);
         let new_weight = weight.unwrap_or(step.weight);
         let new_status = status.unwrap_or(step.status);
+        let new_priority = priority.unwrap_or(step.priority);
 
         // Validate weight sum if weight is being changed
         if let Some(w) = weight {
@@ -133,8 +140,8 @@ pub fn update_step(
         }
 
         conn.execute(
-            "UPDATE steps SET title = ?, weight = ?, status = ?, updated_at = ? WHERE id = ?",
-            rusqlite::params![new_title, new_weight, new_status, now, id],
+            "UPDATE steps SET title = ?, weight = ?, status = ?, priority = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![new_title, new_weight, new_status, new_priority, now, id],
         )
         .map_err(|e| e.to_string())?;
 
@@ -144,6 +151,7 @@ pub fn update_step(
             title: new_title,
             weight: new_weight,
             status: new_status,
+            priority: new_priority,
             created_at: step.created_at,
             updated_at: now,
         })

@@ -28,7 +28,8 @@ pub struct Task {
     pub description: Option<String>,
     pub start_date: Option<String>,
     pub end_date: Option<String>,
-    pub status: String, // pending | in-progress | done
+    pub status: String,   // pending | in-progress | done
+    pub priority: String, // P0 | P1 | P2 | P3 (default P2)
     pub created_at: String,
     pub updated_at: String,
 }
@@ -50,8 +51,9 @@ pub struct Step {
     pub id: String,
     pub target_id: String,
     pub title: String,
-    pub weight: i32,    // 0-100, sum should not exceed 100
-    pub status: String, // pending | completed
+    pub weight: i32,      // 0-100, sum should not exceed 100
+    pub status: String,   // pending | completed
+    pub priority: String, // P0 | P1 | P2 | P3 (default P2)
     pub created_at: String,
     pub updated_at: String,
 }
@@ -62,7 +64,8 @@ pub struct Todo {
     pub title: String,
     pub content: Option<String>,
     pub due_date: Option<String>,
-    pub status: String, // pending | in-progress | done
+    pub status: String,   // pending | in-progress | done
+    pub priority: String, // P0 | P1 | P2 | P3 (default P2)
     pub created_at: String,
     pub updated_at: String,
 }

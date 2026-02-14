@@ -10,7 +10,7 @@ pub fn get_todo(state: tauri::State<AppState>, id: String) -> Result<Todo, Strin
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, title, content, due_date, status, created_at, updated_at FROM todos WHERE id = ?")
+            .prepare("SELECT id, title, content, due_date, status, priority, created_at, updated_at FROM todos WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         stmt.query_row([&id], |row| {
@@ -20,8 +20,9 @@ pub fn get_todo(state: tauri::State<AppState>, id: String) -> Result<Todo, Strin
                 content: row.get(2)?,
                 due_date: row.get(3)?,
                 status: row.get(4)?,
-                created_at: row.get(5)?,
-                updated_at: row.get(6)?,
+                priority: row.get(5)?,
+                created_at: row.get(6)?,
+                updated_at: row.get(7)?,
             })
         })
         .map_err(|e| e.to_string())
@@ -35,7 +36,7 @@ pub fn get_todos(state: tauri::State<AppState>) -> Result<Vec<Todo>, String> {
 
         let mut stmt = conn
             .prepare(
-                "SELECT id, title, content, due_date, status, created_at, updated_at FROM todos",
+                "SELECT id, title, content, due_date, status, priority, created_at, updated_at FROM todos",
             )
             .map_err(|e| e.to_string())?;
 
@@ -47,8 +48,9 @@ pub fn get_todos(state: tauri::State<AppState>) -> Result<Vec<Todo>, String> {
                     content: row.get(2)?,
                     due_date: row.get(3)?,
                     status: row.get(4)?,
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    priority: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -63,16 +65,18 @@ pub fn create_todo(
     title: String,
     content: Option<String>,
     due_date: Option<String>,
+    priority: Option<String>,
 ) -> Result<Todo, String> {
     log_command!("create_todo", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let id = uuid::Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();
+        let priority = priority.unwrap_or_else(|| "P2".to_string());
 
         conn.execute(
-            "INSERT INTO todos (id, title, content, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, 'pending', ?, ?)",
-            rusqlite::params![id, title, content, due_date, now, now],
+            "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)",
+            rusqlite::params![id, title, content, due_date, priority, now, now],
         ).map_err(|e| e.to_string())?;
 
         Ok(Todo {
@@ -81,6 +85,7 @@ pub fn create_todo(
             content,
             due_date,
             status: "pending".to_string(),
+            priority,
             created_at: now.clone(),
             updated_at: now,
         })
@@ -95,13 +100,14 @@ pub fn update_todo(
     content: Option<String>,
     due_date: Option<String>,
     status: Option<String>,
+    priority: Option<String>,
 ) -> Result<Todo, String> {
     log_command!("update_todo", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
 
         let mut stmt = conn
-            .prepare("SELECT id, title, content, due_date, status, created_at, updated_at FROM todos WHERE id = ?")
+            .prepare("SELECT id, title, content, due_date, status, priority, created_at, updated_at FROM todos WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let todo: Todo = stmt
@@ -112,8 +118,9 @@ pub fn update_todo(
                     content: row.get(2)?,
                     due_date: row.get(3)?,
                     status: row.get(4)?,
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    priority: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -122,10 +129,11 @@ pub fn update_todo(
         let new_content = content.or(todo.content);
         let new_due_date = due_date.or(todo.due_date);
         let new_status = status.unwrap_or(todo.status);
+        let new_priority = priority.unwrap_or(todo.priority);
 
         conn.execute(
-            "UPDATE todos SET title = ?, content = ?, due_date = ?, status = ?, updated_at = ? WHERE id = ?",
-            rusqlite::params![new_title, new_content, new_due_date, new_status, now, id],
+            "UPDATE todos SET title = ?, content = ?, due_date = ?, status = ?, priority = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![new_title, new_content, new_due_date, new_status, new_priority, now, id],
         ).map_err(|e| e.to_string())?;
 
         Ok(Todo {
@@ -134,6 +142,7 @@ pub fn update_todo(
             content: new_content,
             due_date: new_due_date,
             status: new_status,
+            priority: new_priority,
             created_at: todo.created_at,
             updated_at: now,
         })
