@@ -211,6 +211,23 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     )
     .ok();
 
+    // Migration: Add priority columns
+    conn.execute(
+        "ALTER TABLE todos ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'P2'",
+        [],
+    )
+    .ok();
+    conn.execute(
+        "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'P2'",
+        [],
+    )
+    .ok();
+    conn.execute(
+        "ALTER TABLE steps ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'P2'",
+        [],
+    )
+    .ok();
+
     // Create indexes for performance optimization
     create_indexes(conn)?;
 
