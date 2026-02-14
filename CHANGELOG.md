@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.4.0] - 2026-02-14
+## [0.3.6] - 2026-02-15
 
 ### Added
 - Tags 标签功能: 支持给 Todo/Plan/Target 添加标签
@@ -15,10 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 后端: Rust tags API (get_tags, create_tag, update_tag, delete_tag)
 - 后端: Entity tags API (get_entity_tags, set_entity_tags, get_entities_by_tag)
 - 前端: 设置页面添加标签管理 (Settings > 标签管理)
-- 前端: Todo 列表显示标签徽章
-- 前端: Todo 创建/编辑表单添加标签选择器
-- 前端: Todo 列表添加标签筛选器
+- 前端: Todo/Plan/Target 列表显示标签徽章
+- 前端: Todo/Plan/Target 创建/编辑表单添加标签选择器
+- 前端: Todo/Plan/Target 列表添加标签筛选器 (支持多选 OR 逻辑)
 - 侧边栏: 添加标签管理导航入口 (设置 > 通用和通知之间)
+- 标签描述字段: tags 表增加 description 字段
+
+### Fixed
+- 数据库迁移: 修复 priority 字段重复添加问题
+- 数据库: 启用 SQLite foreign keys 支持级联删除
+- 后端验证: 标签名称/颜色输入验证
+- 前端: 重复标签名称检查
+
+### Refactored
+- Todo 页面筛选 UI 重构:
+  - 第一行: 状态 tabs 在左，视图切换在右
+  - 第二行: 优先级下拉框、标签下拉框、搜索框
+  - 下拉框提升 z-index 防止遮挡
+  - 搜索框添加清空按钮
 
 ### Changed
 - 更新 iteration-plan.md Phase 2 状态
