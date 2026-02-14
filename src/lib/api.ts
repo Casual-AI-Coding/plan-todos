@@ -601,6 +601,7 @@ export interface Dashboard {
     title: string;
     due_date: string | null;
     status: string;
+    priority: string;
   }>;
   // 过期待办
   overdue_todos: Array<{
@@ -608,6 +609,7 @@ export interface Dashboard {
     title: string;
     due_date: string | null;
     status: string;
+    priority: string;
   }>;
   // 今日完成
   completed_today: Array<{
@@ -615,6 +617,7 @@ export interface Dashboard {
     title: string;
     due_date: string | null;
     status: string;
+    priority: string;
   }>;
   // 进行中的计划
   active_plans: Array<{

@@ -57,6 +57,7 @@ pub struct TodoSummary {
     pub title: String,
     pub due_date: Option<String>,
     pub status: String,
+    pub priority: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -150,7 +151,7 @@ pub fn get_dashboard(state: tauri::State<AppState>) -> Result<Dashboard, String>
 fn get_today_todos(conn: &rusqlite::Connection, today: &str) -> Result<Vec<TodoSummary>, String> {
     let mut stmt = conn
         .prepare(
-            "SELECT id, title, due_date, status 
+            "SELECT id, title, due_date, status, COALESCE(priority, 'P2') as priority
             FROM todos 
             WHERE (status = 'pending' OR status = 'in-progress')
             AND date(due_date) <= date(?)
@@ -165,6 +166,7 @@ fn get_today_todos(conn: &rusqlite::Connection, today: &str) -> Result<Vec<TodoS
                 title: row.get(1)?,
                 due_date: row.get(2)?,
                 status: row.get(3)?,
+                priority: row.get(4)?,
             })
         })
         .map_err(|e| e.to_string())?
@@ -177,7 +179,7 @@ fn get_today_todos(conn: &rusqlite::Connection, today: &str) -> Result<Vec<TodoS
 fn get_overdue_todos(conn: &rusqlite::Connection, today: &str) -> Result<Vec<TodoSummary>, String> {
     let mut stmt = conn
         .prepare(
-            "SELECT id, title, due_date, status 
+            "SELECT id, title, due_date, status, COALESCE(priority, 'P2') as priority
             FROM todos 
             WHERE status != 'done'
             AND date(due_date) < date(?)
@@ -192,6 +194,7 @@ fn get_overdue_todos(conn: &rusqlite::Connection, today: &str) -> Result<Vec<Tod
                 title: row.get(1)?,
                 due_date: row.get(2)?,
                 status: row.get(3)?,
+                priority: row.get(4)?,
             })
         })
         .map_err(|e| e.to_string())?
@@ -207,7 +210,7 @@ fn get_upcoming_todos(
 ) -> Result<Vec<TodoSummary>, String> {
     let mut stmt = conn
         .prepare(
-            "SELECT id, title, due_date, status 
+            "SELECT id, title, due_date, status, COALESCE(priority, 'P2') as priority
             FROM todos 
             WHERE status = 'pending'
             AND date(due_date) > date(?)
@@ -223,6 +226,7 @@ fn get_upcoming_todos(
                 title: row.get(1)?,
                 due_date: row.get(2)?,
                 status: row.get(3)?,
+                priority: row.get(4)?,
             })
         })
         .map_err(|e| e.to_string())?
@@ -238,7 +242,7 @@ fn get_completed_today(
 ) -> Result<Vec<TodoSummary>, String> {
     let mut stmt = conn
         .prepare(
-            "SELECT id, title, due_date, status 
+            "SELECT id, title, due_date, status, COALESCE(priority, 'P2') as priority
             FROM todos 
             WHERE status = 'done'
             AND date(updated_at) = date(?)
@@ -253,6 +257,7 @@ fn get_completed_today(
                 title: row.get(1)?,
                 due_date: row.get(2)?,
                 status: row.get(3)?,
+                priority: row.get(4)?,
             })
         })
         .map_err(|e| e.to_string())?
