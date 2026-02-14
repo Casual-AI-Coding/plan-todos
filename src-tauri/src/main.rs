@@ -13,6 +13,7 @@ mod batch;
 mod command_log;
 mod dashboard;
 mod db;
+mod export;
 mod milestones;
 mod models;
 mod notification_plugins;
@@ -139,6 +140,9 @@ fn main() {
             tags::get_entity_tags,
             tags::set_entity_tags,
             tags::get_entities_by_tag,
+            // Export/Import
+            export::export_data,
+            export::import_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Card, Button, Input } from '@/components/ui';
+import { ImportExportView } from './ImportExportView';
 
 export function SettingsGeneralView() {
   const [theme, setTheme] = useState<'light' | 'dark' | 'auto'>('light');
@@ -58,7 +59,9 @@ export function SettingsGeneralView() {
       {/* Data Management */}
       <Card className="mb-6">
         <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>数据管理</h3>
-        <div className="space-y-4">
+        
+        {/* Auto backup setting - keep as is */}
+        <div className="space-y-4 mb-6">
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div>
               <div className="font-medium">自动备份</div>
@@ -83,16 +86,10 @@ export function SettingsGeneralView() {
               <Button variant="secondary">浏览</Button>
             </div>
           </div>
-
-          <div className="flex gap-3">
-            <Button variant="secondary" className="flex-1">
-              导出数据 (JSON)
-            </Button>
-            <Button variant="secondary" className="flex-1">
-              导入数据
-            </Button>
-          </div>
         </div>
+
+        {/* Import/Export Component */}
+        <ImportExportView />
       </Card>
     </div>
   );

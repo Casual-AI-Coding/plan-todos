@@ -1056,3 +1056,53 @@ export async function getEntitiesByTag(
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<string[]>('get_entities_by_tag', { entityType, tagIds });
 }
+
+// ============================================================================
+// Export/Import
+// ============================================================================
+
+export interface ExportData {
+  version: string;
+  exported_at: string;
+  data: {
+    todos: Todo[];
+    tasks: Task[];
+    plans: Plan[];
+    targets: Target[];
+    steps: Step[];
+    milestones: Milestone[];
+    tags: Tag[];
+    entity_tags: Array<{ entity_type: string; entity_id: string; tag_id: string }>;
+    settings: {
+      daily_summary_settings: DailySummarySettings | null;
+      notification_plugins: NotificationPlugin[];
+    };
+  };
+}
+
+export interface ImportResult {
+  imported: number;
+  skipped: number;
+  errors: string[];
+}
+
+export type ImportMode = 'merge' | 'replace' | 'update';
+
+export async function exportData(): Promise<ExportData> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to export data');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<ExportData>('export_data');
+}
+
+export async function importData(
+  data: ExportData,
+  mode: ImportMode
+): Promise<ImportResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to import data');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<ImportResult>('import_data', { data, mode });
+}
