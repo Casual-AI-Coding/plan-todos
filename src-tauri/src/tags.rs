@@ -13,6 +13,7 @@ pub struct Tag {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[allow(dead_code)]
 pub struct EntityTag {
     pub entity_type: String,
     pub entity_id: String,

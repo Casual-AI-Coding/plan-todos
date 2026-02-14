@@ -251,12 +251,12 @@ export function TodosView() {
         </div>
 
         {/* Search input */}
-        <div className="flex-1 relative">
+        <div className="w-48 relative">
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="搜索待办..."
+            placeholder="搜索..."
             className="w-full px-3 py-1.5 pr-8 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
           {searchQuery && (
