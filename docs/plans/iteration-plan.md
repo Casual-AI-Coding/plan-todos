@@ -23,18 +23,91 @@
 
 | 序号 | 功能 | 说明 | 状态 |
 |------|------|------|------|
-| 1.1 | Dashboard 连接真实数据 | Dashboard 组件调用后端 API，显示真实统计数据 | 待实现 |
+| 1.1 | Dashboard 连接真实数据 | Dashboard 组件调用单一 API，显示完整统计数据 | 待实现 |
 | 1.2 | 数据持久化 | SQLite 数据持久化到本地文件，重启不丢失 | 待实现 |
 
 ### 1.1 Dashboard 连接真实数据
 
-**问题**：
-- 当前 Dashboard 组件获取的是模拟/空数据
-- 需要连接后端 `get_dashboard` 和 `get_statistics` API
+**设计原则**：
+- 所有数据通过 **一个** `get_dashboard` 接口返回
+- 后端聚合所有数据，前端只需调用一次
 
-**实现**：
-- 修改 Dashboard.tsx，调用 `getDashboard()` 和 `getStatistics()` API
-- 显示真实统计数据：今日待办、即将到期、完成数、进行中的计划/目标
+**API 设计**：
+
+```typescript
+// 单一接口
+getDashboard(): Promise<Dashboard>
+
+// 返回结构
+interface Dashboard {
+  // 今日概览
+  overview: {
+    today_todos_count: number;      // 今日待办数
+    upcoming_3days_count: number;  // 3天内到期
+    completed_today_count: number; // 今日完成
+    overdue_count: number;         // 过期数
+    streak_days: number;           // 连续打卡
+    productivity_score: number;    // 效率评分 0-100
+  };
+  
+  // 本周统计
+  week: {
+    completed_count: number;      // 本周完成数
+  };
+  
+  // 实体数量
+  counts: {
+    todo: number;
+    plan: number;
+    task: number;
+    target: number;
+    step: number;
+    milestone: number;
+  };
+  
+  // 今日待办列表
+  today_todos: TodoSummary[];
+  
+  // 过期待办
+  overdue_todos: TodoSummary[];
+  
+  // 今日完成
+  completed_today: TodoSummary[];
+  
+  // 进行中的计划 (Top 5)
+  active_plans: PlanWithProgress[];
+  
+  // 进行中的目标 (Top 5)
+  active_targets: TargetWithProgress[];
+  
+  // 进行中的里程碑 (Top 3)
+  active_milestones: MilestoneWithProgress[];
+}
+```
+
+**数据来源聚合**：
+
+| 字段 | 后端查询 |
+|------|----------|
+| overview.* | SQL 聚合统计 |
+| week.* | SQL 本周统计 |
+| counts.* | 各表 COUNT |
+| today_todos | todos WHERE due_date = today |
+| overdue_todos | todos WHERE due_date < today AND status != done |
+| completed_today | todos WHERE status = done AND updated today |
+| active_plans | plans WHERE status = active (带进度计算) |
+| active_targets | targets WHERE status = active (带进度计算) |
+| active_milestones | milestones WHERE status = pending (带进度) |
+
+**前端调用**：
+
+```typescript
+// 之前 (2个接口)
+// const [dashboard, stats] = await Promise.all([getDashboard(), getStatistics()]);
+
+// 之后 (1个接口)
+const dashboard = await getDashboard(); // 包含所有数据
+```
 
 ### 1.2 数据持久化
 

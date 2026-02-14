@@ -556,24 +556,50 @@ export async function searchAll(query: string): Promise<SearchResult[]> {
 // ============================================================================
 
 export interface Dashboard {
+  // 今日概览
+  overview: {
+    today_todos_count: number;
+    upcoming_3days_count: number;
+    completed_today_count: number;
+    overdue_count: number;
+    streak_days: number;
+    productivity_score: number;
+  };
+  // 本周统计
+  week: {
+    completed_count: number;
+  };
+  // 实体数量
+  counts: {
+    todo: number;
+    plan: number;
+    task: number;
+    target: number;
+    step: number;
+    milestone: number;
+  };
+  // 今日待办
   today_todos: Array<{
     id: string;
     title: string;
     due_date: string | null;
     status: string;
   }>;
-  upcoming_todos: Array<{
+  // 过期待办
+  overdue_todos: Array<{
     id: string;
     title: string;
     due_date: string | null;
     status: string;
   }>;
+  // 今日完成
   completed_today: Array<{
     id: string;
     title: string;
     due_date: string | null;
     status: string;
   }>;
+  // 进行中的计划
   active_plans: Array<{
     id: string;
     title: string;
@@ -581,37 +607,42 @@ export interface Dashboard {
     task_count: number;
     completed_count: number;
   }>;
+  // 进行中的目标
   active_targets: Array<{
     id: string;
     title: string;
     progress: number;
     due_date: string | null;
   }>;
-  today_summary: {
-    total_todos: number;
-    completed_todos: number;
-    upcoming_count: number;
-    active_plans_count: number;
-    active_targets_count: number;
-  };
+  // 进行中的里程碑
+  active_milestones: Array<{
+    id: string;
+    title: string;
+    progress: number;
+    target_date: string | null;
+  }>;
 }
 
 export async function getDashboard(): Promise<Dashboard> {
   if (!isTauri()) {
     console.warn('Running outside Tauri - returning mock data');
     return {
+      overview: {
+        today_todos_count: 0,
+        upcoming_3days_count: 0,
+        completed_today_count: 0,
+        overdue_count: 0,
+        streak_days: 0,
+        productivity_score: 0,
+      },
+      week: { completed_count: 0 },
+      counts: { todo: 0, plan: 0, task: 0, target: 0, step: 0, milestone: 0 },
       today_todos: [],
-      upcoming_todos: [],
+      overdue_todos: [],
       completed_today: [],
       active_plans: [],
       active_targets: [],
-      today_summary: {
-        total_todos: 0,
-        completed_todos: 0,
-        upcoming_count: 0,
-        active_plans_count: 0,
-        active_targets_count: 0,
-      },
+      active_milestones: [],
     };
   }
   const { invoke } = await import('@tauri-apps/api/core');

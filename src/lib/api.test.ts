@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone } from '@/lib/api';
+import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard } from '@/lib/api';
 
 // ============================================================================
 // isTauri Function Tests
@@ -251,31 +251,7 @@ describe('API Functions - Milestone Write Operations (non-Tauri)', () => {
 });
 
 // ============================================================================
-// API Functions - Statistics (non-Tauri)
-// ============================================================================
-import { getStatistics, getDashboard } from '@/lib/api';
-
-describe('API Functions - Statistics (non-Tauri)', () => {
-  beforeEach(() => {
-    Object.defineProperty(global, 'window', {
-      value: {},
-      writable: true,
-    });
-  });
-
-  it('getStatistics returns mock data when not in Tauri', async () => {
-    const stats = await getStatistics();
-    expect(stats).toHaveProperty('counts');
-    expect(stats).toHaveProperty('completion');
-    expect(stats).toHaveProperty('trends');
-    expect(stats).toHaveProperty('efficiency');
-    expect(stats.counts).toHaveProperty('todo');
-    expect(stats.counts).toHaveProperty('plan');
-    expect(stats.completion).toHaveProperty('todo_completion_rate');
-    expect(stats.efficiency).toHaveProperty('productivity_score');
-  });
-});
-
+// API Functions - Dashboard (non-Tauri)
 // ============================================================================
 // API Functions - Dashboard (non-Tauri)
 // ============================================================================
@@ -290,13 +266,14 @@ describe('API Functions - Dashboard (non-Tauri)', () => {
   it('getDashboard returns mock data when not in Tauri', async () => {
     const dashboard = await getDashboard();
     expect(dashboard).toHaveProperty('today_todos');
-    expect(dashboard).toHaveProperty('upcoming_todos');
+    expect(dashboard).toHaveProperty('overdue_todos');
     expect(dashboard).toHaveProperty('completed_today');
     expect(dashboard).toHaveProperty('active_plans');
     expect(dashboard).toHaveProperty('active_targets');
-    expect(dashboard).toHaveProperty('today_summary');
-    expect(dashboard.today_summary).toHaveProperty('total_todos');
-    expect(dashboard.today_summary).toHaveProperty('completed_todos');
+    expect(dashboard).toHaveProperty('active_milestones');
+    expect(dashboard).toHaveProperty('overview');
+    expect(dashboard.overview).toHaveProperty('today_todos_count');
+    expect(dashboard.overview).toHaveProperty('completed_today_count');
   });
 });
 
