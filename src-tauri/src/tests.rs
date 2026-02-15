@@ -27,6 +27,7 @@ mod tests {
             content: None,
             due_date: None,
             status: "pending".to_string(),
+            priority: "P2".to_string(),
             created_at: "2026-01-01T00:00:00Z".to_string(),
             updated_at: "2026-01-01T00:00:00Z".to_string(),
         };
@@ -43,6 +44,7 @@ mod tests {
             start_date: None,
             end_date: None,
             status: "pending".to_string(),
+            priority: "P2".to_string(),
             created_at: "2026-01-01T00:00:00Z".to_string(),
             updated_at: "2026-01-01T00:00:00Z".to_string(),
         };
@@ -72,6 +74,7 @@ mod tests {
             title: "Test".to_string(),
             weight: 25,
             status: "pending".to_string(),
+            priority: "P2".to_string(),
             created_at: "2026-01-01T00:00:00Z".to_string(),
             updated_at: "2026-01-01T00:00:00Z".to_string(),
         };
@@ -84,15 +87,15 @@ mod tests {
             id: "m1".to_string(),
             title: "Test".to_string(),
             target_date: None,
-            plan_id: Some("p1".to_string()),
-            task_id: None,
-            target_id: None,
+            biz_type: Some("plan".to_string()),
+            biz_id: Some("p1".to_string()),
             status: "pending".to_string(),
             progress: 0,
             created_at: "2026-01-01T00:00:00Z".to_string(),
             updated_at: "2026-01-01T00:00:00Z".to_string(),
         };
-        assert_eq!(m.plan_id, Some("p1".to_string()));
+        assert_eq!(m.biz_type, Some("plan".to_string()));
+        assert_eq!(m.biz_id, Some("p1".to_string()));
     }
 
     #[test]
@@ -230,16 +233,16 @@ mod tests {
             ["test-ms-plan", "Plan", "active", &now, &now],
         )
         .unwrap();
-        conn.execute("INSERT INTO milestones (id, title, plan_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-ms-1", "Milestone", "test-ms-plan", "pending", 0, &now, &now]).unwrap();
+        conn.execute("INSERT INTO milestones (id, title, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-ms-1", "Milestone", "plan", "test-ms-plan", "pending", 0, &now, &now]).unwrap();
 
-        let pid: String = conn
+        let biz_type: String = conn
             .query_row(
-                "SELECT plan_id FROM milestones WHERE id = 'test-ms-1'",
+                "SELECT biz_type FROM milestones WHERE id = 'test-ms-1'",
                 [],
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(pid, "test-ms-plan");
+        assert_eq!(biz_type, "plan");
     }
 
     #[test]

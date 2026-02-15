@@ -92,16 +92,12 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             id TEXT PRIMARY KEY,
             title TEXT NOT NULL,
             target_date TEXT,
-            plan_id TEXT,
-            task_id TEXT,
-            target_id TEXT,
+            biz_type TEXT,
+            biz_id TEXT,
             status TEXT NOT NULL DEFAULT 'pending',
             progress INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE SET NULL,
-            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE SET NULL,
-            FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE SET NULL
+            updated_at TEXT NOT NULL
         )",
         [],
     )?;
@@ -225,21 +221,45 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )
     .ok();
-    conn.execute(
-        "ALTER TABLE milestones ADD COLUMN IF NOT EXISTS plan_id TEXT",
-        [],
-    )
-    .ok();
-    conn.execute(
-        "ALTER TABLE milestones ADD COLUMN IF NOT EXISTS task_id TEXT",
-        [],
-    )
-    .ok();
-    conn.execute(
-        "ALTER TABLE milestones ADD COLUMN IF NOT EXISTS target_id TEXT",
-        [],
-    )
-    .ok();
+
+    // Migration: Add biz_type and biz_id columns with data migration from legacy fields
+    // Step 1: Add new columns if they don't exist
+    add_column_if_not_exists(conn, "milestones", "biz_type", "TEXT")?;
+    add_column_if_not_exists(conn, "milestones", "biz_id", "TEXT")?;
+
+    // Step 2: Migrate data from legacy fields to new fields
+    // This is a one-time migration - we check if the old columns still have data
+    let has_legacy_data: bool = conn
+        .query_row(
+            "SELECT EXISTS(SELECT 1 FROM milestones WHERE plan_id IS NOT NULL OR task_id IS NOT NULL OR target_id IS NOT NULL)",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap_or(false);
+
+    if has_legacy_data {
+        // Migrate plan_id -> biz_type='plan', biz_id=plan_id
+        conn.execute(
+            "UPDATE milestones SET biz_type = 'plan', biz_id = plan_id WHERE plan_id IS NOT NULL",
+            [],
+        )
+        .ok();
+
+        // Migrate task_id -> biz_type='task', biz_id=task_id
+        conn.execute(
+            "UPDATE milestones SET biz_type = 'task', biz_id = task_id WHERE task_id IS NOT NULL",
+            [],
+        )
+        .ok();
+
+        // Migrate target_id -> biz_type='target', biz_id=target_id
+        conn.execute(
+            "UPDATE milestones SET biz_type = 'target', biz_id = target_id WHERE target_id IS NOT NULL",
+            [],
+        ).ok();
+
+        info!("Migrated milestone legacy data to biz_type/biz_id");
+    }
 
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
     // Check if column exists first, then add if not
@@ -341,15 +361,15 @@ fn create_indexes(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Indexes for milestones
     conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_milestones_plan_id ON milestones(plan_id)",
+        "CREATE INDEX IF NOT EXISTS idx_milestones_biz_type ON milestones(biz_type)",
         [],
     )?;
     conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_milestones_task_id ON milestones(task_id)",
+        "CREATE INDEX IF NOT EXISTS idx_milestones_biz_id ON milestones(biz_id)",
         [],
     )?;
     conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_milestones_target_id ON milestones(target_id)",
+        "CREATE INDEX IF NOT EXISTS idx_milestones_biz_type_id ON milestones(biz_type, biz_id)",
         [],
     )?;
     conn.execute(
@@ -475,16 +495,16 @@ fn seed_data(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Seed Milestones
     conn.execute(
-        "INSERT INTO milestones (id, title, target_date, plan_id, task_id, target_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["milestone-1", "Beta版本发布", "2026-02-28", "plan-1", Option::<&str>::None, Option::<&str>::None, "pending", 30, &now, &now],
+        "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["milestone-1", "Beta版本发布", "2026-02-28", "plan", "plan-1", "pending", 30, &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO milestones (id, title, target_date, plan_id, task_id, target_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["milestone-2", "V2.0正式发布", "2026-03-31", "plan-1", Option::<&str>::None, Option::<&str>::None, "pending", 0, &now, &now],
+        "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["milestone-2", "V2.0正式发布", "2026-03-31", "plan", "plan-1", "pending", 0, &now, &now],
     )?;
     conn.execute(
-        "INSERT INTO milestones (id, title, target_date, plan_id, task_id, target_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["milestone-3", "代码质量达标", "2026-06-30", Option::<&str>::None, Option::<&str>::None, "target-1", "in-progress", 35, &now, &now],
+        "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["milestone-3", "代码质量达标", "2026-06-30", "target", "target-1", "in-progress", 35, &now, &now],
     )?;
 
     info!("Seed data inserted successfully");

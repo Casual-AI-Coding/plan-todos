@@ -208,8 +208,8 @@ fn import_merge(
             skipped += 1;
         } else {
             match conn.execute(
-                "INSERT INTO milestones (id, title, target_date, plan_id, task_id, target_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.plan_id, milestone.task_id, milestone.target_id, milestone.status, milestone.created_at, milestone.updated_at],
+                "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.biz_type, milestone.biz_id, milestone.status, milestone.created_at, milestone.updated_at],
             ) {
                 Ok(_) => imported += 1,
                 Err(e) => errors.push(format!("Milestone {}: {}", milestone.id, e)),
@@ -371,8 +371,8 @@ fn import_replace(
     // Import milestones
     for milestone in &data.milestones {
         match conn.execute(
-            "INSERT INTO milestones (id, title, target_date, plan_id, task_id, target_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.plan_id, milestone.task_id, milestone.target_id, milestone.status, milestone.created_at, milestone.updated_at],
+            "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.biz_type, milestone.biz_id, milestone.status, milestone.created_at, milestone.updated_at],
         ) {
             Ok(_) => imported += 1,
             Err(e) => errors.push(format!("Milestone {}: {}", milestone.id, e)),
@@ -496,8 +496,8 @@ fn import_update(
     // Import milestones (upsert)
     for milestone in &data.milestones {
         match conn.execute(
-            "INSERT OR REPLACE INTO milestones (id, title, target_date, plan_id, task_id, target_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.plan_id, milestone.task_id, milestone.target_id, milestone.status, milestone.created_at, milestone.updated_at],
+            "INSERT OR REPLACE INTO milestones (id, title, target_date, biz_type, biz_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.biz_type, milestone.biz_id, milestone.status, milestone.created_at, milestone.updated_at],
         ) {
             Ok(_) => imported += 1,
             Err(e) => errors.push(format!("Milestone {}: {}", milestone.id, e)),

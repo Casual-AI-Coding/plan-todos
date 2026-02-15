@@ -233,7 +233,7 @@ fn export_steps(conn: &rusqlite::Connection) -> Result<Vec<Step>, String> {
 
 fn export_milestones(conn: &rusqlite::Connection) -> Result<Vec<Milestone>, String> {
     let mut stmt = conn
-        .prepare("SELECT id, title, target_date, plan_id, task_id, target_id, status, progress, created_at, updated_at FROM milestones")
+        .prepare("SELECT id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at FROM milestones")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
@@ -242,15 +242,12 @@ fn export_milestones(conn: &rusqlite::Connection) -> Result<Vec<Milestone>, Stri
                 id: row.get(0)?,
                 title: row.get(1)?,
                 target_date: row.get(2)?,
-                plan_id: row.get(3)?,
-                task_id: row.get(4)?,
-                target_id: row.get(5)?,
-                biz_type: None,
-                biz_id: None,
-                status: row.get(6)?,
-                progress: row.get(7)?,
-                created_at: row.get(8)?,
-                updated_at: row.get(9)?,
+                biz_type: row.get(3)?,
+                biz_id: row.get(4)?,
+                status: row.get(5)?,
+                progress: row.get(6)?,
+                created_at: row.get(7)?,
+                updated_at: row.get(8)?,
             })
         })
         .map_err(|e| e.to_string())?;
