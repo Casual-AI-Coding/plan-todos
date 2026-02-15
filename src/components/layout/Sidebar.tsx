@@ -98,18 +98,9 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             fontSize: level === 0 ? '15px' : '14px',
           }}
         >
-          {hasChildren && (
-            <span 
-              className="text-xs transition-transform w-3 flex-shrink-0"
-              style={{ 
-                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                color: isCurrentActive ? 'white' : '#134E4A'
-              }}
-            >
-              ▶
-            </span>
-          )}
-          {!hasChildren && level > 0 && <span className="w-3"></span>}
+                    {level > 0 && <span className={`w-3 flex-shrink-0 ${hasChildren ? '' : 'invisible'}`}>
+            {hasChildren && '▶'}
+          </span>}
           <span className="text-base">{menu.icon}</span>
           <span className="font-medium truncate">{menu.label}</span>
         </button>
