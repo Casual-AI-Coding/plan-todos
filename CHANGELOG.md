@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.7] - 2026-02-15
+
+### Added
+- Import/Export 功能: 支持导出全部数据 (todos, tasks, plans, targets, steps, milestones, tags, entity_tags, settings)
+- Import 支持三种模式: merge (跳过冲突), replace (清空后导入), update (upsert 模式)
+- 导出数据格式: JSON，包含版本号和导出时间戳
+- 后端: export_data 和 import_data API
+- 前端: 设置 > 通用 页面集成导入导出组件
+
+### Fixed
+- 侧边栏菜单缩进修复:
+  - Level 1: ml-4, Level 2: ml-8 (保持 2x 关系)
+  - Level 2 max-width 调整为匹配 ml-8 缩进
+- 修复 React StrictMode 导致重复 API 调用问题:
+  - 添加 isLoaded ref 防止重复加载
+  - 影响视图: Dashboard, Todos, Plans, Targets, Tags, Milestones, Statistics, Views
+- 侧边栏子菜单对齐: 无子菜单的项不显示箭头占位符
+
+---
+
 ## [0.3.6] - 2026-02-15
 
 ### Added
