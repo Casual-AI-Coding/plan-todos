@@ -3,22 +3,36 @@
 > 本地优先的跨平台任务管理应用
 
 ![Version](https://img.shields.io/badge/version-0.3.9-blue)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-green)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-green)
 ![Framework](https://img.shields.io/badge/framework-Tauri%20v2-orange)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## 简介
 
 Plan Todos 是一款本地优先的跨平台任务管理应用，融合短期 TODO 与长期 PLAN，帮助用户追踪日常事务与长期目标。
 
+数据存储在本地 SQLite 数据库中，不依赖云服务，保护隐私。
+
 ## 特性
 
+### 核心功能
 - **Dashboard** - 今日概览、统计数据、进度追踪
-- **待办清单 (Todos)** - 日常任务管理
+- **待办清单 (Todos)** - 日常任务管理，支持优先级、标签
 - **计划 (Plans)** - 长期规划与目标分解
 - **目标 (Targets)** - 具体可衡量的目标
 - **里程碑 (Milestones)** - 关键节点追踪
 - **统计分析** - 完成率、效率评分、趋势分析
+
+### 数据管理
+- **导入/导出** - JSON 格式数据备份，支持 merge/replace/update 三种模式
 - **本地存储** - SQLite 数据持久化，数据不上云
+- **标签系统** - 给 Todo/Plan/Target 添加标签分类
+
+### 平台支持
+- Windows (NSIS/MSI 安装包)
+- macOS (DMG 安装包)
+- Linux (DEB/RPM/AppImage)
+- Android (APK/AAB)
 
 ## 技术栈
 
@@ -30,6 +44,7 @@ Plan Todos 是一款本地优先的跨平台任务管理应用，融合短期 TO
 | 数据库 | SQLite (本地文件) |
 | 测试 | Vitest |
 | UI | Tailwind CSS |
+| 构建 | GitHub Actions (多平台自动构建) |
 
 ## 快速开始
 
@@ -60,6 +75,11 @@ npm run tauri:dev
 ```bash
 # 构建 Tauri 应用
 npm run tauri:build
+
+# Android 开发
+npm run tauri:android:init   # 初始化 Android 项目
+npm run tauri:android:dev   # 开发模式
+npm run tauri:android:build # 构建 APK/AAB
 ```
 
 ## 项目结构
