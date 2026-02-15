@@ -94,7 +94,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
           `}
           style={{ 
             fontSize: level === 0 ? '15px' : '14px',
-            maxWidth: level === 0 ? '100%' : level === 1 ? 'calc(100% - 16px)' : 'calc(100% - 24px)',
+            maxWidth: level === 0 ? '100%' : level === 1 ? 'calc(100% - 16px)' : level === 2 ? 'calc(100% - 32px)' : 'calc(100% - 40px)',
           }}
         >
           {hasChildren && (
