@@ -3,6 +3,57 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
+// Simple ICO creation - ICO is basically a container for BMP/PNG images
+// We'll create a proper ICO file structure
+function createIco(pngBuffers) {
+  // ICO header: 2 bytes reserved (0), 2 bytes type (1=ICO), 2 bytes count
+  const numImages = pngBuffers.length;
+  const headerSize = 6;
+  const entrySize = 16;
+  const entriesSize = numImages * entrySize;
+  
+  // Calculate total size
+  let dataOffset = headerSize + entriesSize;
+  const imageData = [];
+  
+  for (const { buffer, width, height } of pngBuffers) {
+    imageData.push({ buffer, width, height, offset: dataOffset });
+    dataOffset += buffer.length;
+  }
+  
+  // Create the ICO file buffer
+  const totalSize = dataOffset;
+  const ico = Buffer.alloc(totalSize);
+  
+  // Write header
+  ico.writeUInt16LE(0, 0);      // Reserved
+  ico.writeUInt16LE(1, 2);      // Type (1 = ICO)
+  ico.writeUInt16LE(numImages, 4); // Number of images
+  
+  // Write directory entries
+  let entryOffset = headerSize;
+  for (const { buffer, width, height, offset } of imageData) {
+    const w = width >= 256 ? 0 : width;
+    const h = height >= 256 ? 0 : height;
+    ico.writeUInt8(w, entryOffset);           // Width
+    ico.writeUInt8(h, entryOffset + 1);       // Height
+    ico.writeUInt8(0, entryOffset + 2);       // Color palette
+    ico.writeUInt8(0, entryOffset + 3);       // Reserved
+    ico.writeUInt16LE(1, entryOffset + 4);     // Color planes
+    ico.writeUInt16LE(32, entryOffset + 6);    // Bits per pixel
+    ico.writeUInt32LE(buffer.length, entryOffset + 8);  // Size
+    ico.writeUInt32LE(offset, entryOffset + 12);        // Offset
+    entryOffset += entrySize;
+  }
+  
+  // Write image data
+  for (const { buffer, offset } of imageData) {
+    buffer.copy(ico, offset);
+  }
+  
+  return ico;
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,23 +79,27 @@ async function generateIcons() {
   console.log('Created public/favicon.png (32x32)');
   
   // 2. Web Favicon ICO - public/favicon.ico (multi-size)
-  // For ICO, we need to create sizes: 16, 32, 48
-  const ico16 = await logo.resize(16, 16).png();
-  const ico32 = await logo.resize(32, 32).png();
-  const ico48 = await logo.resize(48, 48).png();
-  
-  // Write ICO (using 32x32 as the main file, real ICO requires special handling)
-  await logo
-    .resize(32, 32)
-    .png()
-    .toFile(path.join(publicDir, 'favicon.ico'));
+  // Create proper ICO with multiple sizes
+  const sizes = [16, 32, 48];
+  const pngBuffers = await Promise.all(
+    sizes.map(async (size) => {
+      const buffer = await logo.resize(size, size).png().toBuffer();
+      return { buffer, width: size, height: size };
+    })
+  );
+  const faviconIco = createIco(pngBuffers);
+  fs.writeFileSync(path.join(publicDir, 'favicon.ico'), faviconIco);
   console.log('Created public/favicon.ico');
   
   // 3. Next.js favicon - src/app/favicon.ico
-  await logo
-    .resize(32, 32)
-    .png()
-    .toFile(path.join(srcAppDir, 'favicon.ico'));
+  const appFaviconBuffers = await Promise.all(
+    sizes.map(async (size) => {
+      const buffer = await logo.clone().resize(size, size).png().toBuffer();
+      return { buffer, width: size, height: size };
+    })
+  );
+  const appFaviconIco = createIco(appFaviconBuffers);
+  fs.writeFileSync(path.join(srcAppDir, 'favicon.ico'), appFaviconIco);
   console.log('Created src/app/favicon.ico');
   
   // 4. Tauri Icons
@@ -76,11 +131,16 @@ async function generateIcons() {
     .toFile(path.join(iconsDir, 'icon.png'));
   console.log('Created src-tauri/icons/icon.png');
   
-  // icon.ico (Windows) - using 256x256 for quality
-  await logo
-    .resize(256, 256)
-    .png()
-    .toFile(path.join(iconsDir, 'icon.ico'));
+  // icon.ico (Windows) - create proper ICO with multiple sizes
+  const icoSizes = [16, 32, 48, 64, 128, 256];
+  const icoBuffers = await Promise.all(
+    icoSizes.map(async (size) => {
+      const buffer = await logo.clone().resize(size, size).png().toBuffer();
+      return { buffer, width: size, height: size };
+    })
+  );
+  const iconIco = createIco(icoBuffers);
+  fs.writeFileSync(path.join(iconsDir, 'icon.ico'), iconIco);
   console.log('Created src-tauri/icons/icon.ico');
   
   // icon.icns (macOS) - just copy as png for now, real icns needs special tool
