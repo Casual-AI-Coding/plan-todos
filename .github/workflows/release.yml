@@ -47,7 +47,8 @@ jobs:
           releaseBody: 'See the assets to download and install this version.'
           releaseDraft: true
           prerelease: false
-          appName: Plan Todos
+          appName: plan-todos
+          appVersion: '0.3.9'
 
   release-android:
     permissions:
