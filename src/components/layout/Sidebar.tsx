@@ -98,9 +98,11 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             fontSize: level === 0 ? '15px' : '14px',
           }}
         >
-                    {level > 0 && <span className={`w-3 flex-shrink-0 ${hasChildren ? '' : 'invisible'}`}>
-            {hasChildren && '▶'}
-          </span>}
+          {hasChildren && (
+            <span className={`w-3 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} style={{ color: isCurrentActive ? 'white' : '#134E4A', transition: 'transform 0.2s' }}>
+              ▶
+            </span>
+          )}
           <span className="text-base">{menu.icon}</span>
           <span className="font-medium truncate">{menu.label}</span>
         </button>
