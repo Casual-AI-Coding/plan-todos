@@ -7,25 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.11] - 2026-02-15
-
-### Fixed
-- GitHub Actions workflow: fixed multi-platform release files path pattern
-
----
-
-## [0.3.10] - 2026-02-15
+## [0.3.8] - 2026-02-15
 
 ### Added
-- Multi-platform CI release: Ubuntu (deb, rpm, appimage), Windows (nsis, msi), macOS (dmg, app)
-- GitHub Actions workflow improvements: fixed artifact upload issues
-
-### Fixed
-- Bundle targets configuration in tauri.conf.json
-
----
-
-## [0.3.9] - 2026-02-15
+- **多平台发布支持**: GitHub Actions 自动构建和发布 Ubuntu (deb, rpm, appimage), Windows (nsis, msi), macOS (dmg, app), Android (apk, aab)
+- **GitHub Release 自动化**: 使用 `softprops/action-gh-release` 自动创建 release 并上传构建产物
 
 ### Refactored
 - Milestone 模型重构: 移除 `plan_id`, `task_id`, `target_id` 字段，改用统一的 `biz_type` + `biz_id` 字段
@@ -37,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - 修复 export.rs 和 import.rs 中未使用的导入警告
 - 修复 import_replace 和 import_update 中未使用的 mut 变量
+- 修复 release workflow 中 tauri-action artifact 识别问题
+- 修复 productName 包含空格导致的问题
+- 修复 GitHub Actions rust-toolchain action 名称错误
 
 ---
 
