@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority, Tag, EntityType, getTags, createTag, updateTag, deleteTag, getEntityTags, setEntityTags, getEntitiesByTag } from '@/lib/api';
+import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority, Tag, EntityType, getTags, createTag, updateTag, deleteTag, getEntityTags, setEntityTags, getEntitiesByTag, exportData, importData, ExportData, ImportMode } from '@/lib/api';
 
 // ============================================================================
 // isTauri Function Tests
@@ -500,5 +500,120 @@ describe('API Functions - Todo with Tags (non-Tauri)', () => {
   it('createTodo does not accept tags parameter (handled separately)', async () => {
     // Tags are set via setEntityTags after creation
     await expect(createTodo({ title: 'Test' })).rejects.toThrow('This app must run in Tauri to create todos');
+  });
+});
+
+// ============================================================================
+// API Functions - Export/Import (non-Tauri)
+// ============================================================================
+describe('API Functions - Export/Import (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('exportData throws error when not in Tauri', async () => {
+    await expect(exportData()).rejects.toThrow('This app must run in Tauri to export data');
+  });
+
+  it('importData throws error when not in Tauri', async () => {
+    const mockData: ExportData = {
+      version: '1.0',
+      exported_at: '2026-02-15T00:00:00Z',
+      data: {
+        todos: [],
+        tasks: [],
+        plans: [],
+        targets: [],
+        steps: [],
+        milestones: [],
+        tags: [],
+        entity_tags: [],
+        settings: {
+          daily_summary_settings: null,
+          notification_plugins: [],
+        },
+      },
+    };
+    await expect(importData(mockData, 'merge')).rejects.toThrow('This app must run in Tauri to import data');
+    await expect(importData(mockData, 'replace')).rejects.toThrow('This app must run in Tauri to import data');
+    await expect(importData(mockData, 'update')).rejects.toThrow('This app must run in Tauri to import data');
+  });
+});
+
+// ============================================================================
+// Export Data Structure Tests
+// ============================================================================
+describe('Export Data Structure', () => {
+  it('should have correct ExportData structure', () => {
+    const mockExportData: ExportData = {
+      version: '1.0',
+      exported_at: '2026-02-15T12:00:00Z',
+      data: {
+        todos: [
+          {
+            id: 'todo-1',
+            title: 'Test Todo',
+            content: 'Test content',
+            due_date: '2026-02-20',
+            status: 'pending',
+            priority: 'P1',
+            created_at: '2026-02-15T10:00:00Z',
+            updated_at: '2026-02-15T10:00:00Z',
+          },
+        ],
+        tasks: [
+          {
+            id: 'task-1',
+            plan_id: 'plan-1',
+            title: 'Test Task',
+            description: 'Task description',
+            start_date: '2026-02-15',
+            end_date: '2026-02-25',
+            status: 'pending',
+            priority: 'P2',
+            created_at: '2026-02-15T10:00:00Z',
+            updated_at: '2026-02-15T10:00:00Z',
+          },
+        ],
+        plans: [
+          {
+            id: 'plan-1',
+            title: 'Test Plan',
+            description: 'Plan description',
+            start_date: '2026-02-01',
+            end_date: '2026-02-28',
+            status: 'active',
+            created_at: '2026-02-15T10:00:00Z',
+            updated_at: '2026-02-15T10:00:00Z',
+          },
+        ],
+        targets: [],
+        steps: [],
+        milestones: [],
+        tags: [],
+        entity_tags: [],
+        settings: {
+          daily_summary_settings: null,
+          notification_plugins: [],
+        },
+      },
+    };
+
+    expect(mockExportData.version).toBe('1.0');
+    expect(mockExportData.exported_at).toBe('2026-02-15T12:00:00Z');
+    expect(mockExportData.data.todos).toHaveLength(1);
+    expect(mockExportData.data.todos[0].title).toBe('Test Todo');
+    expect(mockExportData.data.tasks).toHaveLength(1);
+    expect(mockExportData.data.plans).toHaveLength(1);
+  });
+
+  it('should handle all ImportMode types', () => {
+    const modes: ImportMode[] = ['merge', 'replace', 'update'];
+    modes.forEach(mode => {
+      expect(['merge', 'replace', 'update']).toContain(mode);
+    });
   });
 });
