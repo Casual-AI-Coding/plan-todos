@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.9] - 2026-02-15
+
+### Refactored
+- Milestone 模型重构: 移除 `plan_id`, `task_id`, `target_id` 字段，改用统一的 `biz_type` + `biz_id` 字段
+- `biz_type` 支持: `'plan' | 'task' | 'target' | 'circulation'`
+- 添加 `schema_migrations` 表追踪数据库迁移，确保迁移只执行一次
+- 更新所有后端 SQL 查询 (milestones, export, import)
+- 修复单元测试中的 Milestone 初始化
+
+### Fixed
+- 修复 export.rs 和 import.rs 中未使用的导入警告
+- 修复 import_replace 和 import_update 中未使用的 mut 变量
+
+---
+
 ## [0.3.7] - 2026-02-15
 
 ### Added

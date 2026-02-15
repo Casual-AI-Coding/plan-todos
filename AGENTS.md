@@ -384,6 +384,33 @@ For complex git operations, use the `git-master` skill:
 # Recommended for: commit, rebase, squash, who wrote, when was X added
 ```
 
+#### Version Management
+
+**Version Format:** `Major.Minor.Patch` (遵循 Semantic Versioning)
+
+| 版本类型 | 说明 | 示例 |
+|----------|------|------|
+| Major (主版本) | 不兼容的 API 变更 | 1.0.0 → 2.0.0 |
+| Minor (次版本) | 新功能 (向后兼容) | 0.3.8 → 0.4.0 |
+| Patch (补丁版本) | Bug 修复 (向后兼容) | 0.3.8 → 0.3.9 |
+| Pre-release | 预发布版本 | 0.3.9-beta.1 |
+| Build Metadata | 构建元数据 | 0.3.9+build.123 |
+
+**版本号递增规则:**
+- 首位 (Major): 重大架构变更、不兼容的 API 变更
+- 次位 (Minor): 新功能添加、向后兼容的功能变更
+- 三位 (Patch): Bug 修复、文档更新、小优化
+
+**发布流程 CHANGELOG:**
+1. 更新.md，添加新版本发布说明
+2. 更新 package.json 版本号
+3. 创建 git tag: `git tag -a v0.3.9 -m "Release v0.3.9"`
+4. 推送 tag: `git push origin v0.3.9`
+
+**Hotfix 版本:**
+- 使用 `-1` 后缀表示紧急修复: `0.3.9-1` (在 patch 版本基础上)
+- 适用于严重 bug 需要立即修复的场景
+
 ---
 
 ## Testing Guidelines
