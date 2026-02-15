@@ -12,7 +12,18 @@ jobs:
   release-desktop:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-latest
+            bundle: deb rpm appimage
+          - platform: windows-latest
+            bundle: nsis msi
+          - platform: macos-latest
+            bundle: dmg app
+
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
@@ -29,7 +40,8 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Install Linux dependencies
+      - name: Install Linux dependencies (Ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -48,9 +60,7 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/rpm/*.rpm
-            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/${{ matrix.bundle }}/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
