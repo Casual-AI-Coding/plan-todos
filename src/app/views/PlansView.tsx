@@ -25,7 +25,7 @@ export function PlansView() {
   const [endDate, setEndDate] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadPlans() {
     try {
@@ -35,7 +35,7 @@ export function PlansView() {
       for (const plan of data) {
         tagsMap[plan.id] = await getEntityTags('plan', plan.id);
       }
-      if (isMounted.current) {
+      if (isLoaded.current) {
         setPlanTags(tagsMap);
         setPlans(data);
       }
@@ -43,19 +43,19 @@ export function PlansView() {
       for (const plan of data) {
         taskMap[plan.id] = await getTasksByPlan(plan.id);
       }
-      if (isMounted.current) setTasks(taskMap);
+      if (isLoaded.current) setTasks(taskMap);
     } catch (e) { console.error(e); }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
-      if (isMounted.current) setAllTags(tags);
+      if (isLoaded.current) setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadPlans(); return () => { isMounted.current = false; }; }, []);
-  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadPlans(); }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
 
   async function togglePlan(planId: string) {
     setExpandedPlans(prev => {

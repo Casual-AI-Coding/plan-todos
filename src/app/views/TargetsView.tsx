@@ -24,7 +24,7 @@ export function TargetsView() {
   const [weight, setWeight] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadTargets() {
     try {
@@ -34,7 +34,7 @@ export function TargetsView() {
       for (const target of data) {
         tagsMap[target.id] = await getEntityTags('target', target.id);
       }
-      if (isMounted.current) {
+      if (isLoaded.current) {
         setTargetTags(tagsMap);
         setTargets(data);
       }
@@ -42,19 +42,19 @@ export function TargetsView() {
       for (const target of data) {
         stepMap[target.id] = await getSteps(target.id);
       }
-      if (isMounted.current) setSteps(stepMap);
+      if (isLoaded.current) setSteps(stepMap);
     } catch (e) { console.error(e); }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
-      if (isMounted.current) setAllTags(tags);
+      if (isLoaded.current) setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadTargets(); return () => { isMounted.current = false; }; }, []);
-  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTargets(); }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
 
   async function toggleTarget(targetId: string) {
     setExpandedTargets(prev => {

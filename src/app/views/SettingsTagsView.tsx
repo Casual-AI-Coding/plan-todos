@@ -17,16 +17,16 @@ export function SettingsTagsView() {
     '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6'
   ];
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadTags() {
     try {
       const data = await getTags();
-      if (isMounted.current) setTags(data);
+      if (isLoaded.current) setTags(data);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
 
   async function handleSubmit() {
     if (!name.trim()) {

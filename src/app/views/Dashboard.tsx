@@ -6,18 +6,18 @@ import { getDashboard, type Dashboard } from '@/lib/api';
 
 export function Dashboard() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadData() {
     try {
       const data = await getDashboard();
-      if (isMounted.current) setDashboard(data);
+      if (isLoaded.current) setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
     }
   }
 
-  useEffect(() => { isMounted.current = true; loadData(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadData(); }, []);
 
   if (!dashboard) {
     return (

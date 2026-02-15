@@ -37,14 +37,14 @@ export function ViewsView() {
   const [targetSteps, setTargetSteps] = useState<Record<string, Step[]>>({});
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadAllData() {
     try {
       const [t, p, tg, m] = await Promise.all([
         getTodos(), getPlans(), getTargets(), getMilestones()
       ]);
-      if (isMounted.current) {
+      if (isLoaded.current) {
         setTodos(t);
         setPlans(p);
         setTargets(tg);
@@ -56,18 +56,18 @@ export function ViewsView() {
       for (const plan of p) {
         taskMap[plan.id] = await getTasksByPlan(plan.id);
       }
-      if (isMounted.current) setTasks(taskMap);
+      if (isLoaded.current) setTasks(taskMap);
       
       // Load steps for each target
       const stepMap: Record<string, Step[]> = {};
       for (const target of tg) {
         stepMap[target.id] = await getSteps(target.id);
       }
-      if (isMounted.current) setTargetSteps(stepMap);
+      if (isLoaded.current) setTargetSteps(stepMap);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadAllData(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadAllData(); }, []);
 
   const viewModes = [
     { id: 'list', icon: '📋', label: '列表' },

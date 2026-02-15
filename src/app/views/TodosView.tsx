@@ -30,7 +30,7 @@ export function TodosView() {
   const [priority, setPriority] = useState<Priority>('P2');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadTodos() {
     try {
@@ -42,19 +42,19 @@ export function TodosView() {
           return { ...todo, tags };
         })
       );
-      if (isMounted.current) setTodos(todosWithTags);
+      if (isLoaded.current) setTodos(todosWithTags);
     } catch (e) { console.error(e); }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
-      if (isMounted.current) setAllTags(tags);
+      if (isLoaded.current) setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadTodos(); return () => { isMounted.current = false; }; }, []);
-  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTodos(); }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
 
   // Convert todos to calendar events
   const calendarEvents: CalendarEvent[] = todos

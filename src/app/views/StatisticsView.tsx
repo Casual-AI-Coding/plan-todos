@@ -10,14 +10,14 @@ export function StatisticsView() {
   const [targets, setTargets] = useState<Target[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadData() {
     try {
       const [t, p, tg, m] = await Promise.all([
         getTodos(), getPlans(), getTargets(), getMilestones()
       ]);
-      if (isMounted.current) {
+      if (isLoaded.current) {
         setTodos(t);
         setPlans(p);
         setTargets(tg);
@@ -26,7 +26,7 @@ export function StatisticsView() {
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadData(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadData(); }, []);
 
   const stats = {
     totalTodos: todos.length,

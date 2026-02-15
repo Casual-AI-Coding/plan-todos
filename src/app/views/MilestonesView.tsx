@@ -17,12 +17,12 @@ export function MilestonesView() {
   const [linkType, setLinkType] = useState<'plan' | 'target'>('plan');
   const [linkId, setLinkId] = useState('');
 
-  const isMounted = useRef(false);
+  const isLoaded = useRef(false);
 
   async function loadData() {
     try {
       const [m, p, t] = await Promise.all([getMilestones(), getPlans(), getTargets()]);
-      if (isMounted.current) {
+      if (isLoaded.current) {
         setMilestones(m);
         setPlans(p);
         setTargets(t);
@@ -30,7 +30,7 @@ export function MilestonesView() {
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { isMounted.current = true; loadData(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadData(); }, []);
 
   async function handleSubmit() {
     if (!title.trim() || !linkId) return;

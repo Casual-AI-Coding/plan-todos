@@ -86,7 +86,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
           }}
           className={`
             w-full flex items-center gap-1.5 px-2 py-2 rounded-md transition-all mb-0.5
-            ${level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-6'}
+            ${level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-8'}
             ${isCurrentActive 
               ? 'bg-teal-500 text-white shadow-sm' 
               : 'hover:bg-teal-100 text-gray-700'
@@ -94,7 +94,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
           `}
           style={{ 
             fontSize: level === 0 ? '15px' : '14px',
-            maxWidth: level === 0 ? '100%' : level === 1 ? 'calc(100% - 24px)' : 'calc(100% - 40px)',
+            maxWidth: level === 0 ? '100%' : level === 1 ? 'calc(100% - 16px)' : 'calc(100% - 24px)',
           }}
         >
           {hasChildren && (
