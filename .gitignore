@@ -61,5 +61,8 @@ Thumbs.db
 # OpenCode
 .opencode/
 
+# Worktrees
+.worktrees/
+
 # Sisyphus
 .sisyphus/
