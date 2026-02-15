@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.3.8] - 2026-02-15
+## [0.3.9] - 2026-02-15
 
 ### Added
 - **多平台发布支持**: GitHub Actions 自动构建和发布 Ubuntu (deb, rpm, appimage), Windows (nsis, msi), macOS (dmg, app), Android (apk, aab)
@@ -26,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 修复 release workflow 中 tauri-action artifact 识别问题
 - 修复 productName 包含空格导致的问题
 - 修复 GitHub Actions rust-toolchain action 名称错误
+
+---
+
+## [0.3.8] - 2026-02-15
+
+### Added
+- 应用图标: 添加 plan-todos-logo 作为应用图标
 
 ---
 
