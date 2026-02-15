@@ -401,15 +401,50 @@ For complex git operations, use the `git-master` skill:
 - 次位 (Minor): 新功能添加、向后兼容的功能变更
 - 三位 (Patch): Bug 修复、文档更新、小优化
 
-**发布流程 CHANGELOG:**
-1. 更新.md，添加新版本发布说明
-2. 更新 package.json 版本号
-3. 创建 git tag: `git tag -a v0.3.9 -m "Release v0.3.9"`
-4. 推送 tag: `git push origin v0.3.9`
+---
+
+### 发布流程 (Release Checklist)
+
+**发版本前必须完成的检查清单:**
+
+| # | 操作 | 命令/说明 |
+|---|------|-----------|
+| 1 | 本地测试全部通过 | `npm run test` |
+| 2 | 类型检查 | `npm run typecheck` |
+| 3 | ESLint 检查 | `npm run lint` |
+| 4 | 代码格式化 | `npm run format` |
+| 5 | 构建测试 | `npm run build` |
+
+**发版本需要修改的文件:**
+
+| 文件 | 修改内容 |
+|------|----------|
+| `package.json` | 更新 `"version": "x.x.x"` |
+| `src-tauri/tauri.conf.json` | 更新 `"version": "x.x.x"` |
+| `CHANGELOG.md` | 添加新版本发布说明 |
+
+**发布步骤:**
+
+```bash
+# 1. 修改版本号 (package.json)
+# 2. 修改版本号 (src-tauri/tauri.conf.json)
+# 3. 更新 CHANGELOG.md
+
+# 4. 提交更改
+git add -A
+git commit -m "release: bump version to x.x.x"
+
+# 5. 创建 tag (Major/Minor/Patch 版本会触发 Release CI)
+git tag -a v{x.x.x} -m "Release v{x.x.x}"
+
+# 6. 推送 tag
+git push origin v{x.x.x}
+```
 
 **Hotfix 版本:**
-- 使用 `-1` 后缀表示紧急修复: `0.3.9-1` (在 patch 版本基础上)
+- 使用 `-1` 后缀: `v0.3.9-1`
 - 适用于严重 bug 需要立即修复的场景
+- **注意**: Hotfix 不会自动触发 Release CI (只触发 `v*` 但版本不匹配)
 
 ---
 
