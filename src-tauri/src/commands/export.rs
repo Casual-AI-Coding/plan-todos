@@ -74,7 +74,7 @@ pub struct NotificationPluginData {
 }
 
 // Re-export import types for backward compatibility
-pub use crate::import::{ImportData, ImportResult};
+pub use super::import::{ImportData, ImportResult};
 
 // ============================================================================
 // Export Command

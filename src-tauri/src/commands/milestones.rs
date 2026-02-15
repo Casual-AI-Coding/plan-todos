@@ -1,8 +1,8 @@
 // Milestone CRUD commands
 
+use super::targets::calculate_target_progress;
 use crate::log_command;
 use crate::models::Milestone;
-use crate::targets::calculate_target_progress;
 use crate::AppState;
 
 pub fn calculate_milestone_progress(

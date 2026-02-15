@@ -9,26 +9,11 @@ use std::sync::Mutex;
 pub use crate::models::AppState;
 
 // Module declarations
-mod batch;
-mod command_log;
-mod dashboard;
+mod commands;
 mod db;
-mod export;
-mod import;
-mod milestones;
 mod models;
-mod notification_plugins;
-mod notifications;
-mod plans;
-mod search;
-mod statistics;
-mod steps;
-mod tags;
-mod targets;
-mod tasks;
 #[cfg(test)]
 mod tests;
-mod todos;
 
 fn main() {
     // Initialize logger with info level
@@ -71,79 +56,79 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             // Plan
-            plans::get_plan,
-            plans::get_plans,
-            plans::create_plan,
-            plans::update_plan,
-            plans::delete_plan,
+            commands::plans::get_plan,
+            commands::plans::get_plans,
+            commands::plans::create_plan,
+            commands::plans::update_plan,
+            commands::plans::delete_plan,
             // Task
-            tasks::get_task,
-            tasks::get_tasks,
-            tasks::get_tasks_by_plan,
-            tasks::create_task,
-            tasks::update_task,
-            tasks::delete_task,
+            commands::tasks::get_task,
+            commands::tasks::get_tasks,
+            commands::tasks::get_tasks_by_plan,
+            commands::tasks::create_task,
+            commands::tasks::update_task,
+            commands::tasks::delete_task,
             // Target
-            targets::get_target,
-            targets::get_targets,
-            targets::create_target,
-            targets::update_target,
-            targets::delete_target,
+            commands::targets::get_target,
+            commands::targets::get_targets,
+            commands::targets::create_target,
+            commands::targets::update_target,
+            commands::targets::delete_target,
             // Step
-            steps::get_steps,
-            steps::create_step,
-            steps::update_step,
-            steps::delete_step,
+            commands::steps::get_steps,
+            commands::steps::create_step,
+            commands::steps::update_step,
+            commands::steps::delete_step,
             // Todo
-            todos::get_todo,
-            todos::get_todos,
-            todos::create_todo,
-            todos::update_todo,
-            todos::delete_todo,
+            commands::todos::get_todo,
+            commands::todos::get_todos,
+            commands::todos::create_todo,
+            commands::todos::update_todo,
+            commands::todos::delete_todo,
             // Milestone
-            milestones::get_milestone,
-            milestones::get_milestones,
-            milestones::create_milestone,
-            milestones::update_milestone,
-            milestones::delete_milestone,
+            commands::milestones::get_milestone,
+            commands::milestones::get_milestones,
+            commands::milestones::create_milestone,
+            commands::milestones::update_milestone,
+            commands::milestones::delete_milestone,
             // Statistics
-            statistics::get_statistics,
+            commands::statistics::get_statistics,
             // Dashboard
-            dashboard::get_dashboard,
+            commands::dashboard::get_dashboard,
             // Batch operations
-            batch::bulk_update_todo_status,
-            batch::bulk_update_task_status,
-            batch::bulk_update_step_status,
-            batch::bulk_delete_todos,
-            batch::bulk_delete_tasks,
+            commands::batch::bulk_update_todo_status,
+            commands::batch::bulk_update_task_status,
+            commands::batch::bulk_update_step_status,
+            commands::batch::bulk_delete_todos,
+            commands::batch::bulk_delete_tasks,
             // Notifications
-            notifications::get_notification_settings,
-            notifications::set_notification_settings,
-            notifications::delete_notification_settings,
-            notifications::get_daily_summary_settings,
-            notifications::update_daily_summary_settings,
-            notifications::get_due_reminders,
-            notifications::mark_reminder_sent,
-            notifications::get_daily_summary,
+            commands::notifications::get_notification_settings,
+            commands::notifications::set_notification_settings,
+            commands::notifications::delete_notification_settings,
+            commands::notifications::get_daily_summary_settings,
+            commands::notifications::update_daily_summary_settings,
+            commands::notifications::get_due_reminders,
+            commands::notifications::mark_reminder_sent,
+            commands::notifications::get_daily_summary,
             // Notification Plugins
-            notification_plugins::get_notification_plugins,
-            notification_plugins::create_notification_plugin,
-            notification_plugins::update_notification_plugin,
-            notification_plugins::delete_notification_plugin,
-            notification_plugins::send_notification,
+            commands::notification_plugins::get_notification_plugins,
+            commands::notification_plugins::create_notification_plugin,
+            commands::notification_plugins::update_notification_plugin,
+            commands::notification_plugins::delete_notification_plugin,
+            commands::notification_plugins::send_notification,
             // Search
-            search::search_all,
+            commands::search::search_all,
             // Tags
-            tags::get_tags,
-            tags::create_tag,
-            tags::update_tag,
-            tags::delete_tag,
-            tags::get_entity_tags,
-            tags::set_entity_tags,
-            tags::get_entities_by_tag,
+            commands::tags::get_tags,
+            commands::tags::create_tag,
+            commands::tags::update_tag,
+            commands::tags::delete_tag,
+            commands::tags::get_entity_tags,
+            commands::tags::set_entity_tags,
+            commands::tags::get_entities_by_tag,
             // Export/Import
-            export::export_data,
-            import::import_data,
+            commands::export::export_data,
+            commands::import::import_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
