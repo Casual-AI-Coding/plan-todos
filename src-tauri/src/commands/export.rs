@@ -245,6 +245,8 @@ fn export_milestones(conn: &rusqlite::Connection) -> Result<Vec<Milestone>, Stri
                 plan_id: row.get(3)?,
                 task_id: row.get(4)?,
                 target_id: row.get(5)?,
+                biz_type: None,
+                biz_id: None,
                 status: row.get(6)?,
                 progress: row.get(7)?,
                 created_at: row.get(8)?,

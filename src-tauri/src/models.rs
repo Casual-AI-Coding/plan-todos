@@ -75,10 +75,13 @@ pub struct Milestone {
     pub id: String,
     pub title: String,
     pub target_date: Option<String>,
-    // One of these three will be set
+    // Legacy fields (kept for backward compatibility)
     pub plan_id: Option<String>,
     pub task_id: Option<String>,
     pub target_id: Option<String>,
+    // New unified fields for flexible linking
+    pub biz_type: Option<String>, // 'plan' | 'task' | 'target' | 'circulation'
+    pub biz_id: Option<String>,
     pub status: String, // pending | completed
     pub progress: i32,  // Calculated from linked entity (0-100)
     pub created_at: String,
