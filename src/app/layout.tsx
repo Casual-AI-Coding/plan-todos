@@ -17,6 +17,9 @@ const firaSans = Fira_Sans({
 export const metadata: Metadata = {
   title: "Plan Todos",
   description: "A todo + plan management application",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
