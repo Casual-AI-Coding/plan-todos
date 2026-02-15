@@ -410,10 +410,12 @@ For complex git operations, use the `git-master` skill:
 | # | 操作 | 命令/说明 |
 |---|------|-----------|
 | 1 | 本地测试全部通过 | `npm run test` |
-| 2 | 类型检查 | `npm run typecheck` |
-| 3 | ESLint 检查 | `npm run lint` |
-| 4 | 代码格式化 | `npm run format` |
-| 5 | 构建测试 | `npm run build` |
+| 2 | 测试覆盖率 >= 90% | `npm run test:coverage` |
+| 3 | 类型检查 | `npm run typecheck` |
+| 4 | ESLint 检查 | `npm run lint` |
+| 5 | 代码格式化 | `npm run format` |
+| 6 | 构建测试 | `npm run build` |
+| 7 | 检查文档是否需要更新 | 检查 CHANGELOG.md、AGENTS.md |
 
 **发版本需要修改的文件:**
 
@@ -429,8 +431,9 @@ For complex git operations, use the `git-master` skill:
 # 1. 修改版本号 (package.json)
 # 2. 修改版本号 (src-tauri/tauri.conf.json)
 # 3. 更新 CHANGELOG.md
+# 4. 检查文档是否需要更新
 
-# 4. 提交更改
+# 5. 提交更改
 git add -A
 git commit -m "release: bump version to x.x.x"
 
