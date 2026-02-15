@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Input } from '@/components/ui';
 import { getTags, createTag, updateTag, deleteTag, Tag } from '@/lib/api';
 
@@ -17,14 +17,16 @@ export function SettingsTagsView() {
     '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6'
   ];
 
+  const isMounted = useRef(false);
+
   async function loadTags() {
     try {
       const data = await getTags();
-      setTags(data);
+      if (isMounted.current) setTags(data);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadTags(); }, []);
+  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
 
   async function handleSubmit() {
     if (!name.trim()) {

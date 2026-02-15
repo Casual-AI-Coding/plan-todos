@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar, Checkbox } from '@/components/ui';
 import { 
   getPlans, getTasksByPlan, createPlan, updatePlan, deletePlan,
@@ -25,6 +25,8 @@ export function PlansView() {
   const [endDate, setEndDate] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const isMounted = useRef(false);
+
   async function loadPlans() {
     try {
       const data = await getPlans();
@@ -33,25 +35,27 @@ export function PlansView() {
       for (const plan of data) {
         tagsMap[plan.id] = await getEntityTags('plan', plan.id);
       }
-      setPlanTags(tagsMap);
-      setPlans(data);
+      if (isMounted.current) {
+        setPlanTags(tagsMap);
+        setPlans(data);
+      }
       const taskMap: Record<string, Task[]> = {};
       for (const plan of data) {
         taskMap[plan.id] = await getTasksByPlan(plan.id);
       }
-      setTasks(taskMap);
+      if (isMounted.current) setTasks(taskMap);
     } catch (e) { console.error(e); }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
-      setAllTags(tags);
+      if (isMounted.current) setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadPlans(); }, []);
-  useEffect(() => { loadTags(); }, []);
+  useEffect(() => { isMounted.current = true; loadPlans(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
 
   async function togglePlan(planId: string) {
     setExpandedPlans(prev => {

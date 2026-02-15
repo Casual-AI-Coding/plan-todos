@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar, Checkbox } from '@/components/ui';
 import { 
   getTargets, getSteps, createTarget, deleteTarget,
@@ -24,6 +24,8 @@ export function TargetsView() {
   const [weight, setWeight] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const isMounted = useRef(false);
+
   async function loadTargets() {
     try {
       const data = await getTargets();
@@ -32,25 +34,27 @@ export function TargetsView() {
       for (const target of data) {
         tagsMap[target.id] = await getEntityTags('target', target.id);
       }
-      setTargetTags(tagsMap);
-      setTargets(data);
+      if (isMounted.current) {
+        setTargetTags(tagsMap);
+        setTargets(data);
+      }
       const stepMap: Record<string, Step[]> = {};
       for (const target of data) {
         stepMap[target.id] = await getSteps(target.id);
       }
-      setSteps(stepMap);
+      if (isMounted.current) setSteps(stepMap);
     } catch (e) { console.error(e); }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
-      setAllTags(tags);
+      if (isMounted.current) setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadTargets(); }, []);
-  useEffect(() => { loadTags(); }, []);
+  useEffect(() => { isMounted.current = true; loadTargets(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
 
   async function toggleTarget(targetId: string) {
     setExpandedTargets(prev => {

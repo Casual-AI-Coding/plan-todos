@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar } from '@/components/ui';
 import { 
   getMilestones, getPlans, getTargets, createMilestone, updateMilestone, deleteMilestone,
@@ -17,16 +17,20 @@ export function MilestonesView() {
   const [linkType, setLinkType] = useState<'plan' | 'target'>('plan');
   const [linkId, setLinkId] = useState('');
 
+  const isMounted = useRef(false);
+
   async function loadData() {
     try {
       const [m, p, t] = await Promise.all([getMilestones(), getPlans(), getTargets()]);
-      setMilestones(m);
-      setPlans(p);
-      setTargets(t);
+      if (isMounted.current) {
+        setMilestones(m);
+        setPlans(p);
+        setTargets(t);
+      }
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { isMounted.current = true; loadData(); return () => { isMounted.current = false; }; }, []);
 
   async function handleSubmit() {
     if (!title.trim() || !linkId) return;

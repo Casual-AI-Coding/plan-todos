@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, Checkbox } from '@/components/ui';
 import { Calendar } from '@/components/ui/Calendar';
 import { getTodos, createTodo, updateTodo, deleteTodo, Todo, Priority, Tag, getTags, getEntityTags, setEntityTags } from '@/lib/api';
@@ -30,6 +30,8 @@ export function TodosView() {
   const [priority, setPriority] = useState<Priority>('P2');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const isMounted = useRef(false);
+
   async function loadTodos() {
     try {
       const data = await getTodos();
@@ -40,19 +42,19 @@ export function TodosView() {
           return { ...todo, tags };
         })
       );
-      setTodos(todosWithTags);
+      if (isMounted.current) setTodos(todosWithTags);
     } catch (e) { console.error(e); }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
-      setAllTags(tags);
+      if (isMounted.current) setAllTags(tags);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadTodos(); }, []);
-  useEffect(() => { loadTags(); }, []);
+  useEffect(() => { isMounted.current = true; loadTodos(); return () => { isMounted.current = false; }; }, []);
+  useEffect(() => { isMounted.current = true; loadTags(); return () => { isMounted.current = false; }; }, []);
 
   // Convert todos to calendar events
   const calendarEvents: CalendarEvent[] = todos

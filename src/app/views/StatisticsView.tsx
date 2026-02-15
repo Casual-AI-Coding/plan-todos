@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, ProgressBar } from '@/components/ui';
 import { getTodos, getPlans, getTargets, getMilestones, Todo, Plan, Target, Milestone } from '@/lib/api';
 
@@ -10,19 +10,23 @@ export function StatisticsView() {
   const [targets, setTargets] = useState<Target[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
+  const isMounted = useRef(false);
+
   async function loadData() {
     try {
       const [t, p, tg, m] = await Promise.all([
         getTodos(), getPlans(), getTargets(), getMilestones()
       ]);
-      setTodos(t);
-      setPlans(p);
-      setTargets(tg);
-      setMilestones(m);
+      if (isMounted.current) {
+        setTodos(t);
+        setPlans(p);
+        setTargets(tg);
+        setMilestones(m);
+      }
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { isMounted.current = true; loadData(); return () => { isMounted.current = false; }; }, []);
 
   const stats = {
     totalTodos: todos.length,

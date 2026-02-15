@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, ProgressBar } from '@/components/ui';
 import { 
   getTodos, getPlans, getTargets, getMilestones,
@@ -37,33 +37,37 @@ export function ViewsView() {
   const [targetSteps, setTargetSteps] = useState<Record<string, Step[]>>({});
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
+  const isMounted = useRef(false);
+
   async function loadAllData() {
     try {
       const [t, p, tg, m] = await Promise.all([
         getTodos(), getPlans(), getTargets(), getMilestones()
       ]);
-      setTodos(t);
-      setPlans(p);
-      setTargets(tg);
-      setMilestones(m);
+      if (isMounted.current) {
+        setTodos(t);
+        setPlans(p);
+        setTargets(tg);
+        setMilestones(m);
+      }
       
       // Load tasks for each plan
       const taskMap: Record<string, Task[]> = {};
       for (const plan of p) {
         taskMap[plan.id] = await getTasksByPlan(plan.id);
       }
-      setTasks(taskMap);
+      if (isMounted.current) setTasks(taskMap);
       
       // Load steps for each target
       const stepMap: Record<string, Step[]> = {};
       for (const target of tg) {
         stepMap[target.id] = await getSteps(target.id);
       }
-      setTargetSteps(stepMap);
+      if (isMounted.current) setTargetSteps(stepMap);
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { loadAllData(); }, []);
+  useEffect(() => { isMounted.current = true; loadAllData(); return () => { isMounted.current = false; }; }, []);
 
   const viewModes = [
     { id: 'list', icon: '📋', label: '列表' },

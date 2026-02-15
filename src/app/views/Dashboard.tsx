@@ -1,24 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, ProgressBar, Checkbox } from '@/components/ui';
 import { getDashboard, type Dashboard } from '@/lib/api';
 
 export function Dashboard() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+  const isMounted = useRef(false);
 
   async function loadData() {
     try {
       const data = await getDashboard();
-      setDashboard(data);
+      if (isMounted.current) setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
     }
   }
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { isMounted.current = true; loadData(); return () => { isMounted.current = false; }; }, []);
 
   if (!dashboard) {
     return (
