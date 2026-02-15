@@ -1,9 +1,6 @@
 // Import functionality
 
-use super::export::{
-    DailySummarySettingsData, EntityTagRow, ExportDataContent, NotificationPluginData,
-    SettingsData, TagData,
-};
+use super::export::ExportDataContent;
 use crate::AppState;
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +10,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
 pub struct ImportData {
-    pub version: String,
+    #[allow(dead_code)]
+    pub version: String, // Reserved for future format versioning
     pub data: ExportDataContent,
 }
 
@@ -287,7 +285,7 @@ fn import_replace(
     data: &ExportDataContent,
 ) -> Result<ImportResult, String> {
     let mut imported = 0usize;
-    let mut skipped = 0usize;
+    let skipped = 0usize; // No skipped items in replace mode
     let mut errors = Vec::new();
 
     // Clear all tables (in reverse dependency order)
@@ -424,7 +422,7 @@ fn import_update(
     data: &ExportDataContent,
 ) -> Result<ImportResult, String> {
     let mut imported = 0usize;
-    let mut skipped = 0usize;
+    let skipped = 0usize; // No skipped items in upsert mode
     let mut errors = Vec::new();
 
     // Import tags (upsert)

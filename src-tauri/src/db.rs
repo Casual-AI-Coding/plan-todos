@@ -117,6 +117,15 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
+    // Schema migrations tracking table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS schema_migrations (
+            id TEXT PRIMARY KEY,
+            applied_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
     // Tags table
     conn.execute(
         "CREATE TABLE IF NOT EXISTS tags (
@@ -223,42 +232,61 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     .ok();
 
     // Migration: Add biz_type and biz_id columns with data migration from legacy fields
-    // Step 1: Add new columns if they don't exist
-    add_column_if_not_exists(conn, "milestones", "biz_type", "TEXT")?;
-    add_column_if_not_exists(conn, "milestones", "biz_id", "TEXT")?;
-
-    // Step 2: Migrate data from legacy fields to new fields
-    // This is a one-time migration - we check if the old columns still have data
-    let has_legacy_data: bool = conn
+    // Only run migration once - check if already applied
+    let migration_id = "milestone_biz_type_migration";
+    let migration_done: bool = conn
         .query_row(
-            "SELECT EXISTS(SELECT 1 FROM milestones WHERE plan_id IS NOT NULL OR task_id IS NOT NULL OR target_id IS NOT NULL)",
-            [],
+            "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE id = ?)",
+            [migration_id],
             |row| row.get(0),
         )
         .unwrap_or(false);
 
-    if has_legacy_data {
-        // Migrate plan_id -> biz_type='plan', biz_id=plan_id
+    if !migration_done {
+        // Add new columns if they don't exist
+        add_column_if_not_exists(conn, "milestones", "biz_type", "TEXT")?;
+        add_column_if_not_exists(conn, "milestones", "biz_id", "TEXT")?;
+
+        // Migrate data from legacy fields to new fields
+        let has_legacy_data: bool = conn
+            .query_row(
+                "SELECT EXISTS(SELECT 1 FROM milestones WHERE plan_id IS NOT NULL OR task_id IS NOT NULL OR target_id IS NOT NULL)",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(false);
+
+        if has_legacy_data {
+            // Migrate plan_id -> biz_type='plan', biz_id=plan_id
+            conn.execute(
+                "UPDATE milestones SET biz_type = 'plan', biz_id = plan_id WHERE plan_id IS NOT NULL",
+                [],
+            )
+            .ok();
+
+            // Migrate task_id -> biz_type='task', biz_id=task_id
+            conn.execute(
+                "UPDATE milestones SET biz_type = 'task', biz_id = task_id WHERE task_id IS NOT NULL",
+                [],
+            )
+            .ok();
+
+            // Migrate target_id -> biz_type='target', biz_id=target_id
+            conn.execute(
+                "UPDATE milestones SET biz_type = 'target', biz_id = target_id WHERE target_id IS NOT NULL",
+                [],
+            ).ok();
+
+            info!("Migrated milestone legacy data to biz_type/biz_id");
+        }
+
+        // Record migration as done
+        let now = chrono::Utc::now().to_rfc3339();
         conn.execute(
-            "UPDATE milestones SET biz_type = 'plan', biz_id = plan_id WHERE plan_id IS NOT NULL",
-            [],
+            "INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)",
+            [migration_id, &now],
         )
         .ok();
-
-        // Migrate task_id -> biz_type='task', biz_id=task_id
-        conn.execute(
-            "UPDATE milestones SET biz_type = 'task', biz_id = task_id WHERE task_id IS NOT NULL",
-            [],
-        )
-        .ok();
-
-        // Migrate target_id -> biz_type='target', biz_id=target_id
-        conn.execute(
-            "UPDATE milestones SET biz_type = 'target', biz_id = target_id WHERE target_id IS NOT NULL",
-            [],
-        ).ok();
-
-        info!("Migrated milestone legacy data to biz_type/biz_id");
     }
 
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
