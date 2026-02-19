@@ -39,6 +39,7 @@ export default function Home() {
       case 'goals-completed': return <TargetsView />;
       case 'milestones': return <MilestonesView />;
       case 'views': return <ViewsView />;
+      case 'circulations':
       case 'circulations-today': return <CirculationsView mode="today" />;
       case 'circulations-settings': return <CirculationsView mode="settings" />;
       case 'statistics': return <StatisticsView />;

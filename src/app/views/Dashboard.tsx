@@ -58,7 +58,7 @@ export function Dashboard() {
       </div>
 
       {/* Entity Counts */}
-      <div className="grid grid-cols-6 gap-2">
+      <div className="grid grid-cols-7 gap-2">
         <Card className="text-center py-2">
           <div className="text-lg font-semibold text-teal-600">{counts.todo}</div>
           <div className="text-xs text-gray-500">待办</div>
@@ -80,10 +80,32 @@ export function Dashboard() {
           <div className="text-xs text-gray-500">里程碑</div>
         </Card>
         <Card className="text-center py-2">
+          <div className="text-lg font-semibold text-teal-600">{counts.circulation || 0}</div>
+          <div className="text-xs text-gray-500">打卡</div>
+        </Card>
+        <Card className="text-center py-2">
           <div className="text-lg font-semibold text-teal-600">{week.completed_count}</div>
           <div className="text-xs text-gray-500">本周完成</div>
         </Card>
       </div>
+
+      {/* Circulation Stats */}
+      {dashboard.circulation_stats && (
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="text-center">
+            <div className="text-3xl font-bold text-teal-600">{dashboard.circulation_stats.today_pending}</div>
+            <div className="text-sm text-gray-500 mt-1">今日待打卡</div>
+          </Card>
+          <Card className="text-center">
+            <div className="text-3xl font-bold text-green-600">{dashboard.circulation_stats.today_completed}</div>
+            <div className="text-sm text-gray-500 mt-1">今日已完成</div>
+          </Card>
+          <Card className="text-center">
+            <div className="text-3xl font-bold text-orange-500">{dashboard.circulation_stats.current_streak}</div>
+            <div className="text-sm text-gray-500 mt-1">当前最长连续</div>
+          </Card>
+        </div>
+      )}
 
       {/* Today's Tasks */}
       <Card>

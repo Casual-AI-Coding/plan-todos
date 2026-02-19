@@ -583,6 +583,46 @@ fn seed_data(conn: &Connection) -> Result<(), rusqlite::Error> {
         rusqlite::params!["milestone-3", "代码质量达标", "2026-06-30", "target", "target-1", "in-progress", 35, &now, &now],
     )?;
 
+    // Seed Circulations - 每日打卡
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-daily-1", "晨跑", "每天早上跑步", "periodic", "daily", 5, 15, "active", &now, &now],
+    )?;
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-daily-2", "读书", "每天阅读 30 分钟", "periodic", "daily", 12, 30, "active", &now, &now],
+    )?;
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-daily-3", "喝水", "每天喝足够的水", "periodic", "daily", 20, 45, "active", &now, &now],
+    )?;
+
+    // Seed Circulations - 每周打卡
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-weekly-1", "周报", "每周完成周报", "periodic", "weekly", 3, 8, "active", &now, &now],
+    )?;
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-weekly-2", "周复盘", "每周进行复盘", "periodic", "weekly", 2, 6, "active", &now, &now],
+    )?;
+
+    // Seed Circulations - 每月打卡
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-monthly-1", "月总结", "每月完成月度总结", "periodic", "monthly", 1, 3, "active", &now, &now],
+    )?;
+
+    // Seed Circulations - 计数打卡
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-count-1", "喝水", "每天喝 8 杯水", "count", 8, 5, "active", &now, &now],
+    )?;
+    conn.execute(
+        "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rusqlite::params!["circ-count-2", "每日10000步", "每天走 10000 步", "count", 10000, 6500, "active", &now, &now],
+    )?;
+
     info!("Seed data inserted successfully");
     Ok(())
 }

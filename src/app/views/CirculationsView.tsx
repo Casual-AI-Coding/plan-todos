@@ -179,7 +179,7 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
         <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
           打卡
         </h2>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button
             variant={viewMode === 'today' ? 'primary' : 'secondary'}
             onClick={() => setViewMode('today')}
@@ -191,6 +191,9 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
             onClick={() => setViewMode('settings')}
           >
             打卡设置
+          </Button>
+          <Button onClick={() => setShowForm(true)}>
+            + 新建
           </Button>
         </div>
       </div>
@@ -309,11 +312,6 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
               </button>
             </div>
           )}
-
-          {/* Add Button */}
-          <Button className="mb-4" onClick={() => setShowForm(true)}>
-            + 新建打卡项
-          </Button>
 
           {/* List */}
           <div className="space-y-4">

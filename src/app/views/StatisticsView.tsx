@@ -2,26 +2,28 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card, ProgressBar } from '@/components/ui';
-import { getTodos, getPlans, getTargets, getMilestones, Todo, Plan, Target, Milestone } from '@/lib/api';
+import { getTodos, getPlans, getTargets, getMilestones, getCirculations, Todo, Plan, Target, Milestone, Circulation } from '@/lib/api';
 
 export function StatisticsView() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [circulations, setCirculations] = useState<Circulation[]>([]);
 
   const isLoaded = useRef(false);
 
   async function loadData() {
     try {
-      const [t, p, tg, m] = await Promise.all([
-        getTodos(), getPlans(), getTargets(), getMilestones()
+      const [t, p, tg, m, c] = await Promise.all([
+        getTodos(), getPlans(), getTargets(), getMilestones(), getCirculations()
       ]);
       if (isLoaded.current) {
         setTodos(t);
         setPlans(p);
         setTargets(tg);
         setMilestones(m);
+        setCirculations(c);
       }
     } catch (e) { console.error(e); }
   }
@@ -38,6 +40,11 @@ export function StatisticsView() {
     activeTargets: targets.filter(t => t.status === 'active').length,
     totalMilestones: milestones.length,
     completedMilestones: milestones.filter(m => m.status === 'completed').length,
+    totalCirculations: circulations.length,
+    activeCirculations: circulations.filter(c => c.status === 'active').length,
+    avgStreak: circulations.length > 0 
+      ? Math.round(circulations.reduce((sum, c) => sum + c.streak_count, 0) / circulations.length * 10) / 10
+      : 0,
   };
 
   const completionRate = stats.totalTodos > 0 
@@ -121,6 +128,25 @@ export function StatisticsView() {
             <div className="flex justify-between">
               <span className="text-gray-600">里程碑</span>
               <span className="font-medium text-teal-600">{stats.totalMilestones}</span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Circulation Stats */}
+        <Card className="col-span-2">
+          <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>打卡统计</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal-600">{stats.totalCirculations}</div>
+              <div className="text-sm text-gray-500">总打卡项</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{stats.activeCirculations}</div>
+              <div className="text-sm text-gray-500">活跃打卡</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-500">{stats.avgStreak}</div>
+              <div className="text-sm text-gray-500">平均连续天数</div>
             </div>
           </div>
         </Card>

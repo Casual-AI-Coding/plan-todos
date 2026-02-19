@@ -655,6 +655,13 @@ export interface Dashboard {
     target: number;
     step: number;
     milestone: number;
+    circulation: number;
+  };
+  // 打卡统计
+  circulation_stats?: {
+    today_pending: number;
+    today_completed: number;
+    current_streak: number;
   };
   // 今日待办
   today_todos: Array<{
@@ -717,7 +724,8 @@ export async function getDashboard(): Promise<Dashboard> {
         productivity_score: 0,
       },
       week: { completed_count: 0 },
-      counts: { todo: 0, plan: 0, task: 0, target: 0, step: 0, milestone: 0 },
+      counts: { todo: 0, plan: 0, task: 0, target: 0, step: 0, milestone: 0, circulation: 0 },
+      circulation_stats: { today_pending: 0, today_completed: 0, current_streak: 0 },
       today_todos: [],
       overdue_todos: [],
       completed_today: [],
