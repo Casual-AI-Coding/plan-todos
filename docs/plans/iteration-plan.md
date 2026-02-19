@@ -269,6 +269,7 @@ Settings
 ## 第三阶段：新概念 - Circulation (打卡)
 
 > ⚠️ **重要提醒**：本阶段开始前，必须与产品方沟通确认相关功能和设计后方可实施。
+> **状态**: ✅ 已完成 (2026-02-19)
 
 ### 目标
 新增循环任务概念，类似于每日打卡、每周打卡。
@@ -280,28 +281,34 @@ Settings
 - 完成后自动重置到下一周期
 - 支持 streak（连续打卡）统计
 
-### 导航更新
+### 导航更新 (已实现)
 
 ```
-🔄 CIRCULATIONS (新增)
-├── 今日打卡 (Today's)
-├── 每周打卡 (Weekly)
-└── 每月打卡 (Monthly)
+📋 TODOS → 🔄 CIRCLUATIONS → 🚀 PLANS
 ```
 
-### 实体设计
+**注意**: 打卡菜单位于 TODOS 和 PLANS 中间，不使用子菜单，而是通过页面内 Tab 切换：
+- 今日打卡 (Tab)
+- 打卡设置 (Tab)
+  - 周期打卡 / 计数打卡 (二级 Tab)
+  - 每日 / 每周 / 每月 (周期打卡子 Tab)
+
+### 实体设计 (已实现)
 
 ```sql
 CREATE TABLE circulations (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   content TEXT,
-  frequency TEXT NOT NULL,  -- 'daily', 'weekly', 'monthly', 'custom'
-  frequency_config TEXT,    -- JSON: { "days": [1,2,3] } for weekly
-  streak_count INTEGER DEFAULT 0,
-  best_streak INTEGER DEFAULT 0,
+  circulation_type TEXT NOT NULL DEFAULT 'periodic',  -- 'periodic' | 'count'
+  frequency TEXT,                                     -- 'daily' | 'weekly' | 'monthly'
+  frequency_config TEXT,                              -- JSON: { "days": [1,2,3] } for weekly
+  target_count INTEGER,                              -- count only
+  current_count INTEGER DEFAULT 0,                    -- count only
+  streak_count INTEGER DEFAULT 0,                    -- periodic only
+  best_streak INTEGER DEFAULT 0,                      -- periodic only
   last_completed_at TEXT,
-  status TEXT DEFAULT 'active',
+  status TEXT DEFAULT 'active',                       -- 'active' | 'archived'
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -311,7 +318,8 @@ CREATE TABLE circulation_logs (
   id TEXT PRIMARY KEY,
   circulation_id TEXT REFERENCES circulations(id) ON DELETE CASCADE,
   completed_at TEXT NOT NULL,
-  period TEXT NOT NULL  -- 记录是哪一期完成的
+  note TEXT,
+  period TEXT  -- 记录是哪一期完成的 (e.g., "2024-W05", "2024-02")
 );
 ```
 
@@ -322,13 +330,64 @@ CREATE TABLE circulation_logs (
 | daily | 每天 00:00 | 每日晨跑 |
 | weekly | 每周一 00:00 | 每周总结 |
 | monthly | 每月1日 00:00 | 每月复盘 |
-| custom | 自定义日期 | 每月15日 |
+| count | 无重置，持续累加 | 喝水 8 杯 |
 
 ### 打卡统计
 
 - **当前连续**：streak_count，连续完成的天数/周数/月数
 - **最佳连续**：best_streak，历史最高连续记录
 - **今日状态**：是否已完成今日打卡
+
+### 打卡主页 UI (已实现)
+
+```
+┌─────────────────────────────────────────────┐
+│  打卡                            [今日打卡] [打卡设置]    [+ 新建]  │
+├─────────────────────────────────────────────┤
+│  Tab: [周期打卡] [计数打卡]                                    │
+│  ┌─────────────────────────────────────┐   │
+│  │ 🔥 连续 5 天      ✨ 最佳 15 天     │   │
+│  │ 晨跑                        [打卡]   │   │
+│  └─────────────────────────────────────┘   │
+└─────────────────────────────────────────────┘
+```
+
+### Dashboard 集成 (已实现)
+
+- 今日待打卡数量
+- 今日已完成数量
+- 当前最长连续天数
+
+### Statistics 集成 (已实现)
+
+- 总打卡项数量
+- 活跃打卡项数量
+- 平均连续天数
+
+### 种子数据 (已实现)
+
+创建以下示例打卡：
+| 类型 | 名称 | 频率/目标 |
+|------|------|----------|
+| 每日 | 晨跑 | daily |
+| 每日 | 读书 | daily |
+| 每日 | 喝水 | daily |
+| 每周 | 周报 | weekly |
+| 每周 | 周复盘 | weekly |
+| 每月 | 月总结 | monthly |
+| 计数 | 喝水 | target: 8 |
+| 计数 | 每日10000步 | target: 10000 |
+
+---
+
+## 文档更新历史
+
+| 日期 | 操作 |
+|------|------|
+| 2026-02-14 | 创建文档 |
+| 2026-02-14 | Phase 2 详细设计: Priority(P0-P3), Tags(Todo/Plan/Target), Import/Export(含settings) |
+| 2026-02-15 | Phase 3 详细设计: Circulation(打卡) - 周期打卡/计数打卡/Streak/撤销打卡 |
+| 2026-02-19 | Phase 3 完成：UI 优化 - 侧边栏调整、卡片布局、Dashboard/Statistics 集成、种子数据 |
 
 ---
 
