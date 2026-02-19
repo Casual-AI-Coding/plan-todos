@@ -334,7 +334,7 @@ fn export_circulations(conn: &rusqlite::Connection) -> Result<Vec<Circulation>, 
 
 fn export_circulation_logs(conn: &rusqlite::Connection) -> Result<Vec<CirculationLog>, String> {
     let mut stmt = conn
-        .prepare("SELECT id, circulation_id, completed_at, note, period FROM circulation_logs")
+        .prepare("SELECT id, circulation_id, completed_at, note, period, COALESCE(count, 1) as count FROM circulation_logs")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
@@ -345,6 +345,7 @@ fn export_circulation_logs(conn: &rusqlite::Connection) -> Result<Vec<Circulatio
                 completed_at: row.get(2)?,
                 note: row.get(3)?,
                 period: row.get(4)?,
+                count: row.get(5)?,
             })
         })
         .map_err(|e| e.to_string())?;
