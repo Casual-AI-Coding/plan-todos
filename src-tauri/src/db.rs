@@ -467,162 +467,170 @@ fn create_indexes(conn: &Connection) -> Result<(), rusqlite::Error> {
 }
 
 fn seed_data(conn: &Connection) -> Result<(), rusqlite::Error> {
-    let count: i32 = conn.query_row("SELECT COUNT(*) FROM todos", [], |row| row.get(0))?;
-    if count > 0 {
-        return Ok(());
-    }
+    let todo_count: i32 = conn.query_row("SELECT COUNT(*) FROM todos", [], |row| row.get(0))?;
+    if todo_count == 0 {
+        info!("Seeding initial data...");
+        let now = chrono::Utc::now().to_rfc3339();
 
-    info!("Seeding initial data...");
-    let now = chrono::Utc::now().to_rfc3339();
+        // Seed Todos
+        conn.execute(
+            "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["todo-1", "完成项目设计稿", "需要给UI设计稿添加注释", "2026-02-15", "pending", "P1", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["todo-2", "准备周报", "总结本周工作进展", "2026-02-14", "in-progress", "P2", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["todo-3", "团队会议", "讨论Q1目标", "2026-02-13", "done", "P2", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["todo-4", "代码审查", "Review PR #123", "2026-02-20", "pending", "P0", &now, &now],
+        )?;
 
-    // Seed Todos
-    conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-1", "完成项目设计稿", "需要给UI设计稿添加注释", "2026-02-15", "pending", "P1", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-2", "准备周报", "总结本周工作进展", "2026-02-14", "in-progress", "P2", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-3", "团队会议", "讨论Q1目标", "2026-02-13", "done", "P2", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["todo-4", "代码审查", "Review PR #123", "2026-02-20", "pending", "P0", &now, &now],
-    )?;
-
-    // Seed Plans
-    conn.execute(
+        // Seed Plans
+        conn.execute(
         "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["plan-1", "完成产品发布", "准备V2.0版本的发布工作", "2026-02-01", "2026-03-31", "active", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["plan-2", "技术重构", "优化代码结构和性能", "2026-01-15", "2026-02-28", "active", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["plan-3", "用户调研", "收集用户反馈", "2025-12-01", "2026-01-31", "completed", &now, &now],
     )?;
 
-    // Seed Tasks
-    conn.execute(
+        // Seed Tasks
+        conn.execute(
         "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["task-1", "plan-1", "准备发布文档", "撰写V2.0功能说明", "2026-02-10", "2026-02-20", "in-progress", "P1", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["task-2", "plan-1", "测试回归", "执行完整测试套件", "2026-02-25", "2026-03-10", "pending", "P2", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["task-3", "plan-2", "重构数据库层", "优化SQL查询", "2026-01-20", "2026-02-10", "done", "P1", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["task-4", "plan-2", "优化前端构建", "减少打包体积", "2026-02-15", "2026-02-25", "pending", "P3", &now, &now],
     )?;
 
-    // Seed Targets
-    conn.execute(
+        // Seed Targets
+        conn.execute(
         "INSERT INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["target-1", "提升代码质量", "重构遗留代码，提高可维护性", "2026-06-30", "active", 35, &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["target-2", "月活用户达10万", "通过运营活动提升活跃度", "2026-12-31", "active", 15, &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["target-3", "完成技术文档", "整理API文档和开发指南", "2026-03-15", "active", 60, &now, &now],
     )?;
 
-    // Seed Steps
-    conn.execute(
+        // Seed Steps
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-1", "target-1", "代码审查流程", 25, "completed", "P1", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-2", "target-1", "单元测试覆盖", 25, "completed", "P2", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-3", "target-1", "重构核心模块", 30, "in-progress", "P0", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-4", "target-1", "性能优化", 20, "pending", "P3", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-5", "target-3", "API文档", 30, "completed", "P1", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-6", "target-3", "开发指南", 30, "completed", "P2", &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["step-7", "target-3", "部署文档", 40, "pending", "P2", &now, &now],
     )?;
 
-    // Seed Milestones
-    conn.execute(
+        // Seed Milestones
+        conn.execute(
         "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["milestone-1", "Beta版本发布", "2026-02-28", "plan", "plan-1", "pending", 30, &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["milestone-2", "V2.0正式发布", "2026-03-31", "plan", "plan-1", "pending", 0, &now, &now],
     )?;
-    conn.execute(
+        conn.execute(
         "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params!["milestone-3", "代码质量达标", "2026-06-30", "target", "target-1", "in-progress", 35, &now, &now],
     )?;
 
-    // Seed Circulations - 每日打卡
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-daily-1", "晨跑", "每天早上跑步", "periodic", "daily", 5, 15, "active", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-daily-2", "读书", "每天阅读 30 分钟", "periodic", "daily", 12, 30, "active", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-daily-3", "喝水", "每天喝足够的水", "periodic", "daily", 20, 45, "active", &now, &now],
-    )?;
+        info!("Seed data inserted successfully");
+    }
 
-    // Seed Circulations - 每周打卡
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-weekly-1", "周报", "每周完成周报", "periodic", "weekly", 3, 8, "active", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-weekly-2", "周复盘", "每周进行复盘", "periodic", "weekly", 2, 6, "active", &now, &now],
-    )?;
+    // Seed Circulations independently (if not exist)
+    let circ_count: i32 =
+        conn.query_row("SELECT COUNT(*) FROM circulations", [], |row| row.get(0))?;
+    if circ_count == 0 {
+        let now = chrono::Utc::now().to_rfc3339();
 
-    // Seed Circulations - 每月打卡
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-monthly-1", "月总结", "每月完成月度总结", "periodic", "monthly", 1, 3, "active", &now, &now],
-    )?;
+        // Seed Circulations - 每日打卡
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-daily-1", "晨跑", "每天早上跑步", "periodic", "daily", 5, 15, "active", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-daily-2", "读书", "每天阅读 30 分钟", "periodic", "daily", 12, 30, "active", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-daily-3", "喝水", "每天喝足够的水", "periodic", "daily", 20, 45, "active", &now, &now],
+        )?;
 
-    // Seed Circulations - 计数打卡
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-count-1", "喝水", "每天喝 8 杯水", "count", 8, 5, "active", &now, &now],
-    )?;
-    conn.execute(
-        "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        rusqlite::params!["circ-count-2", "每日10000步", "每天走 10000 步", "count", 10000, 6500, "active", &now, &now],
-    )?;
+        // Seed Circulations - 每周打卡
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-weekly-1", "周报", "每周完成周报", "periodic", "weekly", 3, 8, "active", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-weekly-2", "周复盘", "每周进行复盘", "periodic", "weekly", 2, 6, "active", &now, &now],
+        )?;
 
-    info!("Seed data inserted successfully");
+        // Seed Circulations - 每月打卡
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-monthly-1", "月总结", "每月完成月度总结", "periodic", "monthly", 1, 3, "active", &now, &now],
+        )?;
+
+        // Seed Circulations - 计数打卡
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-count-1", "喝水", "每天喝 8 杯水", "count", 8, 5, "active", &now, &now],
+        )?;
+        conn.execute(
+            "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["circ-count-2", "每日10000步", "每天走 10000 步", "count", 10000, 6500, "active", &now, &now],
+        )?;
+
+        info!("Circulation seed data inserted successfully");
+    }
+
     Ok(())
 }

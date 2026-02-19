@@ -524,9 +524,8 @@ export async function getMilestones(): Promise<Milestone[]> {
 export async function createMilestone(data: {
   title: string;
   target_date?: string;
-  plan_id?: string;
-  task_id?: string;
-  target_id?: string;
+  biz_type?: string;
+  biz_id?: string;
 }): Promise<Milestone> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to create milestones');
@@ -535,9 +534,8 @@ export async function createMilestone(data: {
   return invoke<Milestone>('create_milestone', {
     title: data.title,
     targetDate: data.target_date || null,
-    planId: data.plan_id || null,
-    taskId: data.task_id || null,
-    targetId: data.target_id || null,
+    bizType: data.biz_type || null,
+    bizId: data.biz_id || null,
   });
 }
 

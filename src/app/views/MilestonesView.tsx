@@ -43,8 +43,8 @@ export function MilestonesView() {
       await createMilestone({ 
         title, 
         target_date: targetDate || undefined,
-        plan_id: linkType === 'plan' ? linkId : undefined,
-        target_id: linkType === 'target' ? linkId : undefined,
+        biz_type: linkType,
+        biz_id: linkId,
       });
       setShowForm(false);
       setTitle(''); setTargetDate(''); setLinkId('');
@@ -121,13 +121,21 @@ export function MilestonesView() {
                 <input type="radio" name="linkType" checked={linkType === 'target'} onChange={() => { setLinkType('target'); setLinkId(''); }} />
                 <span>Target</span>
               </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="linkType" checked={linkType === 'circulation'} onChange={() => { setLinkType('circulation'); setLinkId(''); }} />
+                <span>打卡</span>
+              </label>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">选择{linkType === 'plan' ? '计划' : '目标'}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {linkType === 'plan' ? '选择计划' : linkType === 'target' ? '选择目标' : '选择打卡'}
+            </label>
             <select value={linkId} onChange={e => setLinkId(e.target.value)} className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
               <option value="">请选择...</option>
-              {linkType === 'plan' ? plans.map(p => <option key={p.id} value={p.id}>{p.title}</option>) : targets.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+              {linkType === 'plan' ? plans.map(p => <option key={p.id} value={p.id}>{p.title}</option>) : 
+               linkType === 'target' ? targets.map(t => <option key={t.id} value={t.id}>{t.title}</option>) :
+               circulations.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
             </select>
           </div>
         </div>

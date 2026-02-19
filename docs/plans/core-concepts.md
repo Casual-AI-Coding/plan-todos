@@ -68,43 +68,6 @@
 │   │ 有截止日期    │         │ 无时间概念    │                    │
 │   │ 有进度(%)    │         │ 完成累加进度  │                    │
 │   └──────────────┘         └──────────────┘                    │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌──────────────┐         ┌──────────────┐                    │
-│   │    Plan      │◄───────►│     Task     │                    │
-│   │  长期计划     │  1:N    │   短期任务    │                    │
-│   │ 有持续时间    │         │ 有持续时间    │                    │
-│   │ 可拆分        │         │ 属于Plan     │                    │
-│   └──────────────┘         └──────────────┘                    │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌──────────────┐                                              │
-│   │     Todo     │  ← 独立，无关联                               │
-│   │                                                │
-│   │ 有截止日期    │                                              │
-短期事项     ││   └──────────────┘                                              │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌──────────────┐                                              │
-│   │   Milestone  │  ← 进度检查点                                  │
-│   │   里程碑     │  ← 可关联 Plan/Task/Target (三选一)          │
-│   └──────────────┘                                              │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    概念关系总览                                   │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌──────────────┐         ┌──────────────┐                    │
-│   │    Target    │◄───────►│     Step     │                    │
-│   │  长期目标     │  1:N    │   步骤/权重   │                    │
-│   │ 有截止日期    │         │ 无时间概念    │                    │
-│   │ 有进度(%)    │         │ 完成累加进度  │                    │
-│   └──────────────┘         └──────────────┘                    │
 │          │                                                       │
 │          │ 关联 (可选)                                           │
 │          ▼                                                       │
@@ -163,6 +126,7 @@ Step:      pending | completed
 Todo:      pending | in-progress | done
 Milestone: pending | completed
 Circulation: active | archived
+Priority:  P0 | P1 | P2 | P3 (P0 最高)
 ```
 
 ### 3.4 Circulation (打卡) - 循环任务
@@ -254,6 +218,7 @@ interface Task {
   start_date?: string;       // 开始日期
   end_date?: string;          // 结束日期
   status: 'pending' | 'in-progress' | 'done';
+  priority: Priority;         // 优先级 P0-P3
   created_at: string;
   updated_at: string;
 }
@@ -283,8 +248,42 @@ interface Step {
   title: string;              // 步骤标题
   weight: number;             // 权重 (0-100)，创建时校验总和 ≤ 100
   status: 'pending' | 'completed';
+  priority: Priority;         // 优先级 P0-P3
   created_at: string;
   updated_at: string;
+}
+```
+
+### Priority - 优先级
+
+```typescript
+type Priority = 'P0' | 'P1' | 'P2' | 'P3';  // P0 最高，P3 最低
+
+// 优先级说明
+| 优先级 | 说明 | 颜色 |
+|--------|------|------|
+| P0 | 紧急重要 | 红色 #EF4444 |
+| P1 | 重要 | 橙色 #F59E0B |
+| P2 | 普通 | 蓝色 #3B82F6 |
+| P3 | 低优先 | 灰色 #9CA3AF |
+```
+
+### Tag - 标签
+
+```typescript
+interface Tag {
+  id: string;
+  name: string;               // 标签名称
+  color: string;            // 标签颜色 (#RRGGBB)
+  description?: string;     // 描述
+  created_at: string;
+}
+
+// 实体标签关联 (多对多)
+interface EntityTag {
+  entity_type: 'todo' | 'plan' | 'target';
+  entity_id: string;
+  tag_id: string;
 }
 ```
 
@@ -297,6 +296,8 @@ interface Todo {
   content?: string;           // 内容
   due_date?: string;          // 截止日期
   status: 'pending' | 'in-progress' | 'done';
+  priority: Priority;         // 优先级 P0-P3
+  tags?: Tag[];              // 关联标签
   created_at: string;
   updated_at: string;
 }
@@ -393,7 +394,14 @@ interface CirculationLog {
 - 记录最佳连续天数
 - 查看打卡历史记录
 
-### 5.6 视图模式
+### 5.6 标签管理
+
+- 创建/编辑/删除标签
+- 标签设置颜色
+- 给 Todo/Plan/Target 添加标签
+- 按标签筛选列表
+
+### 5.7 视图模式
 
 | 视图 | 描述 |
 |------|------|
@@ -401,7 +409,7 @@ interface CirculationLog {
 | **日历视图** | 月/周/日视图，按日期显示 Todo/Task |
 | **时间轴视图** | 甘特图样式，横向展示时间分布 |
 
-### 5.7 推送通知
+### 5.8 推送通知
 
 #### 插件式架构
 
