@@ -150,7 +150,8 @@
 | **Target** | 长期目标 | 截止日期 | Step 权重累加 | 1→N Step |
 | **Step** | 步骤 | 无 | 权重值 (0-100%) | 属于 1 Target |
 | **Todo** | 短期事项 | 截止日期 | 完成状态 | 独立 |
-| **Milestone** | 里程碑 | 可选日期 | 衍生 | 关联 Plan/Task/Target |
+| **Milestone** | 里程碑 | 可选日期 | 衍生 | 关联 Plan/Task/Target/Circulation |
+| **Circulation** | 循环打卡 | 周期 (日/周/月) | streak_count | 独立 |
 
 ### 3.3 状态定义
 
@@ -161,9 +162,47 @@ Target:    active | completed | archived
 Step:      pending | completed
 Todo:      pending | in-progress | done
 Milestone: pending | completed
+Circulation: active | archived
 ```
 
-### 3.4 Milestone 定位（混合模式）
+### 3.4 Circulation (打卡) - 循环任务
+
+Circulation = **循环打卡任务**
+
+- 用户手动创建打卡项
+- 设置循环频率：每日(daily)、每周(weekly)、每月(monthly)
+- 或设置目标次数：计数打卡(count)
+- 自动追踪连续打卡(streak)和最佳记录
+- 支持打卡记录和备注
+
+```typescript
+interface Circulation {
+  id: string;
+  title: string;              // 打卡项标题
+  content?: string;          // 描述/备注
+  circulation_type: 'periodic' | 'count';  // 周期打卡或计数打卡
+  frequency?: 'daily' | 'weekly' | 'monthly';  // 周期频率
+  frequency_config?: string; // JSON 配置
+  target_count?: number;     // 目标次数 (计数打卡)
+  current_count: number;     // 当前进度
+  streak_count: number;      // 当前连续天数
+  best_streak: number;       // 最佳连续记录
+  last_completed_at?: string; // 上次完成时间
+  status: 'active' | 'archived';
+  created_at: string;
+  updated_at: string;
+}
+
+interface CirculationLog {
+  id: string;
+  circulation_id: string;   // 关联打卡项
+  completed_at: string;    // 打卡时间
+  note?: string;           // 打卡备注
+  period: string;          // 周期标识 (如 "2024-W05", "2024-02", "2024-02-19")
+}
+```
+
+### 3.5 Milestone 定位（混合模式）
 
 Milestone = **进度检查点 + 阶段性目标**
 
@@ -171,7 +210,7 @@ Milestone = **进度检查点 + 阶段性目标**
 - 手动关联 Plan/Task/Target（三选一）
 - 自动根据关联项的完成度计算进度
 
-```
+```typescript
 Milestone = {
   id: string,
   title: string,           // 如 "设计完成"
@@ -280,6 +319,35 @@ interface Milestone {
 }
 ```
 
+### 4.7 Circulation - 循环打卡
+
+```typescript
+interface Circulation {
+  id: string;
+  title: string;                   // 打卡项标题
+  content?: string;                // 描述
+  circulation_type: 'periodic' | 'count';  // 周期打卡或计数打卡
+  frequency?: 'daily' | 'weekly' | 'monthly';  // 周期频率
+  frequency_config?: string;       // JSON 配置
+  target_count?: number;           // 目标次数 (计数打卡)
+  current_count: number;           // 当前进度 (计数打卡)
+  streak_count: number;            // 当前连续天数 (周期打卡)
+  best_streak: number;             // 最佳连续记录 (周期打卡)
+  last_completed_at?: string;      // 上次完成时间
+  status: 'active' | 'archived';
+  created_at: string;
+  updated_at: string;
+}
+
+interface CirculationLog {
+  id: string;
+  circulation_id: string;         // 关联打卡项
+  completed_at: string;           // 打卡时间
+  note?: string;                  // 打卡备注
+  period: string;                 // 周期标识 (日: "2024-02-19", 周: "2024-W05", 月: "2024-02")
+}
+```
+
 ---
 
 ## 五、核心功能
@@ -314,7 +382,18 @@ interface Milestone {
 - 设置目标日期（可选）
 - 进度自动根据关联项计算
 
-### 5.5 视图模式
+### 5.5 Circulation (打卡) 管理
+
+- 创建/编辑/删除打卡项
+- 选择打卡类型：周期打卡(periodic)或计数打卡(count)
+- 周期打卡设置频率：每日(daily)、每周(weekly)、每月(monthly)
+- 计数打卡设置目标次数
+- 打卡/撤销打卡
+- 连续打卡(streak)自动计算
+- 记录最佳连续天数
+- 查看打卡历史记录
+
+### 5.6 视图模式
 
 | 视图 | 描述 |
 |------|------|
@@ -322,7 +401,7 @@ interface Milestone {
 | **日历视图** | 月/周/日视图，按日期显示 Todo/Task |
 | **时间轴视图** | 甘特图样式，横向展示时间分布 |
 
-### 5.6 推送通知
+### 5.7 推送通知
 
 #### 插件式架构
 

@@ -406,13 +406,3 @@ CREATE TABLE circulation_logs (
 | 提前提醒 | 打卡时间前 N 分钟提醒 |
 | 成就通知 | 连续打卡达到里程碑时通知 |
 | 模板配置 | 支持为不同打卡项设置不同提醒策略 |
-
----
-
-## 文档更新历史
-
-| 日期 | 操作 |
-|------|------|
-| 2026-02-14 | 创建文档 |
-| 2026-02-14 | Phase 2 详细设计: Priority(P0-P3), Tags(Todo/Plan/Target), Import/Export(含settings) |
-| 2026-02-15 | Phase 3 详细设计: Circulation(打卡) - 周期打卡/计数打卡/Streak/撤销打卡 |

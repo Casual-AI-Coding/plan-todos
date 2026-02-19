@@ -348,7 +348,97 @@ conn.execute("ALTER TABLE targets ADD COLUMN IF NOT EXISTS progress INTEGER DEFA
 
 ---
 
-## 七、后续设计
+## 八、Circulation 打卡
+
+### 8.1 circulations 表
+
+```sql
+CREATE TABLE circulations (
+  id                    TEXT PRIMARY KEY,
+  title                 TEXT NOT NULL,
+  content               TEXT,
+  circulation_type      TEXT NOT NULL DEFAULT 'periodic'
+                        CHECK(circulation_type IN ('periodic', 'count')),
+  frequency             TEXT,
+  frequency_config      TEXT,
+  target_count          INTEGER,
+  current_count         INTEGER NOT NULL DEFAULT 0,
+  streak_count          INTEGER NOT NULL DEFAULT 0,
+  best_streak           INTEGER NOT NULL DEFAULT 0,
+  last_completed_at     TEXT,
+  status                TEXT NOT NULL DEFAULT 'active'
+                        CHECK(status IN ('active', 'archived')),
+  created_at            TEXT NOT NULL,
+  updated_at            TEXT NOT NULL
+);
+```
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | TEXT | PK | UUID |
+| title | TEXT | NOT NULL | 打卡项标题 |
+| content | TEXT | | 描述/备注 |
+| circulation_type | TEXT | NOT NULL | `periodic` 或 `count` |
+| frequency | TEXT | | `daily`/`weekly`/`monthly` (周期打卡) |
+| frequency_config | TEXT | | JSON 配置 |
+| target_count | INTEGER | | 目标次数 (计数打卡) |
+| current_count | INTEGER | DEFAULT 0 | 当前进度 (计数打卡) |
+| streak_count | INTEGER | DEFAULT 0 | 当前连续天数 (周期打卡) |
+| best_streak | INTEGER | DEFAULT 0 | 最佳连续记录 (周期打卡) |
+| last_completed_at | TEXT | | 上次完成时间 |
+| status | TEXT | DEFAULT 'active' | 状态 |
+| created_at | TEXT | NOT NULL | 创建时间 |
+| updated_at | TEXT | NOT NULL | 更新时间 |
+
+### 8.2 circulation_logs 表
+
+```sql
+CREATE TABLE circulation_logs (
+  id                TEXT PRIMARY KEY,
+  circulation_id   TEXT NOT NULL,
+  completed_at      TEXT NOT NULL,
+  note              TEXT,
+  period            TEXT,
+  FOREIGN KEY (circulation_id) REFERENCES circulations(id) ON DELETE CASCADE
+);
+```
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | TEXT | PK | UUID |
+| circulation_id | TEXT | FK → circulations | 关联打卡项 |
+| completed_at | TEXT | NOT NULL | 打卡时间 |
+| note | TEXT | | 打卡备注 |
+| period | TEXT | | 周期标识 (如 `2024-W05`, `2024-02`) |
+
+### 8.3 索引
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_circulations_type ON circulations(circulation_type);
+CREATE INDEX IF NOT EXISTS idx_circulations_status ON circulations(status);
+CREATE INDEX IF NOT EXISTS idx_circulation_logs_cid ON circulation_logs(circulation_id);
+```
+
+---
+
+## 九、Milestone 重构 (biz_type/biz_id)
+
+为了支持 Milestone 关联 Circulation，对 Milestone 表进行重构：
+
+```sql
+ALTER TABLE milestones ADD COLUMN biz_type TEXT;
+ALTER TABLE milestones ADD COLUMN biz_id TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_milestones_biz_type ON milestones(biz_type);
+CREATE INDEX IF NOT EXISTS idx_milestones_biz_id ON milestones(biz_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_biz_type_id ON milestones(biz_type, biz_id);
+```
+
+biz_type 可选值：`plan` | `task` | `target` | `circulation`
+
+---
+
+## 十、后续设计
 
 - [ ] API接口设计 → `api-design.md`
 - [ ] 组件设计 → `component-design.md`

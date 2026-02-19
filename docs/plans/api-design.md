@@ -541,6 +541,137 @@
 
 ---
 
-## 十一、后续设计
+## 十一、Circulation API (打卡)
+
+### 11.1 获取所有打卡
+
+```typescript
+// 请求
+{ "cmd": "get_circulations" }
+
+// 响应
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "circ_xxx",
+      "title": "晨跑",
+      "content": "每天早上跑步",
+      "circulation_type": "periodic",  // "periodic" | "count"
+      "frequency": "daily",            // "daily" | "weekly" | "monthly" (periodic only)
+      "frequency_config": null,
+      "target_count": null,
+      "current_count": 0,
+      "streak_count": 5,              // 当前连续天数 (periodic)
+      "best_streak": 15,              // 最佳记录 (periodic)
+      "last_completed_at": "2026-02-19T08:00:00Z",
+      "status": "active",
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-19T08:00:00Z"
+    }
+  ]
+}
+```
+
+### 11.2 按类型筛选
+
+```typescript
+// 请求
+{ 
+  "cmd": "get_circulations_by_type", 
+  "payload": {
+    circulationType: "periodic",  // "periodic" | "count"
+    frequency?: "daily"           // optional, for periodic
+  }
+}
+```
+
+### 11.3 创建打卡
+
+```typescript
+// 请求
+{ 
+  "cmd": "create_circulation", 
+  "payload": {
+    title: string,
+    circulationType: "periodic" | "count",
+    frequency?: "daily" | "weekly" | "monthly",  // required for periodic
+    frequencyConfig?: string,                    // JSON config
+    targetCount?: number                         // for count type
+  }
+}
+```
+
+### 11.4 打卡
+
+```typescript
+// 请求
+{ 
+  "cmd": "checkin_circulation", 
+  "payload": {
+    id: "circ_xxx",
+    note?: string  // optional
+  }
+}
+
+// 响应 - 返回更新后的打卡对象
+{ "ok": true, "data": { /* Circulation with updated streak_count */ } }
+```
+
+### 11.5 撤销打卡
+
+```typescript
+// 请求
+{ "cmd": "undo_checkin_circulation", "payload": { id: "circ_xxx" } }
+```
+
+### 11.6 获取打卡记录
+
+```typescript
+// 请求
+{ 
+  "cmd": "get_circulation_logs", 
+  "payload": { 
+    circulationId: "circ_xxx",
+    limit?: number  // default 20
+  }
+}
+
+// 响应
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "log_xxx",
+      "circulation_id": "circ_xxx",
+      "completed_at": "2026-02-19T08:00:00Z",
+      "note": "早上好",
+      "period": "2026-02-19"  // "2024-W05" for weekly, "2024-02" for monthly
+    }
+  ]
+}
+```
+
+### 11.7 Dashboard 打卡统计
+
+在 get_dashboard 响应中添加：
+
+```typescript
+{
+  "ok": true,
+  "data": {
+    // ... existing fields
+    "circulation_stats": {
+      "today_pending": 3,       // 今日待打卡
+      "today_completed": 2,     // 今日已完成
+      "current_streak": 5        // 当前最长连续
+    }
+  }
+}
+```
+
+---
+
+## 十二、后续设计
 
 - [ ] 组件设计 → `component-design.md`

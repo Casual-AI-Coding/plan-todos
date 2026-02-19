@@ -21,7 +21,8 @@ src/components/
 │   ├── Checkbox/
 │   ├── DatePicker/
 │   ├── SearchBar/
-│   └── Calendar/
+│   ├── Calendar/
+│   └── CheckinConfirm/      # 打卡确认弹窗
 │
 ├── layout/                   # 布局组件
 │   ├── Sidebar/
@@ -34,7 +35,8 @@ src/components/
 │   ├── TaskCard/
 │   ├── TargetCard/
 │   ├── StepCard/
-│   └── MilestoneCard/
+│   ├── MilestoneCard/
+│   └── CirculationCard/     # 打卡卡片
 │
 ├── views/                    # 视图组件
 │   ├── Dashboard/
@@ -42,16 +44,20 @@ src/components/
 │   ├── PlanList/
 │   ├── TargetList/
 │   ├── MilestoneList/
+│   ├── CirculationsView/    # 打卡主页
+│   ├── CirculationDetailView/ # 打卡详情页
 │   ├── ViewSwitcher/
-│   └── Statistics/
+│   ├── Statistics/
+│   └── Settings/
 │
-└── forms/                    # 表单组件
+└── forms                    # 表单组件
     ├── TodoForm/
     ├── PlanForm/
     ├── TaskForm/
     ├── TargetForm/
     ├── StepForm/
-    └── MilestoneForm/
+    ├── MilestoneForm/
+    └── CirculationForm/    # 打卡表单
 ```
 
 ---
@@ -317,6 +323,93 @@ interface MilestoneCardProps {
 ```
 
 ---
+
+### 5.1 Dashboard
+
+```tsx
+// 今日总览页面
+interface DashboardProps {
+  todayTodos: Todo[];
+  upcomingTodos: Todo[];
+  completedToday: Todo[];
+  activePlans: Plan[];
+  activeTargets: Target[];
+  circulationStats: {
+    todayPending: number;
+    todayCompleted: number;
+    currentStreak: number;
+  };
+}
+
+// 布局
+┌────────────────────────────────────────────────────┐
+│  今日待办    │  即将到期    │  今日完成           │
+│     5        │      3       │      8              │
+├────────────────────────────────────────────────────┤
+│  打卡统计                                         │
+│  今日待打卡  │ 今日已完成  │ 当前最长连续         │
+│      3       │      2      │       5             │
+├────────────────────────────────────────────────────┤
+│  今日待办列表                                    
+├────────────────────────────────────────────────────┤
+│  进度概览 (Plan/Target 进度卡片)                 
+└────────────────────────────────────────────────────┘
+```
+
+---
+
+### 5.2 CirculationsView (打卡主页)
+
+```tsx
+interface CirculationsViewProps {
+  mode?: 'today' | 'settings';
+}
+
+// 布局
+┌─────────────────────────────────────────────────────────┐
+│  打卡                                      [今日打卡] [打卡设置] [+ 新建] │
+├─────────────────────────────────────────────────────────┤
+│  Tab: [周期打卡] [计数打卡]                               │
+│  ┌─────────────────────────────────────────────┐      │
+│  │ 🔥 连续 5 天      ✨ 最佳 15 天              │      │
+│  │ 晨跑                             [打卡]     │      │
+│  └─────────────────────────────────────────────┘      │
+│  ┌─────────────────────────────────────────────┐      │
+│  │ 📊 3/8 次                                    │      │
+│  │ 喝水                               [+][-]    │      │
+│  └─────────────────────────────────────────────┘      │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 5.3 CirculationDetailView (打卡详情页)
+
+```tsx
+interface CirculationDetailViewProps {
+  id: string;
+  onBack: () => void;
+}
+
+// 布局
+┌─────────────────────────────────────────────────────────┐
+│  ← 返回              晨跑                             │
+├─────────────────────────────────────────────────────────┤
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────┐           │
+│  │  🔥 5   │ │ ✨ 15   │ │ 📊 3   │ │ ∞  │           │
+│  │当前连续  │ │ 最佳记录│ │已完成  │ │目标│           │
+│  └─────────┘ └─────────┘ └─────────┘ └────┘           │
+│                                                       │
+│            [ 立即打卡 ]                                │
+│                                                       │
+│  ─────── 打卡记录 ───────                            │
+│  2024-02-19 10:30 ✓                                │
+│  2024-02-18 09:15 ✓  早上好                        │
+│  2024-02-17 08:00 ✓                                │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 4.6 CheckinConfirm (打卡确认弹窗)
 
 ## 五、视图组件
 
