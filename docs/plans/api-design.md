@@ -610,12 +610,13 @@
   "cmd": "checkin_circulation", 
   "payload": {
     id: "circ_xxx",
-    note?: string  // optional
+    note?: string,  // optional
+    count?: number   // optional, for count type circulation (default: 1)
   }
 }
 
 // 响应 - 返回更新后的打卡对象
-{ "ok": true, "data": { /* Circulation with updated streak_count */ } }
+{ "ok": true, "data": { /* Circulation with updated streak_count or current_count */ } }
 ```
 
 ### 11.5 撤销打卡

@@ -253,49 +253,83 @@ CREATE TABLE circulation_logs (
     completed_at TEXT NOT NULL,
     note TEXT,
     period TEXT,
+    count INTEGER DEFAULT 1,  -- 本次打卡数量（计数打卡用）
     FOREIGN KEY (circulation_id) REFERENCES circulations(id) ON DELETE CASCADE
 );
 ```
 
 ### 5.2 后端命令
 
-| 命令 | 说明 |
-|------|------|
-| get_circulation | 获取单个打卡 |
-| get_circulations | 获取所有打卡 |
-| get_circulations_by_type | 按类型筛选 |
-| create_circulation | 创建打卡 |
-| update_circulation | 更新打卡 |
-| delete_circulation | 删除打卡 |
-| checkin_circulation | 打卡 |
-| undo_checkin_circulation | 撤销打卡 |
-| get_circulation_logs | 获取打卡记录 |
+| 命令 | 说明 | 参数 |
+|------|------|------|
+| get_circulation | 获取单个打卡 | id |
+| get_circulations | 获取所有打卡 | - |
+| get_circulations_by_type | 按类型筛选 | circulation_type, frequency |
+| create_circulation | 创建打卡 | title, circulation_type, frequency, target_count |
+| update_circulation | 更新打卡 | id, title, circulation_type, frequency, target_count, status |
+| delete_circulation | 删除打卡 | id |
+| checkin_circulation | 打卡 | id, note, count (可选) |
+| undo_checkin_circulation | 撤销打卡 | id |
+| get_circulation_logs | 获取打卡记录 | circulation_id, limit |
 
 ### 5.3 前端组件
 
 | 组件 | 说明 |
 |------|------|
 | CirculationsView | 打卡主页 |
-| CirculationDetailView | 打卡详情页 |
-| CheckinConfirm | 打卡确认弹窗 |
+| CirculationDetailView | 打卡详情页（支持弹窗模式） |
+| CheckinConfirm | 打卡确认弹窗（支持计数输入） |
 
 ---
 
-## 6. 页面检查清单
+## 6. UI 更新说明 (v1.1)
+
+### 6.1 卡片网格布局
+
+**更新内容**：打卡卡片从垂直列表改为 4 列网格布局
+
+```
+PC端: grid-cols-4 (4列)
+平板: grid-cols-2 (2列)
+移动端: grid-cols-1 (1列)
+```
+
+### 6.2 详情弹窗
+
+**更新内容**：点击卡片标题或"详情"按钮，以弹窗形式展示打卡详情
+
+- 弹窗宽度: lg (large)
+- 包含：统计卡片、操作按钮、打卡历史
+- 关闭方式：点击关闭按钮或弹窗外部
+
+### 6.3 计数打卡手动输入
+
+**更新内容**：计数类型打卡支持手动输入本次打卡数量
+
+- 打卡确认弹窗显示数量输入框
+- 显示当前进度和累计进度
+- 默认值为 1，最小为 1
+
+---
+
+## 7. 页面检查清单
 
 - [x] 侧边栏菜单位置
 - [x] 打卡主页 Tab 切换
-- [x] 打卡列表卡片式布局
+- [x] 打卡列表卡片式布局 (4列网格)
 - [x] 新建按钮位置（Tab 行最右边）
 - [x] Streak 显示（主页 + 详情页）
 - [x] Dashboard 打卡统计
 - [x] Statistics 打卡统计
 - [x] 种子数据
+- [x] 详情弹窗
+- [x] 计数打卡手动输入数量
 
 ---
 
-## 7. 更新历史
+## 8. 更新历史
 
 | 日期 | 操作 |
 |------|------|
 | 2026-02-19 | 创建文档 v1.0 |
+| 2026-02-19 | 添加 v1.1 更新：卡片网格布局、详情弹窗、计数输入 |

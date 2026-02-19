@@ -94,12 +94,34 @@
 │                                                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   ┌──────────────┐                                            │
-│   │     Todo     │                                            │
-│   │  短期事项     │  ← 独立，无关联                            │
-│   │ 有截止日期    │                                            │
-│   │ 状态: pending/in-progress/done                           │
-│   └──────────────┘                                            │
+│   ┌──────────────┐                                              │
+│   │     Todo     │                                              │
+│   │  短期事项     │  ← 独立，无关联                               │
+│   │ 有截止日期    │                                              │
+│   │ 状态: pending/in-progress/done                              │
+│   └──────────────┘                                              │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌──────────────┐                                              │
+│   │  Circulation  │  ← 循环打卡                                  │
+│   │ 每日/每周/每月 │  ← streak 连续统计                           │
+│   │ 或计数打卡    │  ← current_count 累加                        │
+│   └──────────────┘                                              │
+│          │                                                       │
+│          │ 关联 (可选)                                           │
+│          ▼                                                       │
+│   ┌──────────────┐                                              │
+│   │   Milestone  │  ← 反映 Circulation 完成度                    │
+│   │   里程碑     │                                              │
+│   └──────────────┘                                              │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌──────────────┐                                              │
+│   │     Tag      │  ← 标签 (可附加到 Todo/Plan/Target)           │
+│   │  多对多关联  │                                               │
+│   └──────────────┘                                              │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -112,9 +134,10 @@
 | **Task** | 短期任务 | 持续时间 (start~end) | 完成状态 | 属于 1 Plan |
 | **Target** | 长期目标 | 截止日期 | Step 权重累加 | 1→N Step |
 | **Step** | 步骤 | 无 | 权重值 (0-100%) | 属于 1 Target |
-| **Todo** | 短期事项 | 截止日期 | 完成状态 | 独立 |
+| **Todo** | 短期事项 | 截止日期 | 完成状态 | 独立，可附加 Tag |
 | **Milestone** | 里程碑 | 可选日期 | 衍生 | 关联 Plan/Task/Target/Circulation |
-| **Circulation** | 循环打卡 | 周期 (日/周/月) | streak_count | 独立 |
+| **Circulation** | 循环打卡 | 周期 (日/周/月) | streak_count / current_count | 独立，可关联 Milestone |
+| **Tag** | 标签 | 无 | 无 | 多对多 (Todo/Plan/Target) |
 
 ### 3.3 状态定义
 
@@ -127,6 +150,7 @@ Todo:      pending | in-progress | done
 Milestone: pending | completed
 Circulation: active | archived
 Priority:  P0 | P1 | P2 | P3 (P0 最高)
+Tag:       (无状态，仅有 color 属性)
 ```
 
 ### 3.4 Circulation (打卡) - 循环任务
@@ -344,8 +368,9 @@ interface CirculationLog {
   id: string;
   circulation_id: string;         // 关联打卡项
   completed_at: string;           // 打卡时间
-  note?: string;                  // 打卡备注
-  period: string;                 // 周期标识 (日: "2024-02-19", 周: "2024-W05", 月: "2024-02")
+  note?: string;                 // 打卡备注
+  period: string;                // 周期标识 (日: "2024-02-19", 周: "2024-W05", 月: "2024-02")
+  count?: number;                // 本次打卡数量 (计数打卡)
 }
 ```
 

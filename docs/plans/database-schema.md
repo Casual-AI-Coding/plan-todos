@@ -399,6 +399,7 @@ CREATE TABLE circulation_logs (
   completed_at      TEXT NOT NULL,
   note              TEXT,
   period            TEXT,
+  count             INTEGER DEFAULT 1,
   FOREIGN KEY (circulation_id) REFERENCES circulations(id) ON DELETE CASCADE
 );
 ```
@@ -410,6 +411,7 @@ CREATE TABLE circulation_logs (
 | completed_at | TEXT | NOT NULL | 打卡时间 |
 | note | TEXT | | 打卡备注 |
 | period | TEXT | | 周期标识 (如 `2024-W05`, `2024-02`) |
+| count | INTEGER | DEFAULT 1 | 本次打卡数量 (计数打卡) |
 
 ### 8.3 索引
 
