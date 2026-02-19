@@ -111,4 +111,5 @@ pub struct CirculationLog {
     pub completed_at: String,
     pub note: Option<String>,
     pub period: Option<String>, // periodic: "2024-W05" / "2024-02"
+    pub count: Option<i32>,     // count for count-type circulation
 }

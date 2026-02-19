@@ -228,10 +228,18 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             completed_at TEXT NOT NULL,
             note TEXT,
             period TEXT,
+            count INTEGER DEFAULT 1,
             FOREIGN KEY (circulation_id) REFERENCES circulations(id) ON DELETE CASCADE
         )",
         [],
     )?;
+
+    // Add count column if not exists (migration)
+    conn.execute(
+        "ALTER TABLE circulation_logs ADD COLUMN count INTEGER DEFAULT 1",
+        [],
+    )
+    .ok(); // Ignore error if column already exists
 
     // Indexes for circulations
     conn.execute(

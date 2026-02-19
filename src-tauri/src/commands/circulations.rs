@@ -277,6 +277,7 @@ pub fn checkin_circulation(
     state: tauri::State<AppState>,
     id: String,
     note: Option<String>,
+    count: Option<i32>,
 ) -> Result<Circulation, String> {
     log_command!("checkin_circulation", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -334,10 +335,13 @@ pub fn checkin_circulation(
             }
         }
 
+        // Get the count to add (default to 1)
+        let add_count = count.unwrap_or(1).max(1);
+
         // Update based on type
         if circ.circulation_type == "count" {
-            // Increment count
-            circ.current_count += 1;
+            // Increment count by specified amount
+            circ.current_count += add_count;
             circ.last_completed_at = Some(now.clone());
 
             conn.execute(
@@ -366,11 +370,11 @@ pub fn checkin_circulation(
             ).map_err(|e| e.to_string())?;
         }
 
-        // Insert log
+        // Insert log with count
         let log_id = uuid::Uuid::new_v4().to_string();
         conn.execute(
-            "INSERT INTO circulation_logs (id, circulation_id, completed_at, note, period) VALUES (?, ?, ?, ?, ?)",
-            rusqlite::params![log_id, id, now, note, period],
+            "INSERT INTO circulation_logs (id, circulation_id, completed_at, note, period, count) VALUES (?, ?, ?, ?, ?, ?)",
+            rusqlite::params![log_id, id, now, note, period, add_count],
         ).map_err(|e| e.to_string())?;
 
         circ.updated_at = now;
@@ -387,15 +391,17 @@ pub fn undo_checkin_circulation(
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
 
-        // Get latest log
+        // Get latest log with count
         let mut log_stmt = conn
-            .prepare("SELECT id, completed_at, period FROM circulation_logs WHERE circulation_id = ? ORDER BY completed_at DESC LIMIT 1")
+            .prepare("SELECT id, completed_at, period, COALESCE(count, 1) as count FROM circulation_logs WHERE circulation_id = ? ORDER BY completed_at DESC LIMIT 1")
             .map_err(|e| e.to_string())?;
 
-        let log_result: Result<(String, String, Option<String>), _> =
-            log_stmt.query_row([&id], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)));
+        let log_result: Result<(String, String, Option<String>, i32), _> = log_stmt
+            .query_row([&id], |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
+            });
 
-        let (log_id, _completed_at, _period) = match log_result {
+        let (log_id, _completed_at, _period, log_count) = match log_result {
             Ok(r) => r,
             Err(_) => return Err("No check-in history found".to_string()),
         };
@@ -433,9 +439,8 @@ pub fn undo_checkin_circulation(
 
         // Reverse based on type
         if circ.circulation_type == "count" {
-            if circ.current_count > 0 {
-                circ.current_count -= 1;
-            }
+            // Decrement by the logged count amount
+            circ.current_count = (circ.current_count - log_count).max(0);
             // Find previous completion
             let mut prev_stmt = conn
                 .prepare("SELECT completed_at FROM circulation_logs WHERE circulation_id = ? AND id != ? ORDER BY completed_at DESC LIMIT 1")
@@ -496,7 +501,7 @@ pub fn get_circulation_logs(
 
         let mut stmt = conn
             .prepare(
-                "SELECT id, circulation_id, completed_at, note, period
+                "SELECT id, circulation_id, completed_at, note, period, COALESCE(count, 1) as count
                  FROM circulation_logs
                  WHERE circulation_id = ?
                  ORDER BY completed_at DESC
@@ -512,6 +517,7 @@ pub fn get_circulation_logs(
                     completed_at: row.get(2)?,
                     note: row.get(3)?,
                     period: row.get(4)?,
+                    count: row.get(5)?,
                 })
             })
             .map_err(|e| e.to_string())?;
