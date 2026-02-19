@@ -1,26 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import { Modal, Button } from '@/components/ui';
+import { Modal, Button, Input } from '@/components/ui';
 import { Circulation } from '@/lib/api';
 
 interface CheckinConfirmProps {
   circulation: Circulation;
   open: boolean;
-  onConfirm: (note: string) => void;
+  onConfirm: (note: string, count?: number) => void;
   onCancel: () => void;
 }
 
 export function CheckinConfirm({ circulation, open, onConfirm, onCancel }: CheckinConfirmProps) {
   const [note, setNote] = useState('');
+  const [count, setCount] = useState<number>(1);
 
   const handleConfirm = () => {
-    onConfirm(note);
+    if (circulation.circulation_type === 'count') {
+      onConfirm(note, count);
+    } else {
+      onConfirm(note);
+    }
     setNote('');
+    setCount(1);
   };
 
   const handleCancel = () => {
     setNote('');
+    setCount(1);
     onCancel();
   };
 
@@ -57,6 +64,24 @@ export function CheckinConfirm({ circulation, open, onConfirm, onCancel }: Check
             </div>
           )}
         </div>
+
+        {circulation.circulation_type === 'count' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              本次打卡数量
+            </label>
+            <Input
+              type="number"
+              value={count}
+              onChange={(e) => setCount(Math.max(1, Number(e.target.value)))}
+              min={1}
+              required
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              每次打卡后累计: {circulation.current_count + count} / {circulation.target_count || '∞'}
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

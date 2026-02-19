@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input } from '@/components/ui';
 import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
+import { CirculationDetailView } from './CirculationDetailView';
 import {
   getCirculations,
   getCirculationsByType,
@@ -22,9 +23,10 @@ type PeriodicSubTab = 'daily' | 'weekly' | 'monthly';
 
 interface CirculationsViewProps {
   mode?: ViewMode;
+  onNavigate?: (id: string) => void;
 }
 
-export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
+export function CirculationsView({ mode = 'today', onNavigate }: CirculationsViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>(mode);
   const [circulations, setCirculations] = useState<Circulation[]>([]);
   const [todayCirculations, setTodayCirculations] = useState<Circulation[]>([]);
@@ -44,6 +46,9 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
   // Checkin state
   const [checkinTarget, setCheckinTarget] = useState<Circulation | null>(null);
   const [checkinLoading, setCheckinLoading] = useState(false);
+  
+  // Detail modal state
+  const [detailCirculation, setDetailCirculation] = useState<Circulation | null>(null);
 
   const isLoaded = useRef(false);
 
@@ -87,10 +92,10 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
   };
 
   // Handle checkin
-  async function handleCheckin(circulation: Circulation, note: string = '') {
+  async function handleCheckin(circulation: Circulation, note: string = '', count?: number) {
     setCheckinLoading(true);
     try {
-      await checkinCirculation(circulation.id, note);
+      await checkinCirculation(circulation.id, note, count);
       await loadCirculations();
       setCheckinTarget(null);
     } catch (e) {
@@ -200,9 +205,9 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
 
       {/* Today View */}
       {viewMode === 'today' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {todayCirculations.length === 0 ? (
-            <Card>
+            <Card className="col-span-full">
               <div className="text-center py-8 text-gray-500">
                 <p className="text-lg">今日没有待打卡项</p>
                 <Button
@@ -215,10 +220,14 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
             </Card>
           ) : (
             todayCirculations.map(c => (
-              <Card key={c.id}>
-                <div className="flex items-center justify-between">
+              <Card key={c.id} className="hover:shadow-md transition-shadow">
+                <div className="flex flex-col h-full">
                   <div className="flex-1">
-                    <div className="font-semibold" style={{ color: '#134E4A' }}>
+                    <div 
+                      className="font-semibold cursor-pointer hover:text-teal-600" 
+                      style={{ color: '#134E4A' }}
+                      onClick={() => setDetailCirculation(c)}
+                    >
                       {c.title}
                     </div>
                     {c.circulation_type === 'periodic' && (
@@ -233,7 +242,14 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-3">
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={() => setDetailCirculation(c)}
+                    >
+                      详情
+                    </Button>
                     {isCompletedToday(c) ? (
                       <Button
                         variant="secondary"
@@ -314,19 +330,23 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
           )}
 
           {/* List */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {filteredCirculations.length === 0 ? (
-              <Card>
+              <Card className="col-span-full">
                 <div className="text-center py-8 text-gray-500">
                   暂无打卡项
                 </div>
               </Card>
             ) : (
               filteredCirculations.map(c => (
-                <Card key={c.id}>
-                  <div className="flex items-center justify-between">
+                <Card key={c.id} className="hover:shadow-md transition-shadow">
+                  <div className="flex flex-col h-full">
                     <div className="flex-1">
-                      <div className="font-semibold" style={{ color: '#134E4A' }}>
+                      <div 
+                        className="font-semibold cursor-pointer hover:text-teal-600" 
+                        style={{ color: '#134E4A' }}
+                        onClick={() => setDetailCirculation(c)}
+                      >
                         {c.title}
                         {c.status === 'archived' && (
                           <span className="ml-2 text-xs text-gray-400">(已归档)</span>
@@ -343,7 +363,10 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      <Button variant="secondary" size="sm" onClick={() => setDetailCirculation(c)}>
+                        详情
+                      </Button>
                       <Button variant="secondary" size="sm" onClick={() => openEdit(c)}>
                         编辑
                       </Button>
@@ -459,8 +482,16 @@ export function CirculationsView({ mode = 'today' }: CirculationsViewProps) {
         <CheckinConfirm
           circulation={checkinTarget}
           open={!!checkinTarget}
-          onConfirm={(note) => handleCheckin(checkinTarget, note)}
+          onConfirm={(note, count) => handleCheckin(checkinTarget, note, count)}
           onCancel={() => setCheckinTarget(null)}
+        />
+      )}
+
+      {/* Detail Modal */}
+      {detailCirculation && (
+        <CirculationDetailView
+          id={detailCirculation.id}
+          onClose={() => setDetailCirculation(null)}
         />
       )}
     </div>

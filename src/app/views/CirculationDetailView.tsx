@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, Modal } from '@/components/ui';
 import {
   getCirculation,
   getCirculationLogs,
@@ -14,15 +14,17 @@ import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
 
 interface CirculationDetailViewProps {
   id: string;
-  onBack: () => void;
+  onBack?: () => void;
+  onClose?: () => void;
 }
 
-export function CirculationDetailView({ id, onBack }: CirculationDetailViewProps) {
+export function CirculationDetailView({ id, onBack, onClose }: CirculationDetailViewProps) {
   const [circulation, setCirculation] = useState<Circulation | null>(null);
   const [logs, setLogs] = useState<CirculationLog[]>([]);
   const [checkinTarget, setCheckinTarget] = useState<Circulation | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isModal = !!onClose;
   const isLoaded = useRef(false);
 
   async function loadData() {
@@ -55,10 +57,10 @@ export function CirculationDetailView({ id, onBack }: CirculationDetailViewProps
     return circulation.last_completed_at.startsWith(today);
   };
 
-  async function handleCheckin(note: string = '') {
+  async function handleCheckin(note: string = '', count?: number) {
     if (!circulation) return;
     try {
-      await checkinCirculation(circulation.id, note);
+      await checkinCirculation(circulation.id, note, count);
       await loadData();
       setCheckinTarget(null);
     } catch (e) {
@@ -77,35 +79,8 @@ export function CirculationDetailView({ id, onBack }: CirculationDetailViewProps
     }
   }
 
-  if (loading) {
-    return (
-      <div className="p-6">
-        <div className="text-center py-8 text-gray-500">加载中...</div>
-      </div>
-    );
-  }
-
-  if (!circulation) {
-    return (
-      <div className="p-6">
-        <div className="text-center py-8 text-gray-500">打卡项不存在</div>
-        <Button onClick={onBack}>返回</Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="secondary" onClick={onBack}>
-          ← 返回
-        </Button>
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
-          {circulation.title}
-        </h2>
-      </div>
-
+  const detailContent = circulation ? (
+    <>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card>
@@ -195,10 +170,72 @@ export function CirculationDetailView({ id, onBack }: CirculationDetailViewProps
         <CheckinConfirm
           circulation={checkinTarget}
           open={!!checkinTarget}
-          onConfirm={(note) => handleCheckin(note)}
+          onConfirm={(note, count) => handleCheckin(note, count)}
           onCancel={() => setCheckinTarget(null)}
         />
       )}
+    </>
+  ) : null;
+
+  if (loading) {
+    if (isModal) {
+      return (
+        <Modal open={true} title="加载中..." onClose={onClose}>
+          <div className="text-center py-8 text-gray-500">加载中...</div>
+        </Modal>
+      );
+    }
+    return (
+      <div className="p-6">
+        <div className="text-center py-8 text-gray-500">加载中...</div>
+      </div>
+    );
+  }
+
+  if (!circulation) {
+    if (isModal) {
+      return (
+        <Modal open={true} title="打卡项不存在" onClose={onClose}>
+          <div className="text-center py-8 text-gray-500">打卡项不存在</div>
+        </Modal>
+      );
+    }
+    return (
+      <div className="p-6">
+        <div className="text-center py-8 text-gray-500">打卡项不存在</div>
+        <Button onClick={onBack}>返回</Button>
+      </div>
+    );
+  }
+
+  if (isModal) {
+    return (
+      <Modal
+        open={true}
+        title={circulation.title}
+        onClose={onClose}
+        width="lg"
+      >
+        {detailContent}
+      </Modal>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-6">
+        {onBack && (
+          <Button variant="secondary" onClick={onBack}>
+            ← 返回
+          </Button>
+        )}
+        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
+          {circulation.title}
+        </h2>
+      </div>
+      {detailContent}
     </div>
   );
 }
+
