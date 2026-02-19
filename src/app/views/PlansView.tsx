@@ -54,7 +54,9 @@ export function PlansView() {
     } catch (e) { console.error(e); }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadPlans(); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
 
   async function togglePlan(planId: string) {

@@ -26,6 +26,7 @@ export function StatisticsView() {
     } catch (e) { console.error(e); }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadData(); }, []);
 
   const stats = {

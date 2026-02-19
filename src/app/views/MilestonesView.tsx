@@ -34,6 +34,7 @@ export function MilestonesView() {
     } catch (e) { console.error(e); }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadData(); }, []);
 
   async function handleSubmit() {

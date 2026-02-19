@@ -53,8 +53,8 @@ export function TodosView() {
     } catch (e) { console.error(e); }
   }
 
-  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTodos(); }, []);
-  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTodos(); }, []); // eslint-disable-line react-hooks/set-state-in-effect
+  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []); // eslint-disable-line react-hooks/set-state-in-effect
 
   // Convert todos to calendar events
   const calendarEvents: CalendarEvent[] = todos

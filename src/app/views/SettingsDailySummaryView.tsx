@@ -177,7 +177,7 @@ export function SettingsDailySummaryView() {
         <div className="space-y-2">
           {plugins.length === 0 ? (
             <div className="text-gray-500 text-center py-4">
-              暂无启用的通知渠道，请在"通知渠道"页面添加
+              暂无启用的通知渠道，请在&quot;通知渠道&quot;页面添加
             </div>
           ) : (
             plugins.map(plugin => (

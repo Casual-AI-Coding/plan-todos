@@ -110,7 +110,7 @@ export function SettingsChannelsView() {
               ) : plugins.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-8 text-center text-gray-500">
-                    暂无通知渠道，点击"添加通知渠道"开始配置
+                    暂无通知渠道，点击&quot;添加通知渠道&quot;开始配置
                   </td>
                 </tr>
               ) : (

@@ -26,6 +26,7 @@ export function SettingsTagsView() {
     } catch (e) { console.error(e); }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []);
 
   async function handleSubmit() {

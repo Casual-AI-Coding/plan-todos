@@ -32,7 +32,7 @@ describe('isTauri', () => {
   });
 
   it('returns true when window has __TAURI__', () => {
-    (global.window as any).__TAURI__ = {};
+    (global.window as Window & { __TAURI__?: object }).__TAURI__ = {};
     expect(isTauri()).toBe(true);
   });
 });
