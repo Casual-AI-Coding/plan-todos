@@ -1241,7 +1241,8 @@ export async function deleteCirculation(id: string): Promise<void> {
 
 export async function checkinCirculation(
   id: string,
-  note?: string
+  note?: string,
+  count?: number
 ): Promise<Circulation> {
   if (!isTauri()) {
     throw new Error('This app must run in Tauri to checkin');
@@ -1250,6 +1251,7 @@ export async function checkinCirculation(
   return invoke<Circulation>('checkin_circulation', {
     id,
     note: note || null,
+    count: count || null,
   });
 }
 

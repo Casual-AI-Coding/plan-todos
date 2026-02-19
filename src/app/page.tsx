@@ -17,11 +17,13 @@ import {
   SettingsAboutView,
   SettingsTagsView,
   CirculationsView,
+  CirculationDetailView,
 } from './views';
 
 // Main App
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -40,8 +42,18 @@ export default function Home() {
       case 'milestones': return <MilestonesView />;
       case 'views': return <ViewsView />;
       case 'circulations':
-      case 'circulations-today': return <CirculationsView mode="today" />;
-      case 'circulations-settings': return <CirculationsView mode="settings" />;
+      case 'circulations-today': return (
+        <CirculationsView 
+          mode="today" 
+          onNavigate={(id) => setCirculationDetailId(id)} 
+        />
+      );
+      case 'circulations-settings': return (
+        <CirculationsView 
+          mode="settings" 
+          onNavigate={(id) => setCirculationDetailId(id)} 
+        />
+      );
       case 'statistics': return <StatisticsView />;
       case 'settings': return <SettingsGeneralView />;
       case 'settings-general': return <SettingsGeneralView />;
@@ -59,6 +71,13 @@ export default function Home() {
       <main className="flex-1 overflow-auto">
         {renderContent()}
       </main>
+      {/* Circulation Detail Modal */}
+      {circulationDetailId && (
+        <CirculationDetailView
+          id={circulationDetailId}
+          onClose={() => setCirculationDetailId(null)}
+        />
+      )}
     </div>
   );
 }
