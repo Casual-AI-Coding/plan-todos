@@ -142,25 +142,35 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
         {logs.length === 0 ? (
           <div className="text-center py-8 text-gray-500">暂无记录</div>
         ) : (
-          <div className="space-y-3">
-            {logs.map(log => (
-              <div
-                key={log.id}
-                className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
-              >
-                <div>
-                  <div className="text-sm text-gray-900">
-                    {new Date(log.completed_at).toLocaleString('zh-CN')}
-                  </div>
-                  {log.period && (
-                    <div className="text-xs text-gray-400">周期: {log.period}</div>
-                  )}
-                </div>
-                {log.note && (
-                  <div className="text-sm text-gray-500">{log.note}</div>
-                )}
-              </div>
-            ))}
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left px-4 py-2 text-gray-500 font-medium">时间</th>
+                  <th className="text-left px-4 py-2 text-gray-500 font-medium">
+                    {circulation?.circulation_type === 'count' ? '进度' : '周期'}
+                  </th>
+                  <th className="text-left px-4 py-2 text-gray-500 font-medium">备注</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map(log => (
+                  <tr key={log.id} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="px-4 py-2 text-gray-700">
+                      {new Date(log.completed_at).toLocaleString('zh-CN')}
+                    </td>
+                    <td className="px-4 py-2 text-gray-500">
+                      {circulation?.circulation_type === 'count' 
+                        ? (log.count !== null ? `+${log.count}` : '-')
+                        : (log.period || '-')}
+                    </td>
+                    <td className="px-4 py-2 text-gray-600">
+                      {log.note || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </Card>

@@ -12,6 +12,7 @@ import {
   deleteCirculation,
   checkinCirculation,
   undoCheckinCirculation,
+  getCirculationLogs,
   Circulation,
   CirculationType,
   PeriodicFrequency,
@@ -20,6 +21,12 @@ import {
 type ViewMode = 'today' | 'settings';
 type SettingsTab = 'periodic' | 'count';
 type PeriodicSubTab = 'daily' | 'weekly' | 'monthly';
+
+// 今日打卡统计
+interface TodayStats {
+  count: number; // 今日打卡次数
+  progress: number; // 今日累计进度
+}
 
 interface CirculationsViewProps {
   mode?: ViewMode;
@@ -30,6 +37,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
   const [viewMode, setViewMode] = useState<ViewMode>(mode);
   const [circulations, setCirculations] = useState<Circulation[]>([]);
   const [todayCirculations, setTodayCirculations] = useState<Circulation[]>([]);
+  const [todayStats, setTodayStats] = useState<Record<string, TodayStats>>({});
   
   // Settings tabs
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('periodic');
@@ -59,7 +67,6 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
         setCirculations(data);
         // Filter today's circulations
         const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
         const dayOfWeek = today.getDay();
         
         const todayList = data.filter(c => {
@@ -71,6 +78,29 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
           return false;
         });
         setTodayCirculations(todayList);
+        
+        // Load today's stats for count-type circulations
+        const stats: Record<string, TodayStats> = {};
+        const todayStr = today.toISOString().split('T')[0];
+        await Promise.all(
+          todayList
+            .filter(c => c.circulation_type === 'count')
+            .map(async (c) => {
+              try {
+                const logs = await getCirculationLogs(c.id, 50);
+                const todayLogs = logs.filter(log => 
+                  log.completed_at.startsWith(todayStr)
+                );
+                stats[c.id] = {
+                  count: todayLogs.length,
+                  progress: todayLogs.reduce((sum, log) => sum + (log.count || 0), 0),
+                };
+              } catch {
+                stats[c.id] = { count: 0, progress: 0 };
+              }
+            })
+        );
+        setTodayStats(stats);
       }
     } catch (e) {
       console.error(e);
@@ -219,53 +249,154 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
               </div>
             </Card>
           ) : (
-            todayCirculations.map(c => (
-              <Card key={c.id} className="hover:shadow-md transition-shadow">
-                <div className="flex flex-col h-full">
-                  <div className="flex-1">
-                    <div 
-                      className="font-semibold cursor-pointer hover:text-teal-600" 
-                      style={{ color: '#134E4A' }}
-                      onClick={() => setDetailCirculation(c)}
-                    >
-                      {c.title}
-                    </div>
-                    {c.circulation_type === 'periodic' && (
-                      <div className="text-sm text-gray-500 mt-1">
-                        🔥 连续 {c.streak_count} 天
-                        {c.best_streak > 0 && <span className="ml-2">最佳: {c.best_streak} 天</span>}
-                      </div>
-                    )}
-                    {c.circulation_type === 'count' && (
-                      <div className="text-sm text-gray-500 mt-1">
-                        📊 {c.current_count} / {c.target_count || '∞'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <Button 
-                      variant="secondary" 
-                      size="sm"
-                      onClick={() => setDetailCirculation(c)}
-                    >
-                      详情
-                    </Button>
-                    {isCompletedToday(c) ? (
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleUndo(c)}
+            todayCirculations.map(c => {
+              const isPeriodic = c.circulation_type === 'periodic';
+              const isDoneToday = isCompletedToday(c);
+              
+              return (
+                <Card 
+                  key={c.id} 
+                  className={`hover:shadow-md transition-all ${
+                    isPeriodic 
+                      ? (isDoneToday ? 'border-green-300 bg-gradient-to-br from-green-50 to-white' : 'border-amber-200 bg-gradient-to-br from-amber-50 to-white')
+                      : 'border-blue-200 bg-gradient-to-br from-blue-50 to-white'
+                  }`}
+                >
+                  <div className="flex flex-col h-full">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div 
+                        className="font-semibold cursor-pointer hover:opacity-80 truncate flex items-center gap-1" 
+                        onClick={() => setDetailCirculation(c)}
+                        title={c.title}
                       >
-                        撤销
+                        {isPeriodic ? (
+                          <span className="text-lg">🔄</span>
+                        ) : (
+                          <span className="text-lg">📊</span>
+                        )}
+                        <span style={{ color: '#134E4A' }}>{c.title}</span>
+                      </div>
+                      {/* Status Badge */}
+                      <div className="flex items-center gap-1">
+                        {isPeriodic ? (
+                          isDoneToday ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                              ✓ 已完成
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                              ○ 待打卡
+                            </span>
+                          )
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            计数打卡
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Type Label */}
+                    <div className="text-xs text-gray-500 mb-2">
+                      {isPeriodic 
+                        ? '周期打卡' 
+                        : `今日已打卡 ${todayStats[c.id]?.count || 0} 次 · 进度 +${todayStats[c.id]?.progress || 0}`
+                      }
+                    </div>
+                    
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-2 mb-3">
+                      {isPeriodic ? (
+                        <>
+                          <div className="bg-white/60 rounded-md p-2 text-center">
+                            <div className="text-xl font-bold text-teal-600">{c.streak_count}</div>
+                            <div className="text-xs text-gray-500">连续天数</div>
+                          </div>
+                          <div className="bg-white/60 rounded-md p-2 text-center">
+                            <div className="text-xl font-bold text-orange-500">{c.best_streak}</div>
+                            <div className="text-xs text-gray-500">最佳记录</div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bg-white/60 rounded-md p-2 text-center">
+                            <div className="text-xl font-bold text-blue-600">{todayStats[c.id]?.count || 0}</div>
+                            <div className="text-xs text-gray-500">今日次数</div>
+                          </div>
+                          <div className="bg-white/60 rounded-md p-2 text-center">
+                            <div className="text-xl font-bold text-green-600">+{todayStats[c.id]?.progress || 0}</div>
+                            <div className="text-xs text-gray-500">今日进度</div>
+                          </div>
+                        </>
+                      )}
+                      {!isPeriodic && c.target_count && (
+                        <div className="col-span-2 bg-white/60 rounded-md p-2">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs text-gray-500">总进度</span>
+                            <span className="text-sm font-medium text-blue-600">{c.current_count} / {c.target_count}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-500 h-2 rounded-full" 
+                              style={{ width: `${Math.min((c.current_count / c.target_count) * 100, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {c.last_completed_at && (
+                        <div className="col-span-2 bg-white/60 rounded-md p-2 text-center">
+                          <div className="text-sm text-gray-600">
+                            {new Date(c.last_completed_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                          <div className="text-xs text-gray-400">上次打卡</div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Buttons */}
+                    <div className="flex gap-2 mt-auto">
+                      {isPeriodic ? (
+                        isDoneToday ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="flex-1 text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                            onClick={() => handleUndo(c)}
+                          >
+                            撤销打卡
+                          </Button>
+                        ) : (
+                          <Button 
+                            size="sm"
+                            className="flex-1 text-xs bg-amber-500 hover:bg-amber-600 text-white"
+                            onClick={() => setCheckinTarget(c)}
+                          >
+                            立即打卡
+                          </Button>
+                        )
+                      ) : (
+                        <Button 
+                          size="sm"
+                          className="flex-1 text-xs bg-blue-500 hover:bg-blue-600 text-white"
+                          onClick={() => setCheckinTarget(c)}
+                        >
+                          打卡 +1
+                        </Button>
+                      )}
+                      <Button 
+                        variant="secondary" 
+                        size="sm"
+                        className="text-xs px-3 bg-white"
+                        onClick={() => setDetailCirculation(c)}
+                      >
+                        详情
                       </Button>
-                    ) : (
-                      <Button onClick={() => setCheckinTarget(c)}>
-                        打卡
-                      </Button>
-                    )}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))
+                </Card>
+              );
+            })
           )}
         </div>
       )}
@@ -364,15 +495,16 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                       )}
                     </div>
                     <div className="flex gap-2 mt-3 flex-wrap">
-                      <Button variant="secondary" size="sm" onClick={() => setDetailCirculation(c)}>
+                      <Button variant="secondary" size="sm" className="text-xs px-2 py-1" onClick={() => setDetailCirculation(c)}>
                         详情
                       </Button>
-                      <Button variant="secondary" size="sm" onClick={() => openEdit(c)}>
+                      <Button variant="secondary" size="sm" className="text-xs px-2 py-1" onClick={() => openEdit(c)}>
                         编辑
                       </Button>
                       <Button
                         variant="secondary"
                         size="sm"
+                        className="text-xs px-2 py-1"
                         onClick={() => handleDelete(c.id)}
                       >
                         删除

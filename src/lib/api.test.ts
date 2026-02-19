@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority, Tag, EntityType, getTags, createTag, updateTag, deleteTag, getEntityTags, setEntityTags, getEntitiesByTag, exportData, importData, ExportData, ImportMode } from '@/lib/api';
+import { isTauri, getPlans, getTasks, getTasksByPlan, getTargets, getSteps, getTodos, getMilestones, createPlan, updatePlan, deletePlan, createTask, updateTask, deleteTask, createTarget, updateTarget, deleteTarget, createStep, updateStep, deleteStep, createTodo, updateTodo, deleteTodo, createMilestone, updateMilestone, deleteMilestone, getDashboard, Priority, Tag, EntityType, getTags, createTag, updateTag, deleteTag, getEntityTags, setEntityTags, getEntitiesByTag, exportData, importData, ExportData, ImportMode, getCirculation, getCirculations, getCirculationsByType, createCirculation, updateCirculation, deleteCirculation, checkinCirculation, undoCheckinCirculation, getCirculationLogs, getNotificationPlugins, createNotificationPlugin, updateNotificationPlugin, deleteNotificationPlugin, sendNotification, Plan, Task, Target, Step, Milestone, Todo } from '@/lib/api';
 
 // ============================================================================
 // isTauri Function Tests
@@ -617,5 +617,343 @@ describe('Export Data Structure', () => {
     modes.forEach(mode => {
       expect(['merge', 'replace', 'update']).toContain(mode);
     });
+  });
+});
+
+// ============================================================================
+// API Functions - Circulation (non-Tauri)
+// ============================================================================
+describe('API Functions - Circulation (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getCirculation throws error when not in Tauri', async () => {
+    await expect(getCirculation('circ-1')).rejects.toThrow('This app must run in Tauri to get circulation');
+  });
+
+  it('getCirculations returns empty array when not in Tauri', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await getCirculations();
+    expect(result).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith('Running outside Tauri - data not available');
+    consoleSpy.mockRestore();
+  });
+
+  it('getCirculationsByType returns empty array when not in Tauri', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await getCirculationsByType('periodic', 'daily');
+    expect(result).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith('Running outside Tauri - data not available');
+    consoleSpy.mockRestore();
+  });
+
+  it('createCirculation throws error when not in Tauri', async () => {
+    await expect(createCirculation({ title: 'Test', circulation_type: 'periodic', frequency: 'daily' })).rejects.toThrow('This app must run in Tauri to create circulation');
+  });
+
+  it('updateCirculation throws error when not in Tauri', async () => {
+    await expect(updateCirculation('circ-1', { title: 'Updated' })).rejects.toThrow('This app must run in Tauri to update circulation');
+  });
+
+  it('deleteCirculation throws error when not in Tauri', async () => {
+    await expect(deleteCirculation('circ-1')).rejects.toThrow('This app must run in Tauri to delete circulation');
+  });
+
+  it('checkinCirculation throws error when not in Tauri', async () => {
+    await expect(checkinCirculation('circ-1')).rejects.toThrow('This app must run in Tauri to checkin');
+  });
+
+  it('checkinCirculation accepts note and count parameters', async () => {
+    await expect(checkinCirculation('circ-1', 'Great day', 5)).rejects.toThrow('This app must run in Tauri to checkin');
+  });
+
+  it('undoCheckinCirculation throws error when not in Tauri', async () => {
+    await expect(undoCheckinCirculation('circ-1')).rejects.toThrow('This app must run in Tauri to undo checkin');
+  });
+
+  it('getCirculationLogs returns empty array when not in Tauri', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await getCirculationLogs('circ-1', 10);
+    expect(result).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith('Running outside Tauri - data not available');
+    consoleSpy.mockRestore();
+  });
+});
+
+// ============================================================================
+// API Functions - Notification Plugins (non-Tauri)
+// ============================================================================
+describe('API Functions - Notification Plugins (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getNotificationPlugins returns empty array when not in Tauri', async () => {
+    const result = await getNotificationPlugins();
+    expect(result).toEqual([]);
+  });
+
+  it('createNotificationPlugin throws error when not in Tauri', async () => {
+    await expect(createNotificationPlugin('Test Plugin', 'feishu', '{}')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('updateNotificationPlugin throws error when not in Tauri', async () => {
+    await expect(updateNotificationPlugin('plugin-1', 'Updated', true, '{}')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('deleteNotificationPlugin throws error when not in Tauri', async () => {
+    await expect(deleteNotificationPlugin('plugin-1')).rejects.toThrow('This app must run in Tauri');
+  });
+
+  it('sendNotification throws error when not in Tauri', async () => {
+    await expect(sendNotification('plugin-1', 'Test', 'Hello')).rejects.toThrow('This app must run in Tauri');
+  });
+});
+
+// ============================================================================
+// Circulation Types Tests
+// ============================================================================
+describe('Circulation Types', () => {
+  it('CirculationType accepts periodic', () => {
+    const type: 'periodic' | 'count' = 'periodic';
+    expect(type).toBe('periodic');
+  });
+
+  it('CirculationType accepts count', () => {
+    const type: 'periodic' | 'count' = 'count';
+    expect(type).toBe('count');
+  });
+
+  it('PeriodicFrequency accepts daily', () => {
+    const freq: 'daily' | 'weekly' | 'monthly' = 'daily';
+    expect(freq).toBe('daily');
+  });
+
+  it('PeriodicFrequency accepts weekly', () => {
+    const freq: 'daily' | 'weekly' | 'monthly' = 'weekly';
+    expect(freq).toBe('weekly');
+  });
+
+  it('PeriodicFrequency accepts monthly', () => {
+    const freq: 'daily' | 'weekly' | 'monthly' = 'monthly';
+    expect(freq).toBe('monthly');
+  });
+});
+
+// ============================================================================
+// Additional API Functions - Milestone with biz_type (non-Tauri)
+// ============================================================================
+describe('API Functions - Milestone biz_type (non-Tauri)', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('createMilestone accepts biz_type and biz_id parameters', async () => {
+    await expect(createMilestone({ 
+      title: 'Test', 
+      biz_type: 'circulation', 
+      biz_id: 'circ-1' 
+    })).rejects.toThrow('This app must run in Tauri to create milestones');
+  });
+});
+
+// ============================================================================
+// Edge Case Tests - Empty Parameters
+// ============================================================================
+describe('API Functions - Edge Cases', () => {
+  beforeEach(() => {
+    Object.defineProperty(global, 'window', {
+      value: {},
+      writable: true,
+    });
+  });
+
+  it('getCirculationsByType works with only type parameter', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await getCirculationsByType('count');
+    expect(result).toEqual([]);
+    consoleSpy.mockRestore();
+  });
+
+  it('getCirculationLogs works without limit parameter', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await getCirculationLogs('circ-1');
+    expect(result).toEqual([]);
+    consoleSpy.mockRestore();
+  });
+
+  it('checkinCirculation works with only id parameter', async () => {
+    await expect(checkinCirculation('circ-1')).rejects.toThrow('This app must run in Tauri to checkin');
+  });
+
+  it('checkinCirculation works with zero count', async () => {
+    await expect(checkinCirculation('circ-1', '', 0)).rejects.toThrow('This app must run in Tauri to checkin');
+  });
+});
+
+// ============================================================================
+// Type Definition Tests
+// ============================================================================
+describe('Type Definitions', () => {
+  it('Plan status accepts active', () => {
+    const plan: Plan = {
+      id: 'plan-1',
+      title: 'Test',
+      description: null,
+      start_date: null,
+      end_date: null,
+      status: 'active',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(plan.status).toBe('active');
+  });
+
+  it('Plan status accepts completed', () => {
+    const plan: Plan = {
+      id: 'plan-1',
+      title: 'Test',
+      description: null,
+      start_date: null,
+      end_date: null,
+      status: 'completed',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(plan.status).toBe('completed');
+  });
+
+  it('Plan status accepts archived', () => {
+    const plan: Plan = {
+      id: 'plan-1',
+      title: 'Test',
+      description: null,
+      start_date: null,
+      end_date: null,
+      status: 'archived',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(plan.status).toBe('archived');
+  });
+
+  it('Task status accepts pending', () => {
+    const task: Task = {
+      id: 'task-1',
+      plan_id: 'plan-1',
+      title: 'Test',
+      description: null,
+      start_date: null,
+      end_date: null,
+      status: 'pending',
+      priority: 'P2',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(task.status).toBe('pending');
+  });
+
+  it('Task status accepts in-progress', () => {
+    const task: Task = {
+      id: 'task-1',
+      plan_id: 'plan-1',
+      title: 'Test',
+      description: null,
+      start_date: null,
+      end_date: null,
+      status: 'in-progress',
+      priority: 'P2',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(task.status).toBe('in-progress');
+  });
+
+  it('Task status accepts done', () => {
+    const task: Task = {
+      id: 'task-1',
+      plan_id: 'plan-1',
+      title: 'Test',
+      description: null,
+      start_date: null,
+      end_date: null,
+      status: 'done',
+      priority: 'P2',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(task.status).toBe('done');
+  });
+
+  it('Target has progress field', () => {
+    const target: Target = {
+      id: 'target-1',
+      title: 'Test',
+      description: null,
+      due_date: null,
+      status: 'active',
+      progress: 50,
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(target.progress).toBe(50);
+  });
+
+  it('Step has weight field', () => {
+    const step: Step = {
+      id: 'step-1',
+      target_id: 'target-1',
+      title: 'Test',
+      weight: 25,
+      status: 'pending',
+      priority: 'P1',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(step.weight).toBe(25);
+  });
+
+  it('Milestone has biz_type and biz_id', () => {
+    const milestone: Milestone = {
+      id: 'milestone-1',
+      title: 'Test',
+      target_date: null,
+      biz_type: 'circulation',
+      biz_id: 'circ-1',
+      status: 'pending',
+      progress: 0,
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    };
+    expect(milestone.biz_type).toBe('circulation');
+    expect(milestone.biz_id).toBe('circ-1');
+  });
+
+  it('Todo can have tags', () => {
+    const todo: Todo = {
+      id: 'todo-1',
+      title: 'Test',
+      content: null,
+      due_date: null,
+      status: 'pending',
+      priority: 'P1',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+      tags: [
+        { id: 'tag-1', name: 'Important', color: '#ff0000', description: null, created_at: '2026-01-01T00:00:00Z' }
+      ],
+    };
+    expect(todo.tags).toHaveLength(1);
+    expect(todo.tags?.[0].name).toBe('Important');
   });
 });

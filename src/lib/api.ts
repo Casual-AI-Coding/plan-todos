@@ -133,6 +133,7 @@ export interface CirculationLog {
   completed_at: string;
   note: string | null;
   period: string | null; // "2024-W05" / "2024-02"
+  count: number | null; // count for count-type circulation
 }
 
 export interface CreateCirculationParams {
