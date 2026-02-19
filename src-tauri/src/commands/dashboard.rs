@@ -2,6 +2,7 @@
 
 use crate::log_command;
 use crate::AppState;
+use chrono::Datelike;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -24,6 +25,15 @@ pub struct Dashboard {
     pub active_targets: Vec<TargetWithProgress>,
     // 进行中的里程碑
     pub active_milestones: Vec<MilestoneWithProgress>,
+    // 打卡相关
+    pub circulation_stats: CirculationStats,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CirculationStats {
+    pub today_pending: i32,   // 今日待打卡
+    pub today_completed: i32, // 今日已完成
+    pub current_streak: i32,  // 当前最长连续
 }
 
 #[derive(Debug, Serialize)]
@@ -121,6 +131,9 @@ pub fn get_dashboard(state: tauri::State<AppState>) -> Result<Dashboard, String>
         // 计算 streak 和 productivity
         let (streak_days, productivity_score) = calculate_efficiency(&conn)?;
 
+        // 打卡统计
+        let circulation_stats = get_circulation_stats(&conn)?;
+
         let overview = Overview {
             today_todos_count: today_todos.len() as i32,
             upcoming_3days_count: upcoming_todos.len() as i32,
@@ -144,6 +157,7 @@ pub fn get_dashboard(state: tauri::State<AppState>) -> Result<Dashboard, String>
             active_plans,
             active_targets,
             active_milestones,
+            circulation_stats,
         })
     })
 }
@@ -487,4 +501,77 @@ fn calculate_efficiency(conn: &rusqlite::Connection) -> Result<(i32, i32), Strin
         (completion_rate * 0.7 + streak.min(10) as f32 * 3.0).min(100.0) as i32;
 
     Ok((streak, productivity_score))
+}
+
+fn get_circulation_stats(conn: &rusqlite::Connection) -> Result<CirculationStats, String> {
+    let today = chrono::Local::now().format("%Y-%m-%d").to_string();
+    let day_of_week = chrono::Local::now().weekday().num_days_from_monday(); // 0=Monday
+    let day_of_month = chrono::Local::now().day();
+
+    // Get all active circulations
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, circulation_type, frequency, last_completed_at, streak_count 
+             FROM circulations WHERE status = 'active'",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let circulations: Vec<(String, String, Option<String>, Option<String>, i32)> = stmt
+        .query_map([], |row| {
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+            ))
+        })
+        .map_err(|e| e.to_string())?
+        .filter_map(|r| r.ok())
+        .collect();
+
+    let mut today_pending = 0i32;
+    let mut today_completed = 0i32;
+    let mut current_streak = 0i32;
+
+    for (_, circ_type, freq, last_completed, streak) in circulations {
+        // Track max streak
+        if streak > current_streak {
+            current_streak = streak;
+        }
+
+        // Determine if needs checkin today
+        let needs_checkin = match circ_type.as_str() {
+            "count" => true,
+            "periodic" => match freq.as_deref() {
+                Some("daily") => true,
+                Some("weekly") => day_of_week == 0,   // Monday
+                Some("monthly") => day_of_month == 1, // 1st of month
+                _ => false,
+            },
+            _ => false,
+        };
+
+        if !needs_checkin {
+            continue;
+        }
+
+        // Check if completed today
+        let is_completed_today = last_completed
+            .as_ref()
+            .map(|d| d.starts_with(&today))
+            .unwrap_or(false);
+
+        if is_completed_today {
+            today_completed += 1;
+        } else {
+            today_pending += 1;
+        }
+    }
+
+    Ok(CirculationStats {
+        today_pending,
+        today_completed,
+        current_streak,
+    })
 }

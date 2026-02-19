@@ -3,29 +3,33 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar } from '@/components/ui';
 import { 
-  getMilestones, getPlans, getTargets, createMilestone, updateMilestone, deleteMilestone,
-  Milestone, Plan, Target 
+  getMilestones, getPlans, getTargets, getTasks, getCirculations, createMilestone, updateMilestone, deleteMilestone,
+  Milestone, Plan, Target, Task, Circulation
 } from '@/lib/api';
 
 export function MilestonesView() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [circulations, setCirculations] = useState<Circulation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [targetDate, setTargetDate] = useState('');
-  const [linkType, setLinkType] = useState<'plan' | 'target'>('plan');
+  const [linkType, setLinkType] = useState<'plan' | 'target' | 'task' | 'circulation'>('plan');
   const [linkId, setLinkId] = useState('');
 
   const isLoaded = useRef(false);
 
   async function loadData() {
     try {
-      const [m, p, t] = await Promise.all([getMilestones(), getPlans(), getTargets()]);
+      const [m, p, t, tk, c] = await Promise.all([getMilestones(), getPlans(), getTargets(), getTasks(), getCirculations()]);
       if (isLoaded.current) {
         setMilestones(m);
         setPlans(p);
         setTargets(t);
+        setTasks(tk);
+        setCirculations(c);
       }
     } catch (e) { console.error(e); }
   }
@@ -61,8 +65,10 @@ export function MilestonesView() {
   }
 
   const getLinkLabel = (m: Milestone) => {
-    if (m.plan_id) return `🚀 ${plans.find(p => p.id === m.plan_id)?.title || 'Plan'}`;
-    if (m.target_id) return `🎯 ${targets.find(t => t.id === m.target_id)?.title || 'Target'}`;
+    if (m.biz_type === 'plan') return `🚀 ${plans.find(p => p.id === m.biz_id)?.title || 'Plan'}`;
+    if (m.biz_type === 'target') return `🎯 ${targets.find(t => t.id === m.biz_id)?.title || 'Target'}`;
+    if (m.biz_type === 'task') return `📋 ${tasks.find(t => t.id === m.biz_id)?.title || 'Task'}`;
+    if (m.biz_type === 'circulation') return `🔄 ${circulations.find(c => c.id === m.biz_id)?.title || 'Circulation'}`;
     return '未关联';
   };
 

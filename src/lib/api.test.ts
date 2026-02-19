@@ -400,6 +400,7 @@ describe('Tag Type', () => {
       id: 'tag-1',
       name: 'Important',
       color: '#ff0000',
+      description: null,
       created_at: '2026-01-01T00:00:00Z',
     };
     expect(tag.id).toBe('tag-1');
@@ -412,6 +413,7 @@ describe('Tag Type', () => {
       id: 'tag-2',
       name: 'Work',
       color: '#FF5733',
+      description: 'Work related tasks',
       created_at: '2026-01-01T00:00:00Z',
     };
     expect(tag.color).toMatch(/^#[0-9A-Fa-f]{6}$/);

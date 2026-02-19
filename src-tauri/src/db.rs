@@ -199,6 +199,54 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
+    // Circulation table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS circulations (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            content TEXT,
+            circulation_type TEXT NOT NULL DEFAULT 'periodic',
+            frequency TEXT,
+            frequency_config TEXT,
+            target_count INTEGER,
+            current_count INTEGER NOT NULL DEFAULT 0,
+            streak_count INTEGER NOT NULL DEFAULT 0,
+            best_streak INTEGER NOT NULL DEFAULT 0,
+            last_completed_at TEXT,
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // Circulation logs table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS circulation_logs (
+            id TEXT PRIMARY KEY,
+            circulation_id TEXT NOT NULL,
+            completed_at TEXT NOT NULL,
+            note TEXT,
+            period TEXT,
+            FOREIGN KEY (circulation_id) REFERENCES circulations(id) ON DELETE CASCADE
+        )",
+        [],
+    )?;
+
+    // Indexes for circulations
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_circulations_type ON circulations(circulation_type)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_circulations_status ON circulations(status)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_circulation_logs_cid ON circulation_logs(circulation_id)",
+        [],
+    )?;
+
     // Migration: Add missing columns
     conn.execute(
         "ALTER TABLE targets ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0",

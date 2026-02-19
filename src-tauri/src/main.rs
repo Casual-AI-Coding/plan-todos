@@ -126,6 +126,16 @@ fn main() {
             commands::tags::get_entity_tags,
             commands::tags::set_entity_tags,
             commands::tags::get_entities_by_tag,
+            // Circulation
+            commands::circulations::get_circulation,
+            commands::circulations::get_circulations,
+            commands::circulations::get_circulations_by_type,
+            commands::circulations::create_circulation,
+            commands::circulations::update_circulation,
+            commands::circulations::delete_circulation,
+            commands::circulations::checkin_circulation,
+            commands::circulations::undo_checkin_circulation,
+            commands::circulations::get_circulation_logs,
             // Export/Import
             commands::export::export_data,
             commands::import::import_data,

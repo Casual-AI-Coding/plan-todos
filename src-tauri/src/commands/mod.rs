@@ -1,6 +1,7 @@
 // Commands module - all Tauri commands
 
 pub mod batch;
+pub mod circulations;
 pub mod command_log;
 pub mod dashboard;
 pub mod export;

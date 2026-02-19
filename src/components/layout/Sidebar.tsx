@@ -23,6 +23,15 @@ const menus: MenuItem[] = [
   { id: 'views', icon: '👁️', label: '视图查看' },
   { id: 'statistics', icon: '📈', label: '数据统计' },
   { 
+    id: 'circulations', 
+    icon: '🔄', 
+    label: '打卡',
+    children: [
+      { id: 'circulations-today', icon: '📅', label: '今日打卡' },
+      { id: 'circulations-settings', icon: '⚙️', label: '打卡设置' },
+    ]
+  },
+  { 
     id: 'settings', 
     icon: '⚙️', 
     label: '设置',

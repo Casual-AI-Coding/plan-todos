@@ -1,6 +1,6 @@
 // Export functionality
 
-use crate::models::{Milestone, Plan, Step, Target, Task, Todo};
+use crate::models::{Circulation, CirculationLog, Milestone, Plan, Step, Target, Task, Todo};
 use crate::AppState;
 use serde::{Deserialize, Serialize};
 
@@ -25,6 +25,8 @@ pub struct ExportDataContent {
     pub milestones: Vec<Milestone>,
     pub tags: Vec<TagData>,
     pub entity_tags: Vec<EntityTagRow>,
+    pub circulations: Vec<Circulation>,
+    pub circulation_logs: Vec<CirculationLog>,
     pub settings: SettingsData,
 }
 
@@ -93,6 +95,8 @@ pub fn export_data(state: tauri::State<AppState>) -> Result<ExportData, String> 
     let milestones = export_milestones(&conn)?;
     let tags = export_tags(&conn)?;
     let entity_tags = export_entity_tags(&conn)?;
+    let circulations = export_circulations(&conn)?;
+    let circulation_logs = export_circulation_logs(&conn)?;
     let settings = export_settings(&conn)?;
 
     let exported_at = chrono::Utc::now().to_rfc3339();
@@ -109,6 +113,8 @@ pub fn export_data(state: tauri::State<AppState>) -> Result<ExportData, String> 
             milestones,
             tags,
             entity_tags,
+            circulations,
+            circulation_logs,
             settings,
         },
     })
@@ -286,6 +292,59 @@ fn export_entity_tags(conn: &rusqlite::Connection) -> Result<Vec<EntityTagRow>, 
                 entity_type: row.get(0)?,
                 entity_id: row.get(1)?,
                 tag_id: row.get(2)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    Ok(rows.filter_map(|r| r.ok()).collect())
+}
+
+fn export_circulations(conn: &rusqlite::Connection) -> Result<Vec<Circulation>, String> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, title, content, circulation_type, frequency, frequency_config, 
+                    target_count, current_count, streak_count, best_streak,
+                    last_completed_at, status, created_at, updated_at FROM circulations",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map([], |row| {
+            Ok(Circulation {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                content: row.get(2)?,
+                circulation_type: row.get(3)?,
+                frequency: row.get(4)?,
+                frequency_config: row.get(5)?,
+                target_count: row.get(6)?,
+                current_count: row.get(7)?,
+                streak_count: row.get(8)?,
+                best_streak: row.get(9)?,
+                last_completed_at: row.get(10)?,
+                status: row.get(11)?,
+                created_at: row.get(12)?,
+                updated_at: row.get(13)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    Ok(rows.filter_map(|r| r.ok()).collect())
+}
+
+fn export_circulation_logs(conn: &rusqlite::Connection) -> Result<Vec<CirculationLog>, String> {
+    let mut stmt = conn
+        .prepare("SELECT id, circulation_id, completed_at, note, period FROM circulation_logs")
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map([], |row| {
+            Ok(CirculationLog {
+                id: row.get(0)?,
+                circulation_id: row.get(1)?,
+                completed_at: row.get(2)?,
+                note: row.get(3)?,
+                period: row.get(4)?,
             })
         })
         .map_err(|e| e.to_string())?;

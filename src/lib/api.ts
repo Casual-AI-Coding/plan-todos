@@ -95,14 +95,61 @@ export interface Milestone {
   id: string;
   title: string;
   target_date: string | null;
-  // One of these will be set
-  plan_id: string | null;
-  task_id: string | null;
-  target_id: string | null;
+  // Unified fields for flexible linking
+  biz_type: string | null; // 'plan' | 'task' | 'target' | 'circulation'
+  biz_id: string | null;
   status: 'pending' | 'completed';
   progress: number; // 0-100, calculated from linked entity
   created_at: string;
   updated_at: string;
+}
+
+// ============================================================================
+// Circulation - 打卡
+// ============================================================================
+export type CirculationType = 'periodic' | 'count';
+export type PeriodicFrequency = 'daily' | 'weekly' | 'monthly';
+
+export interface Circulation {
+  id: string;
+  title: string;
+  content: string | null;
+  circulation_type: CirculationType;
+  frequency: PeriodicFrequency | null; // periodic only
+  frequency_config: string | null; // JSON config
+  target_count: number | null; // count only
+  current_count: number;
+  streak_count: number; // periodic only
+  best_streak: number; // periodic only
+  last_completed_at: string | null;
+  status: 'active' | 'archived';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CirculationLog {
+  id: string;
+  circulation_id: string;
+  completed_at: string;
+  note: string | null;
+  period: string | null; // "2024-W05" / "2024-02"
+}
+
+export interface CreateCirculationParams {
+  title: string;
+  circulation_type: CirculationType;
+  frequency?: PeriodicFrequency;
+  frequency_config?: string;
+  target_count?: number;
+}
+
+export interface UpdateCirculationParams {
+  title?: string;
+  circulation_type?: CirculationType;
+  frequency?: PeriodicFrequency;
+  frequency_config?: string;
+  target_count?: number;
+  status?: 'active' | 'archived';
 }
 
 // Check if running in Tauri environment
@@ -1105,4 +1152,120 @@ export async function importData(
   }
   const { invoke } = await import('@tauri-apps/api/core');
   return invoke<ImportResult>('import_data', { data, mode });
+}
+
+// ============================================================================
+// API Functions - Circulation (打卡)
+// ============================================================================
+
+export async function getCirculation(id: string): Promise<Circulation> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to get circulation');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation>('get_circulation', { id });
+}
+
+export async function getCirculations(): Promise<Circulation[]> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - data not available');
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation[]>('get_circulations');
+}
+
+export async function getCirculationsByType(
+  circulationType: CirculationType,
+  frequency?: PeriodicFrequency
+): Promise<Circulation[]> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - data not available');
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation[]>('get_circulations_by_type', {
+    circulationType,
+    frequency: frequency || null,
+  });
+}
+
+export async function createCirculation(
+  data: CreateCirculationParams
+): Promise<Circulation> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to create circulation');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation>('create_circulation', {
+    title: data.title,
+    circulationType: data.circulation_type,
+    frequency: data.frequency || null,
+    frequencyConfig: data.frequency_config || null,
+    targetCount: data.target_count || null,
+  });
+}
+
+export async function updateCirculation(
+  id: string,
+  data: UpdateCirculationParams
+): Promise<Circulation> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to update circulation');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation>('update_circulation', {
+    id,
+    title: data.title || null,
+    circulationType: data.circulation_type || null,
+    frequency: data.frequency || null,
+    frequencyConfig: data.frequency_config || null,
+    targetCount: data.target_count || null,
+    status: data.status || null,
+  });
+}
+
+export async function deleteCirculation(id: string): Promise<void> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to delete circulation');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<void>('delete_circulation', { id });
+}
+
+export async function checkinCirculation(
+  id: string,
+  note?: string
+): Promise<Circulation> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to checkin');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation>('checkin_circulation', {
+    id,
+    note: note || null,
+  });
+}
+
+export async function undoCheckinCirculation(id: string): Promise<Circulation> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to undo checkin');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<Circulation>('undo_checkin_circulation', { id });
+}
+
+export async function getCirculationLogs(
+  circulationId: string,
+  limit?: number
+): Promise<CirculationLog[]> {
+  if (!isTauri()) {
+    console.warn('Running outside Tauri - data not available');
+    return [];
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<CirculationLog[]>('get_circulation_logs', {
+    circulationId,
+    limit: limit || 20,
+  });
 }

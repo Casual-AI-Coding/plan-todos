@@ -83,3 +83,32 @@ pub struct Milestone {
     pub created_at: String,
     pub updated_at: String,
 }
+
+// Circulation - 打卡
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct Circulation {
+    pub id: String,
+    pub title: String,
+    pub content: Option<String>,
+    pub circulation_type: String,         // 'periodic' | 'count'
+    pub frequency: Option<String>,        // 'daily' | 'weekly' | 'monthly' (periodic only)
+    pub frequency_config: Option<String>, // JSON config (e.g., {"weekdays": [1,2,3]})
+    pub target_count: Option<i32>,        // target count (count only)
+    pub current_count: i32,               // current count (count only)
+    pub streak_count: i32,                // current streak (periodic only)
+    pub best_streak: i32,                 // best streak (periodic only)
+    pub last_completed_at: Option<String>,
+    pub status: String, // 'active' | 'archived'
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+// CirculationLog - 打卡记录
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct CirculationLog {
+    pub id: String,
+    pub circulation_id: String,
+    pub completed_at: String,
+    pub note: Option<String>,
+    pub period: Option<String>, // periodic: "2024-W05" / "2024-02"
+}
