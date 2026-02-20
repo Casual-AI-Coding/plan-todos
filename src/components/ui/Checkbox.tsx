@@ -14,15 +14,21 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           ref={ref}
           type="checkbox"
           className={`
-            w-5 h-5 rounded border-teal-300 text-teal-600 
-            focus:ring-teal-500 focus:ring-offset-0
+            w-5 h-5 rounded 
+            border-2
+            bg-transparent
             cursor-pointer
             ${className}
           `}
+          style={{
+            borderColor: 'var(--color-border)',
+            color: 'var(--color-primary)',
+            '--tw-ring-color': 'var(--color-primary)',
+          } as React.CSSProperties}
           {...props}
         />
         {label && (
-          <span className="text-gray-700">{label}</span>
+          <span style={{ color: 'var(--color-text)' }}>{label}</span>
         )}
       </label>
     );

@@ -11,11 +11,32 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', className = '', children, ...props }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
-    const variantStyles = {
-      primary: 'bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500',
-      secondary: 'bg-white border border-teal-200 text-teal-700 hover:bg-teal-50 focus:ring-teal-500',
-      ghost: 'text-teal-700 hover:bg-teal-50 focus:ring-teal-500',
-      danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+    const getVariantStyles = () => {
+      switch (variant) {
+        case 'primary':
+          return {
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-text-inverse)',
+          };
+        case 'secondary':
+          return {
+            backgroundColor: 'var(--color-bg-card)',
+            border: '2px solid var(--color-border)',
+            color: 'var(--color-text)',
+          };
+        case 'ghost':
+          return {
+            backgroundColor: 'transparent',
+            color: 'var(--color-text)',
+          };
+        case 'danger':
+          return {
+            backgroundColor: 'var(--color-error)',
+            color: 'var(--color-text-inverse)',
+          };
+        default:
+          return {};
+      }
     };
 
     const sizeStyles = {
@@ -27,7 +48,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+        className={`${baseStyles} ${sizeStyles[size]} ${className}`}
+        style={{
+          ...getVariantStyles(),
+        }}
         {...props}
       >
         {children}

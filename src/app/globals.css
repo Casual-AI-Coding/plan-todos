@@ -277,3 +277,22 @@ body {
 
 /* Active states */
 .active\:bg-teal-700:active { background-color: var(--color-primary); }
+
+/* Ring colors (for focus states) */
+.ring-teal-500 { --tw-ring-color: var(--color-primary); }
+.ring-teal-300 { --tw-ring-color: var(--color-primary); }
+
+/* Placeholder text */
+.placeholder-gray-400::placeholder { color: var(--color-text-muted); }
+.placeholder-gray-500::placeholder { color: var(--color-text-muted); }
+
+/* Divider colors */
+.divide-gray-100 > * + * { border-color: var(--color-border); }
+.divide-gray-200 > * + * { border-color: var(--color-border-light); }
+
+/* Scrollbar (for webkit) */
+::-webkit-scrollbar-thumb { background-color: var(--color-border); }
+::-webkit-scrollbar-track { background-color: var(--color-bg); }
+
+/* Selection */
+::selection { background-color: var(--color-primary); color: var(--color-text-inverse); }
