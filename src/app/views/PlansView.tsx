@@ -133,7 +133,7 @@ export function PlansView() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>PLANS</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>PLANS</h2>
         <Button onClick={() => setShowForm(true)}>+ 新建 Plan</Button>
       </div>
 
@@ -176,7 +176,7 @@ export function PlansView() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-lg">{expandedPlans.has(plan.id) ? '▼' : '▶'}</span>
-                    <span className="font-semibold" style={{ color: '#134E4A' }}>{plan.title}</span>
+                    <span className="font-semibold" style={{ color: 'var(--color-text)' }}>{plan.title}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-teal-600 text-sm">{progress}%</span>

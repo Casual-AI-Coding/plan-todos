@@ -211,7 +211,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
     <div className="p-6">
       {/* Tab Navigation */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
           打卡
         </h2>
         <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                         ) : (
                           <span className="text-lg">📊</span>
                         )}
-                        <span style={{ color: '#134E4A' }}>{c.title}</span>
+                        <span style={{ color: 'var(--color-text)' }}>{c.title}</span>
                       </div>
                       {/* Status Badge */}
                       <div className="flex items-center gap-1">
@@ -475,7 +475,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                     <div className="flex-1">
                       <div 
                         className="font-semibold cursor-pointer hover:text-teal-600" 
-                        style={{ color: '#134E4A' }}
+                        style={{ color: 'var(--color-text)' }}
                         onClick={() => setDetailCirculation(c)}
                       >
                         {c.title}

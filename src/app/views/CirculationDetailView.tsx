@@ -136,7 +136,7 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
 
       {/* History */}
       <Card>
-        <h3 className="text-lg font-semibold mb-4" style={{ color: '#134E4A' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
           打卡记录
         </h3>
         {logs.length === 0 ? (
@@ -240,7 +240,7 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             ← 返回
           </Button>
         )}
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
           {circulation.title}
         </h2>
       </div>

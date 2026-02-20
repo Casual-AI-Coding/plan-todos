@@ -1,34 +1,212 @@
 @import "tailwindcss";
 
+/* ============================================
+   Theme CSS Variables
+   Add new themes here - update data-theme selector
+   ============================================ */
+
+/* Base variables (fallback) */
 :root {
-  /* Design System Colors */
   --color-primary: #0D9488;
   --color-secondary: #14B8A6;
   --color-cta: #F97316;
-  --color-background: #F0FDFA;
-  --color-text: #134E4A;
-  
-  /* Additional colors */
-  --color-muted: #64748B;
-  --color-border: #CCFBF1;
-  --color-white: #ffffff;
-  
-  --background: var(--color-background);
-  --foreground: var(--color-text);
 }
 
+/* Light Theme (default) */
+[data-theme="light"],
+:root {
+  --color-bg: #F0FDFA;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-hover: #F0FDFA;
+  --color-text: #134E4A;
+  --color-text-muted: #64748B;
+  --color-text-inverse: #ffffff;
+  --color-border: #CCFBF1;
+  --color-border-light: #E2E8F0;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --color-accent: #0D9488;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-bg: #0F172A;
+  --color-bg-card: #1E293B;
+  --color-bg-elevated: #334155;
+  --color-bg-hover: #1E293B;
+  --color-text: #F1F5F9;
+  --color-text-muted: #94A3B8;
+  --color-text-inverse: #0F172A;
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #14B8A6;
+}
+
+/* Dracula Theme */
+[data-theme="dracula"] {
+  --color-bg: #282A36;
+  --color-bg-card: #383A59;
+  --color-bg-elevated: #44475A;
+  --color-bg-hover: #383A59;
+  --color-text: #F8F8F2;
+  --color-text-muted: #6272A4;
+  --color-text-inverse: #282A36;
+  --color-border: #44475A;
+  --color-border-light: #6272A4;
+  --color-success: #50FA7B;
+  --color-warning: #F1FA8C;
+  --color-error: #FF5555;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #BD93F9;
+}
+
+/* Nord Theme */
+[data-theme="nord"] {
+  --color-bg: #2E3440;
+  --color-bg-card: #3B4252;
+  --color-bg-elevated: #434C5E;
+  --color-bg-hover: #3B4252;
+  --color-text: #ECEFF4;
+  --color-text-muted: #D8DEE9;
+  --color-text-inverse: #2E3440;
+  --color-border: #4C566A;
+  --color-border-light: #5E81AC;
+  --color-success: #A3BE8C;
+  --color-warning: #EBCB8B;
+  --color-error: #BF616A;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #88C0D0;
+}
+
+/* Monokai Theme */
+[data-theme="monokai"] {
+  --color-bg: #272822;
+  --color-bg-card: #3E3D32;
+  --color-bg-elevated: #49483E;
+  --color-bg-hover: #3E3D32;
+  --color-text: #F8F8F2;
+  --color-text-muted: #75715E;
+  --color-text-inverse: #272822;
+  --color-border: #49483E;
+  --color-border-light: #5B5A4E;
+  --color-success: #A6E22E;
+  --color-warning: #E6DB74;
+  --color-error: #F92672;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #F92672;
+}
+
+/* Glass Theme */
+[data-theme="glass"] {
+  --color-bg: rgba(255, 255, 255, 0.1);
+  --color-bg-card: rgba(255, 255, 255, 0.15);
+  --color-bg-elevated: rgba(255, 255, 255, 0.2);
+  --color-bg-hover: rgba(255, 255, 255, 0.1);
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.7);
+  --color-text-inverse: #1F2937;
+  --color-border: rgba(255, 255, 255, 0.2);
+  --color-border-light: rgba(255, 255, 255, 0.3);
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --color-accent: #6366F1;
+}
+
+/* ============================================
+   Tailwind Theme Configuration
+   ============================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
   --color-primary: var(--color-primary);
   --color-secondary: var(--color-secondary);
   --color-cta: var(--color-cta);
+  --color-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --color-card: var(--color-bg-card);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --color-accent: var(--color-accent);
   --font-sans: var(--font-fira-sans), Fira Sans, sans-serif;
   --font-mono: var(--font-fira-code), Fira Code, monospace;
 }
 
+/* ============================================
+   Base Styles
+   ============================================ */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: var(--font-sans);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ============================================
+   Utility Classes for Components
+   ============================================ */
+
+/* Card */
+.card {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+/* Input */
+.input {
+  background: var(--color-bg);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+/* Button primary */
+.btn-primary {
+  background: var(--color-primary);
+}
+
+/* Text colors */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Border colors */
+.border-default {
+  border-color: var(--color-border);
+}
+
+/* Background colors */
+.bg-card {
+  background: var(--color-bg-card);
+}
+
+.bg-default {
+  background: var(--color-bg);
+}
+
+.bg-elevated {
+  background: var(--color-bg-elevated);
+}
+
+.bg-hover:hover {
+  background: var(--color-bg-hover);
 }

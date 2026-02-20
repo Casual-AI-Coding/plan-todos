@@ -133,7 +133,7 @@ export function TargetsView() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>GOALS</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>GOALS</h2>
         <Button onClick={() => { setSelectedTargetId(''); setShowForm(true); }}>+ 新建 Target</Button>
       </div>
 
@@ -175,7 +175,7 @@ export function TargetsView() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-lg">{expandedTargets.has(target.id) ? '▼' : '▶'}</span>
-                    <span className="font-semibold" style={{ color: '#134E4A' }}>{target.title}</span>
+                    <span className="font-semibold" style={{ color: 'var(--color-text)' }}>{target.title}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-orange-500 font-medium">{target.progress}%</span>

@@ -80,7 +80,7 @@ export function SettingsChannelsView() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
           设置 &gt; 通知 &gt; 通知渠道
         </h2>
         <Button onClick={() => setShowAddModal(true)}>

@@ -90,7 +90,7 @@ export function SettingsDailySummaryView() {
   if (isLoading) {
     return (
       <div className="p-6">
-        <h2 className="text-2xl font-semibold mb-6" style={{ color: '#134E4A' }}>
+        <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--color-text)' }}>
           设置 &gt; 通知 &gt; 每日汇总
         </h2>
         <div className="text-center text-gray-500 py-8">加载中...</div>
@@ -100,12 +100,12 @@ export function SettingsDailySummaryView() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#134E4A' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--color-text)' }}>
         设置 &gt; 通知 &gt; 每日汇总
       </h2>
       
       <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>每日汇总设置</h3>
+        <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>每日汇总设置</h3>
         <div className="space-y-4">
           {/* Enable Toggle */}
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -173,7 +173,7 @@ export function SettingsDailySummaryView() {
 
       {/* Send Channels */}
       <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>发送渠道</h3>
+        <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>发送渠道</h3>
         <div className="space-y-2">
           {plugins.length === 0 ? (
             <div className="text-gray-500 text-center py-4">

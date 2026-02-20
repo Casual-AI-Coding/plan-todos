@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fira_Code, Fira_Sans } from "next/font/google";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import "./globals.css";
 
 const firaCode = Fira_Code({
@@ -22,17 +23,37 @@ export const metadata: Metadata = {
   },
 };
 
+// Inline script to set theme before React loads - prevents hydration mismatch
+const themeScript = `
+(function() {
+  var theme = localStorage.getItem('plan-todos-theme');
+  if (!theme) {
+    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  if (theme === 'light' || theme === 'dark' || theme === 'dracula' || theme === 'nord' || theme === 'monokai' || theme === 'glass') {
+    document.documentElement.setAttribute('data-theme', theme);
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
         className={`${firaCode.variable} ${firaSans.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

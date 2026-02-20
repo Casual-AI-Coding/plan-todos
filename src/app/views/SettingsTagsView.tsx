@@ -87,7 +87,7 @@ export function SettingsTagsView() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
           设置 &gt; 标签管理
         </h2>
         <Button onClick={handleNew}>
@@ -98,7 +98,7 @@ export function SettingsTagsView() {
       {/* Form */}
       {showForm && (
         <Card className="mb-6">
-          <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>
+          <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>
             {editingTag ? '编辑标签' : '新建标签'}
           </h3>
           <div className="space-y-4">

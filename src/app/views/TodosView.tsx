@@ -139,7 +139,7 @@ export function TodosView() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>TODOS</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>TODOS</h2>
         <Button onClick={() => setShowForm(true)}>+ 新建</Button>
       </div>
 

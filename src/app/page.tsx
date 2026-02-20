@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { BottomNav } from '@/components/layout/BottomNav';
 import { 
   Dashboard, 
   TodosView, 
@@ -66,11 +67,20 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: '#F0FDFA', fontFamily: 'Fira Sans, sans-serif' }}>
-      <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
-      <main className="flex-1 overflow-auto">
+    <div className="flex h-screen" style={{ backgroundColor: 'var(--color-bg)', fontFamily: 'var(--font-sans)' }}>
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden md:block fixed left-0 top-0 h-screen z-40">
+        <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
+      </div>
+      
+      {/* Main Content - with padding for sidebar on desktop */}
+      <main className="flex-1 overflow-auto pb-16 md:pb-0 md:ml-52">
         {renderContent()}
       </main>
+      
+      {/* Mobile Bottom Nav - hidden on desktop */}
+      <BottomNav activeMenu={activeMenu} onMenuChange={setActiveMenu} />
+      
       {/* Circulation Detail Modal */}
       {circulationDetailId && (
         <CirculationDetailView

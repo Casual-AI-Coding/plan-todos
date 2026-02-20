@@ -17,7 +17,7 @@ export function SettingsAboutView() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#134E4A' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--color-text)' }}>
         设置 &gt; 关于
       </h2>
       
@@ -27,7 +27,7 @@ export function SettingsAboutView() {
         <Card>
           <div className="text-center py-6">
             <div className="text-4xl mb-3">📱</div>
-            <h3 className="text-xl font-bold mb-2" style={{ color: '#134E4A' }}>
+            <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
               Plan Todos
             </h3>
             <p className="text-base text-gray-600 mb-3">v0.3.0</p>
@@ -39,7 +39,7 @@ export function SettingsAboutView() {
 
         {/* Tech Stack */}
         <Card>
-          <h3 className="font-medium mb-3" style={{ color: '#134E4A' }}>技术栈</h3>
+          <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>技术栈</h3>
           <div className="grid grid-cols-2 gap-2">
             {techStack.map((item, index) => (
               <div 
@@ -59,7 +59,7 @@ export function SettingsAboutView() {
 
       {/* Other */}
       <Card>
-        <h3 className="font-medium mb-3" style={{ color: '#134E4A' }}>其他</h3>
+        <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>其他</h3>
         <Button variant="secondary" className="w-full" onClick={handleCheckUpdate}>
           检查更新
         </Button>

@@ -88,18 +88,16 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
           className={`
             w-full flex items-center gap-1.5 px-2 py-2 rounded-md transition-all mb-0.5
             ${level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-8'}
-            ${isCurrentActive 
-              ? 'bg-teal-500 text-white shadow-sm' 
-              : 'hover:bg-teal-100 text-gray-700'
-            }
           `}
           style={{ 
             fontSize: level === 0 ? '15px' : '14px',
             maxWidth: level === 0 ? '100%' : level === 1 ? 'calc(100% - 16px)' : level === 2 ? 'calc(100% - 32px)' : 'calc(100% - 40px)',
+            backgroundColor: isCurrentActive ? 'var(--color-primary)' : 'transparent',
+            color: isCurrentActive ? 'var(--color-text-inverse)' : 'var(--color-text)',
           }}
         >
           {hasChildren && (
-            <span className={`w-3 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} style={{ color: isCurrentActive ? 'white' : '#134E4A', transition: 'transform 0.2s' }}>
+            <span className={`w-3 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} style={{ color: isCurrentActive ? 'var(--color-text-inverse)' : 'var(--color-text)', transition: 'transform 0.2s' }}>
               ▶
             </span>
           )}
@@ -118,14 +116,17 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
 
   return (
     <aside 
-      className="w-52 bg-white border-r border-teal-100 flex flex-col h-screen"
-      style={{ borderColor: '#CCFBF1' }}
+      className="w-52 border-r flex flex-col h-screen"
+      style={{ 
+        backgroundColor: 'var(--color-bg-card)',
+        borderColor: 'var(--color-border)',
+      }}
     >
       {/* Logo */}
-      <div className="p-4 border-b border-teal-100">
+      <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
         <h1 
           className="text-xl font-bold"
-          style={{ color: '#134E4A', fontFamily: 'Fira Code, monospace' }}
+          style={{ color: 'var(--color-text)', fontFamily: 'var(--font-mono)' }}
         >
           Plan Todos
         </h1>

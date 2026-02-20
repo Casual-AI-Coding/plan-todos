@@ -11,11 +11,11 @@ export function SettingsView() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#134E4A' }}>设置</h2>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--color-text)' }}>设置</h2>
       
       {/* Appearance */}
       <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>外观</h3>
+        <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>外观</h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">主题</label>
@@ -57,7 +57,7 @@ export function SettingsView() {
 
       {/* Data Management */}
       <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>数据管理</h3>
+        <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>数据管理</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div>
@@ -101,7 +101,7 @@ export function SettingsView() {
 
       {/* About */}
       <Card>
-        <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>关于</h3>
+        <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>关于</h3>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">应用名称</span>

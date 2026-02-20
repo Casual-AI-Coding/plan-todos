@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.1] - 2026-02-20
+
+### Added
+- **主题系统**: 添加6个主题支持 (浅色、深色、Dracula、Nord、Monokai、毛玻璃)
+- **ThemeRegistry**: 集中的主题配置文件，方便添加新主题
+- **移动端响应式布局**: 添加底部导航栏，移动端自动隐藏侧边栏
+- **骨架屏组件**: Skeleton、SkeletonText、SkeletonCard、SkeletonList 加载组件
+
+### Changed
+- **修复 Hydration 错误**: 使用 inline script 在 React 加载前设置主题
+- **CSS 变量**: 所有视图使用 CSS 变量替代硬编码颜色，支持主题切换
+- **Sidebar**: 使用 CSS 变量适配主题
+- **设置页面**: 使用 ThemeSelector 组件
+
+### Technical
+- 使用 `suppressHydrationWarning` 防止服务端/客户端渲染不匹配
+- useTheme hook 支持 SSR
+
+---
+
 ## [0.4.0] - 2026-02-19
 
 ### Added

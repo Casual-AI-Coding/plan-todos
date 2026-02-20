@@ -173,7 +173,7 @@ export function ViewsView() {
           pointerEvents: 'none'
         }}
       >
-        <div className="font-medium text-sm mb-2" style={{ color: '#134E4A' }}>
+        <div className="font-medium text-sm mb-2" style={{ color: 'var(--color-text)' }}>
           {typeLabels[hoveredItem.type]}详情
         </div>
         <div className="text-sm font-medium">{'title' in data ? data.title : ''}</div>
@@ -216,7 +216,7 @@ export function ViewsView() {
       {/* Plans with Tasks */}
       {filters.plan && (
         <Card>
-          <h3 className="font-semibold mb-4" style={{ color: '#134E4A' }}>🚀 计划 (Plans)</h3>
+          <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>🚀 计划 (Plans)</h3>
           {plans.length === 0 ? (
             <p className="text-gray-400 text-sm">暂无计划</p>
           ) : (
@@ -264,7 +264,7 @@ export function ViewsView() {
       {/* Targets with Steps */}
       {filters.target && (
         <Card>
-          <h3 className="font-semibold mb-4" style={{ color: '#134E4A' }}>🎯 目标 (Targets)</h3>
+          <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>🎯 目标 (Targets)</h3>
           {targets.length === 0 ? (
             <p className="text-gray-400 text-sm">暂无目标</p>
           ) : (
@@ -304,7 +304,7 @@ export function ViewsView() {
       {/* Standalone Todos - hide completed */}
       {filters.todo && (
         <Card>
-          <h3 className="font-semibold mb-4" style={{ color: '#134E4A' }}>✅ 待办 (Todos)</h3>
+          <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>✅ 待办 (Todos)</h3>
           {todos.filter(t => t.status !== 'done').length === 0 ? (
             <p className="text-gray-400 text-sm">暂无待办</p>
           ) : (
@@ -330,7 +330,7 @@ export function ViewsView() {
       {/* Milestones */}
       {filters.milestone && (
         <Card>
-          <h3 className="font-semibold mb-4" style={{ color: '#134E4A' }}>🏁 里程碑 (Milestones)</h3>
+          <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>🏁 里程碑 (Milestones)</h3>
           {milestones.length === 0 ? (
             <p className="text-gray-400 text-sm">暂无里程碑</p>
           ) : (
@@ -483,7 +483,7 @@ export function ViewsView() {
         {renderTooltip()}
         <div className="flex items-center justify-center mb-4 gap-4">
           <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">◀️</button>
-          <h3 className="text-xl font-semibold" style={{ color: '#134E4A' }}>
+          <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
             {monthNames[currentMonth]} {currentYear}
           </h3>
           <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">▶️</button>
@@ -761,7 +761,7 @@ export function ViewsView() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-4" style={{ color: '#134E4A' }}>视图查看</h2>
+      <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>视图查看</h2>
       
       <div className="flex gap-2 mb-4">
         {viewModes.map(mode => (
