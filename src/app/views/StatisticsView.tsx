@@ -53,7 +53,7 @@ export function StatisticsView() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#134E4A' }}>数据统计</h2>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--color-text)' }}>数据统计</h2>
       
       {/* Overview Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
@@ -77,7 +77,7 @@ export function StatisticsView() {
 
       {/* Completion Rate */}
       <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>待办完成率</h3>
+        <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>待办完成率</h3>
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <ProgressBar value={completionRate} color="teal" size="md" />
@@ -89,7 +89,7 @@ export function StatisticsView() {
       {/* Details Grid */}
       <div className="grid grid-cols-2 gap-6">
         <Card>
-          <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>计划统计</h3>
+          <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>计划统计</h3>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">总计划数</span>
@@ -111,7 +111,7 @@ export function StatisticsView() {
         </Card>
 
         <Card>
-          <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>目标统计</h3>
+          <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>目标统计</h3>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">总目标数</span>
@@ -134,7 +134,7 @@ export function StatisticsView() {
 
         {/* Circulation Stats */}
         <Card className="col-span-2">
-          <h3 className="font-medium mb-4" style={{ color: '#134E4A' }}>打卡统计</h3>
+          <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>打卡统计</h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-teal-600">{stats.totalCirculations}</div>

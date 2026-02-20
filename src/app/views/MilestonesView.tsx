@@ -76,7 +76,7 @@ export function MilestonesView() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold" style={{ color: '#134E4A' }}>MILESTONES</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>MILESTONES</h2>
         <Button onClick={() => setShowForm(true)}>+ 新建</Button>
       </div>
 
@@ -85,7 +85,7 @@ export function MilestonesView() {
           <Card key={m.id}>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-semibold" style={{ color: '#134E4A' }}>{m.title}</div>
+                <div className="font-semibold" style={{ color: 'var(--color-text)' }}>{m.title}</div>
                 <div className="text-sm text-gray-500 mt-1">{getLinkLabel(m)}</div>
                 {m.target_date && <div className="text-xs text-gray-400 mt-1">目标日期: {m.target_date}</div>}
                 <ProgressBar value={m.progress} color="teal" size="sm" className="mt-2" />

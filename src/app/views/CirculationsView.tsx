@@ -254,14 +254,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
               const isDoneToday = isCompletedToday(c);
               
               return (
-                <Card 
-                  key={c.id} 
-                  className={`hover:shadow-md transition-all ${
-                    isPeriodic 
-                      ? (isDoneToday ? 'border-green-300 bg-gradient-to-br from-green-50 to-white' : 'border-amber-200 bg-gradient-to-br from-amber-50 to-white')
-                      : 'border-blue-200 bg-gradient-to-br from-blue-50 to-white'
-                  }`}
-                >
+                <Card key={c.id} className="hover:shadow-md transition-all">
                   <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-2">
@@ -281,16 +274,16 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                       <div className="flex items-center gap-1">
                         {isPeriodic ? (
                           isDoneToday ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-success)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
                               ✓ 已完成
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
                               ○ 待打卡
                             </span>
                           )
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
                             计数打卡
                           </span>
                         )}
@@ -298,7 +291,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                     </div>
                     
                     {/* Type Label */}
-                    <div className="text-xs text-gray-500 mb-2">
+                    <div className="text-xs mb-2" style={{ color: 'var(--color-text-muted)' }}>
                       {isPeriodic 
                         ? '周期打卡' 
                         : `今日已打卡 ${todayStats[c.id]?.count || 0} 次 · 进度 +${todayStats[c.id]?.progress || 0}`
@@ -309,47 +302,47 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                     <div className="grid grid-cols-2 gap-2 mb-3">
                       {isPeriodic ? (
                         <>
-                          <div className="bg-white/60 rounded-md p-2 text-center">
-                            <div className="text-xl font-bold text-teal-600">{c.streak_count}</div>
-                            <div className="text-xs text-gray-500">连续天数</div>
+                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                            <div className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>{c.streak_count}</div>
+                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>连续天数</div>
                           </div>
-                          <div className="bg-white/60 rounded-md p-2 text-center">
-                            <div className="text-xl font-bold text-orange-500">{c.best_streak}</div>
-                            <div className="text-xs text-gray-500">最佳记录</div>
+                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                            <div className="text-xl font-bold" style={{ color: 'var(--color-warning)' }}>{c.best_streak}</div>
+                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>最佳记录</div>
                           </div>
                         </>
                       ) : (
                         <>
-                          <div className="bg-white/60 rounded-md p-2 text-center">
-                            <div className="text-xl font-bold text-blue-600">{todayStats[c.id]?.count || 0}</div>
-                            <div className="text-xs text-gray-500">今日次数</div>
+                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                            <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>{todayStats[c.id]?.count || 0}</div>
+                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日次数</div>
                           </div>
-                          <div className="bg-white/60 rounded-md p-2 text-center">
-                            <div className="text-xl font-bold text-green-600">+{todayStats[c.id]?.progress || 0}</div>
-                            <div className="text-xs text-gray-500">今日进度</div>
+                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                            <div className="text-xl font-bold" style={{ color: 'var(--color-success)' }}>+{todayStats[c.id]?.progress || 0}</div>
+                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
                           </div>
                         </>
                       )}
                       {!isPeriodic && c.target_count && (
-                        <div className="col-span-2 bg-white/60 rounded-md p-2">
+                        <div className="col-span-2 rounded-md p-2" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
                           <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-gray-500">总进度</span>
-                            <span className="text-sm font-medium text-blue-600">{c.current_count} / {c.target_count}</span>
+                            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>总进度</span>
+                            <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>{c.current_count} / {c.target_count}</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border-light)' }}>
                             <div 
-                              className="bg-blue-500 h-2 rounded-full" 
-                              style={{ width: `${Math.min((c.current_count / c.target_count) * 100, 100)}%` }}
+                              className="h-2 rounded-full" 
+                              style={{ width: `${Math.min((c.current_count / c.target_count) * 100, 100)}%`, backgroundColor: 'var(--color-accent)' }}
                             />
                           </div>
                         </div>
                       )}
                       {c.last_completed_at && (
-                        <div className="col-span-2 bg-white/60 rounded-md p-2 text-center">
-                          <div className="text-sm text-gray-600">
+                        <div className="col-span-2 rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                          <div className="text-sm" style={{ color: 'var(--color-text)' }}>
                             {new Date(c.last_completed_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </div>
-                          <div className="text-xs text-gray-400">上次打卡</div>
+                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>上次打卡</div>
                         </div>
                       )}
                     </div>
@@ -361,7 +354,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                           <Button
                             variant="secondary"
                             size="sm"
-                            className="flex-1 text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                            className="flex-1 text-xs"
                             onClick={() => handleUndo(c)}
                           >
                             撤销打卡
@@ -369,7 +362,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                         ) : (
                           <Button 
                             size="sm"
-                            className="flex-1 text-xs bg-amber-500 hover:bg-amber-600 text-white"
+                            className="flex-1 text-xs"
                             onClick={() => setCheckinTarget(c)}
                           >
                             立即打卡
@@ -378,7 +371,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                       ) : (
                         <Button 
                           size="sm"
-                          className="flex-1 text-xs bg-blue-500 hover:bg-blue-600 text-white"
+                          className="flex-1 text-xs"
                           onClick={() => setCheckinTarget(c)}
                         >
                           打卡 +1
@@ -387,7 +380,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                       <Button 
                         variant="secondary" 
                         size="sm"
-                        className="text-xs px-3 bg-white"
+                        className="text-xs px-3"
                         onClick={() => setDetailCirculation(c)}
                       >
                         详情
@@ -406,13 +399,18 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
         <>
           {/* Sub Tabs */}
           <div className="flex gap-2 mb-4">
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
               <button
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   settingsTab === 'periodic'
-                    ? 'bg-white text-teal-700 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? ''
+                    : ''
                 }`}
+                style={{
+                  backgroundColor: settingsTab === 'periodic' ? 'var(--color-bg-card)' : 'transparent',
+                  color: settingsTab === 'periodic' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                  boxShadow: settingsTab === 'periodic' ? 'var(--shadow-card)' : 'none'
+                }}
                 onClick={() => setSettingsTab('periodic')}
               >
                 周期打卡
@@ -420,9 +418,14 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
               <button
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   settingsTab === 'count'
-                    ? 'bg-white text-teal-700 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? ''
+                    : ''
                 }`}
+                style={{
+                  backgroundColor: settingsTab === 'count' ? 'var(--color-bg-card)' : 'transparent',
+                  color: settingsTab === 'count' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                  boxShadow: settingsTab === 'count' ? 'var(--shadow-card)' : 'none'
+                }}
                 onClick={() => setSettingsTab('count')}
               >
                 计数打卡

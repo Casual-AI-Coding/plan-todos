@@ -380,17 +380,6 @@ CREATE TABLE circulation_logs (
 
 ---
 
-## 文档更新历史
-
-| 日期 | 操作 |
-|------|------|
-| 2026-02-14 | 创建文档 |
-| 2026-02-14 | Phase 2 详细设计: Priority(P0-P3), Tags(Todo/Plan/Target), Import/Export(含settings) |
-| 2026-02-15 | Phase 3 详细设计: Circulation(打卡) - 周期打卡/计数打卡/Streak/撤销打卡 |
-| 2026-02-19 | Phase 3 完成：UI 优化 - 侧边栏调整、卡片布局、Dashboard/Statistics 集成、种子数据 |
-
----
-
 ## 第四阶段：打卡通知配置（待迭代）
 
 > ⚠️ **重要提醒**：此功能在 Circulation 基础功能完成后进行迭代。

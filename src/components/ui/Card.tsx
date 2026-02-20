@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, CSSProperties } from 'react';
 
 interface CardProps {
   children: ReactNode;
@@ -8,6 +8,7 @@ interface CardProps {
   onClick?: () => void;
   hoverable?: boolean;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  style?: CSSProperties;
 }
 
 export function Card({ 
@@ -15,7 +16,8 @@ export function Card({
   className = '', 
   onClick,
   hoverable = false,
-  padding = 'md'
+  padding = 'md',
+  style
 }: CardProps) {
   const paddingStyles = {
     none: '',
@@ -28,12 +30,16 @@ export function Card({
     <div
       onClick={onClick}
       className={`
-        bg-white rounded-lg border border-teal-100 shadow-sm
+        rounded-lg border shadow-sm
         ${hoverable ? 'hover:shadow-md transition-shadow cursor-pointer' : ''}
         ${paddingStyles[padding]}
         ${className}
       `}
-      style={{ borderColor: '#CCFBF1' }}
+      style={{
+        backgroundColor: 'var(--color-bg-card)',
+        borderColor: 'var(--color-border)',
+        ...style
+      }}
     >
       {children}
     </div>

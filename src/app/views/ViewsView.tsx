@@ -773,7 +773,7 @@ export function ViewsView() {
             }`}
           >
             <span>{mode.icon}</span>
-            <span className="text-sm font-medium" style={{ color: viewMode === mode.id ? '#0D9488' : '#374151' }}>
+            <span className="text-sm font-medium" style={{ color: viewMode === mode.id ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
               {mode.label}
             </span>
           </button>
