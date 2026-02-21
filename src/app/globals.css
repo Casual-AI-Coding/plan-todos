@@ -118,6 +118,13 @@
   --color-secondary: #A6E22E;
 }
 
+/* All themes - Transparent background to show desktop in Tauri */
+html,
+body,
+[data-theme] {
+  background: transparent !important;
+}
+
 /* Glass Theme - True Transparent Frosted Glass (Windows 11 Style) 
  * Note: For true desktop transparency, configure Tauri with:
  * - tauri.conf.json: "transparent": true, "decorations": false
