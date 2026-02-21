@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.2] - 2026-02-21
+
+### Added
+- **4个新主题**: Dracula、Nord、Monokai、Warm (暖色调) 主题
+- **空状态组件**: EmptyState、EmptyStateCard 组件
+- **Toast 通知**: 在 Plans、Targets、Milestones、Todos 等页面添加操作成功/失败提示
+- **进度环组件**: ProgressRing 组件，支持 Dashboard 和打卡详情页
+
+### Changed
+- **主题透明度**: 所有主题支持透明度调节 (5-100%)
+- **主题模糊度**: 所有主题支持模糊效果调节
+- **数字显示**: 大数字使用 K/W/M 格式，悬停显示完整数值
+- **毛玻璃主题**: 替换为暖色调主题，更温馨舒适
+
+### Fixed
+- **Warm 主题**: 修复 CSS 变量未应用的问题
+- **打卡详情**: 进度环仅在计数类型显示，周期类型隐藏
+- **数字溢出**: 修复大数字显示溢出问题
+
+---
+
 ## [0.4.1] - 2026-02-20
 
 ### Added
