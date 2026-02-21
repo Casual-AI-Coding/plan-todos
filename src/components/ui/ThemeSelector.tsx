@@ -106,7 +106,7 @@ function GlassSettingsModal({
           <input
             type="range"
             min="5"
-            max="80"
+            max="100"
             value={tempOpacity}
             onChange={(e) => handleOpacityChange(parseInt(e.target.value, 10))}
             className="w-full h-2 rounded-lg appearance-none cursor-pointer"
@@ -117,7 +117,7 @@ function GlassSettingsModal({
           />
           <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
             <span>5%</span>
-            <span>80%</span>
+            <span>100%</span>
           </div>
         </div>
 

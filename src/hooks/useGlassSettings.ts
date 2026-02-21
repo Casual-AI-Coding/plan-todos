@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-const DEFAULT_BLUR = 30;
-const DEFAULT_OPACITY = 20;
+const DEFAULT_BLUR = 10;
+const DEFAULT_OPACITY = 80;
 
 export function useGlassSettings() {
   const [glassBlur, setGlassBlurState] = useState(DEFAULT_BLUR);
