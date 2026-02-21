@@ -50,7 +50,52 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [isMouseInPopup, setIsMouseInPopup] = useState(false);
   const menuRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear hide timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Handle hover with delay to prevent flickering
+  const handleMenuHover = (menuId: string | null) => {
+    // Clear any pending hide timeout
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setHoveredMenu(menuId);
+  };
+
+  const handleMenuLeave = () => {
+    // Only set timeout if mouse is not entering popup
+    if (!isMouseInPopup) {
+      hideTimeoutRef.current = setTimeout(() => {
+        setHoveredMenu(null);
+      }, 150);
+    }
+  };
+
+  const handlePopupMouseEnter = () => {
+    setIsMouseInPopup(true);
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  };
+
+  const handlePopupMouseLeave = () => {
+    setIsMouseInPopup(false);
+    hideTimeoutRef.current = setTimeout(() => {
+      setHoveredMenu(null);
+    }, 150);
+  };
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -143,12 +188,12 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
     // Handle hover in collapsed mode
     const handleMouseEnter = () => {
       if (isCollapsed && hasChildren) {
-        setHoveredMenu(menu.id);
+        handleMenuHover(menu.id);
       }
     };
     const handleMouseLeave = () => {
       if (isCollapsed && hasChildren) {
-        // Don't hide immediately, wait for mouse to enter popup
+        handleMenuLeave();
       }
     };
 
@@ -244,8 +289,8 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
             top: popupPosition.top,
             left: '4rem',
           }}
-          onMouseEnter={() => setHoveredMenu(hoveredMenu)}
-          onMouseLeave={() => setHoveredMenu(null)}
+          onMouseEnter={handlePopupMouseEnter}
+          onMouseLeave={handlePopupMouseLeave}
         >
           {(() => {
             const menu = menus.find(m => m.id === hoveredMenu);
