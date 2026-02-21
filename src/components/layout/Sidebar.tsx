@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface MenuItem {
   id: string;
@@ -46,6 +46,22 @@ const menus: MenuItem[] = [
 
 export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['settings']));
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Load collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    if (saved) {
+      setIsCollapsed(saved === 'true');
+    }
+  }, []);
+
+  // Save collapsed state to localStorage
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem('sidebar-collapsed', String(newState));
+  };
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -75,6 +91,9 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
       activeMenu === child.id || (child.children?.some(c => activeMenu === c.id))
     );
 
+    // Don't render children when collapsed
+    if (isCollapsed && level > 0) return null;
+
     return (
       <div key={menu.id}>
         <button
@@ -88,7 +107,9 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
           className={`
             w-full flex items-center gap-1.5 px-2 py-2 rounded-md transition-all mb-0.5
             ${level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-8'}
+            ${isCollapsed ? 'justify-center' : ''}
           `}
+          title={isCollapsed ? menu.label : undefined}
           style={{ 
             fontSize: level === 0 ? '15px' : '14px',
             maxWidth: level === 0 ? '100%' : level === 1 ? 'calc(100% - 16px)' : level === 2 ? 'calc(100% - 32px)' : 'calc(100% - 40px)',
@@ -96,16 +117,16 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
             color: isCurrentActive ? 'var(--color-text-inverse)' : 'var(--color-text)',
           }}
         >
-          {hasChildren && (
+          {hasChildren && !isCollapsed && (
             <span className={`w-3 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} style={{ color: isCurrentActive ? 'var(--color-text-inverse)' : 'var(--color-text)', transition: 'transform 0.2s' }}>
               ▶
             </span>
           )}
           <span className="text-base">{menu.icon}</span>
-          <span className="font-medium truncate">{menu.label}</span>
+          {!isCollapsed && <span className="font-medium truncate">{menu.label}</span>}
         </button>
         
-        {hasChildren && isExpanded && (
+        {hasChildren && isExpanded && !isCollapsed && (
           <div className="mb-0.5">
             {menu.children!.map(child => renderMenuItem(child, level + 1))}
           </div>
@@ -116,20 +137,31 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
 
   return (
     <aside 
-      className="w-52 border-r flex flex-col h-screen"
+      className={`border-r flex flex-col h-screen transition-all duration-300`}
       style={{ 
+        width: isCollapsed ? '4rem' : '13rem',
         backgroundColor: 'var(--color-bg-card)',
         borderColor: 'var(--color-border)',
       }}
     >
-      {/* Logo */}
-      <div className="p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
-        <h1 
-          className="text-xl font-bold"
-          style={{ color: 'var(--color-text)', fontFamily: 'var(--font-mono)' }}
+      {/* Header with Logo and Toggle */}
+      <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--color-border)' }}>
+        {!isCollapsed && (
+          <h1 
+            className="text-xl font-bold"
+            style={{ color: 'var(--color-text)', fontFamily: 'var(--font-mono)' }}
+          >
+            Plan Todos
+          </h1>
+        )}
+        <button
+          onClick={toggleCollapse}
+          className="p-1 rounded hover:opacity-80 transition-opacity"
+          style={{ color: 'var(--color-text-muted)' }}
+          title={isCollapsed ? '展开侧边栏' : '收起侧边栏'}
         >
-          Plan Todos
-        </h1>
+          {isCollapsed ? '→' : '←'}
+        </button>
       </div>
 
       {/* Navigation */}
