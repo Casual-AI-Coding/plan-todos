@@ -4,7 +4,23 @@ import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input } from '@/components/ui';
 import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { CirculationDetailView } from './CirculationDetailView';
 import {
   getCirculations,
@@ -33,6 +49,182 @@ interface TodayStats {
 interface CirculationsViewProps {
   mode?: ViewMode;
   onNavigate?: (id: string) => void;
+}
+
+// Sortable Card Component
+interface SortableCardProps {
+  circulation: Circulation;
+  todayStats: Record<string, TodayStats>;
+  isCompletedToday: boolean;
+  onCheckin: () => void;
+  onUndo: () => void;
+  onViewDetail: () => void;
+}
+
+function SortableCard({
+  circulation,
+  todayStats,
+  isCompletedToday,
+  onCheckin,
+  onUndo,
+  onViewDetail,
+}: SortableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: circulation.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1000 : 'auto',
+  };
+
+  const isPeriodic = circulation.circulation_type === 'periodic';
+
+  return (
+    <div ref={setNodeRef} style={style} className="col-span-1" {...attributes} {...listeners}>
+      <Card className="hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
+        <div className="flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-2">
+            <div
+              className="font-semibold cursor-pointer hover:opacity-80 truncate flex items-center gap-1"
+              onClick={onViewDetail}
+              title={circulation.title}
+            >
+              {isPeriodic ? (
+                <span className="text-lg">🔄</span>
+              ) : (
+                <span className="text-lg">📊</span>
+              )}
+              <span style={{ color: 'var(--color-text)' }}>{circulation.title}</span>
+            </div>
+            {/* Status Badge */}
+            <div className="flex items-center gap-1">
+              {isPeriodic ? (
+                isCompletedToday ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-success)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
+                    ✓ 已完成
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
+                    ○ 待打卡
+                  </span>
+                )
+              ) : (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
+                  计数打卡
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Type Label */}
+          <div className="text-xs mb-2" style={{ color: 'var(--color-text-muted)' }}>
+            {isPeriodic
+              ? '周期打卡'
+              : `今日已打卡 ${todayStats[circulation.id]?.count || 0} 次 · 进度 +${todayStats[circulation.id]?.progress || 0}`
+            }
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            {isPeriodic ? (
+              <>
+                <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                  <div className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>{circulation.streak_count}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>连续天数</div>
+                </div>
+                <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                  <div className="text-xl font-bold" style={{ color: 'var(--color-warning)' }}>{circulation.best_streak}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>最佳记录</div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                  <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>{todayStats[circulation.id]?.count || 0}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日次数</div>
+                </div>
+                <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                  <div className="text-xl font-bold" style={{ color: 'var(--color-success)' }}>+{todayStats[circulation.id]?.progress || 0}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
+                </div>
+              </>
+            )}
+            {!isPeriodic && circulation.target_count && (
+              <div className="col-span-2 rounded-md p-2" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>总进度</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>{circulation.current_count} / {circulation.target_count}</span>
+                </div>
+                <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border-light)' }}>
+                  <div
+                    className="h-2 rounded-full"
+                    style={{ width: `${Math.min((circulation.current_count / circulation.target_count) * 100, 100)}%`, backgroundColor: 'var(--color-accent)' }}
+                  />
+                </div>
+              </div>
+            )}
+            {circulation.last_completed_at && (
+              <div className="col-span-2 rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                <div className="text-sm" style={{ color: 'var(--color-text)' }}>
+                  {new Date(circulation.last_completed_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>上次打卡</div>
+              </div>
+            )}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-2 mt-auto">
+            {isPeriodic ? (
+              isCompletedToday ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1 text-xs"
+                  onClick={onUndo}
+                >
+                  撤销打卡
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="flex-1 text-xs"
+                  onClick={onCheckin}
+                >
+                  立即打卡
+                </Button>
+              )
+            ) : (
+              <Button
+                size="sm"
+                className="flex-1 text-xs"
+                onClick={onCheckin}
+              >
+                打卡 +1
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="text-xs px-3"
+              onClick={onViewDetail}
+            >
+              详情
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
 }
 
 export function CirculationsView({ mode = 'today', onNavigate }: CirculationsViewProps) {
@@ -156,23 +348,29 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
     setTodayCirculationsOrdered(newOrder);
   }
 
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+  // Dnd-kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
-    const sourceIndex = result.source.index;
-    const destinationIndex = result.destination.index;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-    if (sourceIndex === destinationIndex) return;
+    if (!over || active.id === over.id) return;
 
-    const currentList = todayCirculationsOrdered.length > 0 
-      ? todayCirculationsOrdered 
-      : todayCirculations;
-    
-    const newItems = Array.from(currentList);
-    const [removed] = newItems.splice(sourceIndex, 1);
-    newItems.splice(destinationIndex, 0, removed);
+    const oldIndex = todayCirculationsOrdered.findIndex((c) => c.id === active.id);
+    const newIndex = todayCirculationsOrdered.findIndex((c) => c.id === over.id);
 
-    setTodayCirculationsOrdered(newItems);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setTodayCirculationsOrdered(arrayMove(todayCirculationsOrdered, oldIndex, newIndex));
+    }
   };
 
   // Handle create/update
@@ -263,191 +461,48 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
 
       {/* Today View */}
       {viewMode === 'today' && (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="circulations-today" direction="vertical">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-              >
-                {todayCirculations.length === 0 ? (
-                  <div className="w-full">
-                    <Card>
-                      <div className="text-center py-8 text-gray-500">
-                        <p className="text-lg">今日没有待打卡项</p>
-                        <Button
-                          className="mt-4"
-                          onClick={() => setViewMode('settings')}
-                        >
-                          去创建打卡
-                        </Button>
-                      </div>
-                    </Card>
-                  </div>
-                ) : (
-                  (todayCirculationsOrdered.length > 0 ? todayCirculationsOrdered : todayCirculations).map((c, index) => {
-                    const isPeriodic = c.circulation_type === 'periodic';
-                    const isDoneToday = isCompletedToday(c);
-                    
-                    return (
-                      <Draggable key={c.id} draggableId={c.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="col-span-1"
-                            style={{
-                              ...provided.draggableProps.style,
-                              opacity: snapshot.isDragging ? 0.8 : 1,
-                            }}
-                          >
-                            <Card className="hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
-                              <div className="flex flex-col">
-                                {/* Header */}
-                                <div className="flex items-center justify-between mb-2">
-                                  <div 
-                                    className="font-semibold cursor-pointer hover:opacity-80 truncate flex items-center gap-1" 
-                                    onClick={() => setDetailCirculation(c)}
-                                    title={c.title}
-                                  >
-                                    {isPeriodic ? (
-                                      <span className="text-lg">🔄</span>
-                                    ) : (
-                                      <span className="text-lg">📊</span>
-                                    )}
-                                    <span style={{ color: 'var(--color-text)' }}>{c.title}</span>
-                                  </div>
-                                  {/* Status Badge */}
-                                  <div className="flex items-center gap-1">
-                                    {isPeriodic ? (
-                                      isDoneToday ? (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-success)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
-                                          ✓ 已完成
-                                        </span>
-                                      ) : (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
-                                          ○ 待打卡
-                                        </span>
-                                      )
-                                    ) : (
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
-                                        计数打卡
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                                
-                                {/* Type Label */}
-                                <div className="text-xs mb-2" style={{ color: 'var(--color-text-muted)' }}>
-                                  {isPeriodic 
-                                    ? '周期打卡' 
-                                    : `今日已打卡 ${todayStats[c.id]?.count || 0} 次 · 进度 +${todayStats[c.id]?.progress || 0}`
-                                  }
-                                </div>
-                                
-                                {/* Stats Grid */}
-                                <div className="grid grid-cols-2 gap-2 mb-3">
-                                  {isPeriodic ? (
-                                    <>
-                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                                        <div className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>{c.streak_count}</div>
-                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>连续天数</div>
-                                      </div>
-                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                                        <div className="text-xl font-bold" style={{ color: 'var(--color-warning)' }}>{c.best_streak}</div>
-                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>最佳记录</div>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                                        <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>{todayStats[c.id]?.count || 0}</div>
-                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日次数</div>
-                                      </div>
-                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                                        <div className="text-xl font-bold" style={{ color: 'var(--color-success)' }}>+{todayStats[c.id]?.progress || 0}</div>
-                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
-                                      </div>
-                                    </>
-                                  )}
-                                  {!isPeriodic && c.target_count && (
-                                    <div className="col-span-2 rounded-md p-2" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                                      <div className="flex justify-between items-center mb-1">
-                                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>总进度</span>
-                                        <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>{c.current_count} / {c.target_count}</span>
-                                      </div>
-                                      <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border-light)' }}>
-                                        <div 
-                                          className="h-2 rounded-full" 
-                                          style={{ width: `${Math.min((c.current_count / c.target_count) * 100, 100)}%`, backgroundColor: 'var(--color-accent)' }}
-                                        />
-                                      </div>
-                                    </div>
-                                  )}
-                                  {c.last_completed_at && (
-                                    <div className="col-span-2 rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                                      <div className="text-sm" style={{ color: 'var(--color-text)' }}>
-                                        {new Date(c.last_completed_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                      </div>
-                                      <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>上次打卡</div>
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                {/* Buttons */}
-                                <div className="flex gap-2 mt-auto">
-                                  {isPeriodic ? (
-                                    isDoneToday ? (
-                                      <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        className="flex-1 text-xs"
-                                        onClick={() => handleUndo(c)}
-                                      >
-                                        撤销打卡
-                                      </Button>
-                                    ) : (
-                                      <Button 
-                                        size="sm"
-                                        className="flex-1 text-xs"
-                                        onClick={() => setCheckinTarget(c)}
-                                      >
-                                        立即打卡
-                                      </Button>
-                                    )
-                                  ) : (
-                                    <Button 
-                                      size="sm"
-                                      className="flex-1 text-xs"
-                                      onClick={() => setCheckinTarget(c)}
-                                    >
-                                      打卡 +1
-                                    </Button>
-                                  )}
-                                  <Button 
-                                    variant="secondary" 
-                                    size="sm"
-                                    className="text-xs px-3"
-                                    onClick={() => setDetailCirculation(c)}
-                                  >
-                                    详情
-                                  </Button>
-                                </div>
-                              </div>
-                            </Card>
-                          </div>
-                        )}
-                      </Draggable>
-                    );
-                  })
-                )}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={todayCirculationsOrdered.map(c => c.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {todayCirculations.length === 0 ? (
+                <div className="w-full">
+                  <Card>
+                    <div className="text-center py-8 text-gray-500">
+                      <p className="text-lg">今日没有待打卡项</p>
+                      <Button
+                        className="mt-4"
+                        onClick={() => setViewMode('settings')}
+                      >
+                        去创建打卡
+                      </Button>
+                    </div>
+                  </Card>
+                </div>
+              ) : (
+                (todayCirculationsOrdered.length > 0 ? todayCirculationsOrdered : todayCirculations).map((c) => {
+                  return (
+                    <SortableCard
+                      key={c.id}
+                      circulation={c}
+                      todayStats={todayStats}
+                      isCompletedToday={isCompletedToday(c)}
+                      onCheckin={() => setCheckinTarget(c)}
+                      onUndo={() => handleUndo(c)}
+                      onViewDetail={() => setDetailCirculation(c)}
+                    />
+                  );
+                })
+              )}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       {/* Settings View */}

@@ -1,32 +1,35 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Draggable } from '@hello-pangea/dnd';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface DraggableCardProps {
   children: ReactNode;
-  index: number;
   id: string;
 }
 
-export function DraggableCard({ children, index, id }: DraggableCardProps) {
+export function DraggableCard({ children, id }: DraggableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1000 : 'auto',
+  };
+
   return (
-    <Draggable draggableId={id} index={index}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          style={{
-            ...provided.draggableProps.style,
-            opacity: snapshot.isDragging ? 0.8 : 1,
-          }}
-          className={snapshot.isDragging ? 'z-50' : ''}
-        >
-          {children}
-        </div>
-      )}
-    </Draggable>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={isDragging ? 'z-50' : ''}>
+      {children}
+    </div>
   );
 }
 

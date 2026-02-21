@@ -1,7 +1,55 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+interface SortableItemProps<T> {
+  item: T;
+  index: number;
+  renderItem: (item: T, index: number) => ReactNode;
+  getItemId: (item: T) => string;
+}
+
+function SortableItem<T>({ item, index, renderItem, getItemId }: SortableItemProps<T>) {
+  const id = getItemId(item);
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1000 : 'auto',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {renderItem(item, index)}
+    </div>
+  );
+}
 
 interface SortableListProps<T> {
   items: T[];
@@ -16,55 +64,53 @@ export function SortableList<T>({
   renderItem,
   getItemId,
 }: SortableListProps<T>) {
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
-    const sourceIndex = result.source.index;
-    const destinationIndex = result.destination.index;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-    if (sourceIndex === destinationIndex) return;
+    if (!over || active.id === over.id) return;
 
-    const newItems = Array.from(items);
-    const [removed] = newItems.splice(sourceIndex, 1);
-    newItems.splice(destinationIndex, 0, removed);
+    const oldIndex = items.findIndex((item) => getItemId(item) === active.id);
+    const newIndex = items.findIndex((item) => getItemId(item) === over.id);
 
-    onReorder(newItems);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onReorder(arrayMove(items, oldIndex, newIndex));
+    }
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable droppableId="sortable-list" direction="horizontal">
-        {(provided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className="flex flex-wrap gap-4"
-          >
-            {items.map((item, index) => (
-              <Draggable key={getItemId(item)} draggableId={getItemId(item)} index={index}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={{
-                      ...provided.draggableProps.style,
-                      opacity: snapshot.isDragging ? 0.8 : 1,
-                      transform: snapshot.isDragging 
-                        ? provided.draggableProps.style?.transform 
-                        : 'none',
-                    }}
-                  >
-                    {renderItem(item, index)}
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={items.map(getItemId)}
+        strategy={rectSortingStrategy}
+      >
+        <div className="flex flex-wrap gap-4">
+          {items.map((item, index) => (
+            <SortableItem
+              key={getItemId(item)}
+              item={item}
+              index={index}
+              renderItem={renderItem}
+              getItemId={getItemId}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 
