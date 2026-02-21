@@ -128,21 +128,6 @@ body,
 }
 
 /* Theme blur/opacity settings - Apply to all themes */
-  -webkit-backdrop-filter: blur(var(--glass-blur, 10px)) saturate(180%) !important;
-  border-radius: 16px;
-  margin: 8px;
-  padding: 16px;
-}
-
-/* Glass Theme Cards - Frosted glass with adjustable blur */
-/* Target Card component and other UI elements */
-[data-theme="glass"] .card,
-[data-theme="glass"] [class*="Card"],
-[data-theme="glass"] .glass-card,
-[data-theme="glass"] [data-glas="true"] {
-  background: linear-gradient(135deg, rgba(255, 255, 255, var(--glass-opacity, 0.2)) 0%, rgba(255, 255, 255, calc(var(--glass-opacity, 0.2) * 0.5)) 100%) !important;
-  backdrop-filter: blur(var(--glass-blur, 10px)) saturate(180%) !important;
-/* Theme blur/opacity settings - Apply to all themes */
 main,
 .view-container {
   backdrop-filter: blur(var(--glass-blur, 0px)) saturate(100%);
