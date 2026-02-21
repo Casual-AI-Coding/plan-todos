@@ -133,7 +133,7 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
           <>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-500 truncate" title={formatNumberWithTooltip(circulation.current_count).title}>
+                <div className="text-3xl font-bold text-blue-500" title={formatNumberWithTooltip(circulation.current_count).title}>
                   {formatNumberWithTooltip(circulation.current_count).display}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">已完成</div>
@@ -141,7 +141,7 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             </Card>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-600 truncate" title={circulation.target_count ? formatNumberWithTooltip(circulation.target_count).title : '无限制'}>
+                <div className="text-3xl font-bold text-gray-600" title={circulation.target_count ? formatNumberWithTooltip(circulation.target_count).title : '无限制'}>
                   {circulation.target_count ? formatNumberWithTooltip(circulation.target_count).display : '∞'}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">目标</div>
