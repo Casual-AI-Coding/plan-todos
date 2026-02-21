@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, Checkbox } from '@/components/ui';
 import { Calendar } from '@/components/ui/Calendar';
+import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
+import { useToast } from '@/components/ui/Toast';
 import { getTodos, createTodo, updateTodo, deleteTodo, Todo, Priority, Tag, getTags, getEntityTags, setEntityTags } from '@/lib/api';
 
 interface CalendarEvent {
@@ -31,6 +33,7 @@ export function TodosView() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const isLoaded = useRef(false);
+  const toast = useToast();
 
   async function loadTodos() {
     try {
@@ -100,9 +103,11 @@ export function TodosView() {
       if (editingTodo) {
         await updateTodo(editingTodo.id, { title, content: content || undefined, due_date: dueDate || undefined, priority });
         todoId = editingTodo.id;
+        toast.success('待办已更新');
       } else {
         const newTodo = await createTodo({ title, content: content || undefined, due_date: dueDate || undefined, priority });
         todoId = newTodo.id;
+        toast.success('待办已创建');
       }
       // Save tags
       await setEntityTags('todo', todoId, selectedTags);
@@ -114,18 +119,23 @@ export function TodosView() {
       setPriority('P2');
       setSelectedTags([]);
       loadTodos();
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error(e);
+      toast.error('操作失败');
+    }
   }
 
   async function handleToggle(todo: Todo) {
     const next = todo.status === 'done' ? 'pending' : 'done';
     await updateTodo(todo.id, { status: next });
+    toast.success(next === 'done' ? '已完成' : '已取消完成');
     loadTodos();
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Delete?')) return;
     await deleteTodo(id);
+    toast.success('待办已删除');
     loadTodos();
   }
 
@@ -335,7 +345,12 @@ export function TodosView() {
           </Card>
         ))}
         {filteredTodos.length === 0 && (
-          <p className="text-gray-400 text-center py-8">暂无数据</p>
+          <EmptyStateCard 
+            icon="📋" 
+            title="暂无待办事项" 
+            description="创建你的第一个待办事项来开始使用"
+            action={<Button onClick={() => setShowForm(true)}>+ 创建待办</Button>}
+          />
         )}
       </div>
       ) : (

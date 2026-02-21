@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card, ProgressBar, Checkbox } from '@/components/ui';
+import { ProgressRing } from '@/components/ui/ProgressRing';
 import { getDashboard, type Dashboard } from '@/lib/api';
 
 export function Dashboard() {
@@ -106,6 +107,37 @@ export function Dashboard() {
           </Card>
         </div>
       )}
+
+      {/* Progress Rings */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="flex flex-col items-center justify-center py-6">
+          <ProgressRing 
+            value={overview.productivity_score || 0} 
+            size={100}
+            strokeWidth={8}
+            label="效率"
+          />
+          <div className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>效率评分</div>
+        </Card>
+        <Card className="flex flex-col items-center justify-center py-6">
+          <ProgressRing 
+            value={overview.completed_today_count > 0 ? Math.min(100, (overview.completed_today_count / overview.today_todos_count) * 100) : 0} 
+            size={100}
+            strokeWidth={8}
+            label="完成"
+          />
+          <div className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
+        </Card>
+        <Card className="flex flex-col items-center justify-center py-6">
+          <ProgressRing 
+            value={dashboard.circulation_stats ? Math.min(100, (dashboard.circulation_stats.current_streak / 30) * 100) : 0} 
+            size={100}
+            strokeWidth={8}
+            label="连续"
+          />
+          <div className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>30天连续</div>
+        </Card>
+      </div>
 
       {/* Today's Tasks */}
       <Card>

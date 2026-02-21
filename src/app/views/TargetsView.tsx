@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar, Checkbox } from '@/components/ui';
+import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
 import { 
   getTargets, getSteps, createTarget, deleteTarget,
   createStep, updateStep, deleteStep, Target, Step, Tag,
@@ -225,7 +226,12 @@ export function TargetsView() {
           );
         })}
         {filteredTargets.length === 0 && (
-          <p className="text-gray-400 text-center py-8">暂无目标</p>
+          <EmptyStateCard 
+            icon="🎯" 
+            title="暂无目标" 
+            description="创建你的第一个目标来开始使用"
+            action={<Button onClick={() => setShowForm(true)}>+ 创建目标</Button>}
+          />
         )}
       </div>
 

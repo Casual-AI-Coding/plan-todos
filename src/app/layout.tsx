@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fira_Code, Fira_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { ToastProvider, ToastContainer } from "@/components/ui/Toast";
 import "./globals.css";
 
 const firaCode = Fira_Code({
@@ -49,10 +50,13 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${firaCode.variable} ${firaSans.variable} antialiased`}
+        className={`${firaCode.variable} ${firaSans.variable} antialiased min-h-screen`}
       >
         <ThemeProvider>
-          {children}
+          <ToastProvider>
+            {children}
+            <ToastContainer />
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input } from '@/components/ui';
 import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
+import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
 import { CirculationDetailView } from './CirculationDetailView';
 import {
   getCirculations,
@@ -467,9 +468,12 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {filteredCirculations.length === 0 ? (
               <Card className="col-span-full">
-                <div className="text-center py-8 text-gray-500">
-                  暂无打卡项
-                </div>
+                <EmptyStateCard 
+                  icon="🔄" 
+                  title="今日暂无打卡" 
+                  description="创建你的第一个打卡项来开始"
+                  action={<Button onClick={() => setShowForm(true)}>+ 创建打卡</Button>}
+                />
               </Card>
             ) : (
               filteredCirculations.map(c => (

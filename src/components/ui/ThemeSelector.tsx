@@ -1,46 +1,249 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { useTheme, ThemeId } from '@/hooks/useTheme';
-import { themes, themeList } from '@/lib/themes/registry';
+import { themeList } from '@/lib/themes/registry';
+import { useGlassSettings } from '@/hooks/useGlassSettings';
+import { Modal, Button } from '@/components/ui';
+
+// Custom theme order: Light -> Dark -> Glass -> Dracula -> Nord -> Monokai
+const themeOrder: ThemeId[] = ['light', 'dark', 'glass', 'dracula', 'nord', 'monokai'];
+
+function reorderThemes(themes: typeof themeList) {
+  return [...themes].sort((a, b) => {
+    const orderA = themeOrder.indexOf(a.id);
+    const orderB = themeOrder.indexOf(b.id);
+    return orderA - orderB;
+  });
+}
+
+function GlassSettingsModal({ 
+  open, 
+  onClose 
+}: { 
+  open: boolean; 
+  onClose: () => void;
+}) {
+  const { glassBlur, glassOpacity, setGlassBlur, setGlassOpacity } = useGlassSettings();
+  const [tempBlur, setTempBlur] = useState(glassBlur);
+  const [tempOpacity, setTempOpacity] = useState(glassOpacity);
+
+  // Reset temp values when modal opens
+  useEffect(() => {
+    if (open) {
+      setTempBlur(glassBlur);
+      setTempOpacity(glassOpacity);
+    }
+  }, [open, glassBlur, glassOpacity]);
+
+  const handleConfirm = () => {
+    setGlassBlur(tempBlur);
+    setGlassOpacity(tempOpacity);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    // Reset to saved values
+    document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
+    document.documentElement.style.setProperty('--glass-opacity', `${glassOpacity / 100}`);
+    onClose();
+  };
+
+  // Apply preview in real-time
+  const handleBlurChange = (value: number) => {
+    setTempBlur(value);
+    document.documentElement.style.setProperty('--glass-blur', `${value}px`);
+  };
+
+  const handleOpacityChange = (value: number) => {
+    setTempOpacity(value);
+    document.documentElement.style.setProperty('--glass-opacity', `${value / 100}`);
+  };
+
+  return (
+    <Modal 
+      open={open} 
+      title="Glass Theme Settings"
+      onClose={handleCancel}
+      footer={
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleConfirm}>Confirm</Button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        {/* Blur Slider */}
+        <div>
+          <div className="flex justify-between mb-2">
+            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Blur (模糊)</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>{tempBlur}px</span>
+          </div>
+          <input
+            type="range"
+            min="5"
+            max="30"
+            value={tempBlur}
+            onChange={(e) => handleBlurChange(parseInt(e.target.value, 10))}
+            className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+            style={{ 
+              background: 'var(--color-border)',
+              accentColor: 'var(--color-primary)'
+            }}
+          />
+          <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+            <span>5px</span>
+            <span>30px</span>
+          </div>
+        </div>
+        
+        {/* Opacity Slider */}
+        <div>
+          <div className="flex justify-between mb-2">
+            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Opacity (透明度)</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>{tempOpacity}%</span>
+          </div>
+          <input
+            type="range"
+            min="5"
+            max="80"
+            value={tempOpacity}
+            onChange={(e) => handleOpacityChange(parseInt(e.target.value, 10))}
+            className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+            style={{ 
+              background: 'var(--color-border)',
+              accentColor: 'var(--color-primary)'
+            }}
+          />
+          <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+            <span>5%</span>
+            <span>80%</span>
+          </div>
+        </div>
+
+        {/* Preview Card */}
+        <div>
+          <span className="font-medium mb-2 block" style={{ color: 'var(--color-text)' }}>Preview (预览)</span>
+          <div 
+            className="p-4 rounded-lg"
+            style={{
+              background: `linear-gradient(135deg, rgba(255, 255, 255, ${tempOpacity / 100}) 0%, rgba(255, 255, 255, ${tempOpacity / 100 * 0.5}) 100%)`,
+              backdropFilter: `blur(${tempBlur}px) saturate(180%)`,
+              WebkitBackdropFilter: `blur(${tempBlur}px) saturate(180%)`,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+          >
+            <div className="font-semibold mb-1" style={{ color: '#fff' }}>Card Title</div>
+            <div className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              This is a preview of your glass card with blur: {tempBlur}px, opacity: {tempOpacity}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
 
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
+  const orderedThemes = reorderThemes(themeList);
+  const [showGlassModal, setShowGlassModal] = useState(false);
+  const { glassBlur, glassOpacity } = useGlassSettings();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Apply glass settings when Glass theme is active - ALWAYS apply when on glass theme
+  useEffect(() => {
+    // Apply glass CSS variables whenever theme is glass
+    document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
+    document.documentElement.style.setProperty('--glass-opacity', `${glassOpacity / 100}`);
+    
+    // If not in Tauri, add a background so blur is visible in browser
+    // In Tauri, the window is transparent and shows the desktop
+    if (typeof window !== 'undefined' && !(window as any).__TAURI__) {
+      document.body.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
+    } else {
+      document.body.style.background = 'transparent';
+    }
+  }, [theme, glassBlur, glassOpacity]);
+
+  // Apply glass theme when modal opens
+  useEffect(() => {
+    if (showGlassModal && theme !== 'glass') {
+      setTheme('glass');
+    }
+  }, [showGlassModal, theme, setTheme]);
+
+  // Click once to switch theme
+  // If already on Glass and click Glass again, open modal
+  const handleThemeClick = (e: React.MouseEvent<HTMLButtonElement>, themeId: ThemeId) => {
+    // Remove focus from clicked button immediately
+    e.currentTarget.blur();
+    
+    if (themeId === 'glass') {
+      if (theme === 'glass') {
+        setShowGlassModal(true);
+      } else {
+        setTheme(themeId);
+      }
+    } else {
+      setTheme(themeId);
+    }
+  };
+  
+  // Prevent focus on mouse down
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+  };
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {themeList.map((t) => {
-        const isActive = theme === t.id;
-        
-        return (
-          <button
-            key={t.id}
-            onClick={() => setTheme(t.id as ThemeId)}
-            className={`
-              p-4 rounded-lg border-2 transition-all flex flex-col items-center
-              ${isActive 
-                ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10' 
-                : 'border-[var(--color-border)] hover:border-[var(--color-primary)]/50'
-              }
-            `}
-          >
-            <div 
-              className="w-12 h-12 rounded-md mb-2 flex items-center justify-center text-xl border"
+    <div data-theme-selector ref={containerRef}>
+      <div className="grid grid-cols-3 gap-3">
+        {orderedThemes.map((t) => {
+          const isActive = theme === t.id;
+          
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={(e) => handleThemeClick(e, t.id)}
+              onMouseDown={handleMouseDown}
+              className={`
+                p-4 rounded-lg border-2 transition-all flex flex-col items-center
+                select-none
+                ${isActive 
+                  ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/15' 
+                  : 'border-[var(--color-border)] hover:border-[var(--color-primary)]/50'
+                }
+              `}
               style={{ 
-                background: t.colors.bg,
-                borderColor: t.colors.border,
+                background: isActive ? undefined : t.colors.bg,
               }}
             >
-              {t.icon}
-            </div>
-            <span 
-              className="text-sm font-medium"
-              style={{ color: isActive ? 'var(--color-primary)' : 'var(--color-text)' }}
-            >
-              {t.nameZh}
-            </span>
-          </button>
-        );
-      })}
+              <div 
+                className="w-12 h-12 rounded-md mb-2 flex items-center justify-center text-xl border"
+                style={{ 
+                  background: t.colors.bg,
+                  borderColor: t.colors.border,
+                }}
+              >
+                {t.icon}
+              </div>
+              <span 
+                className="text-sm font-medium"
+                style={{ color: isActive ? 'var(--color-primary)' : 'var(--color-text)' }}
+              >
+                {t.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      
+      {/* Glass Theme Settings Modal */}
+      <GlassSettingsModal 
+        open={showGlassModal} 
+        onClose={() => setShowGlassModal(false)}
+      />
     </div>
   );
 }

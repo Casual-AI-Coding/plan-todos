@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar, Checkbox } from '@/components/ui';
+import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
 import { 
   getPlans, getTasksByPlan, createPlan, updatePlan, deletePlan,
   createTask, updateTask, deleteTask, Plan, Task, Tag, 
@@ -222,7 +223,12 @@ export function PlansView() {
           );
         })}
         {filteredPlans.length === 0 && (
-          <p className="text-gray-400 text-center py-8">暂无计划</p>
+          <EmptyStateCard 
+            icon="📝" 
+            title="暂无计划" 
+            description="创建你的第一个计划来开始使用"
+            action={<Button onClick={() => setShowForm(true)}>+ 创建计划</Button>}
+          />
         )}
       </div>
 
