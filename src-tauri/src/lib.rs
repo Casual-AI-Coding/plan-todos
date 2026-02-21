@@ -1,5 +1,4 @@
 // Library crate for Tauri Android builds
-pub use crate::commands;
 pub use crate::models::AppState;
 
 mod commands;
@@ -65,7 +64,6 @@ pub fn run() {
             commands::todos::create_todo,
             commands::todos::update_todo,
             commands::todos::delete_todo,
-            commands::todos::toggle_todo,
             commands::plans::get_plans,
             commands::plans::create_plan,
             commands::plans::update_plan,
@@ -98,16 +96,20 @@ pub fn run() {
             commands::steps::create_step,
             commands::steps::update_step,
             commands::steps::delete_step,
-            commands::steps::toggle_step,
             commands::search::search_all,
             commands::import::import_data,
             commands::export::export_data,
             commands::statistics::get_statistics,
             commands::notification_plugins::get_notification_plugins,
-            commands::notifications::send_notification,
-            commands::command_log::get_command_logs,
-            commands::batch::batch_create,
-            commands::batch::batch_update,
+            commands::notifications::get_notification_settings,
+            commands::notifications::set_notification_settings,
+            commands::notifications::delete_notification_settings,
+            commands::notifications::get_daily_summary_settings,
+            commands::notifications::update_daily_summary_settings,
+            commands::notifications::get_due_reminders,
+            commands::notifications::mark_reminder_sent,
+            commands::notifications::get_daily_summary,
+            commands::batch::bulk_update_todo_status,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");
