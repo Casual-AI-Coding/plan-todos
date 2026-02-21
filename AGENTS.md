@@ -423,6 +423,7 @@ For complex git operations, use the `git-master` skill:
 |------|----------|
 | `package.json` | 更新 `"version": "x.x.x"` |
 | `src-tauri/tauri.conf.json` | 更新 `"version": "x.x.x"` |
+| `src-tauri/Cargo.toml` | 更新 `version = "x.x.x"` |
 | `CHANGELOG.md` | 添加新版本发布说明 |
 
 **发布步骤:**
@@ -430,8 +431,9 @@ For complex git operations, use the `git-master` skill:
 ```bash
 # 1. 修改版本号 (package.json)
 # 2. 修改版本号 (src-tauri/tauri.conf.json)
-# 3. 更新 CHANGELOG.md
-# 4. 检查文档是否需要更新
+# 3. 修改版本号 (src-tauri/Cargo.toml)
+# 4. 更新 CHANGELOG.md
+# 5. 检查文档是否需要更新
 
 # 5. 提交更改
 git add -A
