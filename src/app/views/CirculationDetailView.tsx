@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Card, Button, Modal } from '@/components/ui';
+import { Card, Button, Modal, ProgressRing } from '@/components/ui';
 import {
   getCirculation,
   getCirculationLogs,
@@ -81,6 +81,21 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
 
   const detailContent = circulation ? (
     <>
+      {/* Progress Ring */}
+      <div className="flex justify-center mb-6">
+        <ProgressRing
+          value={
+            circulation.circulation_type === 'count' && circulation.target_count
+              ? Math.min(100, (circulation.current_count / circulation.target_count) * 100)
+              : (isCompletedToday() ? 100 : 0)
+          }
+          size={120}
+          strokeWidth={10}
+          color={isCompletedToday() ? 'var(--color-success)' : 'var(--color-primary)'}
+          label={isCompletedToday() ? '今日完成' : '今日进度'}
+        />
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card>

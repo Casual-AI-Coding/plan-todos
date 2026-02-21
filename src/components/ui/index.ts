@@ -1,6 +1,7 @@
 export { Button } from './Button';
 export { Modal } from './Modal';
 export { ProgressBar } from './ProgressBar';
+export { ProgressRing } from './ProgressRing';
 export { Input } from './Input';
 export { Card } from './Card';
 export { Checkbox } from './Checkbox';
