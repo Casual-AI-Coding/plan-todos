@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input } from '@/components/ui';
 import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
+import { SortableList } from '@/components/ui/SortableList';
 import { CirculationDetailView } from './CirculationDetailView';
 import {
   getCirculations,
@@ -38,6 +39,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
   const [viewMode, setViewMode] = useState<ViewMode>(mode);
   const [circulations, setCirculations] = useState<Circulation[]>([]);
   const [todayCirculations, setTodayCirculations] = useState<Circulation[]>([]);
+  const [todayCirculationsOrdered, setTodayCirculationsOrdered] = useState<Circulation[]>([]);
   const [todayStats, setTodayStats] = useState<Record<string, TodayStats>>({});
   
   // Settings tabs
@@ -79,6 +81,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
           return false;
         });
         setTodayCirculations(todayList);
+        setTodayCirculationsOrdered(todayList);
         
         // Load today's stats for count-type circulations
         const stats: Record<string, TodayStats> = {};
@@ -146,6 +149,11 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
     } catch (e) {
       console.error(e);
     }
+  }
+
+  // Handle reorder circulations (local only, not persisted)
+  function handleReorderCirculations(newOrder: Circulation[]) {
+    setTodayCirculationsOrdered(newOrder);
   }
 
   // Handle create/update
@@ -250,7 +258,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
               </div>
             </Card>
           ) : (
-            todayCirculations.map(c => {
+            (todayCirculationsOrdered.length > 0 ? todayCirculationsOrdered : todayCirculations).map(c => {
               const isPeriodic = c.circulation_type === 'periodic';
               const isDoneToday = isCompletedToday(c);
               
