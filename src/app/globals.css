@@ -10,15 +10,17 @@
   --color-primary: #0D9488;
   --color-secondary: #14B8A6;
   --color-cta: #F97316;
+  --glass-blur: 0px;
+  --glass-opacity: 1;
 }
 
-/* Light Theme (default) */
+/* Light Theme (default) - with transparency */
 [data-theme="light"],
 :root {
-  --color-bg: #F0FDFA;
-  --color-bg-card: #ffffff;
-  --color-bg-elevated: #ffffff;
-  --color-bg-hover: #F0FDFA;
+  --color-bg: rgba(240, 253, 250, var(--glass-opacity, 1));
+  --color-bg-card: rgba(255, 255, 255, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(255, 255, 255, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(240, 253, 250, var(--glass-opacity, 1));
   --color-text: #134E4A;
   --color-text-muted: #64748B;
   --color-text-inverse: #ffffff;
@@ -34,12 +36,12 @@
   --color-secondary: #14B8A6;
 }
 
-/* Dark Theme */
+/* Dark Theme - with transparency */
 [data-theme="dark"] {
-  --color-bg: #0F172A;
-  --color-bg-card: #1E293B;
-  --color-bg-elevated: #334155;
-  --color-bg-hover: #334155;
+  --color-bg: rgba(15, 23, 42, var(--glass-opacity, 1));
+  --color-bg-card: rgba(30, 41, 59, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(51, 65, 85, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(51, 65, 85, var(--glass-opacity, 1));
   --color-text: #F8FAFC;
   --color-text-muted: #94A3B8;
   --color-text-inverse: #0F172A;
@@ -55,12 +57,12 @@
   --color-secondary: #5EEAD4;
 }
 
-/* Dracula Theme */
+/* Dracula Theme - with transparency */
 [data-theme="dracula"] {
-  --color-bg: #282A36;
-  --color-bg-card: #383A59;
-  --color-bg-elevated: #44475A;
-  --color-bg-hover: #44475A;
+  --color-bg: rgba(40, 42, 54, var(--glass-opacity, 1));
+  --color-bg-card: rgba(56, 58, 89, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(68, 71, 90, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(68, 71, 90, var(--glass-opacity, 1));
   --color-text: #F8F8F2;
   --color-text-muted: #6272A4;
   --color-text-inverse: #282A36;
@@ -76,12 +78,12 @@
   --color-secondary: #FF79C6;
 }
 
-/* Nord Theme */
+/* Nord Theme - with transparency */
 [data-theme="nord"] {
-  --color-bg: #2E3440;
-  --color-bg-card: #3B4252;
-  --color-bg-elevated: #434C5E;
-  --color-bg-hover: #434C5E;
+  --color-bg: rgba(46, 52, 64, var(--glass-opacity, 1));
+  --color-bg-card: rgba(59, 66, 82, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(67, 76, 94, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(67, 76, 94, var(--glass-opacity, 1));
   --color-text: #ECEFF4;
   --color-text-muted: #81A1C1;
   --color-text-inverse: #2E3440;
@@ -97,12 +99,12 @@
   --color-secondary: #81A1C1;
 }
 
-/* Monokai Theme */
+/* Monokai Theme - with transparency */
 [data-theme="monokai"] {
-  --color-bg: #272822;
-  --color-bg-card: #3E3D32;
-  --color-bg-elevated: #49483E;
-  --color-bg-hover: #49483E;
+  --color-bg: rgba(39, 40, 34, var(--glass-opacity, 1));
+  --color-bg-card: rgba(62, 61, 50, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(73, 72, 62, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(73, 72, 62, var(--glass-opacity, 1));
   --color-text: #F8F8F2;
   --color-text-muted: #75715E;
   --color-text-inverse: #272822;
