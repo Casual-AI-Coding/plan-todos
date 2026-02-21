@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar, Checkbox } from '@/components/ui';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
+import { useToast } from '@/components/ui/Toast';
 import { 
   getPlans, getTasksByPlan, createPlan, updatePlan, deletePlan,
   createTask, updateTask, deleteTask, Plan, Task, Tag, 
@@ -10,6 +11,7 @@ import {
 } from '@/lib/api';
 
 export function PlansView() {
+  const toast = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [tasks, setTasks] = useState<Record<string, Task[]>>({});
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -75,9 +77,11 @@ export function PlansView() {
       let planId: string;
       if (editingPlan) {
         await updatePlan(editingPlan.id, { title, description: description || undefined, start_date: startDate || undefined, end_date: endDate || undefined });
+        toast.success('计划更新成功');
         planId = editingPlan.id;
       } else {
         const newPlan = await createPlan({ title, description: description || undefined, start_date: startDate || undefined, end_date: endDate || undefined });
+        toast.success('计划创建成功');
         planId = newPlan.id;
       }
       // Save tags
@@ -86,7 +90,10 @@ export function PlansView() {
       setEditingPlan(null);
       setTitle(''); setDescription(''); setStartDate(''); setEndDate(''); setSelectedTags([]);
       loadPlans();
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error(e);
+      toast.error('操作失败');
+    }
   }
 
   async function handleSubmitTask() {
@@ -102,11 +109,13 @@ export function PlansView() {
   async function handleDeletePlan(id: string) {
     if (!confirm('Delete plan and all tasks?')) return;
     await deletePlan(id);
+    toast.success('计划已删除');
     loadPlans();
   }
 
   async function handleDeleteTask(id: string) {
     await deleteTask(id);
+    toast.success('任务已删除');
     loadPlans();
   }
 

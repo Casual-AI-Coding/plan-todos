@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar } from '@/components/ui';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
+import { useToast } from '@/components/ui/Toast';
 import { 
   getMilestones, getPlans, getTargets, getTasks, getCirculations, createMilestone, updateMilestone, deleteMilestone,
   Milestone, Plan, Target, Task, Circulation
 } from '@/lib/api';
 
 export function MilestonesView() {
+  const toast = useToast();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [targets, setTargets] = useState<Target[]>([]);
@@ -47,16 +49,19 @@ export function MilestonesView() {
         biz_type: linkType,
         biz_id: linkId,
       });
+      toast.success('里程碑创建成功');
       setShowForm(false);
       setTitle(''); setTargetDate(''); setLinkId('');
       loadData();
     } catch (e: unknown) { 
       alert(e instanceof Error ? e.message : 'Failed to create milestone'); 
+      toast.error('创建失败');
     }
   }
 
   async function handleDelete(id: string) {
     await deleteMilestone(id);
+    toast.success('里程碑已删除');
     loadData();
   }
 

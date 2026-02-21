@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input, ProgressBar, Checkbox } from '@/components/ui';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
+import { useToast } from '@/components/ui/Toast';
 import { 
   getTargets, getSteps, createTarget, deleteTarget,
   createStep, updateStep, deleteStep, Target, Step, Tag,
@@ -10,6 +11,7 @@ import {
 } from '@/lib/api';
 
 export function TargetsView() {
+  const toast = useToast();
   const [targets, setTargets] = useState<Target[]>([]);
   const [steps, setSteps] = useState<Record<string, Step[]>>({});
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -76,9 +78,11 @@ export function TargetsView() {
         // This is actually an update - but we don't have updateTarget for target yet
         // For now, just create new
         const newTarget = await createTarget({ title, description: description || undefined, due_date: dueDate || undefined });
+        toast.success('目标创建成功');
         targetId = newTarget.id;
       } else {
         const newTarget = await createTarget({ title, description: description || undefined, due_date: dueDate || undefined });
+        toast.success('目标创建成功');
         targetId = newTarget.id;
       }
       // Save tags
@@ -86,13 +90,17 @@ export function TargetsView() {
       setShowForm(false);
       setTitle(''); setDescription(''); setDueDate(''); setSelectedTags([]);
       loadTargets();
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error(e);
+      toast.error('操作失败');
+    }
   }
 
   async function handleSubmitStep() {
     if (!title.trim() || !selectedTargetId) return;
     try {
       await createStep({ target_id: selectedTargetId, title, weight });
+      toast.success('步骤添加成功');
       setShowStepForm(false);
       setTitle(''); setWeight(0);
       loadTargets();
@@ -104,11 +112,13 @@ export function TargetsView() {
   async function handleDeleteTarget(id: string) {
     if (!confirm('Delete target and all steps?')) return;
     await deleteTarget(id);
+    toast.success('目标已删除');
     loadTargets();
   }
 
   async function handleDeleteStep(id: string) {
     await deleteStep(id);
+    toast.success('步骤已删除');
     loadTargets();
   }
 
