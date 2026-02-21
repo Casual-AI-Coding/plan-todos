@@ -145,7 +145,8 @@
 }
 
 /* Glass Theme Background - Transparent to show desktop in Tauri
- * Note: In Tauri with transparent window, this shows the actual desktop
+ * In Tauri with transparent window, the desktop shows through
+ * In browser, we show a dark gradient so blur is visible
  */
 [data-theme="glass"] {
   background: transparent;
@@ -157,6 +158,17 @@
   background: transparent !important;
 }
 
+/* Glass Theme main content - frosted glass effect */
+[data-theme="glass"] main,
+[data-theme="glass"] .view-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, var(--glass-opacity, 0.15)) 0%, rgba(255, 255, 255, calc(var(--glass-opacity, 0.15) * 0.5)) 100%) !important;
+  backdrop-filter: blur(var(--glass-blur, 10px)) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 10px)) saturate(180%) !important;
+  border-radius: 16px;
+  margin: 8px;
+  padding: 16px;
+}
+
 /* Glass Theme Cards - Frosted glass with adjustable blur */
 /* Target Card component and other UI elements */
 [data-theme="glass"] .card,
@@ -164,8 +176,8 @@
 [data-theme="glass"] .glass-card,
 [data-theme="glass"] [data-glas="true"] {
   background: linear-gradient(135deg, rgba(255, 255, 255, var(--glass-opacity, 0.2)) 0%, rgba(255, 255, 255, calc(var(--glass-opacity, 0.2) * 0.5)) 100%) !important;
-  backdrop-filter: blur(var(--glass-blur, 20px)) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur, 20px)) saturate(180%) !important;
+  backdrop-filter: blur(var(--glass-blur, 10px)) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 10px)) saturate(180%) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 12px;
   box-shadow: 
@@ -175,6 +187,12 @@
 }
 
 /* Theme blur/opacity settings - Apply to all themes */
+main,
+.view-container {
+  backdrop-filter: blur(var(--glass-blur, 0px)) saturate(100%);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 0px)) saturate(100%);
+}
+
 .card,
 [class*="Card"] {
   backdrop-filter: blur(var(--glass-blur, 0px)) saturate(100%);
