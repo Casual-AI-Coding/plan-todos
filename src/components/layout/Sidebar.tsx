@@ -154,7 +154,7 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
           if (!mouseInPopup) {
             setHoveredMenu(null);
           }
-        }, 100);
+        }, 300);
       }
     };
 
@@ -248,7 +248,7 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
           style={{ 
             backgroundColor: 'var(--color-bg-card)',
             top: popupPosition.top,
-            left: popupPosition.left,
+            left: '4rem',
           }}
           onMouseEnter={() => setMouseInPopup(true)}
           onMouseLeave={() => { setMouseInPopup(false); setHoveredMenu(null); }}

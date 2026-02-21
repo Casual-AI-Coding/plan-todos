@@ -264,12 +264,12 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
       {/* Today View */}
       {viewMode === 'today' && (
         <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="circulations-today" direction="horizontal">
+          <Droppable droppableId="circulations-today" direction="vertical">
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex flex-wrap gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
               >
                 {todayCirculations.length === 0 ? (
                   <div className="w-full">
@@ -297,7 +297,6 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="w-full sm:w-1/2 lg:w-1/4"
                             style={{
                               ...provided.draggableProps.style,
                               opacity: snapshot.isDragging ? 0.8 : 1,
