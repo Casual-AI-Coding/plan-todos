@@ -19,6 +19,7 @@
     "tauri:build": "tauri build"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@tauri-apps/api": "^2.10.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.3",
