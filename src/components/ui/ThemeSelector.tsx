@@ -63,7 +63,7 @@ function GlassSettingsModal({
   return (
     <Modal 
       open={open} 
-      title="Glass Theme Settings"
+      title="Theme Settings"
       onClose={handleCancel}
       footer={
         <div className="flex justify-end gap-2">
@@ -76,7 +76,7 @@ function GlassSettingsModal({
         {/* Blur Slider */}
         <div>
           <div className="flex justify-between mb-2">
-            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Blur (模糊)</span>
+            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Blur</span>
             <span style={{ color: 'var(--color-text-muted)' }}>{tempBlur}px</span>
           </div>
           <input
@@ -100,7 +100,7 @@ function GlassSettingsModal({
         {/* Opacity Slider */}
         <div>
           <div className="flex justify-between mb-2">
-            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Opacity (透明度)</span>
+            <span className="font-medium" style={{ color: 'var(--color-text)' }}>Opacity</span>
             <span style={{ color: 'var(--color-text-muted)' }}>{tempOpacity}%</span>
           </div>
           <input
@@ -135,7 +135,7 @@ function GlassSettingsModal({
           >
             <div className="font-semibold mb-1" style={{ color: '#fff' }}>Card Title</div>
             <div className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              This is a preview of your glass card with blur: {tempBlur}px, opacity: {tempOpacity}%
+              This is a preview with blur: {tempBlur}px, opacity: {tempOpacity}%
             </div>
           </div>
         </div>
@@ -151,41 +151,29 @@ export function ThemeSelector() {
   const { glassBlur, glassOpacity } = useGlassSettings();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Apply glass settings when Glass theme is active - ALWAYS apply when on glass theme
+  // Apply settings when modal values change
   useEffect(() => {
-    // Apply glass CSS variables whenever theme is glass
+    // Apply CSS variables for blur and opacity
     document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
     document.documentElement.style.setProperty('--glass-opacity', `${glassOpacity / 100}`);
-    
-    // If not in Tauri, add a background so blur is visible in browser
-    // In Tauri, the window is transparent and shows the desktop
-    if (typeof window !== 'undefined' && !(window as any).__TAURI__) {
-      document.body.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
-    } else {
-      document.body.style.background = 'transparent';
-    }
-  }, [theme, glassBlur, glassOpacity]);
+  }, [glassBlur, glassOpacity]);
 
   // Apply glass theme when modal opens
   useEffect(() => {
-    if (showGlassModal && theme !== 'glass') {
-      setTheme('glass');
-    }
+    // No longer auto-switch to glass theme
   }, [showGlassModal, theme, setTheme]);
 
   // Click once to switch theme
-  // If already on Glass and click Glass again, open modal
+  // If click on already active theme, open settings modal
   const handleThemeClick = (e: React.MouseEvent<HTMLButtonElement>, themeId: ThemeId) => {
     // Remove focus from clicked button immediately
     e.currentTarget.blur();
     
-    if (themeId === 'glass') {
-      if (theme === 'glass') {
-        setShowGlassModal(true);
-      } else {
-        setTheme(themeId);
-      }
+    if (themeId === theme) {
+      // Already on this theme, open settings modal
+      setShowGlassModal(true);
     } else {
+      // Switch to new theme
       setTheme(themeId);
     }
   };
