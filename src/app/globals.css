@@ -120,6 +120,28 @@
   --color-secondary: #A6E22E;
 }
 
+/* Warm Theme - with transparency */
+[data-theme="glass"] {
+  --color-bg: rgba(255, 248, 240, var(--glass-opacity, 1));
+  --color-bg-card: rgba(255, 252, 245, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(255, 250, 240, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(255, 245, 235, var(--glass-opacity, 1));
+  --color-text: #78350F;
+  --color-text-muted: #92400E;
+  --color-text-inverse: #FFFFFF;
+  --color-border: #FED7AA;
+  --color-border-light: #FDE68A;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --shadow-card: 0 4px 12px rgba(120, 53, 15, 0.1);
+  --shadow-elevated: 0 8px 24px rgba(120, 53, 15, 0.15);
+  --color-accent: #F59E0B;
+  --color-primary: #F59E0B;
+  --color-secondary: #EF4444;
+  --color-cta: #F97316;
+}
+
 /* All themes - Transparent background to show desktop in Tauri */
 html,
 body,
