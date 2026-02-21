@@ -1,48 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use log::info;
-use rusqlite::Connection;
-use std::io::Write;
-use std::sync::Mutex;
-
-// Re-export AppState for use in modules
-pub use crate::models::AppState;
-
-// Module declarations
-mod commands;
-mod db;
-mod models;
-#[cfg(test)]
-mod tests;
-
 fn main() {
-    // Initialize logger with info level
-    env_logger::Builder::from_default_env()
-        .filter_level(log::LevelFilter::Info)
-        .format(|buf, record| {
-            writeln!(
-                buf,
-                "[{} {} {}] {}",
-                chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                record.level(),
-                record.target(),
-                record.args()
-            )
-        })
-        .init();
-
-    info!("Starting Plan Todos application");
-
-    // Initialize database
-    let db_path = dirs::data_local_dir()
-        .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join("plan-todos")
-        .join("data.db");
-
-    // Create directory if it doesn't exist
-    if let Some(parent) = db_path.parent() {
-        std::fs::create_dir_all(parent).ok();
-    }
+    plan_todos_lib::run();
+}
 
     let conn = Connection::open(&db_path).expect("Failed to open database");
     db::init_db(&conn).expect("Failed to initialize database");
