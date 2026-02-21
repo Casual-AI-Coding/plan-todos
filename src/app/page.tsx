@@ -67,7 +67,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: 'var(--color-bg)', fontFamily: 'var(--font-sans)' }}>
+    <div className="flex h-screen" style={{ background: 'transparent', fontFamily: 'var(--font-sans)' }}>
       {/* Desktop Sidebar - hidden on mobile */}
       <div className="hidden md:block fixed left-0 top-0 h-screen z-40">
         <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
