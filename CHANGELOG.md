@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.3] - 2026-02-22
+
+### Added
+- **拖拽排序**: 今日打卡页面支持拖拽排序，使用 dnd-kit 实现网格拖拽
+- **折叠侧边栏 Hover 弹窗**: 折叠侧边栏时，悬停有子菜单的项显示弹窗
+- **动态版本号**: Settings 页面从 package.json 读取版本号
+
+### Changed
+- **dnd-kit 替换 @hello-pangea/dnd**: 使用更现代的 dnd-kit 库
+- **Sidebar 弹窗逻辑**: 优化 hover 弹窗显示逻辑，添加延迟隐藏防止闪烁
+
+### Fixed
+- **拖拽不能工作**: 修复拖拽事件未正确绑定的问题
+- **侧边栏弹窗消失**: 修复鼠标从菜单移到弹窗时弹窗消失的问题
+
+---
+
 ## [0.4.2] - 2026-02-21
 
 ### Added
