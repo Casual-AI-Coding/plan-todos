@@ -149,6 +149,31 @@ body,
   background: transparent !important;
 }
 
+/* Theme transition - smooth color changes when switching themes */
+[data-theme] {
+  transition:
+    background-color 0.3s ease,
+    color 0.15s ease 0.15s,
+    border-color 0.3s ease;
+}
+
+/* Button click animation */
+button:active:not(:disabled) {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Card hover animation */
+.card,
+[class*="Card"] {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover,
+[class*="Card"]:hover {
+  transform: translateY(-2px);
+}
+
 /* Theme blur/opacity settings - Apply to all themes */
 main,
 .view-container {
