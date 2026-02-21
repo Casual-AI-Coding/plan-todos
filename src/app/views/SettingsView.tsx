@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Card, Button, Input } from '@/components/ui';
+import packageJson from '../../../package.json';
 
 export function SettingsView() {
   const [theme, setTheme] = useState<'light' | 'dark' | 'auto'>('light');
@@ -109,7 +110,7 @@ export function SettingsView() {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">版本</span>
-            <span className="font-medium">0.2.0</span>
+            <span className="font-medium">{packageJson.version}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">构建</span>

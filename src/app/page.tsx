@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { 
@@ -25,6 +25,15 @@ import {
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Load sidebar collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    if (saved === 'true') {
+      setSidebarCollapsed(true);
+    }
+  }, []);
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -70,11 +79,18 @@ export default function Home() {
     <div className="flex h-screen" style={{ background: 'transparent', fontFamily: 'var(--font-sans)' }}>
       {/* Desktop Sidebar - hidden on mobile */}
       <div className="hidden md:block fixed left-0 top-0 h-screen z-40">
-        <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
+        <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
       </div>
       
       {/* Main Content - with padding for sidebar on desktop */}
-      <main className="flex-1 overflow-auto pb-16 md:pb-0 md:ml-52" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <main 
+        className="flex-1 overflow-auto pb-16 md:pb-0" 
+        style={{ 
+          backgroundColor: 'var(--color-bg)',
+          marginLeft: sidebarCollapsed ? '4rem' : '13rem',
+          transition: 'margin-left 0.3s ease',
+        }}
+      >
         {renderContent()}
       </main>
       

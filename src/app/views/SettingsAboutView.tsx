@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, Button } from '@/components/ui';
+import packageJson from '../../../package.json';
 
 export function SettingsAboutView() {
   const handleCheckUpdate = () => {
@@ -30,7 +31,7 @@ export function SettingsAboutView() {
             <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
               Plan Todos
             </h3>
-            <p className="text-base text-gray-600 mb-3">v0.3.0</p>
+            <p className="text-base text-gray-600 mb-3">v{packageJson.version}</p>
             <p className="text-gray-500 text-sm">
               本地优先的跨平台任务管理应用
             </p>

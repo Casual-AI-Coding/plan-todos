@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Card, Button, Modal, Input } from '@/components/ui';
 import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
-import { SortableList } from '@/components/ui/SortableList';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { CirculationDetailView } from './CirculationDetailView';
 import {
   getCirculations,
@@ -151,10 +151,29 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
     }
   }
 
-  // Handle reorder circulations (local only, not persisted)
+  // Handle reorder circulations (drag and drop)
   function handleReorderCirculations(newOrder: Circulation[]) {
     setTodayCirculationsOrdered(newOrder);
   }
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const sourceIndex = result.source.index;
+    const destinationIndex = result.destination.index;
+
+    if (sourceIndex === destinationIndex) return;
+
+    const currentList = todayCirculationsOrdered.length > 0 
+      ? todayCirculationsOrdered 
+      : todayCirculations;
+    
+    const newItems = Array.from(currentList);
+    const [removed] = newItems.splice(sourceIndex, 1);
+    newItems.splice(destinationIndex, 0, removed);
+
+    setTodayCirculationsOrdered(newItems);
+  };
 
   // Handle create/update
   async function handleSave() {
@@ -244,163 +263,190 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
 
       {/* Today View */}
       {viewMode === 'today' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {todayCirculations.length === 0 ? (
-            <Card className="col-span-full">
-              <div className="text-center py-8 text-gray-500">
-                <p className="text-lg">今日没有待打卡项</p>
-                <Button
-                  className="mt-4"
-                  onClick={() => setViewMode('settings')}
-                >
-                  去创建打卡
-                </Button>
-              </div>
-            </Card>
-          ) : (
-            (todayCirculationsOrdered.length > 0 ? todayCirculationsOrdered : todayCirculations).map(c => {
-              const isPeriodic = c.circulation_type === 'periodic';
-              const isDoneToday = isCompletedToday(c);
-              
-              return (
-                <Card key={c.id} className="hover:shadow-md transition-all">
-                  <div className="flex flex-col h-full">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div 
-                        className="font-semibold cursor-pointer hover:opacity-80 truncate flex items-center gap-1" 
-                        onClick={() => setDetailCirculation(c)}
-                        title={c.title}
-                      >
-                        {isPeriodic ? (
-                          <span className="text-lg">🔄</span>
-                        ) : (
-                          <span className="text-lg">📊</span>
-                        )}
-                        <span style={{ color: 'var(--color-text)' }}>{c.title}</span>
-                      </div>
-                      {/* Status Badge */}
-                      <div className="flex items-center gap-1">
-                        {isPeriodic ? (
-                          isDoneToday ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-success)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
-                              ✓ 已完成
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
-                              ○ 待打卡
-                            </span>
-                          )
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
-                            计数打卡
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Type Label */}
-                    <div className="text-xs mb-2" style={{ color: 'var(--color-text-muted)' }}>
-                      {isPeriodic 
-                        ? '周期打卡' 
-                        : `今日已打卡 ${todayStats[c.id]?.count || 0} 次 · 进度 +${todayStats[c.id]?.progress || 0}`
-                      }
-                    </div>
-                    
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      {isPeriodic ? (
-                        <>
-                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                            <div className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>{c.streak_count}</div>
-                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>连续天数</div>
-                          </div>
-                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                            <div className="text-xl font-bold" style={{ color: 'var(--color-warning)' }}>{c.best_streak}</div>
-                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>最佳记录</div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                            <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>{todayStats[c.id]?.count || 0}</div>
-                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日次数</div>
-                          </div>
-                          <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                            <div className="text-xl font-bold" style={{ color: 'var(--color-success)' }}>+{todayStats[c.id]?.progress || 0}</div>
-                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
-                          </div>
-                        </>
-                      )}
-                      {!isPeriodic && c.target_count && (
-                        <div className="col-span-2 rounded-md p-2" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>总进度</span>
-                            <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>{c.current_count} / {c.target_count}</span>
-                          </div>
-                          <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border-light)' }}>
-                            <div 
-                              className="h-2 rounded-full" 
-                              style={{ width: `${Math.min((c.current_count / c.target_count) * 100, 100)}%`, backgroundColor: 'var(--color-accent)' }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                      {c.last_completed_at && (
-                        <div className="col-span-2 rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
-                          <div className="text-sm" style={{ color: 'var(--color-text)' }}>
-                            {new Date(c.last_completed_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                          </div>
-                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>上次打卡</div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Buttons */}
-                    <div className="flex gap-2 mt-auto">
-                      {isPeriodic ? (
-                        isDoneToday ? (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="flex-1 text-xs"
-                            onClick={() => handleUndo(c)}
-                          >
-                            撤销打卡
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="sm"
-                            className="flex-1 text-xs"
-                            onClick={() => setCheckinTarget(c)}
-                          >
-                            立即打卡
-                          </Button>
-                        )
-                      ) : (
-                        <Button 
-                          size="sm"
-                          className="flex-1 text-xs"
-                          onClick={() => setCheckinTarget(c)}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="circulations-today" direction="vertical">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+              >
+                {todayCirculations.length === 0 ? (
+                  <div className="w-full">
+                    <Card className="col-span-full">
+                      <div className="text-center py-8 text-gray-500">
+                        <p className="text-lg">今日没有待打卡项</p>
+                        <Button
+                          className="mt-4"
+                          onClick={() => setViewMode('settings')}
                         >
-                          打卡 +1
+                          去创建打卡
                         </Button>
-                      )}
-                      <Button 
-                        variant="secondary" 
-                        size="sm"
-                        className="text-xs px-3"
-                        onClick={() => setDetailCirculation(c)}
-                      >
-                        详情
-                      </Button>
-                    </div>
+                      </div>
+                    </Card>
                   </div>
-                </Card>
-              );
-            })
-          )}
-        </div>
+                ) : (
+                  (todayCirculationsOrdered.length > 0 ? todayCirculationsOrdered : todayCirculations).map((c, index) => {
+                    const isPeriodic = c.circulation_type === 'periodic';
+                    const isDoneToday = isCompletedToday(c);
+                    
+                    return (
+                      <Draggable key={c.id} draggableId={c.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{
+                              ...provided.draggableProps.style,
+                              opacity: snapshot.isDragging ? 0.8 : 1,
+                            }}
+                          >
+                            <Card className="hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col">
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-2">
+                                  <div 
+                                    className="font-semibold cursor-pointer hover:opacity-80 truncate flex items-center gap-1" 
+                                    onClick={() => setDetailCirculation(c)}
+                                    title={c.title}
+                                  >
+                                    {isPeriodic ? (
+                                      <span className="text-lg">🔄</span>
+                                    ) : (
+                                      <span className="text-lg">📊</span>
+                                    )}
+                                    <span style={{ color: 'var(--color-text)' }}>{c.title}</span>
+                                  </div>
+                                  {/* Status Badge */}
+                                  <div className="flex items-center gap-1">
+                                    {isPeriodic ? (
+                                      isDoneToday ? (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-success)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
+                                          ✓ 已完成
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-warning)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
+                                          ○ 待打卡
+                                        </span>
+                                      )
+                                    ) : (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-text-inverse)', opacity: 0.9 }}>
+                                        计数打卡
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Type Label */}
+                                <div className="text-xs mb-2" style={{ color: 'var(--color-text-muted)' }}>
+                                  {isPeriodic 
+                                    ? '周期打卡' 
+                                    : `今日已打卡 ${todayStats[c.id]?.count || 0} 次 · 进度 +${todayStats[c.id]?.progress || 0}`
+                                  }
+                                </div>
+                                
+                                {/* Stats Grid */}
+                                <div className="grid grid-cols-2 gap-2 mb-3">
+                                  {isPeriodic ? (
+                                    <>
+                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                                        <div className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>{c.streak_count}</div>
+                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>连续天数</div>
+                                      </div>
+                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                                        <div className="text-xl font-bold" style={{ color: 'var(--color-warning)' }}>{c.best_streak}</div>
+                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>最佳记录</div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                                        <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>{todayStats[c.id]?.count || 0}</div>
+                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日次数</div>
+                                      </div>
+                                      <div className="rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                                        <div className="text-xl font-bold" style={{ color: 'var(--color-success)' }}>+{todayStats[c.id]?.progress || 0}</div>
+                                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
+                                      </div>
+                                    </>
+                                  )}
+                                  {!isPeriodic && c.target_count && (
+                                    <div className="col-span-2 rounded-md p-2" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                                      <div className="flex justify-between items-center mb-1">
+                                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>总进度</span>
+                                        <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>{c.current_count} / {c.target_count}</span>
+                                      </div>
+                                      <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border-light)' }}>
+                                        <div 
+                                          className="h-2 rounded-full" 
+                                          style={{ width: `${Math.min((c.current_count / c.target_count) * 100, 100)}%`, backgroundColor: 'var(--color-accent)' }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                  {c.last_completed_at && (
+                                    <div className="col-span-2 rounded-md p-2 text-center" style={{ backgroundColor: 'var(--color-bg-hover)' }}>
+                                      <div className="text-sm" style={{ color: 'var(--color-text)' }}>
+                                        {new Date(c.last_completed_at).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                      </div>
+                                      <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>上次打卡</div>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* Buttons */}
+                                <div className="flex gap-2 mt-auto">
+                                  {isPeriodic ? (
+                                    isDoneToday ? (
+                                      <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="flex-1 text-xs"
+                                        onClick={() => handleUndo(c)}
+                                      >
+                                        撤销打卡
+                                      </Button>
+                                    ) : (
+                                      <Button 
+                                        size="sm"
+                                        className="flex-1 text-xs"
+                                        onClick={() => setCheckinTarget(c)}
+                                      >
+                                        立即打卡
+                                      </Button>
+                                    )
+                                  ) : (
+                                    <Button 
+                                      size="sm"
+                                      className="flex-1 text-xs"
+                                      onClick={() => setCheckinTarget(c)}
+                                    >
+                                      打卡 +1
+                                    </Button>
+                                  )}
+                                  <Button 
+                                    variant="secondary" 
+                                    size="sm"
+                                    className="text-xs px-3"
+                                    onClick={() => setDetailCirculation(c)}
+                                  >
+                                    详情
+                                  </Button>
+                                </div>
+                              </div>
+                            </Card>
+                          </div>
+                        )}
+                      </Draggable>
+                    );
+                  })
+                )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       )}
 
       {/* Settings View */}

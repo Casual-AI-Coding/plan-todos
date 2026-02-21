@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface MenuItem {
   id: string;
@@ -12,8 +12,9 @@ interface MenuItem {
 interface SidebarProps {
   activeMenu: string;
   onMenuChange: (menu: string) => void;
+  onCollapseChange?: (isCollapsed: boolean) => void;
 }
-
+ 
 const menus: MenuItem[] = [
   { id: 'dashboard', icon: '📊', label: '今日总览' },
   { id: 'todos', icon: '📋', label: 'TODOS' },
@@ -44,9 +45,12 @@ const menus: MenuItem[] = [
   { id: 'settings-about', icon: 'ℹ️', label: '关于' },
 ];
 
-export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
+export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['settings']));
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const menuRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -56,11 +60,12 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
     }
   }, []);
 
-  // Save collapsed state to localStorage
+  // Save collapsed state to localStorage and notify parent
   const toggleCollapse = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem('sidebar-collapsed', String(newState));
+    onCollapseChange?.(newState);
   };
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {
@@ -76,34 +81,94 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
     });
   };
 
+  // Update popup position based on hovered menu item
+  useEffect(() => {
+    if (isCollapsed && hoveredMenu) {
+      const button = menuRefs.current.get(hoveredMenu);
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        setPopupPosition({ top: rect.top, left: rect.right });
+      }
+    }
+  }, [hoveredMenu, isCollapsed]);
+
   const isActive = (id: string) => activeMenu === id;
   const isChildOfActive = () => {
-    // Check if current menu is a child of settings
     if (activeMenu.startsWith('settings')) return true;
     return false;
   };
 
-  const renderMenuItem = (menu: MenuItem, level: number = 0) => {
+  // Render popup children for collapsed mode
+  const renderPopupChildren = (children: MenuItem[]): React.ReactNode => {
+    return children.map(child => {
+      const hasGrandChildren = child.children && child.children.length > 0;
+      return (
+        <div key={child.id} className="mb-0.5">
+          <button
+            onClick={() => {
+              onMenuChange(child.id);
+              setHoveredMenu(null);
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:opacity-80"
+            style={{ 
+              backgroundColor: activeMenu === child.id ? 'var(--color-primary)' : 'transparent',
+              color: activeMenu === child.id ? 'var(--color-text-inverse)' : 'var(--color-text)',
+            }}
+          >
+            <span>{child.icon}</span>
+            <span className="font-medium truncate">{child.label}</span>
+          </button>
+          {/* Render grandchildren */}
+          {hasGrandChildren && (
+            <div className="ml-2">
+              {renderPopupChildren(child.children!)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
+
+  const renderMenuItem = (menu: MenuItem, level: number = 0, forceShow: boolean = false) => {
     const hasChildren = menu.children && menu.children.length > 0;
-    const isExpanded = expandedMenus.has(menu.id);
+    const isExpanded = expandedMenus.has(menu.id) || forceShow;
     const isCurrentActive = isActive(menu.id);
     const isParentOfActive = hasChildren && menu.children!.some(child => 
       activeMenu === child.id || (child.children?.some(c => activeMenu === c.id))
     );
 
-    // Don't render children when collapsed
+    // In collapsed state, don't render children inline
     if (isCollapsed && level > 0) return null;
 
+    // Handle hover in collapsed mode
+    const handleMouseEnter = () => {
+      if (isCollapsed && hasChildren) {
+        setHoveredMenu(menu.id);
+      }
+    };
+    const handleMouseLeave = () => {
+      if (isCollapsed && hasChildren) {
+        setHoveredMenu(null);
+      }
+    };
+
     return (
-      <div key={menu.id}>
+      <div key={menu.id} className="relative">
         <button
+          ref={(el) => {
+            if (el) menuRefs.current.set(menu.id, el);
+          }}
           onClick={(e) => {
             if (hasChildren) {
-              toggleExpand(menu.id, e);
+              if (!isCollapsed) {
+                toggleExpand(menu.id, e);
+              }
             } else {
               onMenuChange(menu.id);
             }
           }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           className={`
             w-full flex items-center gap-1.5 px-2 py-2 rounded-md transition-all mb-0.5
             ${level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-8'}
@@ -126,9 +191,10 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
           {!isCollapsed && <span className="font-medium truncate">{menu.label}</span>}
         </button>
         
+        {/* Show children inline when expanded and NOT collapsed */}
         {hasChildren && isExpanded && !isCollapsed && (
           <div className="mb-0.5">
-            {menu.children!.map(child => renderMenuItem(child, level + 1))}
+            {menu.children!.map(child => renderMenuItem(child, level + 1, isExpanded))}
           </div>
         )}
       </div>
@@ -168,6 +234,25 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto p-2 scrollbar-hide">
         {menus.map(menu => renderMenuItem(menu))}
       </nav>
+
+      {/* Hover Popup for collapsed state */}
+      {isCollapsed && hoveredMenu && (
+        <div 
+          className="fixed p-2 rounded-md shadow-lg z-50 min-w-40"
+          style={{ 
+            backgroundColor: 'var(--color-bg-card)',
+            top: popupPosition.top,
+            left: popupPosition.left,
+          }}
+          onMouseEnter={() => {}}
+          onMouseLeave={() => setHoveredMenu(null)}
+        >
+          {(() => {
+            const menu = menus.find(m => m.id === hoveredMenu);
+            return menu?.children ? renderPopupChildren(menu.children) : null;
+          })()}
+        </div>
+      )}
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
