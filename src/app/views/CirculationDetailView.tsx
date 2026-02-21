@@ -79,12 +79,25 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
     }
   }
 
-  // Format large numbers with tooltip (e.g., 10000 -> "1万" with tooltip showing "10000")
+  // Format large numbers with tooltip (e.g., 10000 -> "10K" with tooltip showing "10000")
+  // K=千, W=万, M=百万
   const formatNumberWithTooltip = (num: number): { display: string; title: string } => {
+    if (num >= 1000000) {
+      const display = (num / 1000000) % 1 === 0 
+        ? (num / 1000000) + 'M' 
+        : (num / 1000000).toFixed(1) + 'M';
+      return { display, title: num.toLocaleString() };
+    }
     if (num >= 10000) {
-      const wan = num / 10000;
-      // Show "1万" instead of "1.0万" for whole numbers
-      const display = wan % 1 === 0 ? wan.toString() + '万' : wan.toFixed(1) + '万';
+      const display = (num / 10000) % 1 === 0 
+        ? (num / 10000) + 'W' 
+        : (num / 10000).toFixed(1) + 'W';
+      return { display, title: num.toLocaleString() };
+    }
+    if (num >= 1000) {
+      const display = (num / 1000) % 1 === 0 
+        ? (num / 1000) + 'K' 
+        : (num / 1000).toFixed(1) + 'K';
       return { display, title: num.toLocaleString() };
     }
     return { display: num.toLocaleString(), title: num.toString() };
