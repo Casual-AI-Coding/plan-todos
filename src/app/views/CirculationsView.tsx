@@ -297,13 +297,14 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
+                            className="w-full sm:w-1/2 lg:w-1/4"
                             style={{
                               ...provided.draggableProps.style,
                               opacity: snapshot.isDragging ? 0.8 : 1,
                             }}
                           >
-                            <Card className="hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
-                              <div className="flex flex-col">
+                            <Card className="hover:shadow-md transition-all cursor-grab active:cursor-grabbing h-full">
+                              <div className="flex flex-col h-full">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-2">
                                   <div 

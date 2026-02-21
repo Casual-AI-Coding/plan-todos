@@ -148,8 +148,13 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
       }
     };
     const handleMouseLeave = () => {
-      if (isCollapsed && hasChildren && !mouseInPopup) {
-        setHoveredMenu(null);
+      if (isCollapsed && hasChildren) {
+        // Delay hiding to allow mouse to move to popup
+        setTimeout(() => {
+          if (!mouseInPopup) {
+            setHoveredMenu(null);
+          }
+        }, 100);
       }
     };
 
