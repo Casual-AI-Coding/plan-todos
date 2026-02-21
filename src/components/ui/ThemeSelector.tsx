@@ -151,18 +151,6 @@ export function ThemeSelector() {
   const { glassBlur, glassOpacity } = useGlassSettings();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Apply settings when modal values change
-  useEffect(() => {
-    // Apply CSS variables for blur and opacity
-    document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
-    document.documentElement.style.setProperty('--glass-opacity', `${glassOpacity / 100}`);
-  }, [glassBlur, glassOpacity]);
-
-  // Apply glass theme when modal opens
-  useEffect(() => {
-    // No longer auto-switch to glass theme
-  }, [showGlassModal, theme, setTheme]);
-
   // Click once to switch theme
   // If click on already active theme, open settings modal
   const handleThemeClick = (e: React.MouseEvent<HTMLButtonElement>, themeId: ThemeId) => {
