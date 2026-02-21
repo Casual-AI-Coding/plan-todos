@@ -190,10 +190,6 @@ export function ThemeSelector() {
     }
   };
   
-  // Prevent focus on mouse down
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-  };
 
   return (
     <div data-theme-selector ref={containerRef}>
@@ -206,7 +202,6 @@ export function ThemeSelector() {
               key={t.id}
               type="button"
               onClick={(e) => handleThemeClick(e, t.id)}
-              onMouseDown={handleMouseDown}
               className={`
                 p-4 rounded-lg border-2 transition-all flex flex-col items-center
                 select-none

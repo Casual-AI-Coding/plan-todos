@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { ThemeId, themes, defaultTheme } from '@/lib/themes/registry';
 
 const THEME_KEY = 'plan-todos-theme';
@@ -36,8 +36,15 @@ function getStoredTheme(): ThemeId {
  * Works correctly with SSR via inline script in layout.tsx
  */
 export function useTheme() {
-  // Get initial theme from DOM (set by inline script before React loads)
-  const theme = useMemo(() => getStoredTheme(), []);
+  const [theme, setThemeState] = useState<ThemeId>(getStoredTheme);
+  
+  // Sync with DOM on mount and when theme changes externally
+  useEffect(() => {
+    const currentTheme = getStoredTheme();
+    if (currentTheme !== theme) {
+      setThemeState(currentTheme);
+    }
+  }, []);
   
   const setTheme = useCallback((newTheme: ThemeId) => {
     // Validate theme
@@ -45,6 +52,9 @@ export function useTheme() {
       console.warn(`Invalid theme: ${newTheme}, falling back to light`);
       newTheme = defaultTheme;
     }
+    
+    // Update state
+    setThemeState(newTheme);
     
     // Update DOM
     document.documentElement.setAttribute('data-theme', newTheme);
