@@ -12,6 +12,7 @@ use rusqlite::Connection;
 use std::io::Write;
 use std::sync::Mutex;
 
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Initialize logger with info level
     env_logger::Builder::from_default_env()
