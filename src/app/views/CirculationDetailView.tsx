@@ -79,22 +79,32 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
     }
   }
 
+  // Format large numbers (e.g., 10000 -> 1万)
+  const formatNumber = (num: number): string => {
+    if (num >= 10000) {
+      return (num / 10000).toFixed(1) + '万';
+    }
+    return num.toString();
+  };
+
   const detailContent = circulation ? (
     <>
-      {/* Progress Ring */}
-      <div className="flex justify-center mb-6">
-        <ProgressRing
-          value={
-            circulation.circulation_type === 'count' && circulation.target_count
-              ? Math.min(100, (circulation.current_count / circulation.target_count) * 100)
-              : (isCompletedToday() ? 100 : 0)
-          }
-          size={120}
-          strokeWidth={10}
-          color={isCompletedToday() ? 'var(--color-success)' : 'var(--color-primary)'}
-          label={isCompletedToday() ? '今日完成' : '今日进度'}
-        />
-      </div>
+      {/* Progress Ring - Only for count type */}
+      {circulation.circulation_type === 'count' && (
+        <div className="flex justify-center mb-6">
+          <ProgressRing
+            value={
+              circulation.target_count
+                ? Math.min(100, (circulation.current_count / circulation.target_count) * 100)
+                : 0
+            }
+            size={120}
+            strokeWidth={10}
+            color={circulation.target_count && circulation.current_count >= circulation.target_count ? 'var(--color-success)' : 'var(--color-primary)'}
+            label={circulation.target_count ? `${formatNumber(circulation.current_count)}/${formatNumber(circulation.target_count)}` : '无目标'}
+          />
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -118,16 +128,16 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
           <>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-500">
-                  {circulation.current_count}
+                <div className="text-3xl font-bold text-blue-500 truncate" title={circulation.current_count.toString()}>
+                  {formatNumber(circulation.current_count)}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">已完成</div>
               </div>
             </Card>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-600">
-                  {circulation.target_count || '∞'}
+                <div className="text-3xl font-bold text-gray-600 truncate" title={circulation.target_count?.toString()}>
+                  {circulation.target_count ? formatNumber(circulation.target_count) : '∞'}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">目标</div>
               </div>
