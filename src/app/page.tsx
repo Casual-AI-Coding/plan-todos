@@ -74,7 +74,7 @@ export default function Home() {
       </div>
       
       {/* Main Content - with padding for sidebar on desktop */}
-      <main className="flex-1 overflow-auto pb-16 md:pb-0 md:ml-52">
+      <main className="flex-1 overflow-auto pb-16 md:pb-0 md:ml-52" style={{ backgroundColor: 'var(--color-bg)' }}>
         {renderContent()}
       </main>
       
