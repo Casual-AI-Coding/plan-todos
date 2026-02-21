@@ -50,6 +50,7 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [mouseInPopup, setMouseInPopup] = useState(false);
   const menuRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   // Load collapsed state from localStorage
@@ -147,7 +148,7 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
       }
     };
     const handleMouseLeave = () => {
-      if (isCollapsed && hasChildren) {
+      if (isCollapsed && hasChildren && !mouseInPopup) {
         setHoveredMenu(null);
       }
     };
@@ -244,8 +245,8 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
             top: popupPosition.top,
             left: popupPosition.left,
           }}
-          onMouseEnter={() => {}}
-          onMouseLeave={() => setHoveredMenu(null)}
+          onMouseEnter={() => setMouseInPopup(true)}
+          onMouseLeave={() => { setMouseInPopup(false); setHoveredMenu(null); }}
         >
           {(() => {
             const menu = menus.find(m => m.id === hoveredMenu);

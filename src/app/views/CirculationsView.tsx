@@ -264,16 +264,16 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
       {/* Today View */}
       {viewMode === 'today' && (
         <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="circulations-today" direction="vertical">
+          <Droppable droppableId="circulations-today" direction="horizontal">
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+                className="flex flex-wrap gap-4"
               >
                 {todayCirculations.length === 0 ? (
                   <div className="w-full">
-                    <Card className="col-span-full">
+                    <Card>
                       <div className="text-center py-8 text-gray-500">
                         <p className="text-lg">今日没有待打卡项</p>
                         <Button
