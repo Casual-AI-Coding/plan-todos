@@ -15,6 +15,8 @@ interface ProgressRingProps {
   showValue?: boolean;
   /** Center label text */
   label?: string;
+  /** Tooltip title shown on hover */
+  title?: string;
   /** Additional className */
   className?: string;
 }
@@ -32,6 +34,7 @@ export function ProgressRing({
   trackColor,
   showValue = true,
   label,
+  title,
   className = '',
 }: ProgressRingProps) {
   // Clamp value between 0 and 100
@@ -59,6 +62,7 @@ export function ProgressRing({
     <div 
       className={`inline-flex items-center justify-center relative ${className}`}
       style={{ width: size, height: size }}
+      title={title}
     >
       <svg
         width={size}

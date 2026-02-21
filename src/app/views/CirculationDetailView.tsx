@@ -79,12 +79,12 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
     }
   }
 
-  // Format large numbers (e.g., 10000 -> 1万)
-  const formatNumber = (num: number): string => {
+  // Format large numbers with tooltip (e.g., 10000 -> "1万" with tooltip showing "10000")
+  const formatNumberWithTooltip = (num: number): { display: string; title: string } => {
     if (num >= 10000) {
-      return (num / 10000).toFixed(1) + '万';
+      return { display: (num / 10000).toFixed(1) + '万', title: num.toLocaleString() };
     }
-    return num.toString();
+    return { display: num.toLocaleString(), title: num.toString() };
   };
 
   const detailContent = circulation ? (
@@ -101,7 +101,12 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             size={120}
             strokeWidth={10}
             color={circulation.target_count && circulation.current_count >= circulation.target_count ? 'var(--color-success)' : 'var(--color-primary)'}
-            label={circulation.target_count ? `${formatNumber(circulation.current_count)}/${formatNumber(circulation.target_count)}` : '无目标'}
+            label={circulation.target_count 
+              ? `${formatNumberWithTooltip(circulation.current_count).display}/${formatNumberWithTooltip(circulation.target_count).display}` 
+              : '无目标'}
+            title={circulation.target_count 
+              ? `${circulation.current_count.toLocaleString()} / ${circulation.target_count.toLocaleString()}`
+              : undefined}
           />
         </div>
       )}
@@ -128,16 +133,16 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
           <>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-500 truncate" title={circulation.current_count.toString()}>
-                  {formatNumber(circulation.current_count)}
+                <div className="text-3xl font-bold text-blue-500 truncate" title={formatNumberWithTooltip(circulation.current_count).title}>
+                  {formatNumberWithTooltip(circulation.current_count).display}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">已完成</div>
               </div>
             </Card>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-600 truncate" title={circulation.target_count?.toString()}>
-                  {circulation.target_count ? formatNumber(circulation.target_count) : '∞'}
+                <div className="text-3xl font-bold text-gray-600 truncate" title={circulation.target_count ? formatNumberWithTooltip(circulation.target_count).title : '无限制'}>
+                  {circulation.target_count ? formatNumberWithTooltip(circulation.target_count).display : '∞'}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">目标</div>
               </div>
