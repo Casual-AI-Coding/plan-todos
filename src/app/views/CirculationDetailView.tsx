@@ -82,7 +82,10 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
   // Format large numbers with tooltip (e.g., 10000 -> "1万" with tooltip showing "10000")
   const formatNumberWithTooltip = (num: number): { display: string; title: string } => {
     if (num >= 10000) {
-      return { display: (num / 10000).toFixed(1) + '万', title: num.toLocaleString() };
+      const wan = num / 10000;
+      // Show "1万" instead of "1.0万" for whole numbers
+      const display = wan % 1 === 0 ? wan.toString() + '万' : wan.toFixed(1) + '万';
+      return { display, title: num.toLocaleString() };
     }
     return { display: num.toLocaleString(), title: num.toString() };
   };
