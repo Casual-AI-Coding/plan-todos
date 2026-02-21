@@ -170,6 +170,15 @@ jobs:
       - name: Build Android AAB
         run: npm run tauri android build -- --aab
 
+      - name: Rename Android artifacts
+        run: |
+          # Extract version from tag (e.g., v0.4.3-1 -> 0.4.3-1)
+          VERSION=${GITHUB_REF_NAME#v}
+          # Rename APK
+          mv src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk "src-tauri/gen/android/app/build/outputs/apk/universal/release/PlanTodos_${VERSION}_aarch64-universal-release-unsigned.apk"
+          # Rename AAB
+          mv src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab "src-tauri/gen/android/app/build/outputs/bundle/universalRelease/PlanTodos_${VERSION}_aarch64-universal-release.aab"
+
       - name: Upload Android artifacts
         uses: softprops/action-gh-release@v1
         with:
@@ -178,7 +187,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
-            src-tauri/gen/android/app/build/outputs/bundle/universalRelease/*.aab
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/PlanTodos_*.apk
+            src-tauri/gen/android/app/build/outputs/bundle/universalRelease/PlanTodos_*.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
