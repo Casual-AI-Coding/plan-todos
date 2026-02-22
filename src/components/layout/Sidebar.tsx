@@ -47,7 +47,13 @@ const menus: MenuItem[] = [
 
 export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['settings']));
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Lazy initialization for collapsed state
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
+  
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [isMouseInPopup, setIsMouseInPopup] = useState(false);
@@ -96,14 +102,6 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
       setHoveredMenu(null);
     }, 150);
   };
-
-  // Load collapsed state from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    if (saved) {
-      setIsCollapsed(saved === 'true');
-    }
-  }, []);
 
   // Save collapsed state to localStorage and notify parent
   const toggleCollapse = () => {

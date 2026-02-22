@@ -25,15 +25,12 @@ import {
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  // Load sidebar collapsed state from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    if (saved === 'true') {
-      setSidebarCollapsed(true);
-    }
-  }, []);
+  
+  // Lazy initialization for sidebar collapsed state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
 
   const renderContent = () => {
     switch (activeMenu) {

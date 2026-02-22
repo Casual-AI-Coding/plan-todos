@@ -25,20 +25,23 @@ function GlassSettingsModal({
   onClose: () => void;
 }) {
   const { glassBlur, glassOpacity, setGlassBlur, setGlassOpacity } = useGlassSettings();
-  const [tempBlur, setTempBlur] = useState(glassBlur);
-  const [tempOpacity, setTempOpacity] = useState(glassOpacity);
-
-  // Reset temp values when modal opens
+  
+  // Initialize temp values from glass settings
+  const [tempBlurValue, setTempBlurValue] = useState(glassBlur);
+  const [tempOpacityValue, setTempOpacityValue] = useState(glassOpacity);
+  
+  // Sync state when modal opens - this is intentional synchronization
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (open) {
-      setTempBlur(glassBlur);
-      setTempOpacity(glassOpacity);
+      setTempBlurValue(glassBlur);
+      setTempOpacityValue(glassOpacity);
     }
   }, [open, glassBlur, glassOpacity]);
 
   const handleConfirm = () => {
-    setGlassBlur(tempBlur);
-    setGlassOpacity(tempOpacity);
+    setGlassBlur(tempBlurValue);
+    setGlassOpacity(tempOpacityValue);
     onClose();
   };
 
@@ -51,12 +54,12 @@ function GlassSettingsModal({
 
   // Apply preview in real-time
   const handleBlurChange = (value: number) => {
-    setTempBlur(value);
+    setTempBlurValue(value);
     document.documentElement.style.setProperty('--glass-blur', `${value}px`);
   };
 
   const handleOpacityChange = (value: number) => {
-    setTempOpacity(value);
+    setTempOpacityValue(value);
     document.documentElement.style.setProperty('--glass-opacity', `${value / 100}`);
   };
 
@@ -77,13 +80,13 @@ function GlassSettingsModal({
         <div>
           <div className="flex justify-between mb-2">
             <span className="font-medium" style={{ color: 'var(--color-text)' }}>Blur</span>
-            <span style={{ color: 'var(--color-text-muted)' }}>{tempBlur}px</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>{tempBlurValue}px</span>
           </div>
           <input
             type="range"
             min="5"
             max="30"
-            value={tempBlur}
+            value={tempBlurValue}
             onChange={(e) => handleBlurChange(parseInt(e.target.value, 10))}
             className="w-full h-2 rounded-lg appearance-none cursor-pointer"
             style={{ 
@@ -101,13 +104,13 @@ function GlassSettingsModal({
         <div>
           <div className="flex justify-between mb-2">
             <span className="font-medium" style={{ color: 'var(--color-text)' }}>Opacity</span>
-            <span style={{ color: 'var(--color-text-muted)' }}>{tempOpacity}%</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>{tempOpacityValue}%</span>
           </div>
           <input
             type="range"
             min="5"
             max="100"
-            value={tempOpacity}
+            value={tempOpacityValue}
             onChange={(e) => handleOpacityChange(parseInt(e.target.value, 10))}
             className="w-full h-2 rounded-lg appearance-none cursor-pointer"
             style={{ 
@@ -127,15 +130,15 @@ function GlassSettingsModal({
           <div 
             className="p-4 rounded-lg"
             style={{
-              background: `linear-gradient(135deg, rgba(255, 255, 255, ${tempOpacity / 100}) 0%, rgba(255, 255, 255, ${tempOpacity / 100 * 0.5}) 100%)`,
-              backdropFilter: `blur(${tempBlur}px) saturate(180%)`,
-              WebkitBackdropFilter: `blur(${tempBlur}px) saturate(180%)`,
+              background: `linear-gradient(135deg, rgba(255, 255, 255, ${tempOpacityValue / 100}) 0%, rgba(255, 255, 255, ${tempOpacityValue / 100 * 0.5}) 100%)`,
+              backdropFilter: `blur(${tempBlurValue}px) saturate(180%)`,
+              WebkitBackdropFilter: `blur(${tempBlurValue}px) saturate(180%)`,
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
             <div className="font-semibold mb-1" style={{ color: '#fff' }}>Card Title</div>
             <div className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              This is a preview with blur: {tempBlur}px, opacity: {tempOpacity}%
+              This is a preview with blur: {tempBlurValue}px, opacity: {tempOpacityValue}%
             </div>
           </div>
         </div>

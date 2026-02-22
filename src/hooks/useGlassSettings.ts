@@ -1,37 +1,33 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const DEFAULT_BLUR = 10;
 const DEFAULT_OPACITY = 80;
 
-export function useGlassSettings() {
-  const [glassBlur, setGlassBlurState] = useState(DEFAULT_BLUR);
-  const [glassOpacity, setGlassOpacityState] = useState(DEFAULT_OPACITY);
+// Helper to get initial values
+function getInitialBlur(): number {
+  if (typeof window === 'undefined') return DEFAULT_BLUR;
+  const saved = localStorage.getItem('glass-blur');
+  return saved ? parseInt(saved, 10) : DEFAULT_BLUR;
+}
 
-  // Load from localStorage on mount AND set CSS variables
+function getInitialOpacity(): number {
+  if (typeof window === 'undefined') return DEFAULT_OPACITY;
+  const saved = localStorage.getItem('glass-opacity');
+  return saved ? parseInt(saved, 10) : DEFAULT_OPACITY;
+}
+
+export function useGlassSettings() {
+  // Lazy initialization - replaces useEffect for initial load
+  const [glassBlur, setGlassBlurState] = useState<number>(getInitialBlur);
+  const [glassOpacity, setGlassOpacityState] = useState<number>(getInitialOpacity);
+
+  // Set CSS variables on mount
   useEffect(() => {
-    const savedBlur = localStorage.getItem('glass-blur');
-    const savedOpacity = localStorage.getItem('glass-opacity');
-    
-    if (savedBlur) {
-      const blur = parseInt(savedBlur, 10);
-      setGlassBlurState(blur);
-      document.documentElement.style.setProperty('--glass-blur', `${blur}px`);
-    } else {
-      // Set default if nothing saved
-      document.documentElement.style.setProperty('--glass-blur', `${DEFAULT_BLUR}px`);
-    }
-    
-    if (savedOpacity) {
-      const opacity = parseInt(savedOpacity, 10);
-      setGlassOpacityState(opacity);
-      document.documentElement.style.setProperty('--glass-opacity', `${opacity / 100}`);
-    } else {
-      // Set default if nothing saved
-      document.documentElement.style.setProperty('--glass-opacity', `${DEFAULT_OPACITY / 100}`);
-    }
-  }, []);
+    document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
+    document.documentElement.style.setProperty('--glass-opacity', `${glassOpacity / 100}`);
+  }, []); // Only run once on mount
 
   const setGlassBlur = useCallback((blur: number) => {
     setGlassBlurState(blur);

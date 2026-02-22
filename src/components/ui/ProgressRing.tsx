@@ -1,5 +1,7 @@
 'use client';
 
+import { useId } from 'react';
+
 interface ProgressRingProps {
   /** Progress value (0-100) */
   value: number;
@@ -55,8 +57,8 @@ export function ProgressRing({
   // Center position
   const center = size / 2;
   
-  // Calculate gradient ID for unique gradient per instance
-  const gradientId = `progress-gradient-${Math.random().toString(36).substr(2, 9)}`;
+  // Generate unique gradient ID using React useId
+  const gradientId = `progress-gradient-${useId()}`;
   
   return (
     <div 
