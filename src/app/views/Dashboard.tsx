@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Card, ProgressBar, Checkbox } from '@/components/ui';
-import { ProgressRing } from '@/components/ui/ProgressRing';
 import { getDashboard, type Dashboard } from '@/lib/api';
+import { StatCard } from '@/components/features/StatCard';
+import { EntityCountCard } from '@/components/features/EntityCountCard';
+import { CirculationStatsCard } from '@/components/features/CirculationStatsCard';
+import { QuickActions } from '@/components/features/QuickActions';
 
 export function Dashboard() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
@@ -34,7 +37,7 @@ export function Dashboard() {
     );
   }
 
-  const { overview, week, counts, today_todos, overdue_todos, _completed_today, active_plans, active_targets, active_milestones } = dashboard;
+  const { overview, week, counts, today_todos, overdue_todos, completed_today, active_plans, active_targets, active_milestones } = dashboard;
 
   return (
     <div className="p-6 space-y-6">
@@ -44,100 +47,37 @@ export function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="text-center">
-          <div className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>{overview.today_todos_count}</div>
-          <div className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>今日待办</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold" style={{ color: 'var(--color-warning)' }}>{overview.upcoming_3days_count}</div>
-          <div className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>即将到期 (3天内)</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>{overview.completed_today_count}</div>
-          <div className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>今日完成</div>
-        </Card>
+        <StatCard value={overview.today_todos_count} label="今日待办" />
+        <StatCard value={overview.upcoming_3days_count} label="即将到期 (3天内)" color="var(--color-warning)" />
+        <StatCard value={overview.completed_today_count} label="今日完成" />
       </div>
 
       {/* Entity Counts */}
       <div className="grid grid-cols-7 gap-2">
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{counts.todo}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>待办</div>
-        </Card>
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{counts.plan}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>计划</div>
-        </Card>
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{counts.task}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>任务</div>
-        </Card>
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{counts.target}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>目标</div>
-        </Card>
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{counts.milestone}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>里程碑</div>
-        </Card>
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{counts.circulation || 0}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>打卡</div>
-        </Card>
-        <Card className="text-center py-2">
-          <div className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>{week.completed_count}</div>
-          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>本周完成</div>
-        </Card>
+        <EntityCountCard count={counts.todo} label="待办" />
+        <EntityCountCard count={counts.plan} label="计划" />
+        <EntityCountCard count={counts.task} label="任务" />
+        <EntityCountCard count={counts.target} label="目标" />
+        <EntityCountCard count={counts.milestone} label="里程碑" />
+        <EntityCountCard count={counts.circulation || 0} label="打卡" />
+        <EntityCountCard count={week.completed_count} label="本周完成" />
       </div>
 
       {/* Circulation Stats */}
       {dashboard.circulation_stats && (
-        <div className="grid grid-cols-3 gap-4">
-          <Card className="text-center">
-            <div className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>{dashboard.circulation_stats.today_pending}</div>
-            <div className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>今日待打卡</div>
-          </Card>
-          <Card className="text-center">
-            <div className="text-3xl font-bold" style={{ color: 'var(--color-success)' }}>{dashboard.circulation_stats.today_completed}</div>
-            <div className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>今日已完成</div>
-          </Card>
-          <Card className="text-center">
-            <div className="text-3xl font-bold" style={{ color: 'var(--color-warning)' }}>{dashboard.circulation_stats.current_streak}</div>
-            <div className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>当前最长连续</div>
-          </Card>
-        </div>
+        <CirculationStatsCard
+          todayPending={dashboard.circulation_stats.today_pending}
+          todayCompleted={dashboard.circulation_stats.today_completed}
+          currentStreak={dashboard.circulation_stats.current_streak}
+        />
       )}
 
       {/* Progress Rings */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="flex flex-col items-center justify-center py-6">
-          <ProgressRing 
-            value={overview.productivity_score || 0} 
-            size={100}
-            strokeWidth={8}
-            label="效率"
-          />
-          <div className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>效率评分</div>
-        </Card>
-        <Card className="flex flex-col items-center justify-center py-6">
-          <ProgressRing 
-            value={overview.completed_today_count > 0 ? Math.min(100, (overview.completed_today_count / overview.today_todos_count) * 100) : 0} 
-            size={100}
-            strokeWidth={8}
-            label="完成"
-          />
-          <div className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>今日进度</div>
-        </Card>
-        <Card className="flex flex-col items-center justify-center py-6">
-          <ProgressRing 
-            value={dashboard.circulation_stats ? Math.min(100, (dashboard.circulation_stats.current_streak / 30) * 100) : 0} 
-            size={100}
-            strokeWidth={8}
-            label="连续"
-          />
-          <div className="text-sm mt-2" style={{ color: 'var(--color-text-muted)' }}>30天连续</div>
-        </Card>
-      </div>
+      <QuickActions
+        productivityScore={overview.productivity_score || 0}
+        todayProgress={overview.completed_today_count > 0 ? Math.min(100, (overview.completed_today_count / overview.today_todos_count) * 100) : 0}
+        streakProgress={dashboard.circulation_stats ? Math.min(100, (dashboard.circulation_stats.current_streak / 30) * 100) : 0}
+      />
 
       {/* Today's Tasks */}
       <Card>

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.4] - 2026-02-23
+
+### Changed
+- **组件拆分**: 将大组件拆分为可复用的小组件，提高代码可维护性
+  - TodosView → TodoItem, TodoForm, TodoFilters
+  - Dashboard → StatCard, EntityCountCard, CirculationStatsCard, QuickActions
+  - SettingsView → ThemeSelector, LanguageSelector, DataBackupSettings, AboutCard
+
+### Fixed
+- **Hydration 错误**: 修复 Sidebar 组件服务端/客户端渲染不一致问题
+
+---
+
 ## [0.4.3] - 2026-02-22
 
 ### Added

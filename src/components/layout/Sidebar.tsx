@@ -48,11 +48,16 @@ const menus: MenuItem[] = [
 export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['settings']));
   
-  // Lazy initialization for collapsed state
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('sidebar-collapsed') === 'true';
-  });
+  // Use useEffect to avoid hydration mismatch - start with false on both server and client
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+
+  // Sync with localStorage after mount
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    if (saved === 'true') {
+      setIsCollapsed(true);
+    }
+  }, []);
   
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });

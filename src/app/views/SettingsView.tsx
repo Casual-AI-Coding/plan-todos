@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, Input } from '@/components/ui';
-import packageJson from '../../../package.json';
+import { Card } from '@/components/ui';
+import { ThemeSelector, type Theme } from '@/components/features/ThemeSelector';
+import { LanguageSelector, type Language } from '@/components/features/LanguageSelector';
+import { DataBackupSettings } from '@/components/features/DataBackupSettings';
+import { AboutCard } from '@/components/features/AboutCard';
 
 export function SettingsView() {
   const [theme, setTheme] = useState<'light' | 'dark' | 'auto'>('light');
@@ -18,105 +21,26 @@ export function SettingsView() {
       <Card className="mb-6">
         <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>外观</h3>
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">主题</label>
-            <div className="flex gap-3">
-              {[
-                { id: 'light', label: '浅色', icon: '☀️' },
-                { id: 'dark', label: '深色', icon: '🌙' },
-                { id: 'auto', label: '自动', icon: '⚙️' },
-              ].map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setTheme(t.id as typeof theme)}
-                  className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-                    theme === t.id 
-                      ? 'border-teal-500 bg-teal-50' 
-                      : 'border-gray-200 hover:border-teal-200'
-                  }`}
-                >
-                  <div className="text-xl mb-1">{t.icon}</div>
-                  <div className="text-sm font-medium">{t.label}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">语言</label>
-            <select 
-              value={language}
-              onChange={e => setLanguage(e.target.value as typeof language)}
-              className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            >
-              <option value="zh">中文</option>
-              <option value="en">English</option>
-            </select>
-          </div>
+          <ThemeSelector value={theme} onChange={setTheme} />
+          <LanguageSelector value={language} onChange={setLanguage} />
         </div>
       </Card>
 
       {/* Data Management */}
       <Card className="mb-6">
         <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>数据管理</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div>
-              <div className="font-medium">自动备份</div>
-              <div className="text-sm text-gray-500">每次打开应用时自动备份</div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={autoBackup}
-                onChange={e => setAutoBackup(e.target.checked)}
-                className="sr-only peer" 
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">备份路径</label>
-            <div className="flex gap-2">
-              <Input 
-                value={backupPath}
-                onChange={e => setBackupPath(e.target.value)}
-                placeholder="选择备份目录..."
-                className="flex-1"
-              />
-              <Button variant="secondary">浏览</Button>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <Button variant="secondary" className="flex-1">
-              导出数据 (JSON)
-            </Button>
-            <Button variant="secondary" className="flex-1">
-              导入数据
-            </Button>
-          </div>
-        </div>
+        <DataBackupSettings
+          autoBackup={autoBackup}
+          backupPath={backupPath}
+          onAutoBackupChange={setAutoBackup}
+          onBackupPathChange={setBackupPath}
+        />
       </Card>
 
       {/* About */}
       <Card>
         <h3 className="font-medium mb-4" style={{ color: 'var(--color-text)' }}>关于</h3>
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">应用名称</span>
-            <span className="font-medium">Plan Todos</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">版本</span>
-            <span className="font-medium">{packageJson.version}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">构建</span>
-            <span className="font-medium">Tauri + Next.js</span>
-          </div>
-        </div>
+        <AboutCard />
       </Card>
     </div>
   );
