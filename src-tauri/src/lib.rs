@@ -11,6 +11,7 @@ use log::info;
 use rusqlite::Connection;
 use std::io::Write;
 use std::sync::Mutex;
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -31,34 +32,32 @@ pub fn run() {
 
     info!("Starting Plan Todos application...");
 
-    // Initialize database
-    let db_path = dirs::data_local_dir()
-        .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join("plan-todos")
-        .join("data.db");
-
-    // Create directory if it doesn't exist
-    if let Some(parent) = db_path.parent() {
-        std::fs::create_dir_all(parent).ok();
-    }
-
-    info!("Database path: {:?}", db_path);
-    let conn = Connection::open(&db_path).expect("Failed to open database");
-
-    // Initialize database schema
-    db::init_db(&conn).expect("Failed to initialize database");
-
-    // Create AppState
-    let state = AppState {
-        db: Mutex::new(conn),
-    };
-
-    info!("Database initialized successfully");
-
-    // Run Tauri application
+    // Run Tauri application with setup hook to initialize database
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .manage(state)
+        .setup(|app| {
+            // Get app data directory using Tauri v2 path API
+            let app_data_dir = app.path().app_data_dir()
+                .expect("Failed to get app data directory");
+
+            // Create directory if it doesn't exist
+            std::fs::create_dir_all(&app_data_dir).ok();
+
+            let db_path = app_data_dir.join("data.db");
+            info!("Database path: {:?}", db_path);
+
+            let conn = Connection::open(&db_path).expect("Failed to open database");
+            db::init_db(&conn).expect("Failed to initialize database");
+
+            // Create AppState and manage it
+            let state = AppState {
+                db: Mutex::new(conn),
+            };
+            app.manage(state);
+
+            info!("Database initialized successfully");
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::dashboard::get_dashboard,
             commands::todos::get_todo,
