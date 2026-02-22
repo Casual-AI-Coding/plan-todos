@@ -16,7 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SettingsView → ThemeSelector, LanguageSelector, DataBackupSettings, AboutCard
 
 ### Fixed
-- **Hydration 错误**: 修复 Sidebar 组件服务端/客户端渲染不一致问题
+- **Hydration 错误 (Sidebar)**: 修复 Sidebar 组件服务端/客户端渲染不一致问题
+- **Hydration 错误 (page.tsx)**: 修复页面 sidebar 状态导致的水合错误
+- **Android 数据库路径**: 修复 Android 应用闪退问题，使用 Tauri v2 path API 获取正确的应用数据目录
 
 ---
 
