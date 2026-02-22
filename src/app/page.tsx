@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { 
@@ -25,11 +25,16 @@ export default function Home() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
   
-  // Lazy initialization for sidebar collapsed state
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('sidebar-collapsed') === 'true';
-  });
+  // Use useEffect to avoid hydration mismatch - start with false on both server and client
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+
+  // Sync with localStorage after mount
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    if (saved === 'true') {
+      setSidebarCollapsed(true);
+    }
+  }, []);
 
   const renderContent = () => {
     switch (activeMenu) {
