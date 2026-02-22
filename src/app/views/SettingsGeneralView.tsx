@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Card, Button, Input, Modal, Checkbox } from '@/components/ui';
+import { useToast } from '@/components/ui/Toast';
 import { ImportExportView } from './ImportExportView';
 import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import { seedTestData, resetData } from '@/lib/api';
@@ -9,6 +10,7 @@ import { seedTestData, resetData } from '@/lib/api';
 export function SettingsGeneralView() {
   const [language, setLanguage] = useState<'zh' | 'en'>('zh');
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
   
   // Seed modal state
   const [showSeedModal, setShowSeedModal] = useState(false);
@@ -23,10 +25,10 @@ export function SettingsGeneralView() {
     setIsLoading(true);
     try {
       const seedResult = await seedTestData();
-      alert(`测试数据生成成功！\n- Todo: ${seedResult.todos}\n- Plan: ${seedResult.plans}\n- Task: ${seedResult.tasks}\n- Target: ${seedResult.targets}\n- Step: ${seedResult.steps}\n- Milestone: ${seedResult.milestones}\n- Circulation: ${seedResult.circulations}\n- Tag: ${seedResult.tags}`);
+      toast.success(`测试数据生成成功！\n已添加 ${seedResult.todos} 个待办、${seedResult.plans} 个计划、${seedResult.circulations} 个打卡等`);
     } catch (error) {
       console.error('Failed to seed test data:', error);
-      alert('生成测试数据失败: ' + (error as Error).message);
+      toast.error('生成测试数据失败: ' + (error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -37,10 +39,13 @@ export function SettingsGeneralView() {
     setIsLoading(true);
     try {
       await resetData({ keep_tags: keepTags, keep_settings: keepSettings });
-      alert('数据重置成功！');
+      const kept = [];
+      if (keepTags) kept.push('标签');
+      if (keepSettings) kept.push('设置');
+      toast.success(`数据重置成功！${kept.length > 0 ? `（已保留${kept.join('和')}）` : ''}`);
     } catch (error) {
       console.error('Failed to reset data:', error);
-      alert('重置数据失败: ' + (error as Error).message);
+      toast.error('重置数据失败: ' + (error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -242,7 +247,7 @@ export function SettingsGeneralView() {
             此操作将清空所有业务数据（待办、计划、任务、目标、步骤、里程碑、打卡记录），请谨慎操作！
           </p>
           
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4 mt-4">
             <Checkbox
               checked={keepTags}
               onChange={(e) => setKeepTags(e.target.checked)}
