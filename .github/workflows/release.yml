@@ -181,10 +181,15 @@ jobs:
 
       - name: Sign APK
         run: |
+          # Find apksigner in Android SDK
+          APK_SIGNER=$(find $ANDROID_HOME -name "apksigner" -type f 2>/dev/null | head -1)
+          if [ -z "$APK_SIGNER" ]; then
+            APK_SIGNER=$(find /opt -name "apksigner" -type f 2>/dev/null | head -1)
+          fi
           # Sign the unsigned APK using apksigner
           UNSIGNED_APK=src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
-          if [ -f "$UNSIGNED_APK" ]; then
-            apksigner sign --ks src-tauri/gen/android/debug.keystore --ks-pass pass:android --out "$UNSIGNED_APK.tmp" "$UNSIGNED_APK"
+          if [ -f "$UNSIGNED_APK" ] && [ -n "$APK_SIGNER" ]; then
+            "$APK_SIGNER" sign --ks src-tauri/gen/android/debug.keystore --ks-pass pass:android --out "$UNSIGNED_APK.tmp" "$UNSIGNED_APK"
             mv "$UNSIGNED_APK.tmp" "$UNSIGNED_APK"
           fi
 
