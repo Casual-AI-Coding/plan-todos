@@ -128,6 +128,8 @@ pub fn run() {
             commands::batch::bulk_update_step_status,
             commands::batch::bulk_delete_todos,
             commands::batch::bulk_delete_tasks,
+            commands::data::seed_test_data,
+            commands::data::reset_data,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

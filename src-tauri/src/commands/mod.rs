@@ -17,3 +17,5 @@ pub mod tags;
 pub mod targets;
 pub mod tasks;
 pub mod todos;
+
+pub mod data;

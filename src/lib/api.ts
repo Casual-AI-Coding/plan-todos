@@ -1293,3 +1293,40 @@ export async function getCirculationLogs(
     limit: limit || 20,
   });
 }
+
+// ============================================================================
+// Data Management - Seed & Reset
+// ============================================================================
+
+export interface SeedResult {
+  todos: number;
+  plans: number;
+  tasks: number;
+  targets: number;
+  steps: number;
+  milestones: number;
+  circulations: number;
+  circulation_logs: number;
+  tags: number;
+}
+
+export interface ResetOptions {
+  keep_tags?: boolean;
+  keep_settings?: boolean;
+}
+
+export async function seedTestData(): Promise<SeedResult> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to seed test data');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<SeedResult>('seed_test_data');
+}
+
+export async function resetData(options?: ResetOptions): Promise<void> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri to reset data');
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<void>('reset_data', { options: options || null });
+}
