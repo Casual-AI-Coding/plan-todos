@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Card, Button, Input, Modal, Checkbox } from '@/components/ui';
-import { useToast } from '@/components/ui/Toast';
 import { ImportExportView } from './ImportExportView';
 import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import { seedTestData, resetData } from '@/lib/api';
@@ -10,7 +9,9 @@ import { seedTestData, resetData } from '@/lib/api';
 export function SettingsGeneralView() {
   const [language, setLanguage] = useState<'zh' | 'en'>('zh');
   const [isLoading, setIsLoading] = useState(false);
-  const toast = useToast();
+  
+  // Operation result messages
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   // Seed modal state
   const [showSeedModal, setShowSeedModal] = useState(false);
@@ -23,12 +24,16 @@ export function SettingsGeneralView() {
   const handleSeedConfirm = async () => {
     setShowSeedModal(false);
     setIsLoading(true);
+    setMessage(null);
     try {
       const seedResult = await seedTestData();
-      toast.success(`测试数据生成成功！\n已添加 ${seedResult.todos} 个待办、${seedResult.plans} 个计划、${seedResult.circulations} 个打卡等`);
+      setMessage({
+        type: 'success',
+        text: `测试数据生成成功！已添加 ${seedResult.todos} 个待办、${seedResult.plans} 个计划、${seedResult.circulations} 个打卡等`
+      });
     } catch (error) {
       console.error('Failed to seed test data:', error);
-      toast.error('生成测试数据失败: ' + (error as Error).message);
+      setMessage({ type: 'error', text: '生成测试数据失败: ' + (error as Error).message });
     } finally {
       setIsLoading(false);
     }
@@ -37,15 +42,19 @@ export function SettingsGeneralView() {
   const handleResetConfirm = async () => {
     setShowResetModal(false);
     setIsLoading(true);
+    setMessage(null);
     try {
       await resetData({ keep_tags: keepTags, keep_settings: keepSettings });
       const kept = [];
       if (keepTags) kept.push('标签');
       if (keepSettings) kept.push('设置');
-      toast.success(`数据重置成功！${kept.length > 0 ? `（已保留${kept.join('和')}）` : ''}`);
+      setMessage({
+        type: 'success',
+        text: `数据重置成功！${kept.length > 0 ? `（已保留${kept.join('和')}）` : ''}`
+      });
     } catch (error) {
       console.error('Failed to reset data:', error);
-      toast.error('重置数据失败: ' + (error as Error).message);
+      setMessage({ type: 'error', text: '重置数据失败: ' + (error as Error).message });
     } finally {
       setIsLoading(false);
     }
@@ -177,6 +186,30 @@ export function SettingsGeneralView() {
             {isLoading ? '处理中...' : '重置数据'}
           </Button>
         </div>
+
+        {/* Operation Result Message */}
+        {message && (
+          <div 
+            className={`mt-4 p-3 rounded-lg border ${
+              message.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {message.type === 'success' ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+              <span className="text-sm">{message.text}</span>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Seed Data Confirmation Modal */}
