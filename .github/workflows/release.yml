@@ -164,20 +164,44 @@ jobs:
       - name: Initialize Android project
         run: npm run tauri android init
 
+      - name: Setup Android signing
+        run: |
+          # Create debug keystore for signing
+          keytool -genkey -v -keystore src-tauri/gen/android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          # Create keystore.properties for Tauri build
+          echo "keyAlias=androiddebugkey" > src-tauri/gen/android/keystore.properties
+          echo "password=android" >> src-tauri/gen/android/keystore.properties
+          echo "storeFile=debug.keystore" >> src-tauri/gen/android/keystore.properties
+
       - name: Build Android APK
         run: npm run tauri android build -- --apk
 
       - name: Build Android AAB
         run: npm run tauri android build -- --aab
 
+      - name: Sign APK
+        run: |
+          # Sign the unsigned APK using apksigner
+          UNSIGNED_APK=src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+          if [ -f "$UNSIGNED_APK" ]; then
+            apksigner sign --ks src-tauri/gen/android/debug.keystore --ks-pass pass:android --out "$UNSIGNED_APK.tmp" "$UNSIGNED_APK"
+            mv "$UNSIGNED_APK.tmp" "$UNSIGNED_APK"
+          fi
+
       - name: Rename Android artifacts
         run: |
           # Extract version from tag (e.g., v0.4.3-1 -> 0.4.3-1)
           VERSION=${GITHUB_REF_NAME#v}
-          # Rename APK
-          mv src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk "src-tauri/gen/android/app/build/outputs/apk/universal/release/PlanTodos_${VERSION}_aarch64-universal-release-unsigned.apk"
+          # Rename APK (could be signed or unsigned)
+          if [ -f "src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk" ]; then
+            mv src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk "src-tauri/gen/android/app/build/outputs/apk/universal/release/PlanTodos_${VERSION}_aarch64-universal-release.apk"
+          elif [ -f "src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk" ]; then
+            mv src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk "src-tauri/gen/android/app/build/outputs/apk/universal/release/PlanTodos_${VERSION}_aarch64-universal-release.apk"
+          fi
           # Rename AAB
-          mv src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab "src-tauri/gen/android/app/build/outputs/bundle/universalRelease/PlanTodos_${VERSION}_aarch64-universal-release.aab"
+          if [ -f "src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab" ]; then
+            mv src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab "src-tauri/gen/android/app/build/outputs/bundle/universalRelease/PlanTodos_${VERSION}_aarch64-universal-release.aab"
+          fi
 
       - name: Upload Android artifacts
         uses: softprops/action-gh-release@v1
@@ -188,6 +212,6 @@ jobs:
           prerelease: false
           files: |
             src-tauri/gen/android/app/build/outputs/apk/universal/release/PlanTodos_*.apk
-            src-tauri/gen/android/app/build/outputs/bundle/universalRelease/PlanTodos_*.aab
+            src-tauri/gen/android/app/build/outputs/bundle/universalRelease/*.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
