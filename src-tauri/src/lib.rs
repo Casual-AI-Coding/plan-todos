@@ -130,6 +130,10 @@ pub fn run() {
             commands::batch::bulk_delete_tasks,
             commands::data::seed_test_data,
             commands::data::reset_data,
+            commands::window::minimize_window,
+            commands::window::toggle_maximize,
+            commands::window::close_window,
+            commands::window::is_maximized,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { TitleBar } from '@/components/ui/TitleBar';
 import { 
   Dashboard, 
   TodosView, 
@@ -75,28 +76,49 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen" style={{ background: 'transparent', fontFamily: 'var(--font-sans)' }}>
-      {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden md:block fixed left-0 top-0 h-screen z-40">
-        <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
+    <div className="flex flex-col h-screen" style={{ background: 'transparent', fontFamily: 'var(--font-sans)' }}>
+      {/* Desktop: entire app with rounded corners, shadow, border */}
+      <div className="hidden md:flex flex-col h-screen rounded-lg overflow-hidden border border-[var(--color-border)] shadow-lg">
+        <TitleBar />
+        
+        <div className="flex flex-1 overflow-hidden">
+          {/* Desktop Sidebar - hidden on mobile */}
+          <div className="hidden md:block h-full">
+            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
+          </div>
+          
+          {/* Main Content */}
+          <main 
+            className="flex-1 overflow-auto pb-16 md:pb-0" 
+            style={{ 
+              backgroundColor: 'var(--color-bg)',
+            }}
+          >
+            {renderContent()}
+          </main>
+        </div>
       </div>
       
-      {/* Main Content - with padding for sidebar on desktop */}
-      <main 
-        className="flex-1 overflow-auto pb-16 md:pb-0" 
-        style={{ 
-          backgroundColor: 'var(--color-bg)',
-          marginLeft: sidebarCollapsed ? '4rem' : '13rem',
-          transition: 'margin-left 0.3s ease',
-        }}
-      >
-        {renderContent()}
-      </main>
+      {/* Mobile: without rounded corners */}
+      <div className="md:hidden flex flex-col h-screen">
+        <div className="flex flex-1 overflow-hidden">
+          <div className="fixed left-0 top-0 h-screen z-40">
+            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
+          </div>
+          <main 
+            className="flex-1 overflow-auto pb-16 pt-0" 
+            style={{ 
+              backgroundColor: 'var(--color-bg)',
+              marginLeft: sidebarCollapsed ? '4rem' : '13rem',
+            }}
+          >
+            {renderContent()}
+          </main>
+        </div>
+      </div>
       
-      {/* Mobile Bottom Nav - hidden on desktop */}
       <BottomNav activeMenu={activeMenu} onMenuChange={setActiveMenu} />
       
-      {/* Circulation Detail Modal */}
       {circulationDetailId && (
         <CirculationDetailView
           id={circulationDetailId}
