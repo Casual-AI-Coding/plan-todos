@@ -136,7 +136,7 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
   }, [hoveredMenu, isCollapsed]);
 
   const isActive = (id: string) => activeMenu === id;
-  const isChildOfActive = () => {
+  const _isChildOfActive = () => {
     if (activeMenu.startsWith('settings')) return true;
     return false;
   };
@@ -176,7 +176,7 @@ export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarP
     const hasChildren = menu.children && menu.children.length > 0;
     const isExpanded = expandedMenus.has(menu.id) || forceShow;
     const isCurrentActive = isActive(menu.id);
-    const isParentOfActive = hasChildren && menu.children!.some(child => 
+    const _isParentOfActive = hasChildren && menu.children!.some(child => 
       activeMenu === child.id || (child.children?.some(c => activeMenu === c.id))
     );
 

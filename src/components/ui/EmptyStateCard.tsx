@@ -1,6 +1,5 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { Card } from './Card';
 import { EmptyState, EmptyStateProps } from './EmptyState';
 

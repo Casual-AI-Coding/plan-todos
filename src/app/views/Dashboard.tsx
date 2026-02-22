@@ -34,7 +34,7 @@ export function Dashboard() {
     );
   }
 
-  const { overview, week, counts, today_todos, overdue_todos, completed_today, active_plans, active_targets, active_milestones } = dashboard;
+  const { overview, week, counts, today_todos, overdue_todos, _completed_today, active_plans, active_targets, active_milestones } = dashboard;
 
   return (
     <div className="p-6 space-y-6">

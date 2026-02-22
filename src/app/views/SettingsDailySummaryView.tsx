@@ -11,7 +11,7 @@ import {
 } from '@/lib/api';
 
 export function SettingsDailySummaryView() {
-  const [settings, setSettings] = useState<DailySummarySettings | null>(null);
+  const [_settings, setSettings] = useState<DailySummarySettings | null>(null);
   const [plugins, setPlugins] = useState<NotificationPlugin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useTheme, ThemeId } from '@/hooks/useTheme';
 import { themeList } from '@/lib/themes/registry';
 import { useGlassSettings } from '@/hooks/useGlassSettings';
@@ -27,17 +27,9 @@ function GlassSettingsModal({
   const { glassBlur, glassOpacity, setGlassBlur, setGlassOpacity } = useGlassSettings();
   
   // Initialize temp values from glass settings
+  // Using key prop on modal to reset state on re-open
   const [tempBlurValue, setTempBlurValue] = useState(glassBlur);
   const [tempOpacityValue, setTempOpacityValue] = useState(glassOpacity);
-  
-  // Sync state when modal opens - this is intentional synchronization
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (open) {
-      setTempBlurValue(glassBlur);
-      setTempOpacityValue(glassOpacity);
-    }
-  }, [open, glassBlur, glassOpacity]);
 
   const handleConfirm = () => {
     setGlassBlur(tempBlurValue);
@@ -151,7 +143,8 @@ export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
   const orderedThemes = reorderThemes(themeList);
   const [showGlassModal, setShowGlassModal] = useState(false);
-  const { glassBlur, glassOpacity } = useGlassSettings();
+  // glass settings are accessed via useGlassSettings in the modal
+  useGlassSettings();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Click once to switch theme
@@ -215,6 +208,7 @@ export function ThemeSelector() {
       
       {/* Glass Theme Settings Modal */}
       <GlassSettingsModal 
+        key={showGlassModal ? 'modal-open' : 'modal-closed'}
         open={showGlassModal} 
         onClose={() => setShowGlassModal(false)}
       />

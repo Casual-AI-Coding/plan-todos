@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { 
@@ -11,7 +11,6 @@ import {
   MilestonesView, 
   ViewsView, 
   StatisticsView, 
-  SettingsView,
   SettingsGeneralView,
   SettingsChannelsView,
   SettingsDailySummaryView,
@@ -52,13 +51,11 @@ export default function Home() {
       case 'circulations-today': return (
         <CirculationsView 
           mode="today" 
-          onNavigate={(id) => setCirculationDetailId(id)} 
         />
       );
       case 'circulations-settings': return (
         <CirculationsView 
           mode="settings" 
-          onNavigate={(id) => setCirculationDetailId(id)} 
         />
       );
       case 'statistics': return <StatisticsView />;

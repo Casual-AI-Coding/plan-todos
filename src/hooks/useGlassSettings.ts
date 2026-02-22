@@ -24,6 +24,7 @@ export function useGlassSettings() {
   const [glassOpacity, setGlassOpacityState] = useState<number>(getInitialOpacity);
 
   // Set CSS variables on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     document.documentElement.style.setProperty('--glass-blur', `${glassBlur}px`);
     document.documentElement.style.setProperty('--glass-opacity', `${glassOpacity / 100}`);

@@ -24,7 +24,6 @@ import { CSS } from '@dnd-kit/utilities';
 import { CirculationDetailView } from './CirculationDetailView';
 import {
   getCirculations,
-  getCirculationsByType,
   createCirculation,
   updateCirculation,
   deleteCirculation,
@@ -48,7 +47,6 @@ interface TodayStats {
 
 interface CirculationsViewProps {
   mode?: ViewMode;
-  onNavigate?: (id: string) => void;
 }
 
 // Sortable Card Component
@@ -227,7 +225,7 @@ function SortableCard({
   );
 }
 
-export function CirculationsView({ mode = 'today', onNavigate }: CirculationsViewProps) {
+export function CirculationsView({ mode = 'today', onNavigate: _onNavigate }: CirculationsViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>(mode);
   const [circulations, setCirculations] = useState<Circulation[]>([]);
   const [todayCirculations, setTodayCirculations] = useState<Circulation[]>([]);
@@ -248,7 +246,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
   
   // Checkin state
   const [checkinTarget, setCheckinTarget] = useState<Circulation | null>(null);
-  const [checkinLoading, setCheckinLoading] = useState(false);
+  const [_checkinLoading, setCheckinLoading] = useState(false);
   
   // Detail modal state
   const [detailCirculation, setDetailCirculation] = useState<Circulation | null>(null);
@@ -344,7 +342,7 @@ export function CirculationsView({ mode = 'today', onNavigate }: CirculationsVie
   }
 
   // Handle reorder circulations (drag and drop)
-  function handleReorderCirculations(newOrder: Circulation[]) {
+  function _handleReorderCirculations(newOrder: Circulation[]) {
     setTodayCirculationsOrdered(newOrder);
   }
 
