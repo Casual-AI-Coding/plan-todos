@@ -160,6 +160,19 @@ export function isTauri(): boolean {
   return '__TAURI__' in window;
 }
 
+// Helper to wrap Tauri invoke calls with unified error handling
+export async function withTauriError<T>(fn: () => Promise<T>): Promise<T> {
+  if (!isTauri()) {
+    throw new Error('This app must run in Tauri');
+  }
+  try {
+    return await fn();
+  } catch (e) {
+    console.error('[Tauri Error]', e);
+    throw e;
+  }
+}
+
 // ============================================================================
 // API Functions - Plan
 // ============================================================================
