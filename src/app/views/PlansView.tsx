@@ -250,134 +250,20 @@ export function PlansView() {
       </div>
 
       <div className="space-y-4">
-        {filteredPlans.map((plan, index) => {
-          // Fetch tags and tasks for this plan
-          const { data: planTags = [] } = usePlanTags(plan.id);
-          const { data: planTasks = [] } = usePlanTasks(plan.id);
-
-          const progress =
-            planTasks.length > 0
-              ? Math.round(
-                  (planTasks.filter((t) => t.status === "done").length /
-                    planTasks.length) *
-                    100,
-                )
-              : 0;
-          const doneCount = planTasks.filter((t) => t.status === "done").length;
-
-          return (
-            <FadeIn key={plan.id} delay={index * 0.05} direction="up">
-              <Card>
-                <div
-                  onClick={() => togglePlan(plan.id)}
-                  className="cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">
-                        {expandedPlans.has(plan.id) ? "▼" : "▶"}
-                      </span>
-                      <span
-                        className="font-semibold"
-                        style={{ color: "var(--color-text)" }}
-                      >
-                        {plan.title}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-teal-600 text-sm">{progress}%</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedPlanId(plan.id);
-                          setShowTaskForm(true);
-                        }}
-                        className="text-teal-600 hover:bg-teal-50 px-2 py-1 rounded text-sm"
-                      >
-                        + Task
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeletePlan(plan.id);
-                        }}
-                        className="text-gray-400 hover:text-red-500 px-2"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                  <ProgressBar
-                    value={progress}
-                    color="teal"
-                    size="sm"
-                    className="mt-2"
-                  />
-                  {/* Tags display */}
-                  {planTags.length > 0 && (
-                    <div className="flex gap-1 mt-2 flex-wrap">
-                      {planTags.map((tag) => (
-                        <span
-                          key={tag.id}
-                          className="px-2 py-0.5 rounded text-xs"
-                          style={{
-                            backgroundColor: `${tag.color}20`,
-                            color: tag.color,
-                          }}
-                        >
-                          {tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="text-xs text-gray-500 mt-1">
-                    {plan.start_date && `📅 ${plan.start_date}`}{" "}
-                    {plan.start_date && plan.end_date && "~"}{" "}
-                    {plan.end_date || "进行中"}
-                    {planTasks.length > 0 && (
-                      <span className="ml-2">
-                        ({doneCount}/{planTasks.length} Task)
-                      </span>
-                    )}
-                  </div>
-                  {expandedPlans.has(plan.id) && (
-                    <div className="mt-4 pl-6 space-y-2 border-l-2 border-teal-200 ml-4">
-                      {planTasks.map((task) => (
-                        <div
-                          key={task.id}
-                          className="flex items-center gap-3 p-2 bg-gray-50 rounded"
-                        >
-                          <Checkbox
-                            checked={task.status === "done"}
-                            onChange={() => handleToggleTask(task)}
-                          />
-                          <span
-                            className={
-                              task.status === "done"
-                                ? "line-through text-gray-400 flex-1"
-                                : "flex-1"
-                            }
-                          >
-                            {task.title}
-                          </span>
-                          <button
-                            onClick={() => handleDeleteTask(task.id)}
-                            className="text-gray-400 hover:text-red-500"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      ))}
-                      {planTasks.length === 0 && (
-                        <p className="text-gray-400 text-sm">暂无任务</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            </FadeIn>
-          );
-        })}
+        {filteredPlans.map((plan, index) => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            index={index}
+            expandedPlans={expandedPlans}
+            togglePlan={togglePlan}
+            setSelectedPlanId={setSelectedPlanId}
+            setShowTaskForm={setShowTaskForm}
+            handleDeletePlan={handleDeletePlan}
+            handleToggleTask={handleToggleTask}
+            handleDeleteTask={handleDeleteTask}
+          />
+        ))}
         {filteredPlans.length === 0 && (
           <EmptyStateCard
             icon="📝"
@@ -530,5 +416,156 @@ export function PlansView() {
         </div>
       </Modal>
     </div>
+  );
+}
+
+// PlanCard subcomponent - handles its own data fetching
+interface PlanCardProps {
+  plan: Plan;
+  index: number;
+  expandedPlans: Set<string>;
+  togglePlan: (id: string) => void;
+  setSelectedPlanId: (id: string) => void;
+  setShowTaskForm: (show: boolean) => void;
+  handleDeletePlan: (id: string) => void;
+  handleToggleTask: (task: Task) => void;
+  handleDeleteTask: (id: string) => void;
+}
+
+function PlanCard({
+  plan,
+  index,
+  expandedPlans,
+  togglePlan,
+  setSelectedPlanId,
+  setShowTaskForm,
+  handleDeletePlan,
+  handleToggleTask,
+  handleDeleteTask,
+}: PlanCardProps) {
+  const { data: planTags = [] } = usePlanTags(plan.id);
+  const { data: planTasks = [] } = usePlanTasks(plan.id);
+
+  const progress =
+    planTasks.length > 0
+      ? Math.round(
+          (planTasks.filter((t) => t.status === "done").length /
+            planTasks.length) *
+            100,
+        )
+      : 0;
+  const doneCount = planTasks.filter((t) => t.status === "done").length;
+
+  return (
+    <FadeIn key={plan.id} delay={index * 0.05} direction="up">
+      <Card>
+        <div
+          onClick={() => togglePlan(plan.id)}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-lg">
+                {expandedPlans.has(plan.id) ? "▼" : "▶"}
+              </span>
+              <span
+                className="font-semibold"
+                style={{ color: "var(--color-text)" }}
+              >
+                {plan.title}
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-teal-600 text-sm">{progress}%</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPlanId(plan.id);
+                  setShowTaskForm(true);
+                }}
+                className="text-teal-600 hover:bg-teal-50 px-2 py-1 rounded text-sm"
+              >
+                + Task
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeletePlan(plan.id);
+                }}
+                className="text-gray-400 hover:text-red-500 px-2"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+          <ProgressBar
+            value={progress}
+            color="teal"
+            size="sm"
+            className="mt-2"
+          />
+          {/* Tags display */}
+          {planTags.length > 0 && (
+            <div className="flex gap-1 mt-2 flex-wrap">
+              {planTags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="px-2 py-0.5 rounded text-xs"
+                  style={{
+                    backgroundColor: `${tag.color}20`,
+                    color: tag.color,
+                  }}
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="text-xs text-gray-500 mt-1">
+            {plan.start_date && `📅 ${plan.start_date}`}{" "}
+            {plan.start_date && plan.end_date && "~"}{" "}
+            {plan.end_date || "进行中"}
+            {planTasks.length > 0 && (
+              <span className="ml-2">
+                ({doneCount}/{planTasks.length} Task)
+              </span>
+            )}
+          </div>
+          {expandedPlans.has(plan.id) && (
+            <div className="mt-4 pl-6 space-y-2 border-l-2 border-teal-200 ml-4">
+              {planTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 p-2 bg-gray-50 rounded"
+                >
+                  <Checkbox
+                    checked={task.status === "done"}
+                    onChange={() => handleToggleTask(task)}
+                  />
+                  <span
+                    className={
+                      task.status === "done"
+                        ? "line-through text-gray-400 flex-1"
+                        : "flex-1"
+                    }
+                  >
+                    {task.title}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))}
+              {planTasks.length === 0 && (
+                <p className="text-gray-400 text-sm">暂无任务</p>
+              )}
+            </div>
+          )}
+        </div>
+      </Card>
+    </FadeIn>
   );
 }
