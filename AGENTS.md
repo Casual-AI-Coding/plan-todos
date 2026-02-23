@@ -424,26 +424,31 @@ For complex git operations, use the `git-master` skill:
 | `package.json` | 更新 `"version": "x.x.x"` |
 | `src-tauri/tauri.conf.json` | 更新 `"version": "x.x.x"` |
 | `src-tauri/Cargo.toml` | 更新 `version = "x.x.x"` |
+| `README.md` | 更新版本徽章 (version-x.x.x-blue) |
 | `CHANGELOG.md` | 添加新版本发布说明 |
+| `docs/plans/` | 检查是否需要更新设计文档 |
 
 **发布步骤:**
 
 ```bash
-# 1. 修改版本号 (package.json)
+# 1. 验收通过后，修改版本号 (package.json)
 # 2. 修改版本号 (src-tauri/tauri.conf.json)
 # 3. 修改版本号 (src-tauri/Cargo.toml)
-# 4. 更新 CHANGELOG.md
-# 5. 检查文档是否需要更新
+# 4. 更新 README.md 版本徽章
+# 5. 更新 CHANGELOG.md
+# 6. 检查并更新设计文档
 
-# 5. 提交更改
+# 7. 提交更改
 git add -A
 git commit -m "release: bump version to x.x.x"
 
-# 5. 创建 tag (Major/Minor/Patch 版本会触发 Release CI)
+# 8. 创建 tag (触发 Release CI)
 git tag -a v{x.x.x} -m "Release v{x.x.x}"
 
-# 6. 推送 tag
+# 9. 推送 tag
 git push origin v{x.x.x}
+
+# 10. 等待 CI 完成，创建 GitHub Release
 ```
 
 **Hotfix 版本:**
