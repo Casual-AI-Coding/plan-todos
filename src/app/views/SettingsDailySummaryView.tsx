@@ -3,18 +3,19 @@
 import { useState, useEffect } from "react";
 import { Card, Button } from "@/components/ui";
 import {
-  DailySummarySettings,
-  NotificationPlugin,
-  getDailySummarySettings,
-  updateDailySummarySettings,
-  getNotificationPlugins,
-} from "@/lib/api";
+  useDailySummarySettings,
+  useUpdateDailySummarySettings,
+} from "@/hooks/useDailySummarySettings";
+import { useNotificationPlugins } from "@/hooks/useNotificationPlugins";
+import type { NotificationPlugin } from "@/lib/api";
 
 export function SettingsDailySummaryView() {
-  const [_settings, setSettings] = useState<DailySummarySettings | null>(null);
-  const [plugins, setPlugins] = useState<NotificationPlugin[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  // React Query for data fetching
+  const { data: settings, isLoading: settingsLoading } = useDailySummarySettings();
+  const { data: allPlugins = [], isLoading: pluginsLoading } = useNotificationPlugins();
+  const updateSettings = useUpdateDailySummarySettings();
+
+  const plugins = allPlugins.filter((p) => p.enabled);
 
   // Form state
   const [enabled, setEnabled] = useState(false);
@@ -24,49 +25,32 @@ export function SettingsDailySummaryView() {
   const [includeCompleted, setIncludeCompleted] = useState(true);
   const [selectedPlugins, setSelectedPlugins] = useState<string[]>([]);
 
+  // Initialize form state from settings
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const [settingsResult, pluginsResult] = await Promise.all([
-        getDailySummarySettings(),
-        getNotificationPlugins(),
-      ]);
-      setSettings(settingsResult);
-      setPlugins(pluginsResult.filter((p) => p.enabled));
-
-      // Initialize form state
-      setEnabled(settingsResult.enabled);
-      setTime(settingsResult.time);
-      setIncludePending(settingsResult.include_pending);
-      setIncludeOverdue(settingsResult.include_overdue);
-      setIncludeCompleted(settingsResult.include_completed);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setIsLoading(false);
+    if (settings) {
+      setEnabled(settings.enabled);
+      setTime(settings.time);
+      setIncludePending(settings.include_pending);
+      setIncludeOverdue(settings.include_overdue);
+      setIncludeCompleted(settings.include_completed);
     }
-  };
+  }, [settings]);
+
+  const isLoading = settingsLoading || pluginsLoading;
 
   const handleSave = async () => {
-    setIsSaving(true);
     try {
-      await updateDailySummarySettings(
+      await updateSettings.mutateAsync({
         enabled,
         time,
         includePending,
         includeOverdue,
         includeCompleted,
-      );
+      });
       alert("设置已保存");
-      fetchData();
     } catch (error) {
       console.error("Failed to save settings:", error);
       alert("保存失败: " + error);
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -220,8 +204,8 @@ export function SettingsDailySummaryView() {
 
       {/* Actions */}
       <div className="flex gap-3">
-        <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "保存中..." : "保存设置"}
+        <Button onClick={handleSave} disabled={updateSettings.isPending}>
+          {updateSettings.isPending ? "保存中..." : "保存设置"}
         </Button>
         <Button variant="secondary" onClick={handleTest}>
           发送测试

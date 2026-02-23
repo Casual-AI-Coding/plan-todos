@@ -3,13 +3,12 @@
 import { useState, useEffect } from "react";
 import { Card, Button, Input, Modal } from "@/components/ui";
 import {
-  NotificationPlugin,
-  getNotificationPlugins,
-  createNotificationPlugin,
-  updateNotificationPlugin,
-  deleteNotificationPlugin,
-  sendNotification,
-} from "@/lib/api";
+  useNotificationPlugins,
+  useCreateNotificationPlugin,
+  useUpdateNotificationPlugin,
+  useDeleteNotificationPlugin,
+} from "@/hooks/useNotificationPlugins";
+import { sendNotification, type NotificationPlugin } from "@/lib/api";
 
 const PLUGIN_TYPE_LABELS: Record<string, { icon: string; label: string }> = {
   feishu: { icon: "🔔", label: "飞书/Lark" },
@@ -19,37 +18,25 @@ const PLUGIN_TYPE_LABELS: Record<string, { icon: string; label: string }> = {
 };
 
 export function SettingsChannelsView() {
-  const [plugins, setPlugins] = useState<NotificationPlugin[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // React Query for data fetching
+  const { data: plugins = [], isLoading } = useNotificationPlugins();
+  const createPlugin = useCreateNotificationPlugin();
+  const updatePlugin = useUpdateNotificationPlugin();
+  const deletePlugin = useDeleteNotificationPlugin();
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState<NotificationPlugin | null>(
     null,
   );
 
-  useEffect(() => {
-    fetchPlugins();
-  }, []);
-
-  const fetchPlugins = async () => {
-    try {
-      const result = await getNotificationPlugins();
-      setPlugins(result);
-    } catch (error) {
-      console.error("Failed to fetch plugins:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleToggleEnabled = async (plugin: NotificationPlugin) => {
     try {
-      await updateNotificationPlugin(
-        plugin.id,
-        plugin.name,
-        !plugin.enabled,
-        plugin.config,
-      );
-      fetchPlugins();
+      await updatePlugin.mutateAsync({
+        id: plugin.id,
+        name: plugin.name,
+        enabled: !plugin.enabled,
+        config: plugin.config,
+      });
     } catch (error) {
       console.error("Failed to toggle plugin:", error);
     }
@@ -58,8 +45,7 @@ export function SettingsChannelsView() {
   const handleDelete = async (id: string) => {
     if (!confirm("确定要删除这个通知渠道吗？")) return;
     try {
-      await deleteNotificationPlugin(id);
-      fetchPlugins();
+      await deletePlugin.mutateAsync(id);
     } catch (error) {
       console.error("Failed to delete plugin:", error);
     }
@@ -193,9 +179,10 @@ export function SettingsChannelsView() {
         onSave={() => {
           setShowAddModal(false);
           setEditingPlugin(null);
-          fetchPlugins();
         }}
         editingPlugin={editingPlugin}
+        createPlugin={createPlugin}
+        updatePlugin={updatePlugin}
       />
     </div>
   );
@@ -207,6 +194,8 @@ interface PluginModalProps {
   onClose: () => void;
   onSave: () => void;
   editingPlugin: NotificationPlugin | null;
+  createPlugin: ReturnType<typeof useCreateNotificationPlugin>;
+  updatePlugin: ReturnType<typeof useUpdateNotificationPlugin>;
 }
 
 function PluginModal({
@@ -214,6 +203,8 @@ function PluginModal({
   onClose,
   onSave,
   editingPlugin,
+  createPlugin,
+  updatePlugin,
 }: PluginModalProps) {
   const [name, setName] = useState("");
   const [pluginType, setPluginType] = useState("feishu");
@@ -241,14 +232,18 @@ function PluginModal({
     setIsSubmitting(true);
     try {
       if (editingPlugin) {
-        await updateNotificationPlugin(
-          editingPlugin.id,
+        await updatePlugin.mutateAsync({
+          id: editingPlugin.id,
           name,
-          editingPlugin.enabled,
+          enabled: editingPlugin.enabled,
           config,
-        );
+        });
       } else {
-        await createNotificationPlugin(name, pluginType, config);
+        await createPlugin.mutateAsync({
+          name,
+          plugin_type: pluginType,
+          config,
+        });
       }
       onSave();
     } catch (error) {
