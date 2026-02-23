@@ -118,9 +118,12 @@ plan-todos/
 
 详见 [docs/plans/iteration-plan.md](./docs/plans/iteration-plan.md)
 
-- **Phase 1**: Dashboard 连接真实数据 + 数据持久化
-- **Phase 2**: 增强功能 (待规划)
-- **Phase 3**: Circulation 打卡概念 (待规划)
+- **Phase 1**: 数据可用 ✅
+- **Phase 2**: 增强功能 (Priority + Tags + Import/Export) ✅
+- **Phase 3**: Circulation 打卡 ✅
+- **Phase 4**: 通知系统 (后端完成，UI 待开发)
+- **Phase 5**: 移动端适配 (部分完成)
+- **Phase 6**: 数据同步与备份 (规划中)
 
 ## 测试
 

@@ -624,7 +624,7 @@ React Context
 - [x] 添加单个实体查询 API
 - [x] 实现批量操作 API
 
-### Phase 5: 通知系统 ✅ 已完成
+### Phase 5: 通知系统 ⚠️ 部分完成
 
 - [x] 通知核心架构
 - [x] 定时提醒 API (`get_due_reminders`)
@@ -635,17 +635,21 @@ React Context
   - [x] 插件 CRUD API
   - [x] 发送通知 API (`send_notification`)
   - [ ] UI 界面 (待实现)
+  - [ ] 打卡通知配置 (待实现)
 
-### Phase 6: 移动端 📋 待规划
+### Phase 6: 移动端 📋 部分完成
 
-- [ ] Tauri iOS 构建
-- [ ] Tauri Android 构建
+- [x] 响应式布局
+- [x] 移动端 UI 优化
+- [x] Android 构建
+- [ ] iOS 构建 (待测试)
 
-### Phase 7: 数据同步 📋 待规划
+### Phase 7: 数据同步 📋 规划中
 
-- [ ] iCloud/Google Drive/OneDrive 同步
-- [ ] 本地文件导入导出
+- [ ] 本地导出 (JSON/SQLite)
+- [ ] 云同步 (iCloud/Google Drive/OneDrive)
 - [ ] 冲突解决策略
+- [ ] WebDAV 支持
 
 ---
 
