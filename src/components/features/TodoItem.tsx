@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Card, Checkbox } from '@/components/ui';
-import type { Todo } from '@/lib/api';
+import { Card, Checkbox } from "@/components/ui";
+import type { Todo } from "@/lib/api";
 
 export interface TodoItemProps {
   todo: Todo;
@@ -12,29 +12,32 @@ export interface TodoItemProps {
 
 export function TodoItem({ todo, onToggle, onDelete, onClick }: TodoItemProps) {
   const priorityColors: Record<string, string> = {
-    P0: 'bg-red-100 text-red-700',
-    P1: 'bg-orange-100 text-orange-700',
-    P2: 'bg-gray-100 text-gray-600',
-    P3: 'bg-blue-100 text-blue-700',
+    P0: "bg-red-100 text-red-700",
+    P1: "bg-orange-100 text-orange-700",
+    P2: "bg-gray-100 text-gray-600",
+    P3: "bg-blue-100 text-blue-700",
   };
 
   return (
-    <Card
-      hoverable
-      onClick={() => onClick(todo)}
-    >
+    <Card hoverable onClick={() => onClick(todo)}>
       <div className="flex items-center gap-3">
         <Checkbox
-          checked={todo.status === 'done'}
+          checked={todo.status === "done"}
           onChange={() => onToggle(todo)}
           onClick={(e) => e.stopPropagation()}
         />
         {/* Priority badge */}
-        <span className={`px-2 py-0.5 rounded text-xs font-medium ${priorityColors[todo.priority]}`}>
+        <span
+          className={`px-2 py-0.5 rounded text-xs font-medium ${priorityColors[todo.priority]}`}
+        >
           {todo.priority}
         </span>
         <div className="flex-1">
-          <div className={todo.status === 'done' ? 'line-through text-gray-400' : ''}>
+          <div
+            className={
+              todo.status === "done" ? "line-through text-gray-400" : ""
+            }
+          >
             {todo.title}
           </div>
           {/* Tags display */}
@@ -44,7 +47,10 @@ export function TodoItem({ todo, onToggle, onDelete, onClick }: TodoItemProps) {
                 <span
                   key={tag.id}
                   className="px-2 py-0.5 rounded text-xs"
-                  style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                  style={{
+                    backgroundColor: `${tag.color}20`,
+                    color: tag.color,
+                  }}
                 >
                   {tag.name}
                 </span>

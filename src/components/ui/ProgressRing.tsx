@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useId } from 'react';
+import { useId } from "react";
 
 interface ProgressRingProps {
   /** Progress value (0-100) */
@@ -25,7 +25,7 @@ interface ProgressRingProps {
 
 /**
  * ProgressRing Component
- * 
+ *
  * A circular progress indicator using SVG with smooth animation.
  */
 export function ProgressRing({
@@ -37,31 +37,31 @@ export function ProgressRing({
   showValue = true,
   label,
   title,
-  className = '',
+  className = "",
 }: ProgressRingProps) {
   // Clamp value between 0 and 100
   const clampedValue = Math.min(100, Math.max(0, value));
-  
+
   // Calculate dimensions
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (clampedValue / 100) * circumference;
-  
+
   // Colors - use CSS variables
-  const progressColor = color || 'var(--color-primary, #0D9488)';
-  const progressColorSecondary = color 
-    ? color 
-    : 'var(--color-secondary, #14B8A6)';
-  const bgTrackColor = trackColor || 'var(--color-border, #E2E8F0)';
-  
+  const progressColor = color || "var(--color-primary, #0D9488)";
+  const progressColorSecondary = color
+    ? color
+    : "var(--color-secondary, #14B8A6)";
+  const bgTrackColor = trackColor || "var(--color-border, #E2E8F0)";
+
   // Center position
   const center = size / 2;
-  
+
   // Generate unique gradient ID using React useId
   const gradientId = `progress-gradient-${useId()}`;
-  
+
   return (
-    <div 
+    <div
       className={`inline-flex items-center justify-center relative ${className}`}
       style={{ width: size, height: size }}
       title={title}
@@ -78,7 +78,7 @@ export function ProgressRing({
             <stop offset="100%" stopColor={progressColorSecondary} />
           </linearGradient>
         </defs>
-        
+
         {/* Background track */}
         <circle
           cx={center}
@@ -89,7 +89,7 @@ export function ProgressRing({
           strokeWidth={strokeWidth}
           opacity={0.3}
         />
-        
+
         {/* Progress circle */}
         <circle
           cx={center}
@@ -108,14 +108,14 @@ export function ProgressRing({
           className="transition-all duration-700 ease-out"
         />
       </svg>
-      
+
       {/* Center content */}
       <div className="flex flex-col items-center justify-center">
         {showValue && (
-          <span 
+          <span
             className="font-bold"
-            style={{ 
-              color: 'var(--color-text)',
+            style={{
+              color: "var(--color-text)",
               fontSize: size * 0.28,
               fontWeight: 700,
               lineHeight: 1,
@@ -125,9 +125,9 @@ export function ProgressRing({
           </span>
         )}
         {label && (
-          <span 
-            style={{ 
-              color: 'var(--color-text-muted)',
+          <span
+            style={{
+              color: "var(--color-text-muted)",
               fontSize: size * 0.12,
               marginTop: 2,
             }}

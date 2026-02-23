@@ -10,6 +10,7 @@
 **产品定位**：本地优先的跨平台任务管理应用，融合短期 TODO 与长期 PLAN，帮助用户追踪日常事务与长期目标。
 
 **核心理念**：
+
 - 本地化存储，数据不上云（隐私优先）
 - 短期任务与长期计划无缝关联
 - 跨平台支持（桌面 + 移动 + Web 调试）
@@ -20,13 +21,13 @@
 
 ### 2.1 技术栈
 
-| 组件 | 技术选择 |
-|------|----------|
-| 核心框架 | Tauri v2 (Rust) |
-| 前端 | Next.js (App Router) + React |
-| 语言 | TypeScript |
-| 数据库 | SQLite (本地文件) |
-| 测试 | Vitest + Playwright |
+| 组件        | 技术选择                                     |
+| ----------- | -------------------------------------------- |
+| 核心框架    | Tauri v2 (Rust)                              |
+| 前端        | Next.js (App Router) + React                 |
+| 语言        | TypeScript                                   |
+| 数据库      | SQLite (本地文件)                            |
+| 测试        | Vitest + Playwright                          |
 | UI 设计系统 | ui-ux-pro-max (Fira Code/Sans + Teal/Orange) |
 
 ### 2.2 架构图
@@ -128,23 +129,23 @@
 
 ### 3.2 详细定义
 
-| 概念 | 类型 | 时间属性 | 进度 | 关联 |
-|------|------|---------|------|------|
-| **Plan** | 长期计划 | 持续时间 (start~end) | Task 完成百分比 | 1→N Task |
-| **Task** | 短期任务 | 持续时间 (start~end) | 完成状态 | 属于 1 Plan |
-| **Target** | 长期目标 | 截止日期 | Step 权重累加 | 1→N Step |
-| **Step** | 步骤 | 无 | 权重值 (0-100%) | 属于 1 Target |
-| **Todo** | 短期事项 | 截止日期 | 完成状态 | 独立，可附加 Tag |
-| **Milestone** | 里程碑 | 可选日期 | 衍生 | 关联 Plan/Task/Target/Circulation |
-| **Circulation** | 循环打卡 | 周期 (日/周/月) | streak_count / current_count | 独立，可关联 Milestone |
-| **Tag** | 标签 | 无 | 无 | 多对多 (Todo/Plan/Target) |
+| 概念            | 类型     | 时间属性             | 进度                         | 关联                              |
+| --------------- | -------- | -------------------- | ---------------------------- | --------------------------------- |
+| **Plan**        | 长期计划 | 持续时间 (start~end) | Task 完成百分比              | 1→N Task                          |
+| **Task**        | 短期任务 | 持续时间 (start~end) | 完成状态                     | 属于 1 Plan                       |
+| **Target**      | 长期目标 | 截止日期             | Step 权重累加                | 1→N Step                          |
+| **Step**        | 步骤     | 无                   | 权重值 (0-100%)              | 属于 1 Target                     |
+| **Todo**        | 短期事项 | 截止日期             | 完成状态                     | 独立，可附加 Tag                  |
+| **Milestone**   | 里程碑   | 可选日期             | 衍生                         | 关联 Plan/Task/Target/Circulation |
+| **Circulation** | 循环打卡 | 周期 (日/周/月)      | streak_count / current_count | 独立，可关联 Milestone            |
+| **Tag**         | 标签     | 无                   | 无                           | 多对多 (Todo/Plan/Target)         |
 
 ### 3.3 状态定义
 
 ```
 Plan:      active | completed | archived
 Task:      pending | in-progress | done
-Target:    active | completed | archived  
+Target:    active | completed | archived
 Step:      pending | completed
 Todo:      pending | in-progress | done
 Milestone: pending | completed
@@ -166,27 +167,27 @@ Circulation = **循环打卡任务**
 ```typescript
 interface Circulation {
   id: string;
-  title: string;              // 打卡项标题
-  content?: string;          // 描述/备注
-  circulation_type: 'periodic' | 'count';  // 周期打卡或计数打卡
-  frequency?: 'daily' | 'weekly' | 'monthly';  // 周期频率
+  title: string; // 打卡项标题
+  content?: string; // 描述/备注
+  circulation_type: "periodic" | "count"; // 周期打卡或计数打卡
+  frequency?: "daily" | "weekly" | "monthly"; // 周期频率
   frequency_config?: string; // JSON 配置
-  target_count?: number;     // 目标次数 (计数打卡)
-  current_count: number;     // 当前进度
-  streak_count: number;      // 当前连续天数
-  best_streak: number;       // 最佳连续记录
+  target_count?: number; // 目标次数 (计数打卡)
+  current_count: number; // 当前进度
+  streak_count: number; // 当前连续天数
+  best_streak: number; // 最佳连续记录
   last_completed_at?: string; // 上次完成时间
-  status: 'active' | 'archived';
+  status: "active" | "archived";
   created_at: string;
   updated_at: string;
 }
 
 interface CirculationLog {
   id: string;
-  circulation_id: string;   // 关联打卡项
-  completed_at: string;    // 打卡时间
-  note?: string;           // 打卡备注
-  period: string;          // 周期标识 (如 "2024-W05", "2024-02", "2024-02-19")
+  circulation_id: string; // 关联打卡项
+  completed_at: string; // 打卡时间
+  note?: string; // 打卡备注
+  period: string; // 周期标识 (如 "2024-W05", "2024-02", "2024-02-19")
 }
 ```
 
@@ -205,7 +206,7 @@ Milestone = {
   target_date?: string,    // 可选目标日期
   // 关联类型 (三选一)
   plan_id?: string,        // 关联的 Plan
-  task_id?: string,       // 关联的 Task  
+  task_id?: string,       // 关联的 Task
   target_id?: string,     // 关联的 Target
   status: 'pending' | 'completed'
   // 进度 = 关联项的完成度
@@ -221,11 +222,11 @@ Milestone = {
 ```typescript
 interface Plan {
   id: string;
-  title: string;              // 计划标题
-  description?: string;       // 描述
-  start_date?: string;       // 开始日期
-  end_date?: string;          // 结束日期
-  status: 'active' | 'completed' | 'archived';
+  title: string; // 计划标题
+  description?: string; // 描述
+  start_date?: string; // 开始日期
+  end_date?: string; // 结束日期
+  status: "active" | "completed" | "archived";
   created_at: string;
   updated_at: string;
 }
@@ -236,13 +237,13 @@ interface Plan {
 ```typescript
 interface Task {
   id: string;
-  plan_id: string;           // 所属 Plan
-  title: string;              // 任务标题
-  description?: string;       // 描述
-  start_date?: string;       // 开始日期
-  end_date?: string;          // 结束日期
-  status: 'pending' | 'in-progress' | 'done';
-  priority: Priority;         // 优先级 P0-P3
+  plan_id: string; // 所属 Plan
+  title: string; // 任务标题
+  description?: string; // 描述
+  start_date?: string; // 开始日期
+  end_date?: string; // 结束日期
+  status: "pending" | "in-progress" | "done";
+  priority: Priority; // 优先级 P0-P3
   created_at: string;
   updated_at: string;
 }
@@ -253,10 +254,10 @@ interface Task {
 ```typescript
 interface Target {
   id: string;
-  title: string;              // 目标标题
-  description?: string;      // 描述
-  due_date?: string;         // 截止日期
-  status: 'active' | 'completed' | 'archived';
+  title: string; // 目标标题
+  description?: string; // 描述
+  due_date?: string; // 截止日期
+  status: "active" | "completed" | "archived";
   // 进度 = 所有 Step 权重之和 (当 Step 完成时累加)
   created_at: string;
   updated_at: string;
@@ -268,11 +269,11 @@ interface Target {
 ```typescript
 interface Step {
   id: string;
-  target_id: string;          // 所属 Target
-  title: string;              // 步骤标题
-  weight: number;             // 权重 (0-100)，创建时校验总和 ≤ 100
-  status: 'pending' | 'completed';
-  priority: Priority;         // 优先级 P0-P3
+  target_id: string; // 所属 Target
+  title: string; // 步骤标题
+  weight: number; // 权重 (0-100)，创建时校验总和 ≤ 100
+  status: "pending" | "completed";
+  priority: Priority; // 优先级 P0-P3
   created_at: string;
   updated_at: string;
 }
@@ -297,15 +298,15 @@ type Priority = 'P0' | 'P1' | 'P2' | 'P3';  // P0 最高，P3 最低
 ```typescript
 interface Tag {
   id: string;
-  name: string;               // 标签名称
-  color: string;            // 标签颜色 (#RRGGBB)
-  description?: string;     // 描述
+  name: string; // 标签名称
+  color: string; // 标签颜色 (#RRGGBB)
+  description?: string; // 描述
   created_at: string;
 }
 
 // 实体标签关联 (多对多)
 interface EntityTag {
-  entity_type: 'todo' | 'plan' | 'target';
+  entity_type: "todo" | "plan" | "target";
   entity_id: string;
   tag_id: string;
 }
@@ -316,12 +317,12 @@ interface EntityTag {
 ```typescript
 interface Todo {
   id: string;
-  title: string;              // 事项标题
-  content?: string;           // 内容
-  due_date?: string;          // 截止日期
-  status: 'pending' | 'in-progress' | 'done';
-  priority: Priority;         // 优先级 P0-P3
-  tags?: Tag[];              // 关联标签
+  title: string; // 事项标题
+  content?: string; // 内容
+  due_date?: string; // 截止日期
+  status: "pending" | "in-progress" | "done";
+  priority: Priority; // 优先级 P0-P3
+  tags?: Tag[]; // 关联标签
   created_at: string;
   updated_at: string;
 }
@@ -332,13 +333,13 @@ interface Todo {
 ```typescript
 interface Milestone {
   id: string;
-  title: string;              // 里程碑标题
-  target_date?: string;      // 目标日期
+  title: string; // 里程碑标题
+  target_date?: string; // 目标日期
   // 关联类型 (三选一)
   plan_id?: string;
   task_id?: string;
   target_id?: string;
-  status: 'pending' | 'completed';
+  status: "pending" | "completed";
   created_at: string;
   updated_at: string;
 }
@@ -349,28 +350,28 @@ interface Milestone {
 ```typescript
 interface Circulation {
   id: string;
-  title: string;                   // 打卡项标题
-  content?: string;                // 描述
-  circulation_type: 'periodic' | 'count';  // 周期打卡或计数打卡
-  frequency?: 'daily' | 'weekly' | 'monthly';  // 周期频率
-  frequency_config?: string;       // JSON 配置
-  target_count?: number;           // 目标次数 (计数打卡)
-  current_count: number;           // 当前进度 (计数打卡)
-  streak_count: number;            // 当前连续天数 (周期打卡)
-  best_streak: number;             // 最佳连续记录 (周期打卡)
-  last_completed_at?: string;      // 上次完成时间
-  status: 'active' | 'archived';
+  title: string; // 打卡项标题
+  content?: string; // 描述
+  circulation_type: "periodic" | "count"; // 周期打卡或计数打卡
+  frequency?: "daily" | "weekly" | "monthly"; // 周期频率
+  frequency_config?: string; // JSON 配置
+  target_count?: number; // 目标次数 (计数打卡)
+  current_count: number; // 当前进度 (计数打卡)
+  streak_count: number; // 当前连续天数 (周期打卡)
+  best_streak: number; // 最佳连续记录 (周期打卡)
+  last_completed_at?: string; // 上次完成时间
+  status: "active" | "archived";
   created_at: string;
   updated_at: string;
 }
 
 interface CirculationLog {
   id: string;
-  circulation_id: string;         // 关联打卡项
-  completed_at: string;           // 打卡时间
-  note?: string;                 // 打卡备注
-  period: string;                // 周期标识 (日: "2024-02-19", 周: "2024-W05", 月: "2024-02")
-  count?: number;                // 本次打卡数量 (计数打卡)
+  circulation_id: string; // 关联打卡项
+  completed_at: string; // 打卡时间
+  note?: string; // 打卡备注
+  period: string; // 周期标识 (日: "2024-02-19", 周: "2024-W05", 月: "2024-02")
+  count?: number; // 本次打卡数量 (计数打卡)
 }
 ```
 
@@ -428,11 +429,11 @@ interface CirculationLog {
 
 ### 5.7 视图模式
 
-| 视图 | 描述 |
-|------|------|
-| **列表视图** | 层级展示 Plan → Task / Target → Step / Todo |
-| **日历视图** | 月/周/日视图，按日期显示 Todo/Task |
-| **时间轴视图** | 甘特图样式，横向展示时间分布 |
+| 视图           | 描述                                        |
+| -------------- | ------------------------------------------- |
+| **列表视图**   | 层级展示 Plan → Task / Target → Step / Todo |
+| **日历视图**   | 月/周/日视图，按日期显示 Todo/Task          |
+| **时间轴视图** | 甘特图样式，横向展示时间分布                |
 
 ### 5.8 推送通知
 
@@ -458,11 +459,11 @@ interface CirculationLog {
 
 #### 通知类型
 
-| 类型 | 触发条件 | 示例 |
-|------|----------|------|
+| 类型     | 触发条件              | 示例                          |
+| -------- | --------------------- | ----------------------------- |
 | 定时提醒 | 到期前 X 分钟/小时/天 | "项目A设计稿还有 30 分钟到期" |
-| 事件触发 | 任务完成/新建/更新 | "你已完成 '回复邮件'" |
-| 每日汇总 | 每天早上 9 点 | "今日 3 件待办，2 件已过期" |
+| 事件触发 | 任务完成/新建/更新    | "你已完成 '回复邮件'"         |
+| 每日汇总 | 每天早上 9 点         | "今日 3 件待办，2 件已过期"   |
 
 ---
 
@@ -472,15 +473,15 @@ interface CirculationLog {
 
 使用 ui-ux-pro-max 生成的设计系统：
 
-| 元素 | 规格 |
-|------|------|
-| 主色 | `#0D9488` (Teal) |
-| 次色 | `#14B8A6` |
+| 元素     | 规格               |
+| -------- | ------------------ |
+| 主色     | `#0D9488` (Teal)   |
+| 次色     | `#14B8A6`          |
 | 强调/CTA | `#F97316` (Orange) |
-| 背景 | `#F0FDFA` |
-| 文字 | `#134E4A` |
-| 标题字体 | Fira Code |
-| 正文字体 | Fira Sans |
+| 背景     | `#F0FDFA`          |
+| 文字     | `#134E4A`          |
+| 标题字体 | Fira Code          |
+| 正文字体 | Fira Sans          |
 
 ### 6.2 风格
 
@@ -528,33 +529,33 @@ React Context
 
 ### 7.2 Tauri IPC
 
-| 操作 | 命令 | 说明 |
-|------|------|------|
-| 获取所有 Plan | `get_plans` | 返回列表 |
-| 创建 Plan | `create_plan` | 传入 title, description, start_date, end_date |
-| 更新 Plan | `update_plan` | 支持部分更新 |
-| 删除 Plan | `delete_plan` | 级联删除关联 Task |
-| 获取所有 Task | `get_tasks` | 返回列表 |
-| 创建 Task | `create_task` | 传入 title, plan_id, start_date, end_date |
-| 更新 Task | `update_task` | 支持部分更新 |
-| 删除 Task | `delete_task` | |
-| 获取所有 Target | `get_targets` | 返回列表 |
-| 创建 Target | `create_target` | 传入 title, description, due_date |
-| 更新 Target | `update_target` | 支持部分更新 |
-| 删除 Target | `delete_target` | 级联删除关联 Step |
-| 获取所有 Step | `get_steps` | 按 target_id 查询 |
-| 创建 Step | `create_step` | 传入 title, target_id, weight |
-| 更新 Step | `update_step` | 支持部分更新 |
-| 删除 Step | `delete_step` | |
-| 获取所有 Todo | `get_todos` | 返回列表 |
-| 创建 Todo | `create_todo` | 传入 title, content, due_date |
-| 更新 Todo | `update_todo` | 支持部分更新 |
-| 删除 Todo | `delete_todo` | |
-| 获取所有 Milestone | `get_milestones` | 返回列表 |
-| 创建 Milestone | `create_milestone` | 传入 title, target_date, 关联类型 |
-| 更新 Milestone | `update_milestone` | 支持部分更新 |
-| 删除 Milestone | `delete_milestone` | |
-| 发送通知 | `send_notification` | 调用通知插件 |
+| 操作               | 命令                | 说明                                          |
+| ------------------ | ------------------- | --------------------------------------------- |
+| 获取所有 Plan      | `get_plans`         | 返回列表                                      |
+| 创建 Plan          | `create_plan`       | 传入 title, description, start_date, end_date |
+| 更新 Plan          | `update_plan`       | 支持部分更新                                  |
+| 删除 Plan          | `delete_plan`       | 级联删除关联 Task                             |
+| 获取所有 Task      | `get_tasks`         | 返回列表                                      |
+| 创建 Task          | `create_task`       | 传入 title, plan_id, start_date, end_date     |
+| 更新 Task          | `update_task`       | 支持部分更新                                  |
+| 删除 Task          | `delete_task`       |                                               |
+| 获取所有 Target    | `get_targets`       | 返回列表                                      |
+| 创建 Target        | `create_target`     | 传入 title, description, due_date             |
+| 更新 Target        | `update_target`     | 支持部分更新                                  |
+| 删除 Target        | `delete_target`     | 级联删除关联 Step                             |
+| 获取所有 Step      | `get_steps`         | 按 target_id 查询                             |
+| 创建 Step          | `create_step`       | 传入 title, target_id, weight                 |
+| 更新 Step          | `update_step`       | 支持部分更新                                  |
+| 删除 Step          | `delete_step`       |                                               |
+| 获取所有 Todo      | `get_todos`         | 返回列表                                      |
+| 创建 Todo          | `create_todo`       | 传入 title, content, due_date                 |
+| 更新 Todo          | `update_todo`       | 支持部分更新                                  |
+| 删除 Todo          | `delete_todo`       |                                               |
+| 获取所有 Milestone | `get_milestones`    | 返回列表                                      |
+| 创建 Milestone     | `create_milestone`  | 传入 title, target_date, 关联类型             |
+| 更新 Milestone     | `update_milestone`  | 支持部分更新                                  |
+| 删除 Milestone     | `delete_milestone`  |                                               |
+| 发送通知           | `send_notification` | 调用通知插件                                  |
 
 ---
 
@@ -576,11 +577,11 @@ React Context
 
 ## 九、测试策略
 
-| 层级 | 工具 | 覆盖范围 |
-|------|------|----------|
-| 单元测试 | Vitest | 业务逻辑、工具函数 |
-| 集成测试 | Vitest | Tauri 命令、数据库 CRUD |
-| E2E 测试 | Playwright | 核心用户流程 |
+| 层级     | 工具       | 覆盖范围                |
+| -------- | ---------- | ----------------------- |
+| 单元测试 | Vitest     | 业务逻辑、工具函数      |
+| 集成测试 | Vitest     | Tauri 命令、数据库 CRUD |
+| E2E 测试 | Playwright | 核心用户流程            |
 
 ### 核心测试场景
 
@@ -661,14 +662,14 @@ React Context
 
 ### 11.2 支持的备份服务
 
-| 服务 | 类型 | 说明 |
-|------|------|------|
-| **iCloud** | 云同步 | Apple 用户，跨 iPhone/iPad/Mac |
-| **Google Drive** | 云同步 | Android/跨平台用户 |
-| **OneDrive** | 云同步 | Microsoft 生态用户 |
-| **Dropbox** | 云同步 | 通用云盘 |
-| **本地文件** | 手动备份 | 导出为 JSON/SQLite 文件 |
-| **WebDAV** | 自托管 | 支持自建 NAS（如坚果云、Nextcloud） |
+| 服务             | 类型     | 说明                                |
+| ---------------- | -------- | ----------------------------------- |
+| **iCloud**       | 云同步   | Apple 用户，跨 iPhone/iPad/Mac      |
+| **Google Drive** | 云同步   | Android/跨平台用户                  |
+| **OneDrive**     | 云同步   | Microsoft 生态用户                  |
+| **Dropbox**      | 云同步   | 通用云盘                            |
+| **本地文件**     | 手动备份 | 导出为 JSON/SQLite 文件             |
+| **WebDAV**       | 自托管   | 支持自建 NAS（如坚果云、Nextcloud） |
 
 ### 11.3 同步机制
 
@@ -700,11 +701,11 @@ React Context
 
 ### 11.5 冲突解决策略
 
-| 策略 | 描述 | 适用场景 |
-|------|------|----------|
-| **本地优先** | 保留本地修改，覆盖服务端 | 个人设备，不希望被其他设备干扰 |
-| **服务端优先** | 保留服务端修改，覆盖本地 | 多设备协作，希望最新修改生效 |
-| **手动合并** | 提示用户选择 | 重要数据，需要人工确认 |
+| 策略           | 描述                     | 适用场景                       |
+| -------------- | ------------------------ | ------------------------------ |
+| **本地优先**   | 保留本地修改，覆盖服务端 | 个人设备，不希望被其他设备干扰 |
+| **服务端优先** | 保留服务端修改，覆盖本地 | 多设备协作，希望最新修改生效   |
+| **手动合并**   | 提示用户选择             | 重要数据，需要人工确认         |
 
 ---
 

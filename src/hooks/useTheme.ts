@@ -1,20 +1,27 @@
-'use client';
+"use client";
 
-import { useCallback, useState, useEffect } from 'react';
-import { ThemeId, themes, defaultTheme, systemTheme } from '@/lib/themes/registry';
+import { useCallback, useState, useEffect } from "react";
+import {
+  ThemeId,
+  themes,
+  defaultTheme,
+  systemTheme,
+} from "@/lib/themes/registry";
 
-const THEME_KEY = 'plan-todos-theme';
+const THEME_KEY = "plan-todos-theme";
 
 /**
  * Get the actual theme to apply based on stored theme preference
  * If theme is 'system', returns 'light' or 'dark' based on system preference
  */
 function getEffectiveTheme(storedTheme: ThemeId): ThemeId {
-  if (storedTheme === 'system') {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (storedTheme === "system") {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
     }
-    return 'light';
+    return "light";
   }
   return storedTheme;
 }
@@ -23,28 +30,30 @@ function getEffectiveTheme(storedTheme: ThemeId): ThemeId {
  * Get current theme from DOM or localStorage
  */
 function getStoredTheme(): ThemeId {
-  if (typeof window === 'undefined') return defaultTheme;
-  
+  if (typeof window === "undefined") return defaultTheme;
+
   // Get all valid theme IDs
-  const validThemeIds = [...Object.keys(themes) as ThemeId[], systemTheme];
-  
+  const validThemeIds = [...(Object.keys(themes) as ThemeId[]), systemTheme];
+
   // First check DOM (set by inline script)
-  const domTheme = document.documentElement.getAttribute('data-theme') as ThemeId;
+  const domTheme = document.documentElement.getAttribute(
+    "data-theme",
+  ) as ThemeId;
   if (domTheme && validThemeIds.includes(domTheme)) {
     return domTheme;
   }
-  
+
   // Then check localStorage
   const stored = localStorage.getItem(THEME_KEY) as ThemeId;
   if (stored && validThemeIds.includes(stored)) {
     return stored;
   }
-  
+
   // Finally check system preference
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    return "dark";
   }
-  
+
   return defaultTheme;
 }
 
@@ -60,20 +69,20 @@ export function useTheme() {
   // Apply theme to DOM
   const applyTheme = useCallback((themeToApply: ThemeId) => {
     const effectiveTheme = getEffectiveTheme(themeToApply);
-    document.documentElement.setAttribute('data-theme', effectiveTheme);
+    document.documentElement.setAttribute("data-theme", effectiveTheme);
   }, []);
 
   // Listen for system theme changes when in system mode
   useEffect(() => {
-    if (theme !== 'system') return;
+    if (theme !== "system") return;
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      applyTheme('system');
+      applyTheme("system");
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme, applyTheme]);
 
   // Apply theme on mount and when theme changes
@@ -83,35 +92,38 @@ export function useTheme() {
 
   const setTheme = useCallback((newTheme: ThemeId) => {
     // Validate theme - allow system and any theme in our registry
-    const validThemes: ThemeId[] = [...Object.keys(themes) as ThemeId[], systemTheme];
+    const validThemes: ThemeId[] = [
+      ...(Object.keys(themes) as ThemeId[]),
+      systemTheme,
+    ];
     if (!validThemes.includes(newTheme)) {
       console.warn(`Invalid theme: ${newTheme}, falling back to light`);
       newTheme = defaultTheme;
     }
-    
+
     // Update state
     setThemeState(newTheme);
-    
+
     // Persist to localStorage
     localStorage.setItem(THEME_KEY, newTheme);
   }, []);
-  
+
   const toggleTheme = useCallback(() => {
     const effectiveTheme = getEffectiveTheme(theme);
-    const newTheme = effectiveTheme === 'light' ? 'dark' : 'light';
+    const newTheme = effectiveTheme === "light" ? "dark" : "light";
     setTheme(newTheme);
   }, [theme, setTheme]);
 
   // Determine if currently in dark mode
   const effectiveTheme = getEffectiveTheme(theme);
-  const isDark = effectiveTheme === 'dark';
-  
+  const isDark = effectiveTheme === "dark";
+
   return {
     theme,
     setTheme,
     toggleTheme,
     isDark,
-    isSystem: theme === 'system',
+    isSystem: theme === "system",
     isInitialized: true,
   };
 }

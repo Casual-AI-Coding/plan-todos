@@ -1,43 +1,46 @@
-'use client';
+"use client";
 
-import { Card } from './Card';
-import { EmptyState, EmptyStateProps } from './EmptyState';
+import { Card } from "./Card";
+import { EmptyState, EmptyStateProps } from "./EmptyState";
 
-export interface EmptyStateCardProps extends Omit<EmptyStateProps, 'className'> {
+export interface EmptyStateCardProps extends Omit<
+  EmptyStateProps,
+  "className"
+> {
   className?: string;
 }
 
 /**
  * EmptyStateCard Component
- * 
+ *
  * EmptyState wrapped in a Card component for consistent styling.
- * 
+ *
  * Usage:
  * ```tsx
- * <EmptyStateCard 
- *   icon="📋" 
- *   title="暂无待办" 
+ * <EmptyStateCard
+ *   icon="📋"
+ *   title="暂无待办"
  *   description="创建你的第一个待办事项"
  *   action={<Button onClick={handleCreate}>创建待办</Button>}
  * />
  * ```
  */
-export function EmptyStateCard({ 
-  icon, 
-  title, 
-  description, 
+export function EmptyStateCard({
+  icon,
+  title,
+  description,
   action,
-  className = '' 
+  className = "",
 }: EmptyStateCardProps) {
   return (
-    <Card 
+    <Card
       className={className}
-      style={{ 
-        background: 'var(--color-bg-card)',
-        borderColor: 'var(--color-border)'
+      style={{
+        background: "var(--color-bg-card)",
+        borderColor: "var(--color-border)",
       }}
     >
-      <EmptyState 
+      <EmptyState
         icon={icon}
         title={title}
         description={description}

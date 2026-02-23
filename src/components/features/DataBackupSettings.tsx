@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button, Input } from '@/components/ui';
+import { Button, Input } from "@/components/ui";
 
 export interface DataBackupSettingsProps {
   autoBackup: boolean;
@@ -23,20 +23,22 @@ export function DataBackupSettings({
           <div className="text-sm text-gray-500">每次打开应用时自动备份</div>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             checked={autoBackup}
             onChange={(e) => onAutoBackupChange(e.target.checked)}
-            className="sr-only peer" 
+            className="sr-only peer"
           />
           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
         </label>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">备份路径</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          备份路径
+        </label>
         <div className="flex gap-2">
-          <Input 
+          <Input
             value={backupPath}
             onChange={(e) => onBackupPathChange(e.target.value)}
             placeholder="选择备份目录..."

@@ -1,7 +1,7 @@
 # Plan Todos - 组件设计
 
 > 状态：✅ 已实现（2026-02-14）
-> 
+>
 > **实际状态**：UI 组件库和视图组件已全部实现，包含搜索和日历功能
 
 ---
@@ -83,6 +83,7 @@ interface ButtonProps {
 ```
 
 **样式规范**：
+
 - 主色：`#0D9488` (Teal)
 - 强调色：`#F97316` (Orange)
 - 圆角：`8px`
@@ -94,7 +95,7 @@ interface ButtonProps {
 
 ```tsx
 interface InputProps {
-  type: 'text' | 'email' | 'password' | 'date' | 'number';
+  type: "text" | "email" | "password" | "date" | "number";
   placeholder?: string;
   value?: string;
   error?: string;
@@ -114,11 +115,12 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
-  width?: 'sm' | 'md' | 'lg';
+  width?: "sm" | "md" | "lg";
 }
 ```
 
 **行为**：
+
 - 点击遮罩关闭
 - ESC 键关闭
 - 打开时锁定 body scroll
@@ -133,7 +135,7 @@ interface CardProps {
   className?: string;
   onClick?: () => void;
   hoverable?: boolean;
-  padding?: 'none' | 'sm' | 'md' | 'lg';
+  padding?: "none" | "sm" | "md" | "lg";
 }
 ```
 
@@ -143,14 +145,14 @@ interface CardProps {
 
 ```tsx
 interface ProgressBarProps {
-  value: number;        // 0-100
+  value: number; // 0-100
   showLabel?: boolean;
-  color?: 'teal' | 'orange' | 'gray';
-  size?: 'sm' | 'md' | 'lg';
+  color?: "teal" | "orange" | "gray";
+  size?: "sm" | "md" | "lg";
 }
 
 // 使用示例
-<ProgressBar value={75} showLabel color="teal" />
+<ProgressBar value={75} showLabel color="teal" />;
 // ████████████░░░░░░░░░ 75%
 ```
 
@@ -160,7 +162,7 @@ interface ProgressBarProps {
 
 ```tsx
 interface DatePickerProps {
-  value?: string;       // ISO 8601
+  value?: string; // ISO 8601
   onChange: (date: string) => void;
   minDate?: string;
   maxDate?: string;
@@ -183,6 +185,7 @@ interface SidebarProps {
 ```
 
 **结构**：
+
 ```
 ┌─────────────────┐
 │  Logo           │
@@ -197,6 +200,7 @@ interface SidebarProps {
 ```
 
 **交互**：
+
 - 点击一级菜单展开/收起二级
 - 选中状态高亮
 - 折叠模式仅显示图标
@@ -350,9 +354,9 @@ interface DashboardProps {
 │  今日待打卡  │ 今日已完成  │ 当前最长连续         │
 │      3       │      2      │       5             │
 ├────────────────────────────────────────────────────┤
-│  今日待办列表                                    
+│  今日待办列表
 ├────────────────────────────────────────────────────┤
-│  进度概览 (Plan/Target 进度卡片)                 
+│  进度概览 (Plan/Target 进度卡片)
 └────────────────────────────────────────────────────┘
 ```
 
@@ -430,9 +434,9 @@ interface DashboardProps {
 │  今日待办    │  即将到期    │  今日完成           │
 │     5        │      3       │      8              │
 ├────────────────────────────────────────────────────┤
-│  今日待办列表                                    
+│  今日待办列表
 ├────────────────────────────────────────────────────┤
-│  进度概览 (Plan/Target 进度卡片)                 
+│  进度概览 (Plan/Target 进度卡片)
 └────────────────────────────────────────────────────┘
 ```
 
@@ -464,15 +468,15 @@ interface ViewSwitcherProps {
 
 ```tsx
 interface StatisticsProps {
-  period: 'day' | 'week' | 'month' | 'all';
+  period: "day" | "week" | "month" | "all";
   onPeriodChange: (period: string) => void;
 }
 
 // 包含的子组件
-- CompletionChart    // 完成率趋势图
-- CountStats         // 数量统计
-- DistributionChart  // 分布图表
-- EfficiencyStats    // 效率指标
+-CompletionChart - // 完成率趋势图
+  CountStats - // 数量统计
+  DistributionChart - // 分布图表
+  EfficiencyStats; // 效率指标
 ```
 
 ---
@@ -489,10 +493,7 @@ interface PlanFormProps {
 }
 
 // 字段
-- title (必填)
-- description
-- start_date
-- end_date
+-title(必填) - description - start_date - end_date;
 ```
 
 ---
@@ -508,11 +509,7 @@ interface TaskFormProps {
 }
 
 // 字段
-- title (必填)
-- description
-- start_date
-- end_date
-- status
+-title(必填) - description - start_date - end_date - status;
 ```
 
 ---
@@ -589,7 +586,7 @@ interface TodoContextValue {
 interface UIContextValue {
   sidebarCollapsed: boolean;
   currentView: string;
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   // ... UI state
 }
 ```

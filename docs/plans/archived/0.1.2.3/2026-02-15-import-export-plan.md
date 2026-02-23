@@ -4,12 +4,14 @@
 
 **Goal:** Add import/export functionality to Settings > General page, allowing users to backup and restore all application data including todos, tasks, plans, targets, steps, milestones, tags, entity_tags, and settings.
 
-**Architecture:** 
+**Architecture:**
+
 - Backend: Add Rust commands for export_data and import_data in src-tauri/src/
 - Frontend: Add ImportExportView component inside SettingsGeneralView
 - Use Tauri file dialog for file selection
 
-**Tech Stack:** 
+**Tech Stack:**
+
 - Rust (rusqlite, serde_json)
 - TypeScript/React
 - Tauri file dialog API
@@ -19,6 +21,7 @@
 ## Task 1: Backend - Export Data Structure
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs` - Add new tables if needed
 - Create: `src-tauri/src/export.rs` - Export functionality
 
@@ -63,6 +66,7 @@ mod export;
 ## Task 2: Backend - Export Implementation
 
 **Files:**
+
 - Modify: `src-tauri/src/export.rs`
 
 **Step 1: Implement export_data function**
@@ -71,7 +75,7 @@ mod export;
 #[tauri::command]
 pub fn export_data(state: tauri::State<AppState>) -> Result<ExportData, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
+
     // Query all tables and build ExportData
     // ... implementation
 }
@@ -90,6 +94,7 @@ cd src-tauri && cargo check
 ## Task 3: Backend - Import Data Structure
 
 **Files:**
+
 - Modify: `src-tauri/src/export.rs`
 
 **Step 1: Add ImportData and ImportResult structures**
@@ -130,6 +135,7 @@ pub fn import_data(
 ## Task 4: Backend - Import Modes Implementation
 
 **Files:**
+
 - Modify: `src-tauri/src/export.rs`
 
 **Step 1: Implement merge mode (skip on conflict)**
@@ -171,6 +177,7 @@ cd src-tauri && cargo check
 ## Task 5: Frontend - API Functions
 
 **Files:**
+
 - Modify: `src/lib/api.ts` - Add export/import functions
 
 **Step 1: Add TypeScript interfaces**
@@ -188,22 +195,29 @@ export interface ExportData {
   };
 }
 
-export type ImportMode = 'merge' | 'replace' | 'update';
+export type ImportMode = "merge" | "replace" | "update";
 ```
 
 **Step 2: Add API functions**
 
 ```typescript
 export async function exportData(): Promise<ExportData> {
-  if (!isTauri()) { throw new Error('Tauri required'); }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<ExportData>('export_data');
+  if (!isTauri()) {
+    throw new Error("Tauri required");
+  }
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<ExportData>("export_data");
 }
 
-export async function importData(data: ExportData, mode: ImportMode): Promise<ImportResult> {
-  if (!isTauri()) { throw new Error('Tauri required'); }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<ImportResult>('import_data', { data, mode });
+export async function importData(
+  data: ExportData,
+  mode: ImportMode,
+): Promise<ImportResult> {
+  if (!isTauri()) {
+    throw new Error("Tauri required");
+  }
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<ImportResult>("import_data", { data, mode });
 }
 ```
 
@@ -214,18 +228,19 @@ export async function importData(data: ExportData, mode: ImportMode): Promise<Im
 ## Task 6: Frontend - ImportExportView Component
 
 **Files:**
+
 - Create: `src/app/views/ImportExportView.tsx`
 
 **Step 1: Create component**
 
 ```tsx
-'use client';
-import { useState, useRef } from 'react';
-import { Card, Button } from '@/components/ui';
-import { exportData, importData, ExportData, ImportMode } from '@/lib/api';
+"use client";
+import { useState, useRef } from "react";
+import { Card, Button } from "@/components/ui";
+import { exportData, importData, ExportData, ImportMode } from "@/lib/api";
 
 export function ImportExportView() {
-  const [mode, setMode] = useState<ImportMode>('update');
+  const [mode, setMode] = useState<ImportMode>("update");
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -234,13 +249,15 @@ export function ImportExportView() {
       const data = await exportData();
       const json = JSON.stringify(data, null, 2);
       // Use Tauri download API
-      const blob = new Blob([json], { type: 'application/json' });
+      const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `plan-todos-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `plan-todos-backup-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function handleImport(file: File) {
@@ -250,7 +267,9 @@ export function ImportExportView() {
       const data = JSON.parse(text) as ExportData;
       const result = await importData(data, mode);
       alert(`导入完成: ${result.imported} 条`);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
     setImporting(false);
   }
 
@@ -267,19 +286,21 @@ export function ImportExportView() {
       <Card>
         <h3 className="font-medium mb-2">导入数据</h3>
         <p className="text-sm text-gray-500 mb-3">从 JSON 文件恢复数据</p>
-        
+
         <input
           type="file"
           ref={fileInputRef}
           accept=".json"
-          onChange={e => e.target.files?.[0] && handleImport(e.target.files[0])}
+          onChange={(e) =>
+            e.target.files?.[0] && handleImport(e.target.files[0])
+          }
           className="hidden"
         />
-        
+
         <div className="space-y-2">
           <label className="block text-sm text-gray-600">导入模式:</label>
           <div className="flex gap-4">
-            {(['merge', 'replace', 'update'] as ImportMode[]).map(m => (
+            {(["merge", "replace", "update"] as ImportMode[]).map((m) => (
               <label key={m} className="flex items-center gap-1">
                 <input
                   type="radio"
@@ -288,20 +309,20 @@ export function ImportExportView() {
                   onChange={() => setMode(m)}
                 />
                 <span className="text-sm">
-                  {m === 'merge' ? '合并' : m === 'replace' ? '替换' : '更新'}
+                  {m === "merge" ? "合并" : m === "replace" ? "替换" : "更新"}
                 </span>
               </label>
             ))}
           </div>
         </div>
 
-        <Button 
-          variant="secondary" 
+        <Button
+          variant="secondary"
           className="mt-3"
           onClick={() => fileInputRef.current?.click()}
           disabled={importing}
         >
-          {importing ? '导入中...' : '选择文件'}
+          {importing ? "导入中..." : "选择文件"}
         </Button>
       </Card>
     </div>
@@ -316,17 +337,18 @@ export function ImportExportView() {
 ## Task 7: Frontend - Integrate into SettingsGeneralView
 
 **Files:**
+
 - Modify: `src/app/views/SettingsGeneralView.tsx`
 
 **Step 1: Import and add to page**
 
 ```tsx
-import { ImportExportView } from './ImportExportView';
+import { ImportExportView } from "./ImportExportView";
 
 // In the return JSX, add:
 <Card>
   <ImportExportView />
-</Card>
+</Card>;
 ```
 
 **Step 2: Verify build**
@@ -348,6 +370,7 @@ npm run test -- --run
 ```
 
 **Step 2: Manual testing**
+
 - Export data and verify JSON structure
 - Test import with different modes
 
@@ -357,16 +380,16 @@ npm run test -- --run
 
 ## Summary
 
-| Task | Description |
-|------|-------------|
-| 1 | Backend export data structure |
-| 2 | Backend export implementation |
-| 3 | Backend import data structure |
-| 4 | Backend import modes |
-| 5 | Frontend API functions |
-| 6 | ImportExportView component |
-| 7 | Integrate into SettingsGeneralView |
-| 8 | Testing and verification |
+| Task | Description                        |
+| ---- | ---------------------------------- |
+| 1    | Backend export data structure      |
+| 2    | Backend export implementation      |
+| 3    | Backend import data structure      |
+| 4    | Backend import modes               |
+| 5    | Frontend API functions             |
+| 6    | ImportExportView component         |
+| 7    | Integrate into SettingsGeneralView |
+| 8    | Testing and verification           |
 
 ---
 

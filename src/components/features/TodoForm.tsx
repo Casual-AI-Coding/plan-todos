@@ -35,7 +35,7 @@ export function TodoForm({
   const [tags, setTags] = useState<string[]>([]);
   const isInitialized = useRef(false);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
     if (!open) return;
     if (isInitialized.current && !editingTodo) {

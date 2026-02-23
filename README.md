@@ -2,7 +2,7 @@
 
 > 本地优先的跨平台任务管理应用
 
-![Version](https://img.shields.io/badge/version-0.5.2-blue)
+![Version](https://img.shields.io/badge/version-0.5.3-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android-green)
 ![Framework](https://img.shields.io/badge/framework-Tauri%20v2-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -16,6 +16,7 @@ Plan Todos 是一款本地优先的跨平台任务管理应用，融合短期 TO
 ## 特性
 
 ### 核心功能
+
 - **Dashboard** - 今日概览、统计数据、进度追踪
 - **待办清单 (Todos)** - 日常任务管理，支持优先级、标签
 - **计划 (Plans)** - 长期规划与目标分解
@@ -24,11 +25,13 @@ Plan Todos 是一款本地优先的跨平台任务管理应用，融合短期 TO
 - **统计分析** - 完成率、效率评分、趋势分析
 
 ### 数据管理
+
 - **导入/导出** - JSON 格式数据备份，支持 merge/replace/update 三种模式
 - **本地存储** - SQLite 数据持久化，数据不上云
 - **标签系统** - 给 Todo/Plan/Target 添加标签分类
 
 ### 平台支持
+
 - Windows (NSIS/MSI 安装包)
 - macOS (DMG 安装包)
 - Linux (DEB/RPM/AppImage)
@@ -36,15 +39,15 @@ Plan Todos 是一款本地优先的跨平台任务管理应用，融合短期 TO
 
 ## 技术栈
 
-| 组件 | 技术 |
-|------|------|
-| 核心框架 | Tauri v2 (Rust) |
-| 前端 | Next.js 16 + React 19 |
-| 语言 | TypeScript |
-| 数据库 | SQLite (本地文件) |
-| 测试 | Vitest |
-| UI | Tailwind CSS |
-| 构建 | GitHub Actions (多平台自动构建) |
+| 组件     | 技术                            |
+| -------- | ------------------------------- |
+| 核心框架 | Tauri v2 (Rust)                 |
+| 前端     | Next.js 16 + React 19           |
+| 语言     | TypeScript                      |
+| 数据库   | SQLite (本地文件)               |
+| 测试     | Vitest                          |
+| UI       | Tailwind CSS                    |
+| 构建     | GitHub Actions (多平台自动构建) |
 
 ## 快速开始
 
@@ -104,15 +107,15 @@ plan-todos/
 
 ## 主要视图
 
-| 视图 | 说明 |
-|------|------|
-| Dashboard | 今日概览、统计数据、进度追踪 |
-| Todos | 待办清单管理 |
-| Plans | 计划管理 |
-| Targets | 目标追踪 |
-| Milestones | 里程碑管理 |
-| Statistics | 数据统计分析 |
-| Settings | 应用设置 |
+| 视图       | 说明                         |
+| ---------- | ---------------------------- |
+| Dashboard  | 今日概览、统计数据、进度追踪 |
+| Todos      | 待办清单管理                 |
+| Plans      | 计划管理                     |
+| Targets    | 目标追踪                     |
+| Milestones | 里程碑管理                   |
+| Statistics | 数据统计分析                 |
+| Settings   | 应用设置                     |
 
 ## 迭代计划
 

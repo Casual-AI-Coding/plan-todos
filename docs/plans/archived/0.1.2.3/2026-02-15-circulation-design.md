@@ -5,6 +5,7 @@
 ## 概述
 
 Circulation 是循环打卡功能，支持两种类型：
+
 - **周期打卡 (periodic)**: 每日、每周、每月周期性打卡，支持 streak 连续统计
 - **计数打卡 (count)**: 单纯累计次数，无时间维度，无 streak
 
@@ -17,11 +18,13 @@ Circulation 是循环打卡功能，支持两种类型：
 ### 1.1 现有问题
 
 当前 Milestone 使用特定字段关联：
+
 - plan_id
-- task_id  
+- task_id
 - target_id
 
 这种设计导致：
+
 - 字段冗余
 - 难以扩展支持新实体（如 circulation）
 - 不符合开闭原则
@@ -58,32 +61,32 @@ struct Milestone {
 
 ### 2.1 circulations 表
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT PRIMARY KEY | UUID |
-| title | TEXT NOT NULL | 打卡项标题 |
-| content | TEXT | 备注描述 |
-| type | TEXT NOT NULL | **periodic / count** |
-| frequency | TEXT | periodic 时: daily / weekly / monthly |
-| frequency_config | TEXT | JSON 配置（如每周具体哪天） |
-| target_count | INTEGER | count 时: 目标次数 |
-| current_count | INTEGER DEFAULT 0 | count 时: 当前累计 |
-| streak_count | INTEGER DEFAULT 0 | periodic 时: 当前连续 |
-| best_streak | INTEGER DEFAULT 0 | periodic 时: 历史最佳 |
-| last_completed_at | TEXT | 上次完成时间 |
-| status | TEXT DEFAULT 'active' | active / archived |
-| created_at | TEXT | 创建时间 |
-| updated_at | TEXT | 更新时间 |
+| 字段              | 类型                  | 说明                                  |
+| ----------------- | --------------------- | ------------------------------------- |
+| id                | TEXT PRIMARY KEY      | UUID                                  |
+| title             | TEXT NOT NULL         | 打卡项标题                            |
+| content           | TEXT                  | 备注描述                              |
+| type              | TEXT NOT NULL         | **periodic / count**                  |
+| frequency         | TEXT                  | periodic 时: daily / weekly / monthly |
+| frequency_config  | TEXT                  | JSON 配置（如每周具体哪天）           |
+| target_count      | INTEGER               | count 时: 目标次数                    |
+| current_count     | INTEGER DEFAULT 0     | count 时: 当前累计                    |
+| streak_count      | INTEGER DEFAULT 0     | periodic 时: 当前连续                 |
+| best_streak       | INTEGER DEFAULT 0     | periodic 时: 历史最佳                 |
+| last_completed_at | TEXT                  | 上次完成时间                          |
+| status            | TEXT DEFAULT 'active' | active / archived                     |
+| created_at        | TEXT                  | 创建时间                              |
+| updated_at        | TEXT                  | 更新时间                              |
 
 ### 2.2 circulation_logs 表
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT PRIMARY KEY | UUID |
-| circulation_id | TEXT NOT NULL | 外键 |
-| completed_at | TEXT NOT NULL | 完成时间 |
-| note | TEXT | 用户打卡备注 |
-| period | TEXT | periodic 时: 周期标识 (如 2024-W05) |
+| 字段           | 类型             | 说明                                |
+| -------------- | ---------------- | ----------------------------------- |
+| id             | TEXT PRIMARY KEY | UUID                                |
+| circulation_id | TEXT NOT NULL    | 外键                                |
+| completed_at   | TEXT NOT NULL    | 完成时间                            |
+| note           | TEXT             | 用户打卡备注                        |
+| period         | TEXT             | periodic 时: 周期标识 (如 2024-W05) |
 
 ### 2.3 frequency_config JSON 结构
 
@@ -101,11 +104,11 @@ struct Milestone {
 
 ### 3.1 周期打卡 (periodic)
 
-| 频率 | 周期重置时间 | 适用场景 |
-|------|-------------|---------|
-| daily | 每天 00:00 | 每日晨跑、喝水、读书 |
-| weekly | 每周一 00:00 | 每周总结、周计划 |
-| monthly | 每月1日 00:00 | 每月复盘、账单整理 |
+| 频率    | 周期重置时间  | 适用场景             |
+| ------- | ------------- | -------------------- |
+| daily   | 每天 00:00    | 每日晨跑、喝水、读书 |
+| weekly  | 每周一 00:00  | 每周总结、周计划     |
+| monthly | 每月1日 00:00 | 每月复盘、账单整理   |
 
 ### 3.2 计数打卡 (count)
 
@@ -165,6 +168,7 @@ struct Milestone {
 ```
 
 页面内 Tab 切换：
+
 - 今日打卡
 - 打卡设置
   - 周期打卡 / 计数打卡 (二级 Tab)
@@ -173,6 +177,7 @@ struct Milestone {
 ### 5.2 打卡设置页面
 
 Tab 切换分类：
+
 - 周期打卡 (Periodic)
   - 每日
   - 每周
@@ -184,6 +189,7 @@ Tab 切换分类：
 ### 5.3 打卡主页布局
 
 **标题行**
+
 - 左侧：标题 "打卡"
 - 右侧：Tab 按钮组 + 新建按钮（最右边）
 
@@ -196,12 +202,15 @@ Tab 切换分类：
 ### 5.4 打卡设置 Tab 布局
 
 **二级 Tab**
+
 - 周期打卡 | 计数打卡
 
 **周期打卡子 Tab** (点击周期打卡时显示)
+
 - 每日 | 每周 | 每月
 
 **卡片列表**
+
 - 每个打卡项显示为卡片：
   - 标题
   - 🔥 连续 X 天 (周期打卡)
@@ -212,6 +221,7 @@ Tab 切换分类：
 ### 5.5 今日打卡页面
 
 展示今日需要打卡的项：
+
 - periodic/daily 全部显示
 - periodic/weekly 显示今日是周几
 - periodic/monthly 显示今日是几号
@@ -274,29 +284,29 @@ Tab 切换分类：
 
 ### 6.1 CRUD 接口
 
-| 方法 | 路径 | 功能 |
-|------|------|------|
-| GET | /circulations | 获取所有打卡项 |
-| GET | /circulations/:id | 获取单个 |
-| GET | /circulations?type=periodic&frequency=daily | 筛选 |
-| POST | /circulations | 创建 |
-| PUT | /circulations/:id | 更新 |
-| DELETE | /circulations/:id | 删除 |
+| 方法   | 路径                                        | 功能           |
+| ------ | ------------------------------------------- | -------------- |
+| GET    | /circulations                               | 获取所有打卡项 |
+| GET    | /circulations/:id                           | 获取单个       |
+| GET    | /circulations?type=periodic&frequency=daily | 筛选           |
+| POST   | /circulations                               | 创建           |
+| PUT    | /circulations/:id                           | 更新           |
+| DELETE | /circulations/:id                           | 删除           |
 
 ### 6.2 打卡操作
 
-| 方法 | 路径 | 功能 |
-|------|------|------|
-| POST | /circulations/:id/checkin | 打卡 |
-| POST | /circulations/:id/undo | 撤销最近一次打卡 |
-| GET | /circulations/:id/logs | 获取打卡记录(最新20条) |
-| GET | /circulations/:id/stats | 获取统计 |
+| 方法 | 路径                      | 功能                   |
+| ---- | ------------------------- | ---------------------- |
+| POST | /circulations/:id/checkin | 打卡                   |
+| POST | /circulations/:id/undo    | 撤销最近一次打卡       |
+| GET  | /circulations/:id/logs    | 获取打卡记录(最新20条) |
+| GET  | /circulations/:id/stats   | 获取统计               |
 
 ### 6.3 今日数据
 
-| 方法 | 路径 | 功能 |
-|------|------|------|
-| GET | /circulations/today | 获取今日待打卡列表 |
+| 方法 | 路径                | 功能               |
+| ---- | ------------------- | ------------------ |
+| GET  | /circulations/today | 获取今日待打卡列表 |
 
 ---
 
@@ -305,6 +315,7 @@ Tab 切换分类：
 ### 7.1 Dashboard
 
 新增字段：
+
 - today_circulations: 今日打卡项列表
 - today_completed: 今日已完成数
 - today_pending: 今日待打卡数
@@ -319,12 +330,14 @@ Tab 切换分类：
 ### 7.3 Export / Import
 
 导出数据包含：
+
 - circulations 表
 - circulation_logs 表
 
 ### 7.4 Notifications 通知
 
 可选功能：
+
 - 打卡提醒（可配置时间）
 - 打卡完成通知
 - 连续打卡成就通知
@@ -332,6 +345,7 @@ Tab 切换分类：
 ### 7.5 Milestone 集成
 
 Milestone.biz_type = 'circulation' 时：
+
 - progress = circulation.streak_count (periodic)
 - progress = circulation.current_count (count)
 
@@ -354,8 +368,8 @@ ALTER TABLE milestones ADD COLUMN biz_type TEXT;
 ALTER TABLE milestones ADD COLUMN biz_id TEXT;
 
 -- 数据迁移 (伪代码)
-UPDATE milestones 
-SET biz_type = 'plan', biz_id = plan_id 
+UPDATE milestones
+SET biz_type = 'plan', biz_id = plan_id
 WHERE plan_id IS NOT NULL;
 
 -- 删除旧字段 (可选，暂时保留兼容)
@@ -385,8 +399,8 @@ WHERE plan_id IS NOT NULL;
 ### 9.3 类型定义
 
 ```typescript
-type CirculationType = 'periodic' | 'count';
-type PeriodicFrequency = 'daily' | 'weekly' | 'monthly';
+type CirculationType = "periodic" | "count";
+type PeriodicFrequency = "daily" | "weekly" | "monthly";
 
 interface Circulation {
   id: string;
@@ -400,7 +414,7 @@ interface Circulation {
   streak_count: number;
   best_streak: number;
   last_completed_at?: string;
-  status: 'active' | 'archived';
+  status: "active" | "archived";
   created_at: string;
   updated_at: string;
 }
@@ -426,7 +440,7 @@ interface CirculationLog {
 
 ## 11. 更新历史
 
-| 日期 | 操作 |
-|------|------|
-| 2026-02-15 | 创建文档 v1.0 |
+| 日期       | 操作                                                                    |
+| ---------- | ----------------------------------------------------------------------- |
+| 2026-02-15 | 创建文档 v1.0                                                           |
 | 2026-02-19 | 更新 UI 设计：侧边栏结构、卡片布局、Dashboard/Statistics 集成、种子数据 |

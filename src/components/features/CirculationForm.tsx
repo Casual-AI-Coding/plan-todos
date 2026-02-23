@@ -37,7 +37,7 @@ export function CirculationForm({
   const isInitialized = useRef(false);
 
   // Reset form when opening with editing data
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
     if (!open) return;
     if (isInitialized.current && !editingCirculation) {

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 import {
   DndContext,
   closestCenter,
@@ -9,15 +9,15 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   rectSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface SortableItemProps<T> {
   item: T;
@@ -26,7 +26,12 @@ interface SortableItemProps<T> {
   getItemId: (item: T) => string;
 }
 
-function SortableItem<T>({ item, index, renderItem, getItemId }: SortableItemProps<T>) {
+function SortableItem<T>({
+  item,
+  index,
+  renderItem,
+  getItemId,
+}: SortableItemProps<T>) {
   const id = getItemId(item);
   const {
     attributes,
@@ -41,7 +46,7 @@ function SortableItem<T>({ item, index, renderItem, getItemId }: SortableItemPro
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.8 : 1,
-    zIndex: isDragging ? 1000 : 'auto',
+    zIndex: isDragging ? 1000 : "auto",
   };
 
   return (
@@ -72,7 +77,7 @@ export function SortableList<T>({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {

@@ -1,7 +1,7 @@
 # Plan Todos - API 设计
 
 > 状态：✅ 已实现（2026-02-14）
-> 
+>
 > **实际状态**：所有实体 CRUD API 已完成
 
 ---
@@ -46,13 +46,13 @@
 
 ### 错误代码
 
-| 代码 | 说明 |
-|------|------|
-| `NOT_FOUND` | 资源不存在 |
-| `VALIDATION_ERROR` | 参数校验失败 |
-| `WEIGHT_EXCEEDED` | 权重超限 (Step) |
-| `INVALID_REFERENCE` | 无效的关联引用 |
-| `INTERNAL_ERROR` | 内部错误 |
+| 代码                | 说明            |
+| ------------------- | --------------- |
+| `NOT_FOUND`         | 资源不存在      |
+| `VALIDATION_ERROR`  | 参数校验失败    |
+| `WEIGHT_EXCEEDED`   | 权重超限 (Step) |
+| `INVALID_REFERENCE` | 无效的关联引用  |
+| `INTERNAL_ERROR`    | 内部错误        |
 
 ---
 
@@ -94,8 +94,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "create_plan", 
+{
+  "cmd": "create_plan",
   "payload": {
     title: string,
     description?: string,
@@ -112,8 +112,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "update_plan", 
+{
+  "cmd": "update_plan",
   "payload": {
     id: string,
     title?: string,
@@ -142,12 +142,12 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "get_tasks", 
-  "payload": { 
+{
+  "cmd": "get_tasks",
+  "payload": {
     plan_id?: string,
     status?: "pending" | "in-progress" | "done"
-  } 
+  }
 }
 ```
 
@@ -155,8 +155,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "create_task", 
+{
+  "cmd": "create_task",
   "payload": {
     plan_id: string,
     title: string,
@@ -171,8 +171,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "update_task", 
+{
+  "cmd": "update_task",
   "payload": {
     id: string,
     title?: string,
@@ -221,8 +221,8 @@
 ### 5.2 创建 Target
 
 ```typescript
-{ 
-  "cmd": "create_target", 
+{
+  "cmd": "create_target",
   "payload": {
     title: string,
     description?: string,
@@ -234,8 +234,8 @@
 ### 5.3 更新 Target
 
 ```typescript
-{ 
-  "cmd": "update_target", 
+{
+  "cmd": "update_target",
   "payload": {
     id: string,
     title?: string,
@@ -285,8 +285,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "create_step", 
+{
+  "cmd": "create_step",
   "payload": {
     target_id: string,
     title: string,
@@ -311,8 +311,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "update_step", 
+{
+  "cmd": "update_step",
   "payload": {
     id: string,
     title?: string,
@@ -336,21 +336,21 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "get_todos", 
-  "payload": { 
+{
+  "cmd": "get_todos",
+  "payload": {
     status?: "pending" | "in-progress" | "done",
     due_date_start?: string,  // 截止日期范围
     due_date_end?: string
-  } 
+  }
 }
 ```
 
 ### 7.2 创建 Todo
 
 ```typescript
-{ 
-  "cmd": "create_todo", 
+{
+  "cmd": "create_todo",
   "payload": {
     title: string,
     content?: string,
@@ -362,8 +362,8 @@
 ### 7.3 更新 Todo
 
 ```typescript
-{ 
-  "cmd": "update_todo", 
+{
+  "cmd": "update_todo",
   "payload": {
     id: string,
     title?: string,
@@ -413,8 +413,8 @@
 
 ```typescript
 // 请求 - 三选一关联
-{ 
-  "cmd": "create_milestone", 
+{
+  "cmd": "create_milestone",
   "payload": {
     title: string,
     target_date?: string,
@@ -430,8 +430,8 @@
 ### 8.3 更新 Milestone
 
 ```typescript
-{ 
-  "cmd": "update_milestone", 
+{
+  "cmd": "update_milestone",
   "payload": {
     id: string,
     title?: string,
@@ -530,8 +530,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "bulk_update_status", 
+{
+  "cmd": "bulk_update_status",
   "payload": {
     ids: string[],
     status: string
@@ -577,8 +577,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "get_circulations_by_type", 
+{
+  "cmd": "get_circulations_by_type",
   "payload": {
     circulationType: "periodic",  // "periodic" | "count"
     frequency?: "daily"           // optional, for periodic
@@ -590,8 +590,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "create_circulation", 
+{
+  "cmd": "create_circulation",
   "payload": {
     title: string,
     circulationType: "periodic" | "count",
@@ -606,8 +606,8 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "checkin_circulation", 
+{
+  "cmd": "checkin_circulation",
   "payload": {
     id: "circ_xxx",
     note?: string,  // optional
@@ -630,9 +630,9 @@
 
 ```typescript
 // 请求
-{ 
-  "cmd": "get_circulation_logs", 
-  "payload": { 
+{
+  "cmd": "get_circulation_logs",
+  "payload": {
     circulationId: "circ_xxx",
     limit?: number  // default 20
   }

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { searchAll, SearchResult } from '@/lib/api';
+import { useState } from "react";
+import { searchAll, SearchResult } from "@/lib/api";
 
 interface SearchBarProps {
   onResultClick: (entityType: string, id: string) => void;
 }
 
 export function SearchBar({ onResultClick }: SearchBarProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 

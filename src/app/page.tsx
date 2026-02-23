@@ -196,16 +196,38 @@ export default function Home() {
             >
               {/* Mobile sidebar header with close button */}
               <div className="flex items-center justify-between px-4 h-12 border-b">
-                <span className="font-semibold" style={{ color: "var(--color-text)" }}>菜单</span>
+                <span
+                  className="font-semibold"
+                  style={{ color: "var(--color-text)" }}
+                >
+                  菜单
+                </span>
                 <button
                   onClick={() => setMobileSidebarOpen(false)}
                   className="p-2 rounded hover:opacity-80"
                   style={{ color: "var(--color-text)" }}
                   aria-label="关闭菜单"
                 >
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <rect x="4" y="4" width="12" height="1.5" transform="rotate(45 10 10)" />
-                    <rect x="4" y="4" width="12" height="1.5" transform="rotate(-45 10 10)" />
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <rect
+                      x="4"
+                      y="4"
+                      width="12"
+                      height="1.5"
+                      transform="rotate(45 10 10)"
+                    />
+                    <rect
+                      x="4"
+                      y="4"
+                      width="12"
+                      height="1.5"
+                      transform="rotate(-45 10 10)"
+                    />
                   </svg>
                 </button>
               </div>

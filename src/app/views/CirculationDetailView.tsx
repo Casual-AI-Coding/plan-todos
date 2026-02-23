@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Card, Button, Modal, ProgressRing } from '@/components/ui';
+import { useState, useEffect, useRef } from "react";
+import { Card, Button, Modal, ProgressRing } from "@/components/ui";
 import {
   getCirculation,
   getCirculationLogs,
@@ -9,8 +9,8 @@ import {
   undoCheckinCirculation,
   Circulation,
   CirculationLog,
-} from '@/lib/api';
-import { CheckinConfirm } from '@/components/ui/CheckinConfirm';
+} from "@/lib/api";
+import { CheckinConfirm } from "@/components/ui/CheckinConfirm";
 
 interface CirculationDetailViewProps {
   id: string;
@@ -18,7 +18,11 @@ interface CirculationDetailViewProps {
   onClose?: () => void;
 }
 
-export function CirculationDetailView({ id, onBack, onClose }: CirculationDetailViewProps) {
+export function CirculationDetailView({
+  id,
+  onBack,
+  onClose,
+}: CirculationDetailViewProps) {
   const [circulation, setCirculation] = useState<Circulation | null>(null);
   const [logs, setLogs] = useState<CirculationLog[]>([]);
   const [checkinTarget, setCheckinTarget] = useState<Circulation | null>(null);
@@ -53,11 +57,11 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
 
   const isCompletedToday = (): boolean => {
     if (!circulation?.last_completed_at) return false;
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     return circulation.last_completed_at.startsWith(today);
   };
 
-  async function handleCheckin(note: string = '', count?: number) {
+  async function handleCheckin(note: string = "", count?: number) {
     if (!circulation) return;
     try {
       await checkinCirculation(circulation.id, note, count);
@@ -65,12 +69,12 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
       setCheckinTarget(null);
     } catch (e) {
       console.error(e);
-      alert(e instanceof Error ? e.message : '打卡失败');
+      alert(e instanceof Error ? e.message : "打卡失败");
     }
   }
 
   async function handleUndo() {
-    if (!circulation || !confirm('确定要撤销今天的打卡吗？')) return;
+    if (!circulation || !confirm("确定要撤销今天的打卡吗？")) return;
     try {
       await undoCheckinCirculation(circulation.id);
       await loadData();
@@ -81,23 +85,28 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
 
   // Format large numbers with tooltip (e.g., 10000 -> "10K" with tooltip showing "10000")
   // K=千, W=万, M=百万
-  const formatNumberWithTooltip = (num: number): { display: string; title: string } => {
+  const formatNumberWithTooltip = (
+    num: number,
+  ): { display: string; title: string } => {
     if (num >= 1000000) {
-      const display = (num / 1000000) % 1 === 0 
-        ? (num / 1000000) + 'M' 
-        : (num / 1000000).toFixed(1) + 'M';
+      const display =
+        (num / 1000000) % 1 === 0
+          ? num / 1000000 + "M"
+          : (num / 1000000).toFixed(1) + "M";
       return { display, title: num.toLocaleString() };
     }
     if (num >= 10000) {
-      const display = (num / 10000) % 1 === 0 
-        ? (num / 10000) + 'W' 
-        : (num / 10000).toFixed(1) + 'W';
+      const display =
+        (num / 10000) % 1 === 0
+          ? num / 10000 + "W"
+          : (num / 10000).toFixed(1) + "W";
       return { display, title: num.toLocaleString() };
     }
     if (num >= 1000) {
-      const display = (num / 1000) % 1 === 0 
-        ? (num / 1000) + 'K' 
-        : (num / 1000).toFixed(1) + 'K';
+      const display =
+        (num / 1000) % 1 === 0
+          ? num / 1000 + "K"
+          : (num / 1000).toFixed(1) + "K";
       return { display, title: num.toLocaleString() };
     }
     return { display: num.toLocaleString(), title: num.toString() };
@@ -106,23 +115,36 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
   const detailContent = circulation ? (
     <>
       {/* Progress Ring - Only for count type */}
-      {circulation.circulation_type === 'count' && (
+      {circulation.circulation_type === "count" && (
         <div className="flex justify-center mb-6">
           <ProgressRing
             value={
               circulation.target_count
-                ? Math.min(100, (circulation.current_count / circulation.target_count) * 100)
+                ? Math.min(
+                    100,
+                    (circulation.current_count / circulation.target_count) *
+                      100,
+                  )
                 : 0
             }
             size={120}
             strokeWidth={10}
-            color={circulation.target_count && circulation.current_count >= circulation.target_count ? 'var(--color-success)' : 'var(--color-primary)'}
-            label={circulation.target_count 
-              ? `${formatNumberWithTooltip(circulation.current_count).display}/${formatNumberWithTooltip(circulation.target_count).display}` 
-              : '无目标'}
-            title={circulation.target_count 
-              ? `${circulation.current_count.toLocaleString()} / ${circulation.target_count.toLocaleString()}`
-              : undefined}
+            color={
+              circulation.target_count &&
+              circulation.current_count >= circulation.target_count
+                ? "var(--color-success)"
+                : "var(--color-primary)"
+            }
+            label={
+              circulation.target_count
+                ? `${formatNumberWithTooltip(circulation.current_count).display}/${formatNumberWithTooltip(circulation.target_count).display}`
+                : "无目标"
+            }
+            title={
+              circulation.target_count
+                ? `${circulation.current_count.toLocaleString()} / ${circulation.target_count.toLocaleString()}`
+                : undefined
+            }
           />
         </div>
       )}
@@ -145,11 +167,16 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             <div className="text-sm text-gray-500 mt-1">最佳记录</div>
           </div>
         </Card>
-        {circulation.circulation_type === 'count' && (
+        {circulation.circulation_type === "count" && (
           <>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-500" title={formatNumberWithTooltip(circulation.current_count).title}>
+                <div
+                  className="text-3xl font-bold text-blue-500"
+                  title={
+                    formatNumberWithTooltip(circulation.current_count).title
+                  }
+                >
                   {formatNumberWithTooltip(circulation.current_count).display}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">已完成</div>
@@ -157,8 +184,17 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             </Card>
             <Card>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-600" title={circulation.target_count ? formatNumberWithTooltip(circulation.target_count).title : '无限制'}>
-                  {circulation.target_count ? formatNumberWithTooltip(circulation.target_count).display : '∞'}
+                <div
+                  className="text-3xl font-bold text-gray-600"
+                  title={
+                    circulation.target_count
+                      ? formatNumberWithTooltip(circulation.target_count).title
+                      : "无限制"
+                  }
+                >
+                  {circulation.target_count
+                    ? formatNumberWithTooltip(circulation.target_count).display
+                    : "∞"}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">目标</div>
               </div>
@@ -182,7 +218,10 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
 
       {/* History */}
       <Card>
-        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{ color: "var(--color-text)" }}
+        >
           打卡记录
         </h3>
         {logs.length === 0 ? (
@@ -192,26 +231,37 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left px-4 py-2 text-gray-500 font-medium">时间</th>
                   <th className="text-left px-4 py-2 text-gray-500 font-medium">
-                    {circulation?.circulation_type === 'count' ? '进度' : '周期'}
+                    时间
                   </th>
-                  <th className="text-left px-4 py-2 text-gray-500 font-medium">备注</th>
+                  <th className="text-left px-4 py-2 text-gray-500 font-medium">
+                    {circulation?.circulation_type === "count"
+                      ? "进度"
+                      : "周期"}
+                  </th>
+                  <th className="text-left px-4 py-2 text-gray-500 font-medium">
+                    备注
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {logs.map(log => (
-                  <tr key={log.id} className="border-t border-gray-100 hover:bg-gray-50">
+                {logs.map((log) => (
+                  <tr
+                    key={log.id}
+                    className="border-t border-gray-100 hover:bg-gray-50"
+                  >
                     <td className="px-4 py-2 text-gray-700">
-                      {new Date(log.completed_at).toLocaleString('zh-CN')}
+                      {new Date(log.completed_at).toLocaleString("zh-CN")}
                     </td>
                     <td className="px-4 py-2 text-gray-500">
-                      {circulation?.circulation_type === 'count' 
-                        ? (log.count !== null ? `+${log.count}` : '-')
-                        : (log.period || '-')}
+                      {circulation?.circulation_type === "count"
+                        ? log.count !== null
+                          ? `+${log.count}`
+                          : "-"
+                        : log.period || "-"}
                     </td>
                     <td className="px-4 py-2 text-gray-600">
-                      {log.note || '-'}
+                      {log.note || "-"}
                     </td>
                   </tr>
                 ))}
@@ -266,12 +316,7 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
 
   if (isModal) {
     return (
-      <Modal
-        open={true}
-        title={circulation.title}
-        onClose={onClose}
-        width="lg"
-      >
+      <Modal open={true} title={circulation.title} onClose={onClose} width="lg">
         {detailContent}
       </Modal>
     );
@@ -286,7 +331,10 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
             ← 返回
           </Button>
         )}
-        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+        <h2
+          className="text-2xl font-semibold"
+          style={{ color: "var(--color-text)" }}
+        >
           {circulation.title}
         </h2>
       </div>
@@ -294,4 +342,3 @@ export function CirculationDetailView({ id, onBack, onClose }: CirculationDetail
     </div>
   );
 }
-

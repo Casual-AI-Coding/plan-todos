@@ -1,32 +1,45 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Card, Button, FadeIn } from '@/components/ui';
-import { Calendar } from '@/components/ui/Calendar';
-import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
-import { useToast } from '@/components/ui/Toast';
-import { getTodos, createTodo, updateTodo, deleteTodo, Todo, Priority, Tag, getTags, getEntityTags, setEntityTags } from '@/lib/api';
-import { TodoItem } from '@/components/features/TodoItem';
-import { TodoForm, type TodoFormData } from '@/components/features/TodoForm';
-import { TodoFilters } from '@/components/features/TodoFilters';
+import { useState, useEffect, useRef } from "react";
+import { Card, Button, FadeIn } from "@/components/ui";
+import { Calendar } from "@/components/ui/Calendar";
+import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { useToast } from "@/components/ui/Toast";
+import {
+  getTodos,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  Todo,
+  Priority,
+  Tag,
+  getTags,
+  getEntityTags,
+  setEntityTags,
+} from "@/lib/api";
+import { TodoItem } from "@/components/features/TodoItem";
+import { TodoForm, type TodoFormData } from "@/components/features/TodoForm";
+import { TodoFilters } from "@/components/features/TodoFilters";
 
 interface CalendarEvent {
   id: string;
   title: string;
   date: string;
-  type: 'todo' | 'task' | 'plan' | 'milestone';
+  type: "todo" | "task" | "plan" | "milestone";
 }
 
 export function TodosView() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
-  const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
+  const [filter, setFilter] = useState<
+    "all" | "today" | "upcoming" | "completed"
+  >("all");
+  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [showForm, setShowForm] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
@@ -39,58 +52,72 @@ export function TodosView() {
       // Load tags for each todo
       const todosWithTags = await Promise.all(
         data.map(async (todo) => {
-          const tags = await getEntityTags('todo', todo.id);
+          const tags = await getEntityTags("todo", todo.id);
           return { ...todo, tags };
-        })
+        }),
       );
       if (isLoaded.current) setTodos(todosWithTags);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function loadTags() {
     try {
       const tags = await getTags();
       if (isLoaded.current) setAllTags(tags);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTodos(); }, []); // eslint-disable-line react-hooks/set-state-in-effect
-  useEffect(() => { if (isLoaded.current) return; isLoaded.current = true; loadTags(); }, []); // eslint-disable-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    if (isLoaded.current) return;
+    isLoaded.current = true;
+    loadTodos();
+  }, []);  
+  useEffect(() => {
+    if (isLoaded.current) return;
+    isLoaded.current = true;
+    loadTags();
+  }, []);  
 
   // Convert todos to calendar events
   const calendarEvents: CalendarEvent[] = todos
-    .filter(t => t.due_date)
-    .map(t => ({
+    .filter((t) => t.due_date)
+    .map((t) => ({
       id: t.id,
       title: t.title,
       date: t.due_date!,
-      type: 'todo' as const
+      type: "todo" as const,
     }));
 
-  const filteredTodos = todos.filter(t => {
+  const filteredTodos = todos.filter((t) => {
     // Search filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      if (!t.title.toLowerCase().includes(q) && 
-          !(t.content?.toLowerCase().includes(q))) {
+      if (
+        !t.title.toLowerCase().includes(q) &&
+        !t.content?.toLowerCase().includes(q)
+      ) {
         return false;
       }
     }
     // Priority filter
-    if (priorityFilter !== 'all' && t.priority !== priorityFilter) {
+    if (priorityFilter !== "all" && t.priority !== priorityFilter) {
       return false;
     }
     // Tag filter (OR logic - multiple tags)
     if (tagFilters.length > 0) {
-      const todoTagIds = (t.tags || []).map(tag => tag.id);
-      const hasTag = tagFilters.some(tagId => todoTagIds.includes(tagId));
+      const todoTagIds = (t.tags || []).map((tag) => tag.id);
+      const hasTag = tagFilters.some((tagId) => todoTagIds.includes(tagId));
       if (!hasTag) return false;
     }
     // Status filter
-    const today = new Date().toISOString().split('T')[0];
-    if (filter === 'today') return t.due_date?.startsWith(today);
-    if (filter === 'upcoming') return t.due_date && t.due_date > today;
-    if (filter === 'completed') return t.status === 'done';
+    const today = new Date().toISOString().split("T")[0];
+    if (filter === "today") return t.due_date?.startsWith(today);
+    if (filter === "upcoming") return t.due_date && t.due_date > today;
+    if (filter === "completed") return t.status === "done";
     return true;
   });
 
@@ -99,36 +126,46 @@ export function TodosView() {
     try {
       let todoId: string;
       if (editingTodo) {
-        await updateTodo(editingTodo.id, { title: data.title, content: data.content, due_date: data.due_date, priority: data.priority });
+        await updateTodo(editingTodo.id, {
+          title: data.title,
+          content: data.content,
+          due_date: data.due_date,
+          priority: data.priority,
+        });
         todoId = editingTodo.id;
-        toast.success('待办已更新');
+        toast.success("待办已更新");
       } else {
-        const newTodo = await createTodo({ title: data.title, content: data.content, due_date: data.due_date, priority: data.priority });
+        const newTodo = await createTodo({
+          title: data.title,
+          content: data.content,
+          due_date: data.due_date,
+          priority: data.priority,
+        });
         todoId = newTodo.id;
-        toast.success('待办已创建');
+        toast.success("待办已创建");
       }
       // Save tags
-      await setEntityTags('todo', todoId, tags);
+      await setEntityTags("todo", todoId, tags);
       setShowForm(false);
       setEditingTodo(null);
       loadTodos();
-    } catch (e) { 
+    } catch (e) {
       console.error(e);
-      toast.error('操作失败');
+      toast.error("操作失败");
     }
   }
 
   async function handleToggle(todo: Todo) {
-    const next = todo.status === 'done' ? 'pending' : 'done';
+    const next = todo.status === "done" ? "pending" : "done";
     await updateTodo(todo.id, { status: next });
-    toast.success(next === 'done' ? '已完成' : '已取消完成');
+    toast.success(next === "done" ? "已完成" : "已取消完成");
     loadTodos();
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete?')) return;
+    if (!confirm("Delete?")) return;
     await deleteTodo(id);
-    toast.success('待办已删除');
+    toast.success("待办已删除");
     loadTodos();
   }
 
@@ -148,7 +185,12 @@ export function TodosView() {
   return (
     <div className="p-2 sm:p-4 md:p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>TODOS</h2>
+        <h2
+          className="text-xl sm:text-2xl font-semibold"
+          style={{ color: "var(--color-text)" }}
+        >
+          TODOS
+        </h2>
         <Button onClick={() => setShowForm(true)}>+ 新建</Button>
       </div>
 
@@ -167,47 +209,58 @@ export function TodosView() {
         onTagFilterChange={setTagFilters}
         onSearchChange={setSearchQuery}
         onViewModeChange={setViewMode}
-        onPriorityDropdownToggle={() => { setShowPriorityDropdown(!showPriorityDropdown); setShowTagDropdown(false); }}
-        onTagDropdownToggle={() => { setShowTagDropdown(!showTagDropdown); setShowPriorityDropdown(false); }}
+        onPriorityDropdownToggle={() => {
+          setShowPriorityDropdown(!showPriorityDropdown);
+          setShowTagDropdown(false);
+        }}
+        onTagDropdownToggle={() => {
+          setShowTagDropdown(!showTagDropdown);
+          setShowPriorityDropdown(false);
+        }}
       />
 
       {/* Click outside to close dropdowns */}
       {(showPriorityDropdown || showTagDropdown) && (
-        <div 
-          className="fixed inset-0 z-0" 
-          onClick={() => { setShowPriorityDropdown(false); setShowTagDropdown(false); }}
+        <div
+          className="fixed inset-0 z-0"
+          onClick={() => {
+            setShowPriorityDropdown(false);
+            setShowTagDropdown(false);
+          }}
         />
       )}
 
       {/* Content */}
-      {viewMode === 'list' ? (
+      {viewMode === "list" ? (
         /* List */
         <div className="space-y-2">
-        {filteredTodos.map((todo, index) => (
-          <FadeIn key={todo.id} delay={index * 0.05} direction="up">
-            <TodoItem
-              todo={todo}
-              onToggle={handleToggle}
-              onDelete={handleDelete}
-              onClick={handleEditClick}
+          {filteredTodos.map((todo, index) => (
+            <FadeIn key={todo.id} delay={index * 0.05} direction="up">
+              <TodoItem
+                todo={todo}
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+                onClick={handleEditClick}
+              />
+            </FadeIn>
+          ))}
+          {filteredTodos.length === 0 && (
+            <EmptyStateCard
+              icon="📋"
+              title="暂无待办事项"
+              description="创建你的第一个待办事项来开始使用"
+              action={
+                <Button onClick={() => setShowForm(true)}>+ 创建待办</Button>
+              }
             />
-          </FadeIn>
-        ))}
-        {filteredTodos.length === 0 && (
-          <EmptyStateCard 
-            icon="📋" 
-            title="暂无待办事项" 
-            description="创建你的第一个待办事项来开始使用"
-            action={<Button onClick={() => setShowForm(true)}>+ 创建待办</Button>}
-          />
-        )}
-      </div>
+          )}
+        </div>
       ) : (
         /* Calendar */
         <Card>
-          <Calendar 
-            events={calendarEvents} 
-            onEventClick={(e) => console.log('Clicked:', e)}
+          <Calendar
+            events={calendarEvents}
+            onEventClick={(e) => console.log("Clicked:", e)}
           />
         </Card>
       )}

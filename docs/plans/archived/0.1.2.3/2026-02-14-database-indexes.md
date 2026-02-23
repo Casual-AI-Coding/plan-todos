@@ -13,6 +13,7 @@
 ## Task 1: Add Indexes for Task Queries
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Context:** Tasks are frequently queried by plan_id (when showing tasks for a specific plan)
@@ -54,6 +55,7 @@ conn.execute(
 ## Task 2: Add Indexes for Step Queries
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Step 1: Add index on steps.target_id**
@@ -81,6 +83,7 @@ conn.execute(
 ## Task 3: Add Indexes for Todo Queries
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Step 1: Add index on todos.due_date**
@@ -118,6 +121,7 @@ conn.execute(
 ## Task 4: Add Indexes for Plan and Target
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Step 1: Add index on plans.status**
@@ -165,6 +169,7 @@ conn.execute(
 ## Task 5: Add Indexes for Milestones
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Step 1: Add indexes for milestone foreign keys**
@@ -200,6 +205,7 @@ conn.execute(
 ## Task 6: Verify Rust Compilation
 
 **Command:**
+
 ```bash
 cd src-tauri && cargo check
 ```
@@ -211,6 +217,7 @@ cd src-tauri && cargo check
 ## Task 7: Commit Changes
 
 **Command:**
+
 ```bash
 git add src-tauri/src/db.rs
 git commit -m "perf: add database indexes for frequently queried columns
@@ -230,24 +237,24 @@ Indexes use IF NOT EXISTS for safe migration on existing databases"
 
 ## Index Summary
 
-| Table | Index Name | Columns | Purpose |
-|-------|-----------|---------|---------|
-| tasks | idx_tasks_plan_id | plan_id | Fast lookup of tasks by plan |
-| tasks | idx_tasks_status | status | Filter by status |
-| tasks | idx_tasks_dates | start_date, end_date | Date range queries |
-| steps | idx_steps_target_id | target_id | Fast lookup of steps by target |
-| steps | idx_steps_status | status | Filter by status |
-| todos | idx_todos_due_date | due_date | Today's/upcoming queries |
-| todos | idx_todos_status | status | Filter by status |
-| todos | idx_todos_status_due | status, due_date | Dashboard queries |
-| plans | idx_plans_status | status | Filter by status |
-| plans | idx_plans_dates | start_date, end_date | Date range queries |
-| targets | idx_targets_status | status | Filter by status |
-| targets | idx_targets_due_date | due_date | Due date queries |
-| milestones | idx_milestones_plan_id | plan_id | Progress calculation |
-| milestones | idx_milestones_task_id | task_id | Progress calculation |
-| milestones | idx_milestones_target_id | target_id | Progress calculation |
-| milestones | idx_milestones_status | status | Filter by status |
+| Table      | Index Name               | Columns              | Purpose                        |
+| ---------- | ------------------------ | -------------------- | ------------------------------ |
+| tasks      | idx_tasks_plan_id        | plan_id              | Fast lookup of tasks by plan   |
+| tasks      | idx_tasks_status         | status               | Filter by status               |
+| tasks      | idx_tasks_dates          | start_date, end_date | Date range queries             |
+| steps      | idx_steps_target_id      | target_id            | Fast lookup of steps by target |
+| steps      | idx_steps_status         | status               | Filter by status               |
+| todos      | idx_todos_due_date       | due_date             | Today's/upcoming queries       |
+| todos      | idx_todos_status         | status               | Filter by status               |
+| todos      | idx_todos_status_due     | status, due_date     | Dashboard queries              |
+| plans      | idx_plans_status         | status               | Filter by status               |
+| plans      | idx_plans_dates          | start_date, end_date | Date range queries             |
+| targets    | idx_targets_status       | status               | Filter by status               |
+| targets    | idx_targets_due_date     | due_date             | Due date queries               |
+| milestones | idx_milestones_plan_id   | plan_id              | Progress calculation           |
+| milestones | idx_milestones_task_id   | task_id              | Progress calculation           |
+| milestones | idx_milestones_target_id | target_id            | Progress calculation           |
+| milestones | idx_milestones_status    | status               | Filter by status               |
 
 ---
 

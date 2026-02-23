@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import packageJson from '../../../package.json';
+import packageJson from "../../../package.json";
 
 export function AboutCard() {
   return (

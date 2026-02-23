@@ -1,7 +1,7 @@
 # Plan Todos - 数据库设计
 
 > 状态：✅ 已实现（2026-02-14）
-> 
+>
 > **实际状态**：SQLite 数据库已完全实现，包含自动迁移和种子数据
 
 ---
@@ -63,6 +63,7 @@
 ```
 
 **关系说明**：
+
 - **Plan → Task**：1对多，一个Plan可以有多个Task
 - **Target → Step**：1对多，一个Target可以有多个Step
 - **Milestone → Plan/Task/Target**：多选一关联（三个外键但仅能有一个有值）
@@ -81,23 +82,23 @@ CREATE TABLE plans (
   description TEXT,
   start_date  TEXT,
   end_date    TEXT,
-  status      TEXT NOT NULL DEFAULT 'active' 
+  status      TEXT NOT NULL DEFAULT 'active'
               CHECK(status IN ('active', 'completed', 'archived')),
   created_at  TEXT NOT NULL,
   updated_at  TEXT NOT NULL
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| title | TEXT | NOT NULL | 计划标题 |
-| description | TEXT | | 描述 |
-| start_date | TEXT | | 开始日期 (ISO 8601) |
-| end_date | TEXT | | 结束日期 (ISO 8601) |
-| status | TEXT | DEFAULT 'active' | 状态 |
-| created_at | TEXT | NOT NULL | 创建时间 |
-| updated_at | TEXT | NOT NULL | 更新时间 |
+| 字段        | 类型 | 约束             | 说明                |
+| ----------- | ---- | ---------------- | ------------------- |
+| id          | TEXT | PK               | UUID                |
+| title       | TEXT | NOT NULL         | 计划标题            |
+| description | TEXT |                  | 描述                |
+| start_date  | TEXT |                  | 开始日期 (ISO 8601) |
+| end_date    | TEXT |                  | 结束日期 (ISO 8601) |
+| status      | TEXT | DEFAULT 'active' | 状态                |
+| created_at  | TEXT | NOT NULL         | 创建时间            |
+| updated_at  | TEXT | NOT NULL         | 更新时间            |
 
 ---
 
@@ -119,17 +120,17 @@ CREATE TABLE tasks (
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| plan_id | TEXT | FK → plans(id) | 所属计划 |
-| title | TEXT | NOT NULL | 任务标题 |
-| description | TEXT | | 描述 |
-| start_date | TEXT | | 开始日期 |
-| end_date | TEXT | | 结束日期 |
-| status | TEXT | DEFAULT 'pending' | 状态 |
-| created_at | TEXT | NOT NULL | 创建时间 |
-| updated_at | TEXT | NOT NULL | 更新时间 |
+| 字段        | 类型 | 约束              | 说明     |
+| ----------- | ---- | ----------------- | -------- |
+| id          | TEXT | PK                | UUID     |
+| plan_id     | TEXT | FK → plans(id)    | 所属计划 |
+| title       | TEXT | NOT NULL          | 任务标题 |
+| description | TEXT |                   | 描述     |
+| start_date  | TEXT |                   | 开始日期 |
+| end_date    | TEXT |                   | 结束日期 |
+| status      | TEXT | DEFAULT 'pending' | 状态     |
+| created_at  | TEXT | NOT NULL          | 创建时间 |
+| updated_at  | TEXT | NOT NULL          | 更新时间 |
 
 ---
 
@@ -149,16 +150,16 @@ CREATE TABLE targets (
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| title | TEXT | NOT NULL | 目标标题 |
-| description | TEXT | | 描述 |
-| due_date | TEXT | | 截止日期 |
-| status | TEXT | DEFAULT 'active' | 状态 |
-| progress | INTEGER | DEFAULT 0 | 进度 (0-100，从 Steps 自动计算) |
-| created_at | TEXT | NOT NULL | 创建时间 |
-| updated_at | TEXT | NOT NULL | 更新时间 |
+| 字段        | 类型    | 约束             | 说明                            |
+| ----------- | ------- | ---------------- | ------------------------------- |
+| id          | TEXT    | PK               | UUID                            |
+| title       | TEXT    | NOT NULL         | 目标标题                        |
+| description | TEXT    |                  | 描述                            |
+| due_date    | TEXT    |                  | 截止日期                        |
+| status      | TEXT    | DEFAULT 'active' | 状态                            |
+| progress    | INTEGER | DEFAULT 0        | 进度 (0-100，从 Steps 自动计算) |
+| created_at  | TEXT    | NOT NULL         | 创建时间                        |
+| updated_at  | TEXT    | NOT NULL         | 更新时间                        |
 
 ---
 
@@ -179,15 +180,15 @@ CREATE TABLE steps (
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| target_id | TEXT | FK → targets(id) | 所属目标 |
-| title | TEXT | NOT NULL | 步骤标题 |
-| weight | INTEGER | 0-100 | 权重 |
-| status | TEXT | DEFAULT 'pending' | 状态 |
-| created_at | TEXT | NOT NULL | 创建时间 |
-| updated_at | TEXT | NOT NULL | 更新时间 |
+| 字段       | 类型    | 约束              | 说明     |
+| ---------- | ------- | ----------------- | -------- |
+| id         | TEXT    | PK                | UUID     |
+| target_id  | TEXT    | FK → targets(id)  | 所属目标 |
+| title      | TEXT    | NOT NULL          | 步骤标题 |
+| weight     | INTEGER | 0-100             | 权重     |
+| status     | TEXT    | DEFAULT 'pending' | 状态     |
+| created_at | TEXT    | NOT NULL          | 创建时间 |
+| updated_at | TEXT    | NOT NULL          | 更新时间 |
 
 ---
 
@@ -229,24 +230,25 @@ CREATE TABLE milestones (
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| title | TEXT | NOT NULL | 里程碑标题 |
-| target_date | TEXT | | 目标日期 |
-| plan_id | TEXT | FK → plans | 关联计划 (可选) |
-| task_id | TEXT | FK → tasks | 关联任务 (可选) |
-| target_id | TEXT | FK → targets | 关联目标 (可选) |
-| status | TEXT | DEFAULT 'pending' | 状态 |
-| progress | INTEGER | DEFAULT 0 | 进度 (0-100，从关联实体自动计算) |
-| created_at | TEXT | NOT NULL | 创建时间 |
-| updated_at | TEXT | NOT NULL | 更新时间 |
+| 字段        | 类型    | 约束              | 说明                             |
+| ----------- | ------- | ----------------- | -------------------------------- |
+| id          | TEXT    | PK                | UUID                             |
+| title       | TEXT    | NOT NULL          | 里程碑标题                       |
+| target_date | TEXT    |                   | 目标日期                         |
+| plan_id     | TEXT    | FK → plans        | 关联计划 (可选)                  |
+| task_id     | TEXT    | FK → tasks        | 关联任务 (可选)                  |
+| target_id   | TEXT    | FK → targets      | 关联目标 (可选)                  |
+| status      | TEXT    | DEFAULT 'pending' | 状态                             |
+| progress    | INTEGER | DEFAULT 0         | 进度 (0-100，从关联实体自动计算) |
+| created_at  | TEXT    | NOT NULL          | 创建时间                         |
+| updated_at  | TEXT    | NOT NULL          | 更新时间                         |
 
 **关联说明**：plan_id、task_id、target_id 三选一关联（仅能有一个有值）
 
 ---
 
 ## 四、索引设计
+
 - `chk_milestone_target`：确保三选一关联（plan_id/task_id/target_id 必须且仅能有一个）
 
 ---
@@ -255,24 +257,24 @@ CREATE TABLE milestones (
 
 ### 4.1 索引列表
 
-| 表 | 索引名 | 字段 | 用途 |
-|----|--------|------|------|
-| tasks | idx_tasks_plan_id | plan_id | 按计划查询任务 |
-| tasks | idx_tasks_status | status | 状态筛选 |
-| tasks | idx_tasks_dates | start_date, end_date | 日期范围查询 |
-| steps | idx_steps_target_id | target_id | 按目标查询步骤 |
-| steps | idx_steps_status | status | 状态筛选 |
-| todos | idx_todos_due_date | due_date | 今日/即将到期查询 |
-| todos | idx_todos_status | status | 状态筛选 |
-| todos | idx_todos_status_due | status, due_date | Dashboard综合查询 |
-| plans | idx_plans_status | status | 状态筛选 |
-| plans | idx_plans_dates | start_date, end_date | 日期范围查询 |
-| targets | idx_targets_status | status | 状态筛选 |
-| targets | idx_targets_due_date | due_date | 截止日期查询 |
-| milestones | idx_milestones_plan_id | plan_id | 进度计算 |
-| milestones | idx_milestones_task_id | task_id | 进度计算 |
-| milestones | idx_milestones_target_id | target_id | 进度计算 |
-| milestones | idx_milestones_status | status | 状态筛选 |
+| 表         | 索引名                   | 字段                 | 用途              |
+| ---------- | ------------------------ | -------------------- | ----------------- |
+| tasks      | idx_tasks_plan_id        | plan_id              | 按计划查询任务    |
+| tasks      | idx_tasks_status         | status               | 状态筛选          |
+| tasks      | idx_tasks_dates          | start_date, end_date | 日期范围查询      |
+| steps      | idx_steps_target_id      | target_id            | 按目标查询步骤    |
+| steps      | idx_steps_status         | status               | 状态筛选          |
+| todos      | idx_todos_due_date       | due_date             | 今日/即将到期查询 |
+| todos      | idx_todos_status         | status               | 状态筛选          |
+| todos      | idx_todos_status_due     | status, due_date     | Dashboard综合查询 |
+| plans      | idx_plans_status         | status               | 状态筛选          |
+| plans      | idx_plans_dates          | start_date, end_date | 日期范围查询      |
+| targets    | idx_targets_status       | status               | 状态筛选          |
+| targets    | idx_targets_due_date     | due_date             | 截止日期查询      |
+| milestones | idx_milestones_plan_id   | plan_id              | 进度计算          |
+| milestones | idx_milestones_task_id   | task_id              | 进度计算          |
+| milestones | idx_milestones_target_id | target_id            | 进度计算          |
+| milestones | idx_milestones_status    | status               | 状态筛选          |
 
 ### 4.2 性能提升预期
 
@@ -325,7 +327,7 @@ CREATE INDEX IF NOT EXISTS idx_milestones_status ON milestones(status);
 CREATE TRIGGER update_plan_progress
 AFTER UPDATE ON tasks
 BEGIN
-  UPDATE plans 
+  UPDATE plans
   SET updated_at = datetime('now')
   WHERE id = NEW.plan_id;
 END;
@@ -336,6 +338,7 @@ END;
 ## 六、迁移策略
 
 应用启动时自动执行迁移（`init_db` 函数）：
+
 1. `CREATE TABLE IF NOT EXISTS` - 创建表（仅在表不存在时）
 2. `ALTER TABLE ADD COLUMN IF NOT EXISTS` - 添加新列（向后兼容）
 3. 种子数据初始化（仅在表为空时）
@@ -373,22 +376,22 @@ CREATE TABLE circulations (
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| title | TEXT | NOT NULL | 打卡项标题 |
-| content | TEXT | | 描述/备注 |
-| circulation_type | TEXT | NOT NULL | `periodic` 或 `count` |
-| frequency | TEXT | | `daily`/`weekly`/`monthly` (周期打卡) |
-| frequency_config | TEXT | | JSON 配置 |
-| target_count | INTEGER | | 目标次数 (计数打卡) |
-| current_count | INTEGER | DEFAULT 0 | 当前进度 (计数打卡) |
-| streak_count | INTEGER | DEFAULT 0 | 当前连续天数 (周期打卡) |
-| best_streak | INTEGER | DEFAULT 0 | 最佳连续记录 (周期打卡) |
-| last_completed_at | TEXT | | 上次完成时间 |
-| status | TEXT | DEFAULT 'active' | 状态 |
-| created_at | TEXT | NOT NULL | 创建时间 |
-| updated_at | TEXT | NOT NULL | 更新时间 |
+| 字段              | 类型    | 约束             | 说明                                  |
+| ----------------- | ------- | ---------------- | ------------------------------------- |
+| id                | TEXT    | PK               | UUID                                  |
+| title             | TEXT    | NOT NULL         | 打卡项标题                            |
+| content           | TEXT    |                  | 描述/备注                             |
+| circulation_type  | TEXT    | NOT NULL         | `periodic` 或 `count`                 |
+| frequency         | TEXT    |                  | `daily`/`weekly`/`monthly` (周期打卡) |
+| frequency_config  | TEXT    |                  | JSON 配置                             |
+| target_count      | INTEGER |                  | 目标次数 (计数打卡)                   |
+| current_count     | INTEGER | DEFAULT 0        | 当前进度 (计数打卡)                   |
+| streak_count      | INTEGER | DEFAULT 0        | 当前连续天数 (周期打卡)               |
+| best_streak       | INTEGER | DEFAULT 0        | 最佳连续记录 (周期打卡)               |
+| last_completed_at | TEXT    |                  | 上次完成时间                          |
+| status            | TEXT    | DEFAULT 'active' | 状态                                  |
+| created_at        | TEXT    | NOT NULL         | 创建时间                              |
+| updated_at        | TEXT    | NOT NULL         | 更新时间                              |
 
 ### 8.2 circulation_logs 表
 
@@ -404,14 +407,14 @@ CREATE TABLE circulation_logs (
 );
 ```
 
-| 字段 | 类型 | 约束 | 说明 |
-|------|------|------|------|
-| id | TEXT | PK | UUID |
-| circulation_id | TEXT | FK → circulations | 关联打卡项 |
-| completed_at | TEXT | NOT NULL | 打卡时间 |
-| note | TEXT | | 打卡备注 |
-| period | TEXT | | 周期标识 (如 `2024-W05`, `2024-02`) |
-| count | INTEGER | DEFAULT 1 | 本次打卡数量 (计数打卡) |
+| 字段           | 类型    | 约束              | 说明                                |
+| -------------- | ------- | ----------------- | ----------------------------------- |
+| id             | TEXT    | PK                | UUID                                |
+| circulation_id | TEXT    | FK → circulations | 关联打卡项                          |
+| completed_at   | TEXT    | NOT NULL          | 打卡时间                            |
+| note           | TEXT    |                   | 打卡备注                            |
+| period         | TEXT    |                   | 周期标识 (如 `2024-W05`, `2024-02`) |
+| count          | INTEGER | DEFAULT 1         | 本次打卡数量 (计数打卡)             |
 
 ### 8.3 索引
 

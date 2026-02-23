@@ -7,6 +7,7 @@
 **产品定位**：本地优先的跨平台任务管理应用，融合短期 TODO 与长期 PLAN，帮助用户追踪日常事务与长期目标。
 
 **核心理念**：
+
 - 本地化存储，数据不上云（隐私优先）
 - 短期任务与长期计划无缝关联
 - 跨平台支持（桌面 + 移动 + Web 调试）
@@ -17,13 +18,13 @@
 
 ### 2.1 技术栈
 
-| 组件 | 技术选择 |
-|------|----------|
-| 核心框架 | Tauri v2 (Rust) |
-| 前端 | Next.js (App Router) + React |
-| 语言 | TypeScript |
-| 数据库 | SQLite (本地文件) |
-| 测试 | Vitest + Playwright |
+| 组件        | 技术选择                                     |
+| ----------- | -------------------------------------------- |
+| 核心框架    | Tauri v2 (Rust)                              |
+| 前端        | Next.js (App Router) + React                 |
+| 语言        | TypeScript                                   |
+| 数据库      | SQLite (本地文件)                            |
+| 测试        | Vitest + Playwright                          |
 | UI 设计系统 | ui-ux-pro-max (Fira Code/Sans + Teal/Orange) |
 
 ### 2.2 架构图
@@ -56,8 +57,8 @@ interface Plan {
   id: string;
   title: string;
   description?: string;
-  targetDate?: Date;        // 目标日期
-  status: 'active' | 'completed' | 'archived';
+  targetDate?: Date; // 目标日期
+  status: "active" | "completed" | "archived";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -68,7 +69,7 @@ interface Milestone {
   planId: string;
   title: string;
   targetDate?: Date;
-  status: 'pending' | 'completed';
+  status: "pending" | "completed";
 }
 
 // Todo - 短期任务
@@ -76,10 +77,10 @@ interface Todo {
   id: string;
   title: string;
   content?: string;
-  dueDate?: Date;           // 截止日期
-  status: 'pending' | 'in-progress' | 'done';
-  planIds: string[];        // 关联的 Plan（多对多）
-  milestoneId?: string;     // 可选关联到里程碑
+  dueDate?: Date; // 截止日期
+  status: "pending" | "in-progress" | "done";
+  planIds: string[]; // 关联的 Plan（多对多）
+  milestoneId?: string; // 可选关联到里程碑
   createdAt: Date;
   updatedAt: Date;
 }
@@ -87,9 +88,9 @@ interface Todo {
 // NotificationConfig - 通知配置
 interface NotificationConfig {
   id: string;
-  type: 'feishu' | 'dingtalk' | 'email' | 'webhook';
+  type: "feishu" | "dingtalk" | "email" | "webhook";
   enabled: boolean;
-  config: Record<string, string>;  // 平台特定配置
+  config: Record<string, string>; // 平台特定配置
 }
 ```
 
@@ -115,11 +116,11 @@ interface NotificationConfig {
 
 ### 3.3 视图模式
 
-| 视图 | 描述 |
-|------|------|
-| **列表视图** | 层级展示 PLAN → Milestone → TODO |
-| **日历视图** | 月/周/日视图，按日期显示 TODO |
-| **时间轴视图** | 甘特图样式，横向展示时间分布 |
+| 视图           | 描述                             |
+| -------------- | -------------------------------- |
+| **列表视图**   | 层级展示 PLAN → Milestone → TODO |
+| **日历视图**   | 月/周/日视图，按日期显示 TODO    |
+| **时间轴视图** | 甘特图样式，横向展示时间分布     |
 
 ### 3.4 推送通知
 
@@ -145,11 +146,11 @@ interface NotificationConfig {
 
 #### 通知类型
 
-| 类型 | 触发条件 | 示例 |
-|------|----------|------|
+| 类型     | 触发条件              | 示例                          |
+| -------- | --------------------- | ----------------------------- |
 | 定时提醒 | 到期前 X 分钟/小时/天 | "项目A设计稿还有 30 分钟到期" |
-| 事件触发 | 任务完成/新建/更新 | "你已完成 '回复邮件'" |
-| 每日汇总 | 每天早上 9 点 | "今日 3 件待办，2 件已过期" |
+| 事件触发 | 任务完成/新建/更新    | "你已完成 '回复邮件'"         |
+| 每日汇总 | 每天早上 9 点         | "今日 3 件待办，2 件已过期"   |
 
 #### 定时任务
 
@@ -164,15 +165,15 @@ interface NotificationConfig {
 
 使用 ui-ux-pro-max 生成的设计系统：
 
-| 元素 | 规格 |
-|------|------|
-| 主色 | `#0D9488` (Teal) |
-| 次色 | `#14B8A6` |
+| 元素     | 规格               |
+| -------- | ------------------ |
+| 主色     | `#0D9488` (Teal)   |
+| 次色     | `#14B8A6`          |
 | 强调/CTA | `#F97316` (Orange) |
-| 背景 | `#F0FDFA` |
-| 文字 | `#134E4A` |
-| 标题字体 | Fira Code |
-| 正文字体 | Fira Sans |
+| 背景     | `#F0FDFA`          |
+| 文字     | `#134E4A`          |
+| 标题字体 | Fira Code          |
+| 正文字体 | Fira Sans          |
 
 ### 4.2 风格
 
@@ -212,21 +213,21 @@ interface NotificationConfig {
 ```
 React Context
 ├── TodoContext - TODO 列表状态
-├── PlanContext - PLAN 列表状态  
+├── PlanContext - PLAN 列表状态
 └── UIContext - 视图切换、侧边栏状态
 ```
 
 ### 5.2 Tauri IPC
 
-| 操作 | 命令 | 说明 |
-|------|------|------|
-| 获取所有 TODO | `get_todos` | 返回列表 |
-| 创建 TODO | `create_todo` | 传入 title, content, dueDate, planIds |
-| 更新 TODO | `update_todo` | 支持部分更新 |
-| 删除 TODO | `delete_todo` | 软删除 |
-| 获取所有 PLAN | `get_plans` | 返回列表 |
-| 创建 PLAN | `create_plan` | 传入 title, description, targetDate |
-| 发送通知 | `send_notification` | 调用通知插件 |
+| 操作          | 命令                | 说明                                  |
+| ------------- | ------------------- | ------------------------------------- |
+| 获取所有 TODO | `get_todos`         | 返回列表                              |
+| 创建 TODO     | `create_todo`       | 传入 title, content, dueDate, planIds |
+| 更新 TODO     | `update_todo`       | 支持部分更新                          |
+| 删除 TODO     | `delete_todo`       | 软删除                                |
+| 获取所有 PLAN | `get_plans`         | 返回列表                              |
+| 创建 PLAN     | `create_plan`       | 传入 title, description, targetDate   |
+| 发送通知      | `send_notification` | 调用通知插件                          |
 
 ---
 
@@ -248,11 +249,11 @@ React Context
 
 ## 七、测试策略
 
-| 层级 | 工具 | 覆盖范围 |
-|------|------|----------|
-| 单元测试 | Vitest | 业务逻辑、工具函数 |
-| 集成测试 | Vitest | Tauri 命令、数据库 CRUD |
-| E2E 测试 | Playwright | 核心用户流程 |
+| 层级     | 工具       | 覆盖范围                |
+| -------- | ---------- | ----------------------- |
+| 单元测试 | Vitest     | 业务逻辑、工具函数      |
+| 集成测试 | Vitest     | Tauri 命令、数据库 CRUD |
+| E2E 测试 | Playwright | 核心用户流程            |
 
 ### 核心测试场景
 
@@ -298,14 +299,14 @@ React Context
 
 ### 9.2 支持的备份服务
 
-| 服务 | 类型 | 说明 |
-|------|------|------|
-| **iCloud** | 云同步 | Apple 用户，跨 iPhone/iPad/Mac |
-| **Google Drive** | 云同步 | Android/跨平台用户 |
-| **OneDrive** | 云同步 | Microsoft 生态用户 |
-| **Dropbox** | 云同步 | 通用云盘 |
-| **本地文件** | 手动备份 | 导出为 JSON/SQLite 文件 |
-| **WebDAV** | 自托管 | 支持自建 NAS（如坚果云、Nextcloud） |
+| 服务             | 类型     | 说明                                |
+| ---------------- | -------- | ----------------------------------- |
+| **iCloud**       | 云同步   | Apple 用户，跨 iPhone/iPad/Mac      |
+| **Google Drive** | 云同步   | Android/跨平台用户                  |
+| **OneDrive**     | 云同步   | Microsoft 生态用户                  |
+| **Dropbox**      | 云同步   | 通用云盘                            |
+| **本地文件**     | 手动备份 | 导出为 JSON/SQLite 文件             |
+| **WebDAV**       | 自托管   | 支持自建 NAS（如坚果云、Nextcloud） |
 
 ### 9.3 同步机制
 
@@ -337,11 +338,11 @@ React Context
 
 ### 9.5 冲突解决策略
 
-| 策略 | 描述 | 适用场景 |
-|------|------|----------|
-| **本地优先** | 保留本地修改，覆盖服务端 | 个人设备，不希望被其他设备干扰 |
-| **服务端优先** | 保留服务端修改，覆盖本地 | 多设备协作，希望最新修改生效 |
-| **手动合并** | 提示用户选择 | 重要数据，需要人工确认 |
+| 策略           | 描述                     | 适用场景                       |
+| -------------- | ------------------------ | ------------------------------ |
+| **本地优先**   | 保留本地修改，覆盖服务端 | 个人设备，不希望被其他设备干扰 |
+| **服务端优先** | 保留服务端修改，覆盖本地 | 多设备协作，希望最新修改生效   |
+| **手动合并**   | 提示用户选择             | 重要数据，需要人工确认         |
 
 ### 9.6 备份设置界面
 

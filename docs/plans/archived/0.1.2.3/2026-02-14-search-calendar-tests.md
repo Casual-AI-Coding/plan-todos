@@ -4,7 +4,8 @@
 
 **Goal:** Add full-text search (title + content) with global + per-page UI, calendar view (all entities, month view) with list/calendar toggle on each entity page, and increase backend test coverage to 90%+.
 
-**Architecture:** 
+**Architecture:**
+
 - Search: SQLite LIKE queries across todos, plans, tasks, targets, milestones tables. Global search via header component, per-page via existing view filters.
 - Calendar: Month grid with events rendered by entity type color. Toggle state managed via local component state.
 
@@ -17,6 +18,7 @@
 ### Task 1: Add search database queries
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs` - Add search tables/indexes if needed
 - Create: `src-tauri/src/search.rs` - New search module
 
@@ -40,7 +42,7 @@ pub struct SearchResult {
 pub fn search_all(state: tauri::State<AppState>, query: String) -> Result<Vec<SearchResult>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     let mut results = Vec::new();
-    
+
     // Search todos
     let mut stmt = conn.prepare(
         "SELECT id, title, content, status FROM todos WHERE title LIKE ? OR content LIKE ?"
@@ -56,12 +58,12 @@ pub fn search_all(state: tauri::State<AppState>, query: String) -> Result<Vec<Se
         })
     }).map_err(|e| e.to_string())?;
     results.extend(todos.filter_map(|r| r.ok()));
-    
+
     // Search plans (title, description)
-    // Search tasks (title, description)  
+    // Search tasks (title, description)
     // Search targets (title, description)
     // Search milestones (title)
-    
+
     Ok(results)
 }
 ```
@@ -69,15 +71,18 @@ pub fn search_all(state: tauri::State<AppState>, query: String) -> Result<Vec<Se
 **Step 2: Register command in main.rs**
 
 Add to `src-tauri/src/main.rs`:
+
 ```rust
 mod search;
 // Add to invoke_handler: search::search_all,
 ```
 
 **Step 3: Run test**
+
 ```bash
 cd src-tauri && cargo test
 ```
+
 Expected: Build passes
 
 ---
@@ -85,6 +90,7 @@ Expected: Build passes
 ### Task 2: Add frontend search API
 
 **Files:**
+
 - Modify: `src/lib/api.ts` - Add search function
 
 **Step 1: Add search API function**
@@ -100,18 +106,20 @@ export interface SearchResult {
 
 export async function searchAll(query: string): Promise<SearchResult[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - search not available');
+    console.warn("Running outside Tauri - search not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<SearchResult[]>('search_all', { query });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<SearchResult[]>("search_all", { query });
 }
 ```
 
 **Step 2: Run typecheck**
+
 ```bash
 npm run typecheck
 ```
+
 Expected: No errors
 
 ---
@@ -119,21 +127,22 @@ Expected: No errors
 ### Task 3: Create global search component
 
 **Files:**
+
 - Create: `src/components/ui/SearchBar.tsx` - Global search in header
 
 **Step 1: Create SearchBar component**
 
 ```tsx
-'use client';
-import { useState } from 'react';
-import { searchAll, SearchResult } from '@/lib/api';
+"use client";
+import { useState } from "react";
+import { searchAll, SearchResult } from "@/lib/api";
 
 interface SearchBarProps {
   onResultClick: (entityType: string, id: string) => void;
 }
 
 export function SearchBar({ onResultClick }: SearchBarProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -182,6 +191,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
 ### Task 4: Add per-page search to existing views
 
 **Files:**
+
 - Modify: `src/app/views/TodosView.tsx` - Add search filter
 - Modify: `src/app/views/PlansView.tsx` - Add search filter
 - Modify: `src/app/views/TargetsView.tsx` - Add search filter
@@ -196,7 +206,7 @@ const filteredTodos = todos
   .filter(t => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return t.title.toLowerCase().includes(q) || 
+      return t.title.toLowerCase().includes(q) ||
              t.content?.toLowerCase().includes(q);
     }
     return true;
@@ -211,30 +221,31 @@ const filteredTodos = todos
 ### Task 5: Create Calendar component
 
 **Files:**
+
 - Create: `src/components/ui/Calendar.tsx` - Reusable calendar
 
 **Step 1: Create Calendar component with month view**
 
 ```tsx
-'use client';
-import { useState } from 'react';
-import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
+"use client";
+import { useState } from "react";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
   eachDayOfInterval,
   isSameMonth,
   isSameDay,
   addMonths,
-  subMonths
-} from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+  subMonths,
+} from "date-fns";
+import { zhCN } from "date-fns/locale";
 
 interface CalendarEvent {
   id: string;
   title: string;
   date: string;
-  type: 'todo' | 'task' | 'plan' | 'milestone';
+  type: "todo" | "task" | "plan" | "milestone";
 }
 
 interface CalendarProps {
@@ -244,21 +255,21 @@ interface CalendarProps {
 
 export function Calendar({ events, onEventClick }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  
+
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  
+
   const getEventsForDay = (day: Date) => {
-    const dateStr = format(day, 'yyyy-MM-dd');
-    return events.filter(e => e.date.startsWith(dateStr));
+    const dateStr = format(day, "yyyy-MM-dd");
+    return events.filter((e) => e.date.startsWith(dateStr));
   };
 
   const eventColors: Record<string, string> = {
-    todo: 'bg-teal-500',
-    task: 'bg-blue-500', 
-    plan: 'bg-orange-500',
-    milestone: 'bg-purple-500'
+    todo: "bg-teal-500",
+    task: "bg-blue-500",
+    plan: "bg-orange-500",
+    milestone: "bg-purple-500",
   };
 
   return (
@@ -268,34 +279,34 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
         <button onClick={() => setCurrentDate(subMonths(currentDate, 1))}>
           ←
         </button>
-        <h3>{format(currentDate, 'yyyy年M月', { locale: zhCN })}</h3>
+        <h3>{format(currentDate, "yyyy年M月", { locale: zhCN })}</h3>
         <button onClick={() => setCurrentDate(addMonths(currentDate, 1))}>
           →
         </button>
       </div>
-      
+
       {/* Day headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {['日', '一', '二', '三', '四', '五', '六'].map(d => (
+        {["日", "一", "二", "三", "四", "五", "六"].map((d) => (
           <div key={d} className="text-center text-sm font-medium p-2">
             {d}
           </div>
         ))}
       </div>
-      
+
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
-        {days.map(day => {
+        {days.map((day) => {
           const dayEvents = getEventsForDay(day);
           return (
-            <div 
+            <div
               key={day.toISOString()}
               className={`min-h-20 border p-1 ${
-                isSameDay(day, new Date()) ? 'bg-teal-50' : ''
+                isSameDay(day, new Date()) ? "bg-teal-50" : ""
               }`}
             >
-              <div className="text-sm">{format(day, 'd')}</div>
-              {dayEvents.slice(0, 3).map(e => (
+              <div className="text-sm">{format(day, "d")}</div>
+              {dayEvents.slice(0, 3).map((e) => (
                 <div
                   key={e.id}
                   onClick={() => onEventClick(e)}
@@ -318,9 +329,10 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
 ### Task 6: Add calendar toggle to entity views
 
 **Files:**
+
 - Modify: `src/app/views/TodosView.tsx` - Add list/calendar toggle
 - Modify: `src/app/views/PlansView.tsx` - Add list/calendar toggle
-- Modify: `src/app/views/TargetsView.tsx` - Add list/calendar toggle  
+- Modify: `src/app/views/TargetsView.tsx` - Add list/calendar toggle
 - Modify: `src/app/views/MilestonesView.tsx` - Add list/calendar toggle
 
 **Step 1: Add toggle state to TodosView**
@@ -347,26 +359,26 @@ useEffect(() => {
 return (
   <div>
     <div className="flex gap-2 mb-4">
-      <button 
+      <button
         onClick={() => setViewMode('list')}
         className={viewMode === 'list' ? 'bg-teal-500 text-white' : ''}
       >
         列表
       </button>
-      <button 
+      <button
         onClick={() => setViewMode('calendar')}
         className={viewMode === 'calendar' ? 'bg-teal-500 text-white' : ''}
       >
         日历
       </button>
     </div>
-    
+
     {viewMode === 'list' ? (
       /* existing list render */
     ) : (
-      <Calendar 
-        events={calendarEvents} 
-        onEventClick={(e) => console.log(e)} 
+      <Calendar
+        events={calendarEvents}
+        onEventClick={(e) => console.log(e)}
       />
     )}
   </div>
@@ -380,10 +392,13 @@ return (
 ### Task 7: Run coverage and identify gaps
 
 **Step 1: Run coverage**
+
 ```bash
 cd src-tauri && cargo tarpaulin --output-format html
 ```
+
 Or use:
+
 ```bash
 cargo install cargo-tarpaulin
 cargo tarpaulin --out Html
@@ -392,6 +407,7 @@ cargo tarpaulin --out Html
 **Step 2: Identify uncovered modules**
 
 Look at coverage report. Likely gaps:
+
 - `search.rs` (new)
 - `statistics.rs`
 - `batch.rs`
@@ -403,6 +419,7 @@ Look at coverage report. Likely gaps:
 ### Task 8: Add tests for search module
 
 **Files:**
+
 - Modify: `src-tauri/src/tests.rs` - Add search tests
 
 **Step 1: Add search tests**
@@ -413,12 +430,12 @@ fn test_search_todos() {
     let conn = Connection::open_in_memory().unwrap();
     init_db(&conn).unwrap();
     let now = chrono::Utc::now().to_rfc3339();
-    
+
     conn.execute(
         "INSERT INTO todos (id, title, content, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
         ["s1", "Buy milk", "Get 2 liters", "pending", &now, &now],
     ).unwrap();
-    
+
     // Test search by title
     let mut stmt = conn.prepare(
         "SELECT id, title FROM todos WHERE title LIKE ?"
@@ -438,6 +455,7 @@ fn test_search_todos() {
 ### Task 9: Add tests for statistics module
 
 **Files:**
+
 - Modify: `src-tauri/src/tests.rs` - Add statistics tests
 
 **Step 1: Add statistics tests**
@@ -448,13 +466,13 @@ fn test_statistics_counts() {
     let conn = Connection::open_in_memory().unwrap();
     init_db(&conn).unwrap();
     let now = chrono::Utc::now().to_rfc3339();
-    
+
     // Insert test data
     conn.execute(
         "INSERT INTO todos (id, title, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
         ["t1", "Test", "pending", &now, &now],
     ).unwrap();
-    
+
     // Count
     let count: i32 = conn
         .query_row("SELECT COUNT(*) FROM todos", [], |row| row.get(0))
@@ -468,11 +486,13 @@ fn test_statistics_counts() {
 ### Task 10: Verify 90%+ coverage
 
 **Step 1: Run final coverage check**
+
 ```bash
 cd src-tauri && cargo tarpaulin --out Html
 ```
 
 **Step 2: If below 90%, add more edge case tests**
+
 - Null handling
 - Invalid inputs
 - Boundary conditions

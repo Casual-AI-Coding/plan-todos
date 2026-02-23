@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { motion, MotionProps } from 'framer-motion';
-import { ReactNode } from 'react';
+import { motion, MotionProps } from "framer-motion";
+import { ReactNode } from "react";
 
-interface FadeInProps extends Omit<MotionProps, 'children'> {
+interface FadeInProps extends Omit<MotionProps, "children"> {
   children: ReactNode;
   /** Delay in seconds (default: 0) */
   delay?: number;
   /** Duration in seconds (default: 0.3) */
   duration?: number;
   /** Direction to fade in from (default: up) */
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
+  direction?: "up" | "down" | "left" | "right" | "none";
 }
 
 /**
  * FadeIn Component
- * 
+ *
  * Creates a fade-in animation with optional direction.
- * 
+ *
  * @example
  * <FadeIn>
  *   <Card>Content</Card>
@@ -27,7 +27,7 @@ export function FadeIn({
   children,
   delay = 0,
   duration = 0.3,
-  direction = 'up',
+  direction = "up",
   ...props
 }: FadeInProps) {
   const directionVariants = {
@@ -38,15 +38,16 @@ export function FadeIn({
     none: { y: 0, x: 0 },
   };
 
-  const initial = direction === 'none'
-    ? { opacity: 0 }
-    : { opacity: 0, ...directionVariants[direction] };
+  const initial =
+    direction === "none"
+      ? { opacity: 0 }
+      : { opacity: 0, ...directionVariants[direction] };
 
   return (
     <motion.div
       initial={initial}
       animate={{ opacity: 1, y: 0, x: 0 }}
-      transition={{ duration, delay, ease: 'easeOut' }}
+      transition={{ duration, delay, ease: "easeOut" }}
       {...props}
     >
       {children}

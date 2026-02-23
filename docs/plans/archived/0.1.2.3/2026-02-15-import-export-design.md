@@ -34,20 +34,22 @@ Add import/export functionality to Settings > General page, allowing users to ba
 
 ### Import Modes
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| merge | Skip on ID conflict | Incremental import |
-| replace | Clear all, then import | Full overwrite |
-| update | Update on ID conflict | Sync changes |
+| Mode    | Description            | Use Case           |
+| ------- | ---------------------- | ------------------ |
+| merge   | Skip on ID conflict    | Incremental import |
+| replace | Clear all, then import | Full overwrite     |
+| update  | Update on ID conflict  | Sync changes       |
 
 ---
 
 ## UI Design
 
 ### Location
+
 - Settings > General page (inside, not separate tab)
 
 ### Export Section
+
 ```
 ┌─────────────────────────────────────┐
 │ 导出数据                              │
@@ -58,6 +60,7 @@ Add import/export functionality to Settings > General page, allowing users to ba
 ```
 
 ### Import Section
+
 ```
 ┌─────────────────────────────────────┐
 │ 导入数据                              │
@@ -77,6 +80,7 @@ Add import/export functionality to Settings > General page, allowing users to ba
 ## Backend API Design
 
 ### Export
+
 ```rust
 // GET /export - Returns all data as JSON
 #[tauri::command]
@@ -84,6 +88,7 @@ pub fn export_data() -> Result<ExportData, String>
 ```
 
 ### Import
+
 ```rust
 // POST /import - Import data with mode
 #[tauri::command]

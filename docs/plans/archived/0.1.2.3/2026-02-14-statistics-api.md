@@ -13,6 +13,7 @@
 ## Task 1: Create Statistics Module Structure
 
 **Files:**
+
 - Create: `src-tauri/src/statistics.rs`
 - Modify: `src-tauri/src/main.rs` (add module declaration)
 - Modify: `src-tauri/src/main.rs` (register command)
@@ -116,6 +117,7 @@ Add to the `invoke_handler`:
 ## Task 2: Implement Entity Counts Query
 
 **Files:**
+
 - Modify: `src-tauri/src/statistics.rs`
 
 **Step 1: Add get_counts function**
@@ -162,6 +164,7 @@ fn get_counts(conn: &rusqlite::Connection) -> Result<EntityCounts, String> {
 ## Task 3: Implement Completion Stats Query
 
 **Files:**
+
 - Modify: `src-tauri/src/statistics.rs`
 
 **Step 1: Add get_completion_stats function**
@@ -171,7 +174,7 @@ fn get_completion_stats(conn: &rusqlite::Connection) -> Result<CompletionStats, 
     // Todo stats
     let (todo_done, todo_total): (i32, i32) = conn
         .query_row(
-            "SELECT 
+            "SELECT
                 SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END),
                 COUNT(*)
             FROM todos",
@@ -183,7 +186,7 @@ fn get_completion_stats(conn: &rusqlite::Connection) -> Result<CompletionStats, 
     // Task stats
     let (task_done, task_total): (i32, i32) = conn
         .query_row(
-            "SELECT 
+            "SELECT
                 SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END),
                 COUNT(*)
             FROM tasks",
@@ -195,7 +198,7 @@ fn get_completion_stats(conn: &rusqlite::Connection) -> Result<CompletionStats, 
     // Step stats
     let (step_completed, step_total): (i32, i32) = conn
         .query_row(
-            "SELECT 
+            "SELECT
                 SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END),
                 COUNT(*)
             FROM steps",
@@ -207,7 +210,7 @@ fn get_completion_stats(conn: &rusqlite::Connection) -> Result<CompletionStats, 
     // Milestone stats
     let (milestone_done, milestone_total): (i32, i32) = conn
         .query_row(
-            "SELECT 
+            "SELECT
                 SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END),
                 COUNT(*)
             FROM milestones",
@@ -262,6 +265,7 @@ fn get_completion_stats(conn: &rusqlite::Connection) -> Result<CompletionStats, 
 ## Task 4: Implement Daily Trends Query
 
 **Files:**
+
 - Modify: `src-tauri/src/statistics.rs`
 
 **Step 1: Add get_trend_stats function**
@@ -273,7 +277,7 @@ fn get_trend_stats(conn: &rusqlite::Connection) -> Result<TrendStats, String> {
     // Get last 7 days of completion data
     let mut stmt = conn
         .prepare(
-            "SELECT 
+            "SELECT
                 date(updated_at) as date,
                 COUNT(*) as completed
             FROM todos
@@ -308,6 +312,7 @@ fn get_trend_stats(conn: &rusqlite::Connection) -> Result<TrendStats, String> {
 ## Task 5: Implement Efficiency Stats Query
 
 **Files:**
+
 - Modify: `src-tauri/src/statistics.rs`
 
 **Step 1: Add get_efficiency_stats function**
@@ -319,8 +324,8 @@ fn get_efficiency_stats(conn: &rusqlite::Connection) -> Result<EfficiencyStats, 
     // Today's completed count
     let today_completed: i32 = conn
         .query_row(
-            "SELECT COUNT(*) FROM todos 
-            WHERE status = 'done' 
+            "SELECT COUNT(*) FROM todos
+            WHERE status = 'done'
             AND date(updated_at) = date('now', 'localtime')",
             [],
             |row| row.get(0),
@@ -330,8 +335,8 @@ fn get_efficiency_stats(conn: &rusqlite::Connection) -> Result<EfficiencyStats, 
     // Week completed count (last 7 days)
     let week_completed: i32 = conn
         .query_row(
-            "SELECT COUNT(*) FROM todos 
-            WHERE status = 'done' 
+            "SELECT COUNT(*) FROM todos
+            WHERE status = 'done'
             AND date(updated_at) >= date('now', '-7 days', 'localtime')",
             [],
             |row| row.get(0),
@@ -341,8 +346,8 @@ fn get_efficiency_stats(conn: &rusqlite::Connection) -> Result<EfficiencyStats, 
     // Month completed count (last 30 days)
     let month_completed: i32 = conn
         .query_row(
-            "SELECT COUNT(*) FROM todos 
-            WHERE status = 'done' 
+            "SELECT COUNT(*) FROM todos
+            WHERE status = 'done'
             AND date(updated_at) >= date('now', '-30 days', 'localtime')",
             [],
             |row| row.get(0),
@@ -419,7 +424,7 @@ fn calculate_productivity_score(conn: &rusqlite::Connection, streak: i32) -> Res
     // Get completion rate for last 7 days
     let (completed, total): (i32, i32) = conn
         .query_row(
-            "SELECT 
+            "SELECT
                 SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END),
                 COUNT(*)
             FROM todos
@@ -450,6 +455,7 @@ fn calculate_productivity_score(conn: &rusqlite::Connection, streak: i32) -> Res
 ## Task 6: Implement Main get_statistics Command
 
 **Files:**
+
 - Modify: `src-tauri/src/statistics.rs`
 
 **Step 1: Add the main Tauri command**
@@ -478,6 +484,7 @@ pub fn get_statistics(state: tauri::State<AppState>) -> Result<Statistics, Strin
 ## Task 7: Verify Rust Compilation
 
 **Command:**
+
 ```bash
 cd src-tauri && cargo check
 ```
@@ -489,6 +496,7 @@ cd src-tauri && cargo check
 ## Task 8: Add Frontend API Function
 
 **Files:**
+
 - Modify: `src/lib/api.ts`
 
 **Step 1: Add Statistics interface**
@@ -538,21 +546,35 @@ export interface Statistics {
 ```typescript
 export async function getStatistics(): Promise<Statistics> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - returning mock data');
+    console.warn("Running outside Tauri - returning mock data");
     return {
       counts: { todo: 0, plan: 0, task: 0, target: 0, step: 0, milestone: 0 },
       completion: {
-        todo_done: 0, todo_total: 0, task_done: 0, task_total: 0,
-        step_completed: 0, step_total: 0, milestone_done: 0, milestone_total: 0,
-        todo_completion_rate: 0, task_completion_rate: 0,
-        step_completion_rate: 0, milestone_completion_rate: 0
+        todo_done: 0,
+        todo_total: 0,
+        task_done: 0,
+        task_total: 0,
+        step_completed: 0,
+        step_total: 0,
+        milestone_done: 0,
+        milestone_total: 0,
+        todo_completion_rate: 0,
+        task_completion_rate: 0,
+        step_completion_rate: 0,
+        milestone_completion_rate: 0,
       },
       trends: { daily: [] },
-      efficiency: { streak_days: 0, today_completed: 0, week_completed: 0, month_completed: 0, productivity_score: 0 }
+      efficiency: {
+        streak_days: 0,
+        today_completed: 0,
+        week_completed: 0,
+        month_completed: 0,
+        productivity_score: 0,
+      },
     };
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Statistics>('get_statistics');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Statistics>("get_statistics");
 }
 ```
 
@@ -561,22 +583,23 @@ export async function getStatistics(): Promise<Statistics> {
 ## Task 9: Add Tests
 
 **Files:**
+
 - Modify: `src/lib/api.test.ts`
 
 **Step 1: Add getStatistics test**
 
 ```typescript
-describe('Statistics API', () => {
-  it('getStatistics returns statistics object', async () => {
+describe("Statistics API", () => {
+  it("getStatistics returns statistics object", async () => {
     const stats = await getStatistics();
-    expect(stats).toHaveProperty('counts');
-    expect(stats).toHaveProperty('completion');
-    expect(stats).toHaveProperty('trends');
-    expect(stats).toHaveProperty('efficiency');
-    expect(stats.counts).toHaveProperty('todo');
-    expect(stats.counts).toHaveProperty('plan');
-    expect(stats.completion).toHaveProperty('todo_completion_rate');
-    expect(stats.efficiency).toHaveProperty('productivity_score');
+    expect(stats).toHaveProperty("counts");
+    expect(stats).toHaveProperty("completion");
+    expect(stats).toHaveProperty("trends");
+    expect(stats).toHaveProperty("efficiency");
+    expect(stats.counts).toHaveProperty("todo");
+    expect(stats.counts).toHaveProperty("plan");
+    expect(stats.completion).toHaveProperty("todo_completion_rate");
+    expect(stats.efficiency).toHaveProperty("productivity_score");
   });
 });
 ```
@@ -586,6 +609,7 @@ describe('Statistics API', () => {
 ## Task 10: Run Tests
 
 **Command:**
+
 ```bash
 npm run test
 ```
@@ -597,6 +621,7 @@ npm run test
 ## Task 11: Commit Changes
 
 **Commands:**
+
 ```bash
 git add src-tauri/src/statistics.rs src-tauri/src/main.rs src/lib/api.ts src/lib/api.test.ts
 git commit -m "feat: add statistics API for comprehensive analytics

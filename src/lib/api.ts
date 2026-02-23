@@ -9,7 +9,7 @@ export interface Plan {
   description: string | null;
   start_date: string | null;
   end_date: string | null;
-  status: 'active' | 'completed' | 'archived';
+  status: "active" | "completed" | "archived";
   created_at: string;
   updated_at: string;
 }
@@ -17,7 +17,7 @@ export interface Plan {
 // ============================================================================
 // Task - 短期任务
 // ============================================================================
-export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
+export type Priority = "P0" | "P1" | "P2" | "P3";
 
 // ============================================================================
 // Tag - 标签
@@ -30,7 +30,7 @@ export interface Tag {
   created_at: string;
 }
 
-export type EntityType = 'todo' | 'plan' | 'target';
+export type EntityType = "todo" | "plan" | "target";
 
 export interface Task {
   id: string;
@@ -39,7 +39,7 @@ export interface Task {
   description: string | null;
   start_date: string | null;
   end_date: string | null;
-  status: 'pending' | 'in-progress' | 'done';
+  status: "pending" | "in-progress" | "done";
   priority: Priority;
   created_at: string;
   updated_at: string;
@@ -53,7 +53,7 @@ export interface Target {
   title: string;
   description: string | null;
   due_date: string | null;
-  status: 'active' | 'completed' | 'archived';
+  status: "active" | "completed" | "archived";
   progress: number; // 0-100, calculated from Steps
   created_at: string;
   updated_at: string;
@@ -67,7 +67,7 @@ export interface Step {
   target_id: string;
   title: string;
   weight: number; // 0-100
-  status: 'pending' | 'completed';
+  status: "pending" | "completed";
   priority: Priority;
   created_at: string;
   updated_at: string;
@@ -81,7 +81,7 @@ export interface Todo {
   title: string;
   content: string | null;
   due_date: string | null;
-  status: 'pending' | 'in-progress' | 'done';
+  status: "pending" | "in-progress" | "done";
   priority: Priority;
   created_at: string;
   updated_at: string;
@@ -98,19 +98,17 @@ export interface Milestone {
   // Unified fields for flexible linking
   biz_type: string | null; // 'plan' | 'task' | 'target' | 'circulation'
   biz_id: string | null;
-  status: 'pending' | 'completed';
+  status: "pending" | "completed";
   progress: number; // 0-100, calculated from linked entity
   created_at: string;
   updated_at: string;
 }
 
-
-
 // ============================================================================
 // Circulation - 打卡
 // ============================================================================
-export type CirculationType = 'periodic' | 'count';
-export type PeriodicFrequency = 'daily' | 'weekly' | 'monthly';
+export type CirculationType = "periodic" | "count";
+export type PeriodicFrequency = "daily" | "weekly" | "monthly";
 
 export interface Circulation {
   id: string;
@@ -124,7 +122,7 @@ export interface Circulation {
   streak_count: number; // periodic only
   best_streak: number; // periodic only
   last_completed_at: string | null;
-  status: 'active' | 'archived';
+  status: "active" | "archived";
   created_at: string;
   updated_at: string;
 }
@@ -152,25 +150,25 @@ export interface UpdateCirculationParams {
   frequency?: PeriodicFrequency;
   frequency_config?: string;
   target_count?: number;
-  status?: 'active' | 'archived';
+  status?: "active" | "archived";
 }
 
 // Check if running in Tauri environment
 // Exported for testing purposes
 export function isTauri(): boolean {
-  if (typeof window === 'undefined') return false;
-  return '__TAURI__' in window;
+  if (typeof window === "undefined") return false;
+  return "__TAURI__" in window;
 }
 
 // Helper to wrap Tauri invoke calls with unified error handling
 export async function withTauriError<T>(fn: () => Promise<T>): Promise<T> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
   try {
     return await fn();
   } catch (e) {
-    console.error('[Tauri Error]', e);
+    console.error("[Tauri Error]", e);
     throw e;
   }
 }
@@ -181,19 +179,19 @@ export async function withTauriError<T>(fn: () => Promise<T>): Promise<T> {
 
 export async function getPlan(id: string): Promise<Plan> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to get plan');
+    throw new Error("This app must run in Tauri to get plan");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Plan>('get_plan', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Plan>("get_plan", { id });
 }
 
 export async function getPlans(): Promise<Plan[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Plan[]>('get_plans');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Plan[]>("get_plans");
 }
 
 export async function createPlan(data: {
@@ -203,10 +201,10 @@ export async function createPlan(data: {
   end_date?: string;
 }): Promise<Plan> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create plans');
+    throw new Error("This app must run in Tauri to create plans");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Plan>('create_plan', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Plan>("create_plan", {
     title: data.title,
     description: data.description || null,
     startDate: data.start_date || null,
@@ -214,18 +212,21 @@ export async function createPlan(data: {
   });
 }
 
-export async function updatePlan(id: string, data: {
-  title?: string;
-  description?: string;
-  start_date?: string;
-  end_date?: string;
-  status?: 'active' | 'completed' | 'archived';
-}): Promise<Plan> {
+export async function updatePlan(
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    start_date?: string;
+    end_date?: string;
+    status?: "active" | "completed" | "archived";
+  },
+): Promise<Plan> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update plans');
+    throw new Error("This app must run in Tauri to update plans");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Plan>('update_plan', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Plan>("update_plan", {
     id,
     title: data.title,
     description: data.description,
@@ -237,10 +238,10 @@ export async function updatePlan(id: string, data: {
 
 export async function deletePlan(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete plans');
+    throw new Error("This app must run in Tauri to delete plans");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_plan', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_plan", { id });
 }
 
 // ============================================================================
@@ -249,28 +250,28 @@ export async function deletePlan(id: string): Promise<void> {
 
 export async function getTask(id: string): Promise<Task> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to get task');
+    throw new Error("This app must run in Tauri to get task");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Task>('get_task', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Task>("get_task", { id });
 }
 
 export async function getTasks(): Promise<Task[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Task[]>('get_tasks');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Task[]>("get_tasks");
 }
 
 export async function getTasksByPlan(planId: string): Promise<Task[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Task[]>('get_tasks_by_plan', { planId });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Task[]>("get_tasks_by_plan", { planId });
 }
 
 export async function createTask(data: {
@@ -282,10 +283,10 @@ export async function createTask(data: {
   priority?: Priority;
 }): Promise<Task> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create tasks');
+    throw new Error("This app must run in Tauri to create tasks");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Task>('create_task', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Task>("create_task", {
     planId: data.plan_id,
     title: data.title,
     description: data.description || null,
@@ -295,19 +296,22 @@ export async function createTask(data: {
   });
 }
 
-export async function updateTask(id: string, data: {
-  title?: string;
-  description?: string;
-  start_date?: string;
-  end_date?: string;
-  status?: 'pending' | 'in-progress' | 'done';
-  priority?: Priority;
-}): Promise<Task> {
+export async function updateTask(
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    start_date?: string;
+    end_date?: string;
+    status?: "pending" | "in-progress" | "done";
+    priority?: Priority;
+  },
+): Promise<Task> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update tasks');
+    throw new Error("This app must run in Tauri to update tasks");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Task>('update_task', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Task>("update_task", {
     id,
     title: data.title,
     description: data.description,
@@ -320,10 +324,10 @@ export async function updateTask(id: string, data: {
 
 export async function deleteTask(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete tasks');
+    throw new Error("This app must run in Tauri to delete tasks");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_task', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_task", { id });
 }
 
 // ============================================================================
@@ -332,19 +336,19 @@ export async function deleteTask(id: string): Promise<void> {
 
 export async function getTarget(id: string): Promise<Target> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to get target');
+    throw new Error("This app must run in Tauri to get target");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Target>('get_target', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Target>("get_target", { id });
 }
 
 export async function getTargets(): Promise<Target[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Target[]>('get_targets');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Target[]>("get_targets");
 }
 
 export async function createTarget(data: {
@@ -353,27 +357,30 @@ export async function createTarget(data: {
   due_date?: string;
 }): Promise<Target> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create targets');
+    throw new Error("This app must run in Tauri to create targets");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Target>('create_target', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Target>("create_target", {
     title: data.title,
     description: data.description || null,
     dueDate: data.due_date || null,
   });
 }
 
-export async function updateTarget(id: string, data: {
-  title?: string;
-  description?: string;
-  due_date?: string;
-  status?: 'active' | 'completed' | 'archived';
-}): Promise<Target> {
+export async function updateTarget(
+  id: string,
+  data: {
+    title?: string;
+    description?: string;
+    due_date?: string;
+    status?: "active" | "completed" | "archived";
+  },
+): Promise<Target> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update targets');
+    throw new Error("This app must run in Tauri to update targets");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Target>('update_target', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Target>("update_target", {
     id,
     title: data.title,
     description: data.description,
@@ -384,10 +391,10 @@ export async function updateTarget(id: string, data: {
 
 export async function deleteTarget(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete targets');
+    throw new Error("This app must run in Tauri to delete targets");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_target', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_target", { id });
 }
 
 // ============================================================================
@@ -396,11 +403,11 @@ export async function deleteTarget(id: string): Promise<void> {
 
 export async function getSteps(targetId: string): Promise<Step[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Step[]>('get_steps', { targetId });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Step[]>("get_steps", { targetId });
 }
 
 export async function createStep(data: {
@@ -410,10 +417,10 @@ export async function createStep(data: {
   priority?: Priority;
 }): Promise<Step> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create steps');
+    throw new Error("This app must run in Tauri to create steps");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Step>('create_step', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Step>("create_step", {
     targetId: data.target_id,
     title: data.title,
     weight: data.weight,
@@ -421,17 +428,20 @@ export async function createStep(data: {
   });
 }
 
-export async function updateStep(id: string, data: {
-  title?: string;
-  weight?: number;
-  status?: 'pending' | 'completed';
-  priority?: Priority;
-}): Promise<Step> {
+export async function updateStep(
+  id: string,
+  data: {
+    title?: string;
+    weight?: number;
+    status?: "pending" | "completed";
+    priority?: Priority;
+  },
+): Promise<Step> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update steps');
+    throw new Error("This app must run in Tauri to update steps");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Step>('update_step', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Step>("update_step", {
     id,
     title: data.title,
     weight: data.weight,
@@ -442,10 +452,10 @@ export async function updateStep(id: string, data: {
 
 export async function deleteStep(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete steps');
+    throw new Error("This app must run in Tauri to delete steps");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_step', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_step", { id });
 }
 
 // ============================================================================
@@ -454,19 +464,19 @@ export async function deleteStep(id: string): Promise<void> {
 
 export async function getTodo(id: string): Promise<Todo> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to get todo');
+    throw new Error("This app must run in Tauri to get todo");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Todo>('get_todo', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Todo>("get_todo", { id });
 }
 
 export async function getTodos(): Promise<Todo[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Todo[]>('get_todos');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Todo[]>("get_todos");
 }
 
 export async function createTodo(data: {
@@ -476,10 +486,10 @@ export async function createTodo(data: {
   priority?: Priority;
 }): Promise<Todo> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create todos');
+    throw new Error("This app must run in Tauri to create todos");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Todo>('create_todo', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Todo>("create_todo", {
     title: data.title,
     content: data.content || null,
     dueDate: data.due_date || null,
@@ -487,18 +497,21 @@ export async function createTodo(data: {
   });
 }
 
-export async function updateTodo(id: string, data: {
-  title?: string;
-  content?: string;
-  due_date?: string;
-  status?: 'pending' | 'in-progress' | 'done';
-  priority?: Priority;
-}): Promise<Todo> {
+export async function updateTodo(
+  id: string,
+  data: {
+    title?: string;
+    content?: string;
+    due_date?: string;
+    status?: "pending" | "in-progress" | "done";
+    priority?: Priority;
+  },
+): Promise<Todo> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update todos');
+    throw new Error("This app must run in Tauri to update todos");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Todo>('update_todo', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Todo>("update_todo", {
     id,
     title: data.title,
     content: data.content,
@@ -510,10 +523,10 @@ export async function updateTodo(id: string, data: {
 
 export async function deleteTodo(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete todos');
+    throw new Error("This app must run in Tauri to delete todos");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_todo', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_todo", { id });
 }
 
 // ============================================================================
@@ -522,19 +535,19 @@ export async function deleteTodo(id: string): Promise<void> {
 
 export async function getMilestone(id: string): Promise<Milestone> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to get milestone');
+    throw new Error("This app must run in Tauri to get milestone");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Milestone>('get_milestone', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Milestone>("get_milestone", { id });
 }
 
 export async function getMilestones(): Promise<Milestone[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Milestone[]>('get_milestones');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Milestone[]>("get_milestones");
 }
 
 export async function createMilestone(data: {
@@ -544,10 +557,10 @@ export async function createMilestone(data: {
   biz_id?: string;
 }): Promise<Milestone> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create milestones');
+    throw new Error("This app must run in Tauri to create milestones");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Milestone>('create_milestone', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Milestone>("create_milestone", {
     title: data.title,
     targetDate: data.target_date || null,
     bizType: data.biz_type || null,
@@ -555,16 +568,19 @@ export async function createMilestone(data: {
   });
 }
 
-export async function updateMilestone(id: string, data: {
-  title?: string;
-  target_date?: string;
-  status?: 'pending' | 'completed';
-}): Promise<Milestone> {
+export async function updateMilestone(
+  id: string,
+  data: {
+    title?: string;
+    target_date?: string;
+    status?: "pending" | "completed";
+  },
+): Promise<Milestone> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update milestones');
+    throw new Error("This app must run in Tauri to update milestones");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Milestone>('update_milestone', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Milestone>("update_milestone", {
     id,
     title: data.title,
     targetDate: data.target_date,
@@ -574,10 +590,10 @@ export async function updateMilestone(id: string, data: {
 
 export async function deleteMilestone(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete milestones');
+    throw new Error("This app must run in Tauri to delete milestones");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_milestone', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_milestone", { id });
 }
 
 // ============================================================================
@@ -636,11 +652,11 @@ export interface SearchResult {
 
 export async function searchAll(query: string): Promise<SearchResult[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - search not available');
+    console.warn("Running outside Tauri - search not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<SearchResult[]>('search_all', { query });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<SearchResult[]>("search_all", { query });
 }
 
 // ============================================================================
@@ -727,7 +743,7 @@ export interface Dashboard {
 
 export async function getDashboard(): Promise<Dashboard> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - returning mock data');
+    console.warn("Running outside Tauri - returning mock data");
     return {
       overview: {
         today_todos_count: 0,
@@ -738,8 +754,20 @@ export async function getDashboard(): Promise<Dashboard> {
         productivity_score: 0,
       },
       week: { completed_count: 0 },
-      counts: { todo: 0, plan: 0, task: 0, target: 0, step: 0, milestone: 0, circulation: 0 },
-      circulation_stats: { today_pending: 0, today_completed: 0, current_streak: 0 },
+      counts: {
+        todo: 0,
+        plan: 0,
+        task: 0,
+        target: 0,
+        step: 0,
+        milestone: 0,
+        circulation: 0,
+      },
+      circulation_stats: {
+        today_pending: 0,
+        today_completed: 0,
+        current_streak: 0,
+      },
       today_todos: [],
       overdue_todos: [],
       completed_today: [],
@@ -748,8 +776,8 @@ export async function getDashboard(): Promise<Dashboard> {
       active_milestones: [],
     };
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Dashboard>('get_dashboard');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Dashboard>("get_dashboard");
 }
 
 // ============================================================================
@@ -766,51 +794,55 @@ export interface BatchUpdateResult {
 
 export async function bulkUpdateTodoStatus(
   ids: string[],
-  status: string
+  status: string,
 ): Promise<BatchUpdateResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<BatchUpdateResult>('bulk_update_todo_status', { ids, status });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<BatchUpdateResult>("bulk_update_todo_status", { ids, status });
 }
 
 export async function bulkUpdateTaskStatus(
   ids: string[],
-  status: string
+  status: string,
 ): Promise<BatchUpdateResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<BatchUpdateResult>('bulk_update_task_status', { ids, status });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<BatchUpdateResult>("bulk_update_task_status", { ids, status });
 }
 
 export async function bulkUpdateStepStatus(
   ids: string[],
-  status: string
+  status: string,
 ): Promise<BatchUpdateResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<BatchUpdateResult>('bulk_update_step_status', { ids, status });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<BatchUpdateResult>("bulk_update_step_status", { ids, status });
 }
 
-export async function bulkDeleteTodos(ids: string[]): Promise<BatchUpdateResult> {
+export async function bulkDeleteTodos(
+  ids: string[],
+): Promise<BatchUpdateResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<BatchUpdateResult>('bulk_delete_todos', { ids });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<BatchUpdateResult>("bulk_delete_todos", { ids });
 }
 
-export async function bulkDeleteTasks(ids: string[]): Promise<BatchUpdateResult> {
+export async function bulkDeleteTasks(
+  ids: string[],
+): Promise<BatchUpdateResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<BatchUpdateResult>('bulk_delete_tasks', { ids });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<BatchUpdateResult>("bulk_delete_tasks", { ids });
 }
 
 // ============================================================================
@@ -856,13 +888,13 @@ export interface DailySummary {
 
 export async function getNotificationSettings(
   entityType: string,
-  entityId: string
+  entityId: string,
 ): Promise<NotificationSettings | null> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<NotificationSettings | null>('get_notification_settings', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<NotificationSettings | null>("get_notification_settings", {
     entityType,
     entityId,
   });
@@ -871,13 +903,13 @@ export async function getNotificationSettings(
 export async function setNotificationSettings(
   entityType: string,
   entityId: string,
-  reminderMinutes: number
+  reminderMinutes: number,
 ): Promise<NotificationSettings> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<NotificationSettings>('set_notification_settings', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<NotificationSettings>("set_notification_settings", {
     entityType,
     entityId,
     reminderMinutes,
@@ -886,13 +918,13 @@ export async function setNotificationSettings(
 
 export async function deleteNotificationSettings(
   entityType: string,
-  entityId: string
+  entityId: string,
 ): Promise<boolean> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<boolean>('delete_notification_settings', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<boolean>("delete_notification_settings", {
     entityType,
     entityId,
   });
@@ -900,10 +932,10 @@ export async function deleteNotificationSettings(
 
 export async function getDailySummarySettings(): Promise<DailySummarySettings> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<DailySummarySettings>('get_daily_summary_settings');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<DailySummarySettings>("get_daily_summary_settings");
 }
 
 export async function updateDailySummarySettings(
@@ -911,13 +943,13 @@ export async function updateDailySummarySettings(
   time: string,
   includePending: boolean,
   includeOverdue: boolean,
-  includeCompleted: boolean
+  includeCompleted: boolean,
 ): Promise<DailySummarySettings> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<DailySummarySettings>('update_daily_summary_settings', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<DailySummarySettings>("update_daily_summary_settings", {
     enabled,
     time,
     includePending,
@@ -928,21 +960,21 @@ export async function updateDailySummarySettings(
 
 export async function getDueReminders(): Promise<DueReminder[]> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<DueReminder[]>('get_due_reminders');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<DueReminder[]>("get_due_reminders");
 }
 
 export async function markReminderSent(
   entityType: string,
-  entityId: string
+  entityId: string,
 ): Promise<boolean> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<boolean>('mark_reminder_sent', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<boolean>("mark_reminder_sent", {
     entityType,
     entityId,
   });
@@ -950,10 +982,10 @@ export async function markReminderSent(
 
 export async function getDailySummary(): Promise<DailySummary> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<DailySummary>('get_daily_summary');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<DailySummary>("get_daily_summary");
 }
 
 // ============================================================================
@@ -978,23 +1010,23 @@ export interface SendNotificationResult {
 
 export async function getNotificationPlugins(): Promise<NotificationPlugin[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<NotificationPlugin[]>('get_notification_plugins');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<NotificationPlugin[]>("get_notification_plugins");
 }
 
 export async function createNotificationPlugin(
   name: string,
   pluginType: string,
-  config: string
+  config: string,
 ): Promise<NotificationPlugin> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<NotificationPlugin>('create_notification_plugin', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<NotificationPlugin>("create_notification_plugin", {
     name,
     pluginType,
     config,
@@ -1005,13 +1037,13 @@ export async function updateNotificationPlugin(
   id: string,
   name: string,
   enabled: boolean,
-  config: string
+  config: string,
 ): Promise<NotificationPlugin> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<NotificationPlugin>('update_notification_plugin', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<NotificationPlugin>("update_notification_plugin", {
     id,
     name,
     enabled,
@@ -1021,22 +1053,22 @@ export async function updateNotificationPlugin(
 
 export async function deleteNotificationPlugin(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_notification_plugin', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_notification_plugin", { id });
 }
 
 export async function sendNotification(
   pluginId: string,
   title: string,
-  content: string
+  content: string,
 ): Promise<SendNotificationResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<SendNotificationResult>('send_notification', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<SendNotificationResult>("send_notification", {
     pluginId,
     title,
     content,
@@ -1049,34 +1081,38 @@ export async function sendNotification(
 
 export async function getTags(): Promise<Tag[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - returning empty');
+    console.warn("Running outside Tauri - returning empty");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Tag[]>('get_tags');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Tag[]>("get_tags");
 }
 
 export async function createTag(
   name: string,
   color?: string,
-  description?: string
+  description?: string,
 ): Promise<Tag> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Tag>('create_tag', { name, color: color || null, description: description || null });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Tag>("create_tag", {
+    name,
+    color: color || null,
+    description: description || null,
+  });
 }
 
 export async function updateTag(
   id: string,
-  data: { name?: string; color?: string; description?: string }
+  data: { name?: string; color?: string; description?: string },
 ): Promise<Tag> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Tag>('update_tag', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Tag>("update_tag", {
     id,
     name: data.name || null,
     color: data.color || null,
@@ -1086,44 +1122,44 @@ export async function updateTag(
 
 export async function deleteTag(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_tag', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_tag", { id });
 }
 
 export async function getEntityTags(
   entityType: EntityType,
-  entityId: string
+  entityId: string,
 ): Promise<Tag[]> {
   if (!isTauri()) {
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Tag[]>('get_entity_tags', { entityType, entityId });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Tag[]>("get_entity_tags", { entityType, entityId });
 }
 
 export async function setEntityTags(
   entityType: EntityType,
   entityId: string,
-  tagIds: string[]
+  tagIds: string[],
 ): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri');
+    throw new Error("This app must run in Tauri");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('set_entity_tags', { entityType, entityId, tagIds });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("set_entity_tags", { entityType, entityId, tagIds });
 }
 
 export async function getEntitiesByTag(
   entityType: EntityType,
-  tagIds: string[]
+  tagIds: string[],
 ): Promise<string[]> {
   if (!isTauri()) {
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<string[]>('get_entities_by_tag', { entityType, tagIds });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<string[]>("get_entities_by_tag", { entityType, tagIds });
 }
 
 // ============================================================================
@@ -1141,7 +1177,11 @@ export interface ExportData {
     steps: Step[];
     milestones: Milestone[];
     tags: Tag[];
-    entity_tags: Array<{ entity_type: string; entity_id: string; tag_id: string }>;
+    entity_tags: Array<{
+      entity_type: string;
+      entity_id: string;
+      tag_id: string;
+    }>;
     settings: {
       daily_summary_settings: DailySummarySettings | null;
       notification_plugins: NotificationPlugin[];
@@ -1155,25 +1195,25 @@ export interface ImportResult {
   errors: string[];
 }
 
-export type ImportMode = 'merge' | 'replace' | 'update';
+export type ImportMode = "merge" | "replace" | "update";
 
 export async function exportData(): Promise<ExportData> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to export data');
+    throw new Error("This app must run in Tauri to export data");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<ExportData>('export_data');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<ExportData>("export_data");
 }
 
 export async function importData(
   data: ExportData,
-  mode: ImportMode
+  mode: ImportMode,
 ): Promise<ImportResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to import data');
+    throw new Error("This app must run in Tauri to import data");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<ImportResult>('import_data', { data, mode });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<ImportResult>("import_data", { data, mode });
 }
 
 // ============================================================================
@@ -1182,44 +1222,44 @@ export async function importData(
 
 export async function getCirculation(id: string): Promise<Circulation> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to get circulation');
+    throw new Error("This app must run in Tauri to get circulation");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation>('get_circulation', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation>("get_circulation", { id });
 }
 
 export async function getCirculations(): Promise<Circulation[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation[]>('get_circulations');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation[]>("get_circulations");
 }
 
 export async function getCirculationsByType(
   circulationType: CirculationType,
-  frequency?: PeriodicFrequency
+  frequency?: PeriodicFrequency,
 ): Promise<Circulation[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation[]>('get_circulations_by_type', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation[]>("get_circulations_by_type", {
     circulationType,
     frequency: frequency || null,
   });
 }
 
 export async function createCirculation(
-  data: CreateCirculationParams
+  data: CreateCirculationParams,
 ): Promise<Circulation> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to create circulation');
+    throw new Error("This app must run in Tauri to create circulation");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation>('create_circulation', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation>("create_circulation", {
     title: data.title,
     circulationType: data.circulation_type,
     frequency: data.frequency || null,
@@ -1230,13 +1270,13 @@ export async function createCirculation(
 
 export async function updateCirculation(
   id: string,
-  data: UpdateCirculationParams
+  data: UpdateCirculationParams,
 ): Promise<Circulation> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to update circulation');
+    throw new Error("This app must run in Tauri to update circulation");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation>('update_circulation', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation>("update_circulation", {
     id,
     title: data.title || null,
     circulationType: data.circulation_type || null,
@@ -1249,22 +1289,22 @@ export async function updateCirculation(
 
 export async function deleteCirculation(id: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to delete circulation');
+    throw new Error("This app must run in Tauri to delete circulation");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('delete_circulation', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("delete_circulation", { id });
 }
 
 export async function checkinCirculation(
   id: string,
   note?: string,
-  count?: number
+  count?: number,
 ): Promise<Circulation> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to checkin');
+    throw new Error("This app must run in Tauri to checkin");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation>('checkin_circulation', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation>("checkin_circulation", {
     id,
     note: note || null,
     count: count || null,
@@ -1273,22 +1313,22 @@ export async function checkinCirculation(
 
 export async function undoCheckinCirculation(id: string): Promise<Circulation> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to undo checkin');
+    throw new Error("This app must run in Tauri to undo checkin");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<Circulation>('undo_checkin_circulation', { id });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Circulation>("undo_checkin_circulation", { id });
 }
 
 export async function getCirculationLogs(
   circulationId: string,
-  limit?: number
+  limit?: number,
 ): Promise<CirculationLog[]> {
   if (!isTauri()) {
-    console.warn('Running outside Tauri - data not available');
+    console.warn("Running outside Tauri - data not available");
     return [];
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<CirculationLog[]>('get_circulation_logs', {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<CirculationLog[]>("get_circulation_logs", {
     circulationId,
     limit: limit || 20,
   });
@@ -1317,18 +1357,18 @@ export interface ResetOptions {
 
 export async function seedTestData(): Promise<SeedResult> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to seed test data');
+    throw new Error("This app must run in Tauri to seed test data");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<SeedResult>('seed_test_data');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<SeedResult>("seed_test_data");
 }
 
 export async function resetData(options?: ResetOptions): Promise<void> {
   if (!isTauri()) {
-    throw new Error('This app must run in Tauri to reset data');
+    throw new Error("This app must run in Tauri to reset data");
   }
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('reset_data', { options: options || null });
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("reset_data", { options: options || null });
 }
 
 // ============================================================================
@@ -1336,21 +1376,21 @@ export async function resetData(options?: ResetOptions): Promise<void> {
 // ============================================================================
 
 export async function minimizeWindow(): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('minimize_window');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("minimize_window");
 }
 
 export async function toggleMaximize(): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('toggle_maximize');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("toggle_maximize");
 }
 
 export async function closeWindow(): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<void>('close_window');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<void>("close_window");
 }
 
 export async function isMaximized(): Promise<boolean> {
-  const { invoke } = await import('@tauri-apps/api/core');
-  return invoke<boolean>('is_maximized');
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<boolean>("is_maximized");
 }

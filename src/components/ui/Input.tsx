@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { InputHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes, forwardRef } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,11 +8,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = '', ...props }, ref) => {
+  ({ label, error, className = "", ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
+          <label
+            className="block text-sm font-medium mb-1"
+            style={{ color: "var(--color-text)" }}
+          >
             {label}
           </label>
         )}
@@ -24,18 +27,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ${className}
           `}
           style={{
-            backgroundColor: error ? 'var(--color-error)' : 'var(--color-bg)',
-            borderColor: error ? 'var(--color-error)' : 'var(--color-border)',
-            color: 'var(--color-text)',
+            backgroundColor: error ? "var(--color-error)" : "var(--color-bg)",
+            borderColor: error ? "var(--color-error)" : "var(--color-border)",
+            color: "var(--color-text)",
           }}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm" style={{ color: 'var(--color-error)' }}>{error}</p>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-error)" }}>
+            {error}
+          </p>
         )}
       </div>
     );
-  }
+  },
 );
 
-Input.displayName = 'Input';
+Input.displayName = "Input";

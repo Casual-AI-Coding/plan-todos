@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { 
-  createContext, 
-  useContext, 
-  useState, 
-  useCallback, 
-  ReactNode 
-} from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 
-export type ToastType = 'success' | 'error' | 'info' | 'warning';
+export type ToastType = "success" | "error" | "info" | "warning";
 
 export interface Toast {
   id: string;
@@ -31,7 +31,7 @@ const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 export function useToastContext() {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error('useToastContext must be used within ToastProvider');
+    throw new Error("useToastContext must be used within ToastProvider");
   }
   return context;
 }
@@ -42,10 +42,10 @@ interface ToastProviderProps {
 
 /**
  * ToastProvider
- * 
+ *
  * Provides toast notification context to the app.
  * Must be placed at the root of the application.
- * 
+ *
  * Usage:
  * ```tsx
  * <ToastProvider>
@@ -59,9 +59,9 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const addToast = useCallback((type: ToastType, message: string) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const toast: Toast = { id, type, message };
-    
+
     setToasts((prev) => [...prev, toast]);
-    
+
     // Auto remove after 3 seconds
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -72,21 +72,33 @@ export function ToastProvider({ children }: ToastProviderProps) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const success = useCallback((message: string) => addToast('success', message), [addToast]);
-  const error = useCallback((message: string) => addToast('error', message), [addToast]);
-  const info = useCallback((message: string) => addToast('info', message), [addToast]);
-  const warning = useCallback((message: string) => addToast('warning', message), [addToast]);
+  const success = useCallback(
+    (message: string) => addToast("success", message),
+    [addToast],
+  );
+  const error = useCallback(
+    (message: string) => addToast("error", message),
+    [addToast],
+  );
+  const info = useCallback(
+    (message: string) => addToast("info", message),
+    [addToast],
+  );
+  const warning = useCallback(
+    (message: string) => addToast("warning", message),
+    [addToast],
+  );
 
   return (
-    <ToastContext.Provider 
-      value={{ 
-        toasts, 
-        addToast, 
-        removeToast, 
-        success, 
-        error, 
-        info, 
-        warning 
+    <ToastContext.Provider
+      value={{
+        toasts,
+        addToast,
+        removeToast,
+        success,
+        error,
+        info,
+        warning,
       }}
     >
       {children}

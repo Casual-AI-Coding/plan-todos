@@ -4,7 +4,8 @@
 
 **Goal:** 实现完整的 Circulation 打卡功能，包括周期打卡和计数打卡，支持 streak 统计，集成到 Dashboard/统计/导出/通知。
 
-**Architecture:** 
+**Architecture:**
+
 1. 先重构 Milestone 使用统一 biz_type/biz_id 关联字段
 2. 创建 Circulation 数据模型和数据库表
 3. 实现 CRUD 和打卡命令
@@ -19,6 +20,7 @@
 ### Task 1: 修改 Milestone Model
 
 **Files:**
+
 - Modify: `src-tauri/src/models.rs:73-86`
 
 **Step 1: 修改 Milestone 结构体**
@@ -57,6 +59,7 @@ git commit -m "refactor: update Milestone model with biz_type/biz_id"
 ### Task 2: 数据库 Milestone 字段迁移
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Step 1: 添加迁移 SQL**
@@ -93,6 +96,7 @@ git commit -m "feat: add biz_type/biz_id columns to milestones table"
 ### Task 3: 添加 Circulation Model
 
 **Files:**
+
 - Modify: `src-tauri/src/models.rs`
 
 **Step 1: 添加结构体**
@@ -144,6 +148,7 @@ git commit -f "feat: add Circulation and CirculationLog models"
 ### Task 4: 创建 Circulation 数据库表
 
 **Files:**
+
 - Modify: `src-tauri/src/db.rs`
 
 **Step 1: 添加建表 SQL**
@@ -218,6 +223,7 @@ git commit -m "feat: create circulations and circulation_logs tables"
 ### Task 5: 创建 Circulation CRUD 命令
 
 **Files:**
+
 - Create: `src-tauri/src/commands/circulations.rs`
 
 **Step 1: 实现基础 CRUD**
@@ -277,6 +283,7 @@ git commit -m "feat: add Circulation CRUD commands"
 ### Task 6: 实现打卡命令 (checkin)
 
 **Files:**
+
 - Modify: `src-tauri/src/commands/circulations.rs`
 
 **Step 1: 添加 checkin 命令**
@@ -337,6 +344,7 @@ git commit -m "feat: add checkin and get_logs commands"
 ### Task 7: 注册 Circulation 命令
 
 **Files:**
+
 - Modify: `src-tauri/src/commands/mod.rs`
 - Modify: `src-tauri/src/main.rs`
 
@@ -379,13 +387,14 @@ git commit -m "feat: register Circulation commands in Tauri"
 ### Task 8: 添加 TypeScript 类型
 
 **Files:**
+
 - Modify: `src/lib/api.ts`
 
 **Step 1: 添加类型**
 
 ```typescript
-export type CirculationType = 'periodic' | 'count';
-export type PeriodicFrequency = 'daily' | 'weekly' | 'monthly';
+export type CirculationType = "periodic" | "count";
+export type PeriodicFrequency = "daily" | "weekly" | "monthly";
 
 export interface Circulation {
   id: string;
@@ -399,7 +408,7 @@ export interface Circulation {
   streak_count: number;
   best_streak: number;
   last_completed_at?: string;
-  status: 'active' | 'archived';
+  status: "active" | "archived";
   created_at: string;
   updated_at: string;
 }
@@ -438,6 +447,7 @@ git commit -f "feat: add Circulation TypeScript types"
 ### Task 9: 添加 Circulation API 函数
 
 **Files:**
+
 - Modify: `src/lib/api.ts`
 
 **Step 1: 添加 API 函数**
@@ -471,6 +481,7 @@ git commit -m "feat: add Circulation API functions"
 ### Task 10: 创建打卡二次确认组件
 
 **Files:**
+
 - Create: `src/components/ui/CheckinConfirm.tsx`
 
 **Step 1: 实现确认弹窗**
@@ -499,6 +510,7 @@ git commit -m "feat: add CheckinConfirm modal component"
 ### Task 11: 创建 CirculationsView 主页面
 
 **Files:**
+
 - Create: `src/app/views/CirculationsView.tsx`
 
 **Step 1: 实现页面结构**
@@ -528,6 +540,7 @@ git commit -m "feat: add CirculationsView page"
 ### Task 12: 创建打卡详情页
 
 **Files:**
+
 - Create: `src/app/views/CirculationDetailView.tsx`
 
 **Step 1: 实现详情**
@@ -552,6 +565,7 @@ git commit -m "feat: add CirculationDetailView"
 ### Task 13: 添加路由和 Sidebar 入口
 
 **Files:**
+
 - Modify: `src/app/page.tsx`
 - Modify: `src/components/layout/Sidebar.tsx`
 
@@ -594,6 +608,7 @@ git commit -m "feat: add Circulation routes and navigation"
 ### Task 14: 集成到 Dashboard
 
 **Files:**
+
 - Modify: `src-tauri/src/commands/dashboard.rs`
 - Modify: `src/app/views/Dashboard.tsx`
 
@@ -626,6 +641,7 @@ git commit -m "feat: integrate Circulation into Dashboard"
 ### Task 15: 集成到 Export/Import
 
 **Files:**
+
 - Modify: `src-tauri/src/commands/export.rs`
 
 **Step 1: 导出中添加 circulations**
@@ -653,12 +669,13 @@ git commit -m "feat: add Circulation to export/import"
 ### Task 16: 添加测试
 
 **Files:**
+
 - Create: `src/lib/circulations.test.ts`
 
 **Step 1: 编写测试**
 
 ```typescript
-describe('Circulation API', () => {
+describe("Circulation API", () => {
   // 测试创建
   // 测试打卡
   // 测试 streak 计算

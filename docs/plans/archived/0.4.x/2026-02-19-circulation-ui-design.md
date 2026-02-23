@@ -45,22 +45,25 @@ Circulation（打卡）是一个循环任务功能，支持每日、每周、每
 
 ### 2.2 打卡类型
 
-| 类型 | 说明 | 频率选项 |
-|------|------|----------|
+| 类型     | 说明     | 频率选项                 |
+| -------- | -------- | ------------------------ |
 | periodic | 周期打卡 | daily / weekly / monthly |
-| count | 计数打卡 | 无频率，持续累加 |
+| count    | 计数打卡 | 无频率，持续累加         |
 
 ### 2.3 Streak 计算逻辑
 
 **每日打卡**
+
 - 连续日期：昨天打卡 + 今天打卡 = 2 天
 - 中断：某天未打卡，streak 归零重新计算
 
 **每周打卡**
+
 - 连续周：上周完成 + 本周完成 = 2 周
 - 周一为一周开始
 
 **每月打卡**
+
 - 连续月：上月完成 + 本月完成 = 2 月
 - 每月 1 日为开始
 
@@ -124,7 +127,7 @@ TODOS → CIRCLUATIONS → PLANS
    - 计数打卡卡片：
      - 标题
      - 📊 当前/目标 次
-     - + / - 按钮
+     - - / - 按钮
 
 ### 3.3 打卡详情页 (CirculationDetailView)
 
@@ -180,45 +183,47 @@ TODOS → CIRCLUATIONS → PLANS
 
 ### 4.1 打卡操作
 
-| 操作 | 说明 | 触发条件 |
-|------|------|----------|
-| 打卡 | 记录一次完成 | 点击打卡按钮 |
-| 撤销 | 撤销今日打卡 | 点击撤销按钮 |
-| +1 | 计数+1 (计数打卡) | 点击 + 按钮 |
-| -1 | 计数-1 (计数打卡) | 点击 - 按钮 |
+| 操作 | 说明              | 触发条件     |
+| ---- | ----------------- | ------------ |
+| 打卡 | 记录一次完成      | 点击打卡按钮 |
+| 撤销 | 撤销今日打卡      | 点击撤销按钮 |
+| +1   | 计数+1 (计数打卡) | 点击 + 按钮  |
+| -1   | 计数-1 (计数打卡) | 点击 - 按钮  |
 
 ### 4.2 CRUD 操作
 
-| 操作 | 说明 |
-|------|------|
+| 操作 | 说明                      |
+| ---- | ------------------------- |
 | 创建 | 填写标题、类型、频率/目标 |
 | 编辑 | 修改标题、类型、频率/目标 |
-| 删除 | 确认后删除 |
-| 归档 | 归档后不在列表显示 |
+| 删除 | 确认后删除                |
+| 归档 | 归档后不在列表显示        |
 
 ### 4.3 今日打卡逻辑
 
 **周期打卡**
+
 - daily: 每天需要打卡
 - weekly: 每周一需要打卡
 - monthly: 每月1日需要打卡
 
 **计数打卡**
+
 - 每天都可以打卡，次数无限制
 
 ### 4.4 种子数据
 
 创建以下示例打卡：
 
-| 类型 | 名称 | 频率/目标 |
-|------|------|----------|
-| 每日 | 晨跑 | daily |
-| 每日 | 读书 | daily |
-| 每日 | 喝水 | daily |
-| 每周 | 周报 | weekly |
-| 每周 | 周复盘 | weekly |
-| 每月 | 月总结 | monthly |
-| 计数 | 喝水 | target: 8 |
+| 类型 | 名称        | 频率/目标     |
+| ---- | ----------- | ------------- |
+| 每日 | 晨跑        | daily         |
+| 每日 | 读书        | daily         |
+| 每日 | 喝水        | daily         |
+| 每周 | 周报        | weekly        |
+| 每周 | 周复盘      | weekly        |
+| 每月 | 月总结      | monthly       |
+| 计数 | 喝水        | target: 8     |
 | 计数 | 每日10000步 | target: 10000 |
 
 ---
@@ -260,25 +265,25 @@ CREATE TABLE circulation_logs (
 
 ### 5.2 后端命令
 
-| 命令 | 说明 | 参数 |
-|------|------|------|
-| get_circulation | 获取单个打卡 | id |
-| get_circulations | 获取所有打卡 | - |
-| get_circulations_by_type | 按类型筛选 | circulation_type, frequency |
-| create_circulation | 创建打卡 | title, circulation_type, frequency, target_count |
-| update_circulation | 更新打卡 | id, title, circulation_type, frequency, target_count, status |
-| delete_circulation | 删除打卡 | id |
-| checkin_circulation | 打卡 | id, note, count (可选) |
-| undo_checkin_circulation | 撤销打卡 | id |
-| get_circulation_logs | 获取打卡记录 | circulation_id, limit |
+| 命令                     | 说明         | 参数                                                         |
+| ------------------------ | ------------ | ------------------------------------------------------------ |
+| get_circulation          | 获取单个打卡 | id                                                           |
+| get_circulations         | 获取所有打卡 | -                                                            |
+| get_circulations_by_type | 按类型筛选   | circulation_type, frequency                                  |
+| create_circulation       | 创建打卡     | title, circulation_type, frequency, target_count             |
+| update_circulation       | 更新打卡     | id, title, circulation_type, frequency, target_count, status |
+| delete_circulation       | 删除打卡     | id                                                           |
+| checkin_circulation      | 打卡         | id, note, count (可选)                                       |
+| undo_checkin_circulation | 撤销打卡     | id                                                           |
+| get_circulation_logs     | 获取打卡记录 | circulation_id, limit                                        |
 
 ### 5.3 前端组件
 
-| 组件 | 说明 |
-|------|------|
-| CirculationsView | 打卡主页 |
-| CirculationDetailView | 打卡详情页（支持弹窗模式） |
-| CheckinConfirm | 打卡确认弹窗（支持计数输入） |
+| 组件                  | 说明                         |
+| --------------------- | ---------------------------- |
+| CirculationsView      | 打卡主页                     |
+| CirculationDetailView | 打卡详情页（支持弹窗模式）   |
+| CheckinConfirm        | 打卡确认弹窗（支持计数输入） |
 
 ---
 
@@ -329,7 +334,7 @@ PC端: grid-cols-4 (4列)
 
 ## 8. 更新历史
 
-| 日期 | 操作 |
-|------|------|
-| 2026-02-19 | 创建文档 v1.0 |
+| 日期       | 操作                                             |
+| ---------- | ------------------------------------------------ |
+| 2026-02-19 | 创建文档 v1.0                                    |
 | 2026-02-19 | 添加 v1.1 更新：卡片网格布局、详情弹窗、计数输入 |
