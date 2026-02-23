@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Input } from '@/components/ui';
-import type { Todo, Priority, Tag } from '@/lib/api';
+import { useState, useEffect, useRef } from "react";
+import { Modal, Button, Input } from "@/components/ui";
+import type { Todo, Priority, Tag } from "@/lib/api";
 
 export interface TodoFormData {
   title: string;
@@ -28,10 +28,10 @@ export function TodoForm({
   onClose,
   onSave,
 }: TodoFormProps) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [priority, setPriority] = useState<Priority>('P2');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState<Priority>("P2");
   const [tags, setTags] = useState<string[]>([]);
   const isInitialized = useRef(false);
 
@@ -39,17 +39,18 @@ export function TodoForm({
   useEffect(() => {
     if (!open) return;
     if (isInitialized.current && !editingTodo) {
-      setTitle('');
-      setContent('');
-      setDueDate('');
-      setPriority('P2');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTitle("");
+      setContent("");
+      setDueDate("");
+      setPriority("P2");
       setTags([]);
     } else if (editingTodo) {
       setTitle(editingTodo.title);
-      setContent(editingTodo.content || '');
-      setDueDate(editingTodo.due_date || '');
+      setContent(editingTodo.content || "");
+      setDueDate(editingTodo.due_date || "");
       setPriority(editingTodo.priority);
-      setTags(editingTodo.tags?.map(t => t.id) || []);
+      setTags(editingTodo.tags?.map((t) => t.id) || []);
     }
     isInitialized.current = true;
   }, [open, editingTodo]);
@@ -63,34 +64,36 @@ export function TodoForm({
         due_date: dueDate || undefined,
         priority,
       },
-      tags
+      tags,
     );
   };
 
   const handleClose = () => {
-    setTitle('');
-    setContent('');
-    setDueDate('');
-    setPriority('P2');
+    setTitle("");
+    setContent("");
+    setDueDate("");
+    setPriority("P2");
     setTags([]);
     onClose();
   };
 
   const toggleTag = (tagId: string) => {
-    setTags(prev =>
-      prev.includes(tagId) ? prev.filter(t => t !== tagId) : [...prev, tagId]
+    setTags((prev) =>
+      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId],
     );
   };
 
   return (
     <Modal
       open={open}
-      title={editingTodo ? '编辑 Todo' : '新建 Todo'}
+      title={editingTodo ? "编辑 Todo" : "新建 Todo"}
       onClose={handleClose}
       footer={
         <>
-          <Button variant="secondary" onClick={handleClose}>取消</Button>
-          <Button onClick={handleSave}>{editingTodo ? '保存' : '创建'}</Button>
+          <Button variant="secondary" onClick={handleClose}>
+            取消
+          </Button>
+          <Button onClick={handleSave}>{editingTodo ? "保存" : "创建"}</Button>
         </>
       }
     >
@@ -103,7 +106,9 @@ export function TodoForm({
           autoFocus
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">内容</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            内容
+          </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -119,26 +124,36 @@ export function TodoForm({
           onChange={(e) => setDueDate(e.target.value)}
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            优先级
+          </label>
           <div className="flex gap-2">
-            {(['P0', 'P1', 'P2', 'P3'] as Priority[]).map((p) => (
+            {(["P0", "P1", "P2", "P3"] as Priority[]).map((p) => (
               <button
                 key={p}
                 type="button"
                 onClick={() => setPriority(p)}
                 className={`flex-1 py-2 rounded-lg border-2 transition-colors ${
                   priority === p
-                    ? 'border-teal-500 bg-teal-50 text-teal-700'
-                    : 'border-gray-200 text-gray-600'
+                    ? "border-teal-500 bg-teal-50 text-teal-700"
+                    : "border-gray-200 text-gray-600"
                 }`}
               >
-                {p === 'P0' ? 'P0 紧急' : p === 'P1' ? 'P1 重要' : p === 'P2' ? 'P2 普通' : 'P3 低'}
+                {p === "P0"
+                  ? "P0 紧急"
+                  : p === "P1"
+                    ? "P1 重要"
+                    : p === "P2"
+                      ? "P2 普通"
+                      : "P3 低"}
               </button>
             ))}
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">标签</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            标签
+          </label>
           <div className="flex flex-wrap gap-2">
             {allTags.length === 0 ? (
               <span className="text-sm text-gray-400">暂无标签</span>
@@ -150,10 +165,18 @@ export function TodoForm({
                   onClick={() => toggleTag(tag.id)}
                   className={`px-3 py-1 rounded-full text-sm border transition-colors ${
                     tags.includes(tag.id)
-                      ? 'border-teal-500 bg-teal-50 text-teal-700'
-                      : 'border-gray-200 text-gray-600 hover:border-teal-300'
+                      ? "border-teal-500 bg-teal-50 text-teal-700"
+                      : "border-gray-200 text-gray-600 hover:border-teal-300"
                   }`}
-                  style={tags.includes(tag.id) ? {} : { backgroundColor: `${tag.color}20`, color: tag.color, borderColor: tag.color }}
+                  style={
+                    tags.includes(tag.id)
+                      ? {}
+                      : {
+                          backgroundColor: `${tag.color}20`,
+                          color: tag.color,
+                          borderColor: tag.color,
+                        }
+                  }
                 >
                   {tag.name}
                 </button>

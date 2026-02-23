@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { BottomNav } from '@/components/layout/BottomNav';
-import { TitleBar } from '@/components/ui/TitleBar';
-import { 
-  Dashboard, 
-  TodosView, 
-  PlansView, 
-  TargetsView, 
-  MilestonesView, 
-  ViewsView, 
-  StatisticsView, 
+import { useState, useEffect } from "react";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { BottomNav } from "@/components/layout/BottomNav";
+import { TitleBar } from "@/components/ui/TitleBar";
+import {
+  Dashboard,
+  TodosView,
+  PlansView,
+  TargetsView,
+  MilestonesView,
+  ViewsView,
+  StatisticsView,
   SettingsGeneralView,
   SettingsChannelsView,
   SettingsDailySummaryView,
@@ -19,13 +19,15 @@ import {
   SettingsTagsView,
   CirculationsView,
   CirculationDetailView,
-} from './views';
+} from "./views";
 
 // Main App
 export default function Home() {
-  const [activeMenu, setActiveMenu] = useState('dashboard');
-  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
-  
+  const [activeMenu, setActiveMenu] = useState("dashboard");
+  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(
+    null,
+  );
+
   // Use useEffect to avoid hydration mismatch - start with false on both server and client
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
@@ -34,88 +36,104 @@ export default function Home() {
 
   // Sync with localStorage after mount
   useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    if (saved === 'true') {
+    const saved = localStorage.getItem("sidebar-collapsed");
+    if (saved === "true") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSidebarCollapsed(true);
     }
   }, []);
 
   const renderContent = () => {
     switch (activeMenu) {
-      case 'dashboard': return <Dashboard />;
-      case 'todos':
-      case 'todos-all':
-      case 'todos-today':
-      case 'todos-upcoming':
-      case 'todos-completed': return <TodosView />;
-      case 'plans':
-      case 'plans-active':
-      case 'plans-archived': return <PlansView />;
-      case 'goals':
-      case 'goals-active':
-      case 'goals-completed': return <TargetsView />;
-      case 'milestones': return <MilestonesView />;
-      case 'views': return <ViewsView />;
-      case 'circulations':
-      case 'circulations-today': return (
-        <CirculationsView 
-          mode="today" 
-        />
-      );
-      case 'circulations-settings': return (
-        <CirculationsView 
-          mode="settings" 
-        />
-      );
-      case 'statistics': return <StatisticsView />;
-      case 'settings': return <SettingsGeneralView />;
-      case 'settings-general': return <SettingsGeneralView />;
-      case 'settings-tags': return <SettingsTagsView />;
-      case 'settings-channels': return <SettingsChannelsView />;
-      case 'settings-daily-summary': return <SettingsDailySummaryView />;
-      case 'settings-about': return <SettingsAboutView />;
-      default: return <Dashboard />;
+      case "dashboard":
+        return <Dashboard />;
+      case "todos":
+      case "todos-all":
+      case "todos-today":
+      case "todos-upcoming":
+      case "todos-completed":
+        return <TodosView />;
+      case "plans":
+      case "plans-active":
+      case "plans-archived":
+        return <PlansView />;
+      case "goals":
+      case "goals-active":
+      case "goals-completed":
+        return <TargetsView />;
+      case "milestones":
+        return <MilestonesView />;
+      case "views":
+        return <ViewsView />;
+      case "circulations":
+      case "circulations-today":
+        return <CirculationsView mode="today" />;
+      case "circulations-settings":
+        return <CirculationsView mode="settings" />;
+      case "statistics":
+        return <StatisticsView />;
+      case "settings":
+        return <SettingsGeneralView />;
+      case "settings-general":
+        return <SettingsGeneralView />;
+      case "settings-tags":
+        return <SettingsTagsView />;
+      case "settings-channels":
+        return <SettingsChannelsView />;
+      case "settings-daily-summary":
+        return <SettingsDailySummaryView />;
+      case "settings-about":
+        return <SettingsAboutView />;
+      default:
+        return <Dashboard />;
     }
   };
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: 'transparent', fontFamily: 'var(--font-sans)' }}>
+    <div
+      className="flex flex-col h-screen"
+      style={{ background: "transparent", fontFamily: "var(--font-sans)" }}
+    >
       {/* Desktop: entire app with rounded corners, shadow, border */}
       <div className="hidden md:flex flex-col h-screen rounded-lg overflow-hidden border border-[var(--color-border)] shadow-lg">
         <TitleBar />
-        
+
         <div className="flex flex-1 overflow-hidden">
           {/* Desktop Sidebar - hidden on mobile */}
           <div className="hidden md:block h-full">
-            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
+            <Sidebar
+              activeMenu={activeMenu}
+              onMenuChange={setActiveMenu}
+              onCollapseChange={setSidebarCollapsed}
+            />
           </div>
-          
+
           {/* Main Content */}
-          <main 
-            className="flex-1 overflow-auto pb-16 md:pb-0" 
-            style={{ 
-              backgroundColor: 'var(--color-bg)',
+          <main
+            className="flex-1 overflow-auto pb-16 md:pb-0"
+            style={{
+              backgroundColor: "var(--color-bg)",
             }}
           >
             {renderContent()}
           </main>
         </div>
       </div>
-      
+
       {/* Mobile: with hamburger menu */}
       <div className="md:hidden flex flex-col h-screen">
         {/* Mobile Header with hamburger */}
-        <header 
+        <header
           className="flex items-center h-12 px-4 border-b"
-          style={{ 
-            backgroundColor: 'var(--color-bg-card)',
-            borderColor: 'var(--color-border)',
+          style={{
+            backgroundColor: "var(--color-bg-card)",
+            borderColor: "var(--color-border)",
           }}
         >
           <button
             onClick={() => setMobileSidebarOpen(true)}
             className="p-2 -ml-2 rounded hover:opacity-80"
-            style={{ color: 'var(--color-text)' }}
+            style={{ color: "var(--color-text)" }}
             aria-label="打开菜单"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -124,19 +142,19 @@ export default function Home() {
               <rect x="2" y="14" width="16" height="1.5" />
             </svg>
           </button>
-          <h1 
+          <h1
             className="ml-2 text-lg font-semibold"
-            style={{ color: 'var(--color-text)' }}
+            style={{ color: "var(--color-text)" }}
           >
             Plan Todos
           </h1>
         </header>
 
         {/* Main Content */}
-        <main 
-          className="flex-1 overflow-auto pb-16" 
-          style={{ 
-            backgroundColor: 'var(--color-bg)',
+        <main
+          className="flex-1 overflow-auto pb-16"
+          style={{
+            backgroundColor: "var(--color-bg)",
           }}
         >
           {renderContent()}
@@ -146,25 +164,25 @@ export default function Home() {
         {mobileSidebarOpen && (
           <>
             {/* Backdrop */}
-            <div 
+            <div
               className="fixed inset-0 z-40 bg-black/50"
               onClick={() => setMobileSidebarOpen(false)}
             />
             {/* Sidebar Panel */}
-            <div 
+            <div
               className="fixed left-0 top-0 h-full z-50 w-64"
-              style={{ 
-                backgroundColor: 'var(--color-bg-card)',
-                transform: 'translateX(0)',
-                transition: 'transform 0.3s ease',
+              style={{
+                backgroundColor: "var(--color-bg-card)",
+                transform: "translateX(0)",
+                transition: "transform 0.3s ease",
               }}
             >
-              <Sidebar 
-                activeMenu={activeMenu} 
+              <Sidebar
+                activeMenu={activeMenu}
                 onMenuChange={(menu) => {
                   setActiveMenu(menu);
                   setMobileSidebarOpen(false);
-                }} 
+                }}
                 onCollapseChange={setSidebarCollapsed}
                 isMobile
               />
@@ -172,9 +190,9 @@ export default function Home() {
           </>
         )}
       </div>
-      
+
       <BottomNav activeMenu={activeMenu} onMenuChange={setActiveMenu} />
-      
+
       {circulationDetailId && (
         <CirculationDetailView
           id={circulationDetailId}

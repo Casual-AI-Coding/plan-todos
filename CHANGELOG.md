@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.1] - 2026-02-23
+
+### Fixed
+- **移动端安全区域适配**: 修复刘海屏/全面屏设备上的 UI 遮挡问题
+  - 顶部刘海区域不再遮挡汉堡菜单
+  - 底部虚拟导航键不再遮挡 BottomNav
+  - 侧边栏不被刘海遮挡
+  - 使用 CSS `env()` 函数自动适配不同系统设置
+
+---
+
 ## [0.5.0] - 2026-02-23
 
 ### Added

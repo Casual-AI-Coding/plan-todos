@@ -1,8 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTheme } from '@/hooks/useTheme';
-import { minimizeWindow, toggleMaximize, closeWindow, isMaximized } from '@/lib/api';
+import { useState, useEffect } from "react";
+import { useTheme } from "@/hooks/useTheme";
+import {
+  minimizeWindow,
+  toggleMaximize,
+  closeWindow,
+  isMaximized,
+} from "@/lib/api";
 
 interface TitleBarProps {
   /**
@@ -21,20 +26,24 @@ interface TitleBarProps {
  * Custom window title bar for Tauri desktop application
  * Provides window dragging and control buttons
  */
-export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBarProps) {
+export function TitleBar({
+  title = "Plan Todos",
+  showControls = true,
+}: TitleBarProps) {
   const { theme } = useTheme();
   const [maximized, setMaximized] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   // Prevent hydration mismatch
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
   }, []);
 
   // Check initial maximized state
   useEffect(() => {
     if (!isClient) return;
-    
+
     const checkMaximized = async () => {
       try {
         const max = await isMaximized();
@@ -43,7 +52,7 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
         // Ignore errors - not in Tauri
       }
     };
-    
+
     checkMaximized();
   }, [isClient]);
 
@@ -90,33 +99,33 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
       className="title-bar"
       data-tauri-drag-region
       style={{
-        height: '36px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 8px',
-        backgroundColor: 'var(--color-bg)',
-        userSelect: 'none',
+        height: "36px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 8px",
+        backgroundColor: "var(--color-bg)",
+        userSelect: "none",
       }}
       onDoubleClick={handleDoubleClick}
     >
       {/* Left section: App icon and title */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
         }}
       >
         {/* App icon */}
         <div
           style={{
-            width: '16px',
-            height: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
+            width: "16px",
+            height: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "14px",
           }}
         >
           📋
@@ -124,9 +133,9 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
         {/* Title */}
         <span
           style={{
-            fontSize: '13px',
+            fontSize: "13px",
             fontWeight: 500,
-            color: 'var(--color-text)',
+            color: "var(--color-text)",
           }}
         >
           {title}
@@ -137,9 +146,9 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
       {showControls && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2px',
+            display: "flex",
+            alignItems: "center",
+            gap: "2px",
           }}
         >
           {/* Minimize button */}
@@ -147,7 +156,12 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
             onClick={handleMinimize}
             title="Minimize"
             icon={
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="currentColor"
+              >
                 <rect x="0" y="4" width="10" height="1" />
               </svg>
             }
@@ -155,16 +169,36 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
           {/* Maximize/Restore button */}
           <WindowControlButton
             onClick={handleMaximize}
-            title={maximized ? 'Restore' : 'Maximize'}
+            title={maximized ? "Restore" : "Maximize"}
             icon={
               maximized ? (
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                >
                   <rect x="2" y="0" width="8" height="8" />
-                  <rect x="0" y="2" width="8" height="8" fill="var(--color-bg)" />
+                  <rect
+                    x="0"
+                    y="2"
+                    width="8"
+                    height="8"
+                    fill="var(--color-bg)"
+                  />
                   <rect x="0" y="2" width="8" height="8" />
                 </svg>
               ) : (
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1">
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                >
                   <rect x="0" y="0" width="10" height="10" />
                 </svg>
               )
@@ -175,8 +209,17 @@ export function TitleBar({ title = 'Plan Todos', showControls = true }: TitleBar
             onClick={handleClose}
             title="Close"
             icon={
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" strokeWidth="1.2" />
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="currentColor"
+              >
+                <path
+                  d="M1 1L9 9M9 1L1 9"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
               </svg>
             }
             isClose
@@ -212,23 +255,21 @@ function WindowControlButton({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        width: '32px',
-        height: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        border: 'none',
+        width: "32px",
+        height: "24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "none",
         backgroundColor: isHovered
           ? isClose
-            ? '#e81123' // Windows close button red
-            : 'var(--color-bg-hover)'
-          : 'transparent',
-        color: isHovered && isClose
-          ? '#ffffff'
-          : 'var(--color-text)',
-        cursor: 'pointer',
-        borderRadius: '4px',
-        transition: 'background-color 0.15s ease',
+            ? "#e81123" // Windows close button red
+            : "var(--color-bg-hover)"
+          : "transparent",
+        color: isHovered && isClose ? "#ffffff" : "var(--color-text)",
+        cursor: "pointer",
+        borderRadius: "4px",
+        transition: "background-color 0.15s ease",
       }}
       aria-label={title}
     >
