@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-02-23
+
+### Added
+- **移动端响应式布局**: 完全重构移动端导航和布局
+  - 移动端引入汉堡菜单，点击展开侧边栏 overlay
+  - 平板端侧边栏自动收起
+  - 桌面端保持原有 Sidebar + TitleBar 布局
+
+### Changed
+- **Dashboard 响应式网格**:
+  - 统计卡片: 移动端1列 → 平板2列 → 桌面3列
+  - EntityCount: 移动端3列 → 平板5列 → 桌面7列
+  - Plans/Targets: 移动端1列 → 平板/桌面2列
+
+### Fixed
+- **Android 视口问题**: 添加 viewport meta 和 CSS 修复，解决 UI 旋转90度问题
+- **玻璃效果透明度**: 修复启动时不加载透明度设置的问题，现在启动时立即应用
+
+---
+
 ## [0.4.6] - 2026-02-23
 
 ### Added

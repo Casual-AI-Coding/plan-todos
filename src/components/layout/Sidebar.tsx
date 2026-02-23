@@ -13,6 +13,8 @@ interface SidebarProps {
   activeMenu: string;
   onMenuChange: (menu: string) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
+  /** Mobile mode: show as full-height panel without collapse */
+  isMobile?: boolean;
 }
  
 const menus: MenuItem[] = [
@@ -45,19 +47,21 @@ const menus: MenuItem[] = [
   { id: 'settings-about', icon: 'ℹ️', label: '关于' },
 ];
 
-export function Sidebar({ activeMenu, onMenuChange, onCollapseChange }: SidebarProps) {
+export function Sidebar({ activeMenu, onMenuChange, onCollapseChange, isMobile = false }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(['settings']));
   
   // Use useEffect to avoid hydration mismatch - start with false on both server and client
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  // In mobile mode, always expanded (not collapsed)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(isMobile);
 
-  // Sync with localStorage after mount
+  // Sync with localStorage after mount (desktop only)
   useEffect(() => {
+    if (isMobile) return; // Don't sync in mobile mode
     const saved = localStorage.getItem('sidebar-collapsed');
     if (saved === 'true') {
       setIsCollapsed(true);
     }
-  }, []);
+  }, [isMobile]);
   
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });

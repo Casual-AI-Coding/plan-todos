@@ -24,6 +24,15 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  height: 'device-height',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
+
 // Inline script to set theme before React loads - prevents hydration mismatch
 const themeScript = `
 (function() {

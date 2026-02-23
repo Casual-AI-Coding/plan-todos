@@ -618,3 +618,41 @@ body {
 
 /* Selection */
 ::selection { background-color: var(--color-primary); color: var(--color-text-inverse); }
+
+
+/* ============================================
+   Mobile Viewport Fixes
+   ============================================ */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  overscroll-behavior: none;
+}
+
+/* Dynamic viewport height for mobile browsers */
+@supports (height: 100dvh) {
+  body {
+    height: 100dvh;
+  }
+}
+
+/* Prevent pull-to-refresh and overscroll glow */
+body {
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}

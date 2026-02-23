@@ -45,15 +45,15 @@ export function Dashboard() {
         今日总览
       </h2>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Stats Cards - Responsive: 1 col mobile, 2 col tablet, 3 col desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard value={overview.today_todos_count} label="今日待办" />
         <StatCard value={overview.upcoming_3days_count} label="即将到期 (3天内)" color="var(--color-warning)" />
         <StatCard value={overview.completed_today_count} label="今日完成" />
       </div>
 
-      {/* Entity Counts */}
-      <div className="grid grid-cols-7 gap-2">
+      {/* Entity Counts - Responsive: 3 col mobile, 5 col tablet, 7 col desktop */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2">
         <EntityCountCard count={counts.todo} label="待办" />
         <EntityCountCard count={counts.plan} label="计划" />
         <EntityCountCard count={counts.task} label="任务" />
@@ -115,8 +115,8 @@ export function Dashboard() {
         </Card>
       )}
 
-      {/* Active Plans & Targets */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Active Plans & Targets - Responsive: 1 col mobile, 2 col tablet+ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>进行中的计划</h3>
           {active_plans.length === 0 ? (

@@ -29,6 +29,9 @@ export default function Home() {
   // Use useEffect to avoid hydration mismatch - start with false on both server and client
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
+  // Mobile sidebar overlay state
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
+
   // Sync with localStorage after mount
   useEffect(() => {
     const saved = localStorage.getItem('sidebar-collapsed');
@@ -99,22 +102,75 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Mobile: without rounded corners */}
+      {/* Mobile: with hamburger menu */}
       <div className="md:hidden flex flex-col h-screen">
-        <div className="flex flex-1 overflow-hidden">
-          <div className="fixed left-0 top-0 h-screen z-40">
-            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
-          </div>
-          <main 
-            className="flex-1 overflow-auto pb-16 pt-0" 
-            style={{ 
-              backgroundColor: 'var(--color-bg)',
-              marginLeft: sidebarCollapsed ? '4rem' : '13rem',
-            }}
+        {/* Mobile Header with hamburger */}
+        <header 
+          className="flex items-center h-12 px-4 border-b"
+          style={{ 
+            backgroundColor: 'var(--color-bg-card)',
+            borderColor: 'var(--color-border)',
+          }}
+        >
+          <button
+            onClick={() => setMobileSidebarOpen(true)}
+            className="p-2 -ml-2 rounded hover:opacity-80"
+            style={{ color: 'var(--color-text)' }}
+            aria-label="打开菜单"
           >
-            {renderContent()}
-          </main>
-        </div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <rect x="2" y="4" width="16" height="1.5" />
+              <rect x="2" y="9" width="16" height="1.5" />
+              <rect x="2" y="14" width="16" height="1.5" />
+            </svg>
+          </button>
+          <h1 
+            className="ml-2 text-lg font-semibold"
+            style={{ color: 'var(--color-text)' }}
+          >
+            Plan Todos
+          </h1>
+        </header>
+
+        {/* Main Content */}
+        <main 
+          className="flex-1 overflow-auto pb-16" 
+          style={{ 
+            backgroundColor: 'var(--color-bg)',
+          }}
+        >
+          {renderContent()}
+        </main>
+
+        {/* Mobile Sidebar Overlay */}
+        {mobileSidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 z-40 bg-black/50"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+            {/* Sidebar Panel */}
+            <div 
+              className="fixed left-0 top-0 h-full z-50 w-64"
+              style={{ 
+                backgroundColor: 'var(--color-bg-card)',
+                transform: 'translateX(0)',
+                transition: 'transform 0.3s ease',
+              }}
+            >
+              <Sidebar 
+                activeMenu={activeMenu} 
+                onMenuChange={(menu) => {
+                  setActiveMenu(menu);
+                  setMobileSidebarOpen(false);
+                }} 
+                onCollapseChange={setSidebarCollapsed}
+                isMobile
+              />
+            </div>
+          </>
+        )}
       </div>
       
       <BottomNav activeMenu={activeMenu} onMenuChange={setActiveMenu} />
