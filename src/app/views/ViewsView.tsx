@@ -87,7 +87,6 @@ export function ViewsView() {
     }
   }
 
-   
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;

@@ -80,13 +80,12 @@ export function TargetsView() {
     }
   }
 
-   
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;
     loadTargets();
   }, []);
-   
+
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;

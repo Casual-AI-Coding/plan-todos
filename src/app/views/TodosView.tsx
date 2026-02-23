@@ -75,12 +75,12 @@ export function TodosView() {
     if (isLoaded.current) return;
     isLoaded.current = true;
     loadTodos();
-  }, []);  
+  }, []);
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;
     loadTags();
-  }, []);  
+  }, []);
 
   // Convert todos to calendar events
   const calendarEvents: CalendarEvent[] = todos

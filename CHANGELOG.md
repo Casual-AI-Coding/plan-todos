@@ -11,24 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
- **全局搜索**: Sidebar 集成 SearchBar，支持 Ctrl+K 快捷键打开搜索
- **4 个新主题**: Spring (春意)、Catppuccin、Tokyo Night、One Dark
- **系统主题跟随**: 添加 useSystemTheme hook，自动跟随操作系统深色/浅色模式
- **ThemeSelector 改进**: 4列网格布局，所有主题都可调整透明度/模糊度
- **淡入动画**: Dashboard、Todos、Plans、Targets、Milestones 视图添加 FadeIn 动画
- **Skeleton 组件**: 添加骨架屏加载组件
+**全局搜索**: Sidebar 集成 SearchBar，支持 Ctrl+K 快捷键打开搜索
+**4 个新主题**: Spring (春意)、Catppuccin、Tokyo Night、One Dark
+**系统主题跟随**: 添加 useSystemTheme hook，自动跟随操作系统深色/浅色模式
+**ThemeSelector 改进**: 4列网格布局，所有主题都可调整透明度/模糊度
+**淡入动画**: Dashboard、Todos、Plans、Targets、Milestones 视图添加 FadeIn 动画
+**Skeleton 组件**: 添加骨架屏加载组件
 
 ### Changed
 
- **主题过渡动画**: 使用 cubic-bezier(0.22, 1, 0.36, 1) 缓动函数，过渡更平滑
- **主题透明度**: 所有主题支持透明度/模糊度调节（之前仅玻璃主题）
- **删除 SettingsView**: 移除未使用的独立设置页面
+**主题过渡动画**: 使用 cubic-bezier(0.22, 1, 0.36, 1) 缓动函数，过渡更平滑
+**主题透明度**: 所有主题支持透明度/模糊度调节（之前仅玻璃主题）
+**删除 SettingsView**: 移除未使用的独立设置页面
 
 ### Fixed
 
- **移动端 z-index 修复**: 汉堡菜单、Sidebar overlay 的层级问题
- **SearchBar 溢出**: 修复移动端搜索框溢出问题 (w-64 → w-full)
- **新主题不生效**: 修复新主题 CSS 变量未正确应用透明度的问题
+**移动端 z-index 修复**: 汉堡菜单、Sidebar overlay 的层级问题
+**SearchBar 溢出**: 修复移动端搜索框溢出问题 (w-64 → w-full)
+**新主题不生效**: 修复新主题 CSS 变量未正确应用透明度的问题
 
 ---
 

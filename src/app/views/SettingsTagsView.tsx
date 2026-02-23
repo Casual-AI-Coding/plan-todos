@@ -34,7 +34,6 @@ export function SettingsTagsView() {
     }
   }
 
-   
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;

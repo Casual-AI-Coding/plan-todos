@@ -80,13 +80,12 @@ export function PlansView() {
     }
   }
 
-   
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;
     loadPlans();
   }, []);
-   
+
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;

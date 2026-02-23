@@ -168,10 +168,11 @@ export default function Home() {
 
         {/* Main Content */}
         <main
-          className="flex-1 overflow-auto pb-14 mt-12"
+          className="flex-1 overflow-auto pb-14"
           style={{
             backgroundColor: "var(--color-bg)",
             paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom))",
+            marginTop: "calc(3rem + env(safe-area-inset-top))",
           }}
         >
           {renderContent()}
@@ -187,7 +188,7 @@ export default function Home() {
             />
             {/* Sidebar Panel */}
             <div
-              className="fixed left-0 top-0 h-full z-30 w-64 pt-12"
+              className="fixed left-0 top-0 h-full z-50 w-64 pt-12"
               style={{
                 backgroundColor: "var(--color-bg-card)",
                 transform: "translateX(0)",

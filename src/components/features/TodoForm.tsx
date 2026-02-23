@@ -35,7 +35,6 @@ export function TodoForm({
   const [tags, setTags] = useState<string[]>([]);
   const isInitialized = useRef(false);
 
-   
   useEffect(() => {
     if (!open) return;
     if (isInitialized.current && !editingTodo) {

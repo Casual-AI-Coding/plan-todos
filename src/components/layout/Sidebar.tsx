@@ -60,14 +60,17 @@ export function Sidebar({
 
   // Use useEffect to avoid hydration mismatch - start with false on both server and client
   // In mobile mode, always expanded (not collapsed)
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(isMobile);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   // Sync with localStorage after mount (desktop only)
   useEffect(() => {
-    if (isMobile) return; // Don't sync in mobile mode
+    if (isMobile) {
+      // Mobile mode: always expanded
+      setIsCollapsed(false);
+      return;
+    }
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCollapsed(true);
     }
   }, [isMobile]);

@@ -45,7 +45,6 @@ export function StatisticsView() {
     }
   }
 
-   
   useEffect(() => {
     if (isLoaded.current) return;
     isLoaded.current = true;

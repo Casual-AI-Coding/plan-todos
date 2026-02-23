@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fira_Code, Fira_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { QueryProvider } from "@/components/ui/QueryProvider";
 import { ToastProvider, ToastContainer } from "@/components/ui/Toast";
 import "./globals.css";
 
@@ -62,10 +63,12 @@ export default function RootLayout({
         className={`${firaCode.variable} ${firaSans.variable} antialiased min-h-screen`}
       >
         <ThemeProvider>
-          <ToastProvider>
-            {children}
-            <ToastContainer />
-          </ToastProvider>
+          <QueryProvider>
+            <ToastProvider>
+              {children}
+              <ToastContainer />
+            </ToastProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

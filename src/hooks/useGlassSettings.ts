@@ -25,7 +25,7 @@ export function useGlassSettings() {
     useState<number>(getInitialOpacity);
 
   // Set CSS variables on mount
-   
+
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--glass-blur",
