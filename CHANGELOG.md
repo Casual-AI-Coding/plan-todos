@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.2] - 2026-02-23
+
+### Fixed
+- **移动端刘海遮挡修复**: Header、Sidebar、Main Content 添加 safe-area padding
+- **移动端 Sidebar 优化**: 添加关闭按钮和顶部安全区域
+- **移动端滚动条隐藏**: 隐藏 body 和 webkit 滚动条
+- **移动端底部导航高度**: 从 h-16 调整为 h-14 (56px)
+- **移动端视图间距优化**: Dashboard、Todos 等页面添加响应式 padding
+
+---
+
 ## [0.5.1] - 2026-02-23
 
 ### Fixed
