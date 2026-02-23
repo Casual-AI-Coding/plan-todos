@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { SearchBar } from "@/components/ui/SearchBar";
 
 interface MenuItem {
   id: string;
@@ -333,6 +334,27 @@ export function Sidebar({
           {isCollapsed ? "→" : "←"}
         </button>
       </div>
+
+      {/* Search Bar */}
+      {!isCollapsed && (
+        <div className="px-2 pb-2">
+          <SearchBar
+            onResultClick={(entityType, id) => {
+              // Navigate to the entity based on type
+              const menuMap: Record<string, string> = {
+                todo: "todos",
+                plan: "plans",
+                target: "goals",
+                milestone: "milestones",
+              };
+              const menu = menuMap[entityType];
+              if (menu) {
+                onMenuChange(menu);
+              }
+            }}
+          />
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2 scrollbar-hide">

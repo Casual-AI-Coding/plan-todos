@@ -142,6 +142,94 @@
   --color-cta: #F97316;
 }
 
+/* Spring Theme - Chinese New Year */
+[data-theme="spring"] {
+  --color-bg: #FFF1F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-elevated: #FFF5F5;
+  --color-bg-hover: #FFE4E6;
+  --color-text: #7F1D1D;
+  --color-text-muted: #B91C1C;
+  --color-text-inverse: #FFFFFF;
+  --color-border: #FECACA;
+  --color-border-light: #FECACA;
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-error: #DC2626;
+  --shadow-card: 0 1px 3px rgba(220, 38, 38, 0.1);
+  --shadow-elevated: 0 4px 12px rgba(220, 38, 38, 0.15);
+  --color-accent: #DC2626;
+  --color-primary: #DC2626;
+  --color-secondary: #F97316;
+  --color-cta: #FBBF24;
+}
+
+/* Catppuccin Theme */
+[data-theme="catppuccin"] {
+  --color-bg: #1e1e2e;
+  --color-bg-card: #313244;
+  --color-bg-elevated: #45475a;
+  --color-bg-hover: #45475a;
+  --color-text: #cdd6f4;
+  --color-text-muted: #a6adc8;
+  --color-text-inverse: #1e1e2e;
+  --color-border: #45475a;
+  --color-border-light: #585b70;
+  --color-success: #a6e3a1;
+  --color-warning: #f9e2af;
+  --color-error: #f38ba8;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #cba6f7;
+  --color-primary: #cba6f7;
+  --color-secondary: #f5c2e7;
+  --color-cta: #f38ba8;
+}
+
+/* Tokyo Night Theme */
+[data-theme="tokyoNight"] {
+  --color-bg: #1a1b26;
+  --color-bg-card: #24283b;
+  --color-bg-elevated: #414868;
+  --color-bg-hover: #414868;
+  --color-text: #c0caf5;
+  --color-text-muted: #565f89;
+  --color-text-inverse: #1a1b26;
+  --color-border: #414868;
+  --color-border-light: #565f89;
+  --color-success: #9ece6a;
+  --color-warning: #e0af68;
+  --color-error: #f7768e;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #7aa2f7;
+  --color-primary: #7aa2f7;
+  --color-secondary: #bb9af7;
+  --color-cta: #f7768e;
+}
+
+/* One Dark Theme */
+[data-theme="oneDark"] {
+  --color-bg: #282c34;
+  --color-bg-card: #21252b;
+  --color-bg-elevated: #2c313c;
+  --color-bg-hover: #2c313c;
+  --color-text: #abb2bf;
+  --color-text-muted: #5c6370;
+  --color-text-inverse: #282c34;
+  --color-border: #3e4451;
+  --color-border-light: #4b5263;
+  --color-success: #98c379;
+  --color-warning: #e5c07b;
+  --color-error: #e06c75;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-accent: #c678dd;
+  --color-primary: #c678dd;
+  --color-secondary: #98c379;
+  --color-cta: #e06c75;
+}
+
 /* All themes - Transparent background to show desktop in Tauri */
 html,
 body,

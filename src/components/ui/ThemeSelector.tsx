@@ -2,14 +2,14 @@
 
 import { useState, useRef } from 'react';
 import { useTheme, ThemeId } from '@/hooks/useTheme';
-import { themeList } from '@/lib/themes/registry';
+import { themeListWithSystem } from '@/lib/themes/registry';
 import { useGlassSettings } from '@/hooks/useGlassSettings';
 import { Modal, Button } from '@/components/ui';
 
-// Custom theme order: Light -> Dark -> Glass -> Dracula -> Nord -> Monokai
-const themeOrder: ThemeId[] = ['light', 'dark', 'glass', 'dracula', 'nord', 'monokai'];
+// Custom theme order: System -> Light -> Dark -> Glass -> Dracula -> Nord -> Monokai -> Spring -> Catppuccin -> Tokyo Night -> One Dark
+const themeOrder: ThemeId[] = ['system', 'light', 'dark', 'glass', 'dracula', 'nord', 'monokai', 'spring', 'catppuccin', 'tokyoNight', 'oneDark'];
 
-function reorderThemes(themes: typeof themeList) {
+function reorderThemes(themes: typeof themeListWithSystem) {
   return [...themes].sort((a, b) => {
     const orderA = themeOrder.indexOf(a.id);
     const orderB = themeOrder.indexOf(b.id);
@@ -141,21 +141,21 @@ function GlassSettingsModal({
 
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
-  const orderedThemes = reorderThemes(themeList);
+  const orderedThemes = reorderThemes(themeListWithSystem);
   const [showGlassModal, setShowGlassModal] = useState(false);
   // glass settings are accessed via useGlassSettings in the modal
   useGlassSettings();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Click once to switch theme
-  // If click on already active theme, open settings modal
+  // If click on already active theme, only open settings modal for Glass theme
   const handleThemeClick = (e: React.MouseEvent<HTMLButtonElement>, themeId: ThemeId) => {
     // Remove focus from clicked button immediately
     e.currentTarget.blur();
     
     if (themeId === theme) {
       // Already on this theme, open settings modal
-      setShowGlassModal(true);
+        setShowGlassModal(true);
     } else {
       // Switch to new theme
       setTheme(themeId);
@@ -165,7 +165,7 @@ export function ThemeSelector() {
 
   return (
     <div data-theme-selector ref={containerRef}>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
         {orderedThemes.map((t) => {
           const isActive = theme === t.id;
           
@@ -187,7 +187,7 @@ export function ThemeSelector() {
               }}
             >
               <div 
-                className="w-12 h-12 rounded-md mb-2 flex items-center justify-center text-xl border"
+                className="w-10 h-10 rounded mb-2 flex items-center justify-center text-xs border"
                 style={{ 
                   background: t.colors.bg,
                   borderColor: t.colors.border,
@@ -196,7 +196,7 @@ export function ThemeSelector() {
                 {t.icon}
               </div>
               <span 
-                className="text-sm font-medium"
+                className="text-xs font-medium"
                 style={{ color: isActive ? 'var(--color-primary)' : 'var(--color-text)' }}
               >
                 {t.name}

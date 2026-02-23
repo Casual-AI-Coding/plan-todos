@@ -43,6 +43,22 @@ export default function Home() {
     }
   }, []);
 
+  // Global keyboard shortcut for search (Ctrl+K / Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        const searchInput = document.getElementById("sidebar-search-input");
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const renderContent = () => {
     switch (activeMenu) {
       case "dashboard":
@@ -124,7 +140,7 @@ export default function Home() {
       <div className="md:hidden flex flex-col h-screen">
         {/* Mobile Header with hamburger */}
         <header
-          className="flex items-center h-12 px-4 border-b pt-[env(safe-area-inset-top)]"
+          className="flex items-center h-12 px-4 border-b pt-[env(safe-area-inset-top)] fixed top-0 left-0 right-0 z-50"
           style={{
             backgroundColor: "var(--color-bg-card)",
             borderColor: "var(--color-border)",
@@ -152,7 +168,7 @@ export default function Home() {
 
         {/* Main Content */}
         <main
-          className="flex-1 overflow-auto pb-14"
+          className="flex-1 overflow-auto pb-14 mt-12"
           style={{
             backgroundColor: "var(--color-bg)",
             paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom))",
@@ -171,12 +187,11 @@ export default function Home() {
             />
             {/* Sidebar Panel */}
             <div
-              className="fixed left-0 top-0 h-full z-50 w-64"
+              className="fixed left-0 top-0 h-full z-30 w-64 pt-12"
               style={{
                 backgroundColor: "var(--color-bg-card)",
                 transform: "translateX(0)",
                 transition: "transform 0.3s ease",
-                paddingTop: "env(safe-area-inset-top)",
               }}
             >
               {/* Mobile sidebar header with close button */}

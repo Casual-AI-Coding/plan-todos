@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, FadeIn } from '@/components/ui';
 import { Calendar } from '@/components/ui/Calendar';
 import { EmptyStateCard } from '@/components/ui/EmptyStateCard';
 import { useToast } from '@/components/ui/Toast';
@@ -183,14 +183,15 @@ export function TodosView() {
       {viewMode === 'list' ? (
         /* List */
         <div className="space-y-2">
-        {filteredTodos.map(todo => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onToggle={handleToggle}
-            onDelete={handleDelete}
-            onClick={handleEditClick}
-          />
+        {filteredTodos.map((todo, index) => (
+          <FadeIn key={todo.id} delay={index * 0.05} direction="up">
+            <TodoItem
+              todo={todo}
+              onToggle={handleToggle}
+              onDelete={handleDelete}
+              onClick={handleEditClick}
+            />
+          </FadeIn>
         ))}
         {filteredTodos.length === 0 && (
           <EmptyStateCard 

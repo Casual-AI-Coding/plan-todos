@@ -9,3 +9,4 @@ export { SearchBar } from './SearchBar';
 export { FadeIn } from './FadeIn';
 export { ScaleIn } from './ScaleIn';
 export { PageTransition } from './PageTransition';
+export { Skeleton } from './Skeleton';

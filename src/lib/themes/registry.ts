@@ -5,7 +5,7 @@
  * Add new themes here - no other files need modification.
  */
 
-export type ThemeId = 'light' | 'dark' | 'dracula' | 'nord' | 'monokai' | 'glass';
+export type ThemeId = 'light' | 'dark' | 'dracula' | 'nord' | 'monokai' | 'glass' | 'spring' | 'catppuccin' | 'tokyoNight' | 'oneDark' | 'system';
 
 export interface ThemeColors {
   // Base colors
@@ -49,7 +49,7 @@ export interface Theme {
   colors: ThemeColors;
 }
 
-export const themes: Record<ThemeId, Theme> = {
+export const themes: Omit<Record<ThemeId, Theme>, 'system'> = {
   light: {
     id: 'light',
     name: 'Light',
@@ -211,14 +211,161 @@ export const themes: Record<ThemeId, Theme> = {
       accent: '#F59E0B',
     },
   },
+
+  // Spring Theme (春节)
+  spring: {
+    id: 'spring',
+    name: 'Spring',
+    nameZh: '春节',
+    icon: '🧧',
+    colors: {
+      primary: '#DC2626',
+      secondary: '#F97316',
+      cta: '#FBBF24',
+      bg: '#FFF1F2',
+      bgCard: '#FFFFFF',
+      bgElevated: '#FFF5F5',
+      bgHover: '#FFE4E6',
+      text: '#7F1D1D',
+      textMuted: '#B91C1C',
+      textInverse: '#FFFFFF',
+      border: '#FECACA',
+      borderLight: '#FECACA',
+      success: '#16A34A',
+      warning: '#F59E0B',
+      error: '#DC2626',
+      shadowCard: '0 1px 3px rgba(220, 38, 38, 0.1)',
+      shadowElevated: '0 4px 12px rgba(220, 38, 38, 0.15)',
+      accent: '#DC2626',
+    },
+  },
+
+  // Catppuccin Theme
+  catppuccin: {
+    id: 'catppuccin',
+    name: 'Catppuccin',
+    nameZh: '猫咪',
+    icon: '🐱',
+    colors: {
+      primary: '#cba6f7',
+      secondary: '#f5c2e7',
+      cta: '#f38ba8',
+      bg: '#1e1e2e',
+      bgCard: '#313244',
+      bgElevated: '#45475a',
+      bgHover: '#45475a',
+      text: '#cdd6f4',
+      textMuted: '#a6adc8',
+      textInverse: '#1e1e2e',
+      border: '#45475a',
+      borderLight: '#585b70',
+      success: '#a6e3a1',
+      warning: '#f9e2af',
+      error: '#f38ba8',
+      shadowCard: '0 1px 3px rgba(0, 0, 0, 0.3)',
+      shadowElevated: '0 4px 12px rgba(0, 0, 0, 0.4)',
+      accent: '#cba6f7',
+    },
+  },
+
+  // Tokyo Night Theme
+  tokyoNight: {
+    id: 'tokyoNight',
+    name: 'Tokyo Night',
+    nameZh: '东京夜',
+    icon: '🌃',
+    colors: {
+      primary: '#7aa2f7',
+      secondary: '#bb9af7',
+      cta: '#f7768e',
+      bg: '#1a1b26',
+      bgCard: '#24283b',
+      bgElevated: '#414868',
+      bgHover: '#414868',
+      text: '#c0caf5',
+      textMuted: '#565f89',
+      textInverse: '#1a1b26',
+      border: '#414868',
+      borderLight: '#565f89',
+      success: '#9ece6a',
+      warning: '#e0af68',
+      error: '#f7768e',
+      shadowCard: '0 1px 3px rgba(0, 0, 0, 0.3)',
+      shadowElevated: '0 4px 12px rgba(0, 0, 0, 0.4)',
+      accent: '#7aa2f7',
+    },
+  },
+
+  // One Dark Theme
+  oneDark: {
+    id: 'oneDark',
+    name: 'One Dark',
+    nameZh: '暗色一',
+    icon: '🎨',
+    colors: {
+      primary: '#c678dd',
+      secondary: '#98c379',
+      cta: '#e06c75',
+      bg: '#282c34',
+      bgCard: '#21252b',
+      bgElevated: '#2c313c',
+      bgHover: '#2c313c',
+      text: '#abb2bf',
+      textMuted: '#5c6370',
+      textInverse: '#282c34',
+      border: '#3e4451',
+      borderLight: '#4b5263',
+      success: '#98c379',
+      warning: '#e5c07b',
+      error: '#e06c75',
+      shadowCard: '0 1px 3px rgba(0, 0, 0, 0.3)',
+      shadowElevated: '0 4px 12px rgba(0, 0, 0, 0.4)',
+      accent: '#c678dd',
+    },
+  },
 };
 
 export const themeList = Object.values(themes);
 
-// Helper function to get theme by id
+// Helper function to get theme by id (does not handle 'system' - use activeTheme in useTheme hook)
 export function getTheme(id: ThemeId): Theme {
+  if (id === 'system') return systemThemeDisplay;
   return themes[id] || themes.light;
 }
 
 // Default theme
 export const defaultTheme: ThemeId = 'light';
+
+// System theme is special - it follows the OS preference
+export const systemTheme: ThemeId = 'system';
+
+// Manual system theme for display in selector (not a real theme)
+export const systemThemeDisplay: Theme = {
+  id: 'system',
+  name: 'System',
+  nameZh: '跟随系统',
+  icon: '🖥️',
+  colors: {
+    primary: '#0D9488',
+    secondary: '#14B8A6',
+    cta: '#F97316',
+    bg: '#F0FDFA',
+    bgCard: '#ffffff',
+    bgElevated: '#ffffff',
+    bgHover: '#F0FDFA',
+    text: '#134E4A',
+    textMuted: '#64748B',
+    textInverse: '#ffffff',
+    border: '#CCFBF1',
+    borderLight: '#E2E8F0',
+    success: '#22C55E',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    shadowCard: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    shadowElevated: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    accent: '#0D9488',
+  },
+};
+
+// Extended theme list including system for display
+export const themeListWithSystem = [...themeList, systemThemeDisplay];
