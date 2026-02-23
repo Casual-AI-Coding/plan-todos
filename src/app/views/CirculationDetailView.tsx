@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Card, Button, Modal, ProgressRing } from "@/components/ui";
 import {
-  getCirculation,
-  getCirculationLogs,
-  checkinCirculation,
-  undoCheckinCirculation,
-  Circulation,
-  CirculationLog,
-} from "@/lib/api";
+  useCirculation,
+  useCirculationLogs,
+  useCheckinCirculation,
+  useUndoCheckinCirculation,
+} from "@/hooks/useCirculations";
 import { CheckinConfirm } from "@/components/ui/CheckinConfirm";
 
 interface CirculationDetailViewProps {
@@ -23,37 +21,20 @@ export function CirculationDetailView({
   onBack,
   onClose,
 }: CirculationDetailViewProps) {
-  const [circulation, setCirculation] = useState<Circulation | null>(null);
-  const [logs, setLogs] = useState<CirculationLog[]>([]);
-  const [checkinTarget, setCheckinTarget] = useState<Circulation | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [checkinTarget, setCheckinTarget] = useState<{ id: string } | null>(null);
 
   const isModal = !!onClose;
-  const isLoaded = useRef(false);
 
-  async function loadData() {
-    try {
-      const [c, l] = await Promise.all([
-        getCirculation(id),
-        getCirculationLogs(id, 20),
-      ]);
-      if (isLoaded.current) {
-        setCirculation(c);
-        setLogs(l);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      if (isLoaded.current) setLoading(false);
-    }
-  }
+  const {
+    data: circulation,
+    isLoading,
+    error,
+  } = useCirculation(id);
 
-  useEffect(() => {
-    if (!isLoaded.current) {
-      isLoaded.current = true;
-      loadData();
-    }
-  }, []);
+  const { data: logs = [] } = useCirculationLogs(id, 20);
+
+  const checkin = useCheckinCirculation();
+  const undoCheckin = useUndoCheckinCirculation();
 
   const isCompletedToday = (): boolean => {
     if (!circulation?.last_completed_at) return false;
@@ -64,8 +45,7 @@ export function CirculationDetailView({
   async function handleCheckin(note: string = "", count?: number) {
     if (!circulation) return;
     try {
-      await checkinCirculation(circulation.id, note, count);
-      await loadData();
+      await checkin.mutateAsync({ id: circulation.id, note, count });
       setCheckinTarget(null);
     } catch (e) {
       console.error(e);
@@ -76,8 +56,7 @@ export function CirculationDetailView({
   async function handleUndo() {
     if (!circulation || !confirm("确定要撤销今天的打卡吗？")) return;
     try {
-      await undoCheckinCirculation(circulation.id);
-      await loadData();
+      await undoCheckin.mutateAsync(circulation.id);
     } catch (e) {
       console.error(e);
     }
@@ -206,12 +185,19 @@ export function CirculationDetailView({
       {/* Action Buttons */}
       <div className="flex gap-4 mb-6">
         {isCompletedToday() ? (
-          <Button variant="secondary" onClick={handleUndo}>
-            撤销打卡
+          <Button
+            variant="secondary"
+            onClick={handleUndo}
+            disabled={undoCheckin.isPending}
+          >
+            {undoCheckin.isPending ? "撤销中..." : "撤销打卡"}
           </Button>
         ) : (
-          <Button onClick={() => setCheckinTarget(circulation)}>
-            立即打卡
+          <Button
+            onClick={() => setCheckinTarget(circulation)}
+            disabled={checkin.isPending}
+          >
+            {checkin.isPending ? "打卡中..." : "立即打卡"}
           </Button>
         )}
       </div>
@@ -274,7 +260,7 @@ export function CirculationDetailView({
       {/* Checkin Modal */}
       {checkinTarget && (
         <CheckinConfirm
-          circulation={checkinTarget}
+          circulation={checkinTarget as never}
           open={!!checkinTarget}
           onConfirm={(note, count) => handleCheckin(note, count)}
           onCancel={() => setCheckinTarget(null)}
@@ -283,7 +269,25 @@ export function CirculationDetailView({
     </>
   ) : null;
 
-  if (loading) {
+  if (error) {
+    if (isModal) {
+      return (
+        <Modal open={true} title="加载失败" onClose={onClose}>
+          <div className="text-center py-8 text-red-500">
+            加载失败: {error.message}
+          </div>
+        </Modal>
+      );
+    }
+    return (
+      <div className="p-6">
+        <p className="text-red-500">加载失败: {error.message}</p>
+        <Button onClick={onBack}>返回</Button>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     if (isModal) {
       return (
         <Modal open={true} title="加载中..." onClose={onClose}>

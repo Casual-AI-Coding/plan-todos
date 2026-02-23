@@ -1,55 +1,40 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { Card, ProgressBar } from "@/components/ui";
-import {
-  getTodos,
-  getPlans,
-  getTargets,
-  getMilestones,
-  getCirculations,
-  Todo,
-  Plan,
-  Target,
-  Milestone,
-  Circulation,
-} from "@/lib/api";
+import { useStatistics } from "@/hooks/useStatistics";
 
 export function StatisticsView() {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [circulations, setCirculations] = useState<Circulation[]>([]);
+  const { data, isLoading, error } = useStatistics();
 
-  const isLoaded = useRef(false);
-
-  async function loadData() {
-    try {
-      const [t, p, tg, m, c] = await Promise.all([
-        getTodos(),
-        getPlans(),
-        getTargets(),
-        getMilestones(),
-        getCirculations(),
-      ]);
-      if (isLoaded.current) {
-        setTodos(t);
-        setPlans(p);
-        setTargets(tg);
-        setMilestones(m);
-        setCirculations(c);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  if (error) {
+    return (
+      <div className="p-6">
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: "var(--color-text)" }}
+        >
+          数据统计
+        </h2>
+        <p className="text-red-500">加载失败: {error.message}</p>
+      </div>
+    );
   }
 
-  useEffect(() => {
-    if (isLoaded.current) return;
-    isLoaded.current = true;
-    loadData();
-  }, []);
+  if (isLoading || !data) {
+    return (
+      <div className="p-6">
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: "var(--color-text)" }}
+        >
+          数据统计
+        </h2>
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    );
+  }
+
+  const { todos, plans, targets, milestones, circulations } = data;
 
   const stats = {
     totalTodos: todos.length,
