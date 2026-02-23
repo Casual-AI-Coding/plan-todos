@@ -1,13 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Card, Button, Input } from "@/components/ui";
-import { getTags, createTag, updateTag, deleteTag, Tag } from "@/lib/api";
+import {
+  useTags,
+  useCreateTag,
+  useUpdateTag,
+  useDeleteTag,
+  type CreateTagInput,
+  type UpdateTagInput,
+} from "@/hooks/useTags";
 
 export function SettingsTagsView() {
-  const [tags, setTags] = useState<Tag[]>([]);
+  const { data: tags = [], isLoading, error } = useTags();
+  const createTag = useCreateTag();
+  const updateTag = useUpdateTag();
+  const deleteTag = useDeleteTag();
+
   const [showForm, setShowForm] = useState(false);
-  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const [editingTag, setEditingTag] = useState<{ id: string; name: string; color: string; description?: string | null } | null>(null);
   const [name, setName] = useState("");
   const [color, setColor] = useState("#3B82F6");
   const [description, setDescription] = useState("");
@@ -22,23 +33,6 @@ export function SettingsTagsView() {
     "#6B7280",
     "#14B8A6",
   ];
-
-  const isLoaded = useRef(false);
-
-  async function loadTags() {
-    try {
-      const data = await getTags();
-      if (isLoaded.current) setTags(data);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  useEffect(() => {
-    if (isLoaded.current) return;
-    isLoaded.current = true;
-    loadTags();
-  }, []);
 
   async function handleSubmit() {
     if (!name.trim()) {
@@ -59,20 +53,22 @@ export function SettingsTagsView() {
     try {
       const desc = description.trim() || undefined;
       if (editingTag) {
-        await updateTag(editingTag.id, {
+        const input: UpdateTagInput = {
+          id: editingTag.id,
           name: trimmedName,
           color,
           description: desc,
-        });
+        };
+        await updateTag.mutateAsync(input);
       } else {
-        await createTag(trimmedName, color, desc);
+        const input: CreateTagInput = {
+          name: trimmedName,
+          color,
+          description: desc,
+        };
+        await createTag.mutateAsync(input);
       }
-      setShowForm(false);
-      setEditingTag(null);
-      setName("");
-      setColor("#3B82F6");
-      setDescription("");
-      loadTags();
+      resetForm();
     } catch (e) {
       console.error(e);
     }
@@ -81,14 +77,13 @@ export function SettingsTagsView() {
   async function handleDelete(id: string) {
     if (!confirm("Delete this tag?")) return;
     try {
-      await deleteTag(id);
-      loadTags();
+      await deleteTag.mutateAsync(id);
     } catch (e) {
       console.error(e);
     }
   }
 
-  function handleEdit(tag: Tag) {
+  function handleEdit(tag: { id: string; name: string; color: string; description?: string | null }) {
     setEditingTag(tag);
     setName(tag.name);
     setColor(tag.color);
@@ -102,6 +97,22 @@ export function SettingsTagsView() {
     setColor("#3B82F6");
     setDescription("");
     setShowForm(true);
+  }
+
+  function resetForm() {
+    setShowForm(false);
+    setEditingTag(null);
+    setName("");
+    setColor("#3B82F6");
+    setDescription("");
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <p className="text-red-500">加载失败: {error.message}</p>
+      </div>
+    );
   }
 
   return (
@@ -166,15 +177,15 @@ export function SettingsTagsView() {
             <div className="flex gap-2">
               <Button
                 variant="secondary"
-                onClick={() => {
-                  setShowForm(false);
-                  setEditingTag(null);
-                }}
+                onClick={resetForm}
               >
                 取消
               </Button>
-              <Button onClick={handleSubmit}>
-                {editingTag ? "保存" : "创建"}
+              <Button
+                onClick={handleSubmit}
+                disabled={createTag.isPending || updateTag.isPending}
+              >
+                {createTag.isPending || updateTag.isPending ? "保存中..." : editingTag ? "保存" : "创建"}
               </Button>
             </div>
           </div>
@@ -183,7 +194,9 @@ export function SettingsTagsView() {
 
       {/* Tags List */}
       <Card>
-        {tags.length === 0 ? (
+        {isLoading ? (
+          <p className="text-gray-400 text-center py-8">加载中...</p>
+        ) : tags.length === 0 ? (
           <p className="text-gray-400 text-center py-8">暂无标签</p>
         ) : (
           <div className="space-y-2">
@@ -216,8 +229,9 @@ export function SettingsTagsView() {
                   <button
                     onClick={() => handleDelete(tag.id)}
                     className="text-red-500 hover:text-red-600 text-sm"
+                    disabled={deleteTag.isPending}
                   >
-                    删除
+                    {deleteTag.isPending ? "删除中..." : "删除"}
                   </button>
                 </div>
               </div>

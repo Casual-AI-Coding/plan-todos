@@ -1,33 +1,30 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { Card, ProgressBar, Checkbox, FadeIn } from "@/components/ui";
-import { getDashboard, type Dashboard } from "@/lib/api";
+import { useDashboard } from "@/hooks/useDashboard";
 import { StatCard } from "@/components/features/StatCard";
 import { EntityCountCard } from "@/components/features/EntityCountCard";
 import { CirculationStatsCard } from "@/components/features/CirculationStatsCard";
 import { QuickActions } from "@/components/features/QuickActions";
 
 export function Dashboard() {
-  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-  const isLoaded = useRef(false);
+  const { data: dashboard, isLoading, error } = useDashboard();
 
-  async function loadData() {
-    try {
-      const data = await getDashboard();
-      if (isLoaded.current) setDashboard(data);
-    } catch (error) {
-      console.error("Failed to load dashboard:", error);
-    }
+  if (error) {
+    return (
+      <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+        <h2
+          className="text-xl sm:text-2xl font-semibold"
+          style={{ color: "var(--color-text)" }}
+        >
+          今日总览
+        </h2>
+        <p className="text-red-500">加载失败: {error.message}</p>
+      </div>
+    );
   }
 
-  useEffect(() => {
-    if (isLoaded.current) return;
-    isLoaded.current = true;
-    loadData();
-  }, []);
-
-  if (!dashboard) {
+  if (isLoading || !dashboard) {
     return (
       <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
         <h2
@@ -49,7 +46,6 @@ export function Dashboard() {
     counts,
     today_todos,
     overdue_todos,
-    completed_today,
     active_plans,
     active_targets,
     active_milestones,
