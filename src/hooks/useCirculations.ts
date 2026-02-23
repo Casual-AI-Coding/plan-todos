@@ -16,6 +16,8 @@ import {
   undoCheckinCirculation,
   type Circulation,
   type CirculationLog,
+  type CirculationType,
+  type PeriodicFrequency,
 } from "@/lib/api";
 
 // Query Keys
@@ -28,19 +30,17 @@ export const circulationKeys = {
 // Types for mutations
 export type CreateCirculationInput = {
   title: string;
-  circulation_type: "count" | "boolean";
-  frequency: string;
+  circulation_type: CirculationType;
+  frequency?: PeriodicFrequency;
   target_count?: number;
-  description?: string;
 };
 
 export type UpdateCirculationInput = {
   id: string;
   title?: string;
-  circulation_type?: "count" | "boolean";
-  frequency?: string;
+  circulation_type?: CirculationType;
+  frequency?: PeriodicFrequency;
   target_count?: number;
-  description?: string;
 };
 
 // =============================================================================
