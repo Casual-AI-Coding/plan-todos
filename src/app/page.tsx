@@ -124,7 +124,7 @@ export default function Home() {
       <div className="md:hidden flex flex-col h-screen">
         {/* Mobile Header with hamburger */}
         <header
-          className="flex items-center h-12 px-4 border-b"
+          className="flex items-center h-12 px-4 border-b pt-[env(safe-area-inset-top)]"
           style={{
             backgroundColor: "var(--color-bg-card)",
             borderColor: "var(--color-border)",
@@ -152,9 +152,10 @@ export default function Home() {
 
         {/* Main Content */}
         <main
-          className="flex-1 overflow-auto pb-16"
+          className="flex-1 overflow-auto pb-14"
           style={{
             backgroundColor: "var(--color-bg)",
+            paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom))",
           }}
         >
           {renderContent()}
@@ -175,8 +176,24 @@ export default function Home() {
                 backgroundColor: "var(--color-bg-card)",
                 transform: "translateX(0)",
                 transition: "transform 0.3s ease",
+                paddingTop: "env(safe-area-inset-top)",
               }}
             >
+              {/* Mobile sidebar header with close button */}
+              <div className="flex items-center justify-between px-4 h-12 border-b">
+                <span className="font-semibold" style={{ color: "var(--color-text)" }}>菜单</span>
+                <button
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className="p-2 rounded hover:opacity-80"
+                  style={{ color: "var(--color-text)" }}
+                  aria-label="关闭菜单"
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <rect x="4" y="4" width="12" height="1.5" transform="rotate(45 10 10)" />
+                    <rect x="4" y="4" width="12" height="1.5" transform="rotate(-45 10 10)" />
+                  </svg>
+                </button>
+              </div>
               <Sidebar
                 activeMenu={activeMenu}
                 onMenuChange={(menu) => {

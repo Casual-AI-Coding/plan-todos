@@ -22,7 +22,7 @@ export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
         borderColor: "var(--color-border)",
       }}
     >
-      <div className="flex justify-around items-center h-16">
+      <div className="flex justify-around items-center h-14">
         {navItems.map((item) => {
           const isActive =
             activeMenu === item.id ||

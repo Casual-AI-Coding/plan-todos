@@ -26,8 +26,8 @@ export function Dashboard() {
 
   if (!dashboard) {
     return (
-      <div className="p-6 space-y-6">
-        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+      <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+        <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
           今日总览
         </h2>
         <div className="flex items-center justify-center h-64">
@@ -40,8 +40,8 @@ export function Dashboard() {
   const { overview, week, counts, today_todos, overdue_todos, completed_today, active_plans, active_targets, active_milestones } = dashboard;
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
+    <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>
         今日总览
       </h2>
 

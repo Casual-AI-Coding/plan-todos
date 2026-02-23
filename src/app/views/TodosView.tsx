@@ -146,9 +146,9 @@ export function TodosView() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
-    <div className="p-6">
+    <div className="p-2 sm:p-4 md:p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>TODOS</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: 'var(--color-text)' }}>TODOS</h2>
         <Button onClick={() => setShowForm(true)}>+ 新建</Button>
       </div>
 
