@@ -1,21 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, ProgressBar } from "@/components/ui";
-import {
-  getTodos,
-  getPlans,
-  getTargets,
-  getMilestones,
-  getTasksByPlan,
-  getSteps,
-  Todo,
-  Plan,
-  Task,
-  Target,
-  Step,
-  Milestone,
-} from "@/lib/api";
+import { useTodos } from "@/hooks/useTodos";
+import { usePlans } from "@/hooks/usePlans";
+import { useTargets } from "@/hooks/useTargets";
+import { useMilestones } from "@/hooks/useMilestones";
+import { useTasks } from "@/hooks/useTasks";
+import { getSteps, type Todo, type Plan, type Task, type Target, type Step, type Milestone } from "@/lib/api";
+import { ViewsFilters } from "@/components/views/ViewsFilters";
+import { ViewsList } from "@/components/views/ViewsList";
+import { ViewsBoard } from "@/components/views/ViewsBoard";
+import { useTargetSteps } from "@/hooks/useTargets";
 
 export function ViewsView() {
   const [viewMode, setViewMode] = useState<
@@ -44,54 +40,31 @@ export function ViewsView() {
   // Gantt timeline zoom state (number of months)
   const [ganttZoom, setGanttZoom] = useState(3);
 
-  // Data states
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [tasks, setTasks] = useState<Record<string, Task[]>>({});
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [targetSteps, setTargetSteps] = useState<Record<string, Step[]>>({});
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  // React Query for data fetching
+  const { data: todos = [] } = useTodos();
+  const { data: plans = [] } = usePlans();
+  const { data: targets = [] } = useTargets();
+  const { data: milestones = [] } = useMilestones();
+  const { data: allTasks = [] } = useTasks();
 
-  const isLoaded = useRef(false);
-
-  async function loadAllData() {
-    try {
-      const [t, p, tg, m] = await Promise.all([
-        getTodos(),
-        getPlans(),
-        getTargets(),
-        getMilestones(),
-      ]);
-      if (isLoaded.current) {
-        setTodos(t);
-        setPlans(p);
-        setTargets(tg);
-        setMilestones(m);
+  // Group tasks by plan ID using useMemo
+  const tasksByPlan = useMemo(() => {
+    const map: Record<string, Task[]> = {};
+    for (const task of allTasks) {
+      if (task.plan_id) {
+        if (!map[task.plan_id]) map[task.plan_id] = [];
+        map[task.plan_id].push(task);
       }
-
-      // Load tasks for each plan
-      const taskMap: Record<string, Task[]> = {};
-      for (const plan of p) {
-        taskMap[plan.id] = await getTasksByPlan(plan.id);
-      }
-      if (isLoaded.current) setTasks(taskMap);
-
-      // Load steps for each target
-      const stepMap: Record<string, Step[]> = {};
-      for (const target of tg) {
-        stepMap[target.id] = await getSteps(target.id);
-      }
-      if (isLoaded.current) setTargetSteps(stepMap);
-    } catch (e) {
-      console.error(e);
     }
-  }
+    return map;
+  }, [allTasks]);
 
-  useEffect(() => {
-    if (isLoaded.current) return;
-    isLoaded.current = true;
-    loadAllData();
-  }, []);
+  // Load steps for each target using React Query (no more N+1)
+  const targetSteps: Record<string, Step[]> = {};
+  for (const target of targets) {
+    const { data: steps = [] } = useTargetSteps(target.id);
+    targetSteps[target.id] = steps;
+  }
 
   const viewModes = [
     { id: "list", icon: "📋", label: "列表" },
@@ -303,9 +276,9 @@ export function ViewsView() {
                     </p>
                   )}
                   {/* Tasks under plan */}
-                  {filters.task && (tasks[plan.id] || []).length > 0 && (
+                  {filters.task && (tasksByPlan[plan.id] || []).length > 0 && (
                     <div className="mt-2 pl-4 space-y-2">
-                      {(tasks[plan.id] || []).map((task) => (
+                      {(tasksByPlan[plan.id] || []).map((task) => (
                         <div
                           key={task.id}
                           className="flex items-center gap-2 text-sm"
@@ -525,8 +498,7 @@ export function ViewsView() {
           .filter((t) => t.status === status)
           .forEach((t) => items.push({ type: "todo", data: t }));
       if (filters.task)
-        Object.values(tasks)
-          .flat()
+        allTasks
           .filter((t) => t.status === status)
           .forEach((t) => items.push({ type: "task", data: t }));
       if (filters.plan)
@@ -686,8 +658,7 @@ export function ViewsView() {
           .filter((t) => t.due_date === dateStr)
           .forEach((t) => items.push({ type: "todo", data: t }));
       if (filters.task)
-        Object.values(tasks)
-          .flat()
+        allTasks
           .filter((t) => t.end_date === dateStr)
           .forEach((t) => items.push({ type: "task", data: t }));
       if (filters.target)

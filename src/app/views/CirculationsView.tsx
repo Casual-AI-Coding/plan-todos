@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, Button, Modal, Input } from "@/components/ui";
 import { CheckinConfirm } from "@/components/ui/CheckinConfirm";
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
@@ -31,16 +31,18 @@ import {
   type TodayStats,
 } from "@/components/features/CirculationCard";
 import {
-  getCirculations,
-  createCirculation,
-  updateCirculation,
-  deleteCirculation,
-  checkinCirculation,
-  undoCheckinCirculation,
+  useCirculations,
+  useCreateCirculation,
+  useUpdateCirculation,
+  useDeleteCirculation,
+  useCheckinCirculation,
+  useUndoCheckinCirculation,
+} from "@/hooks/useCirculations";
+import {
   getCirculationLogs,
-  Circulation,
-  CirculationType,
-  PeriodicFrequency,
+  type Circulation,
+  type CirculationType,
+  type PeriodicFrequency,
 } from "@/lib/api";
 
 type ViewMode = "today" | "settings";
@@ -343,11 +345,42 @@ function SortableCard({
 
 export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>(mode);
-  const [circulations, setCirculations] = useState<Circulation[]>([]);
-  const [todayCirculations, setTodayCirculations] = useState<Circulation[]>([]);
+
+  // React Query for data fetching
+  const { data: circulations = [], isLoading } = useCirculations();
+
+  // React Query mutations
+  const createMutation = useCreateCirculation();
+  const updateMutation = useUpdateCirculation();
+  const deleteMutation = useDeleteCirculation();
+  const checkinMutation = useCheckinCirculation();
+  const undoMutation = useUndoCheckinCirculation();
+
+  // Compute today's circulations using useMemo
+  const todayCirculations = useMemo(() => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    return circulations.filter((c) => {
+      if (c.status !== "active") return false;
+      if (c.circulation_type === "count") return true;
+      if (c.frequency === "daily") return true;
+      if (c.frequency === "weekly" && dayOfWeek === 1) return true;
+      if (c.frequency === "monthly" && today.getDate() === 1) return true;
+      return false;
+    });
+  }, [circulations]);
+
+  // Ordered circulations for DnD - sync with todayCirculations
   const [todayCirculationsOrdered, setTodayCirculationsOrdered] = useState<
     Circulation[]
   >([]);
+
+  // Initialize ordered list when todayCirculations changes
+  useEffect(() => {
+    setTodayCirculationsOrdered(todayCirculations);
+  }, [todayCirculations]);
+
+  // Stats for count-type circulations (N+1 pattern - fetch logs for each)
   const [todayStats, setTodayStats] = useState<Record<string, TodayStats>>({});
 
   // Settings tabs
@@ -372,65 +405,34 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   const [detailCirculation, setDetailCirculation] =
     useState<Circulation | null>(null);
 
-  const isLoaded = useRef(false);
-
-  async function loadCirculations() {
-    try {
-      const data = await getCirculations();
-      if (isLoaded.current) {
-        setCirculations(data);
-        // Filter today's circulations
-        const today = new Date();
-        const dayOfWeek = today.getDay();
-
-        const todayList = data.filter((c) => {
-          if (c.status !== "active") return false;
-          if (c.circulation_type === "count") return true;
-          if (c.frequency === "daily") return true;
-          if (c.frequency === "weekly" && dayOfWeek === 1) return true; // Monday
-          if (c.frequency === "monthly" && today.getDate() === 1) return true; // 1st of month
-          return false;
-        });
-        setTodayCirculations(todayList);
-        setTodayCirculationsOrdered(todayList);
-
-        // Load today's stats for count-type circulations
-        const stats: Record<string, TodayStats> = {};
-        const todayStr = today.toISOString().split("T")[0];
-        await Promise.all(
-          todayList
-            .filter((c) => c.circulation_type === "count")
-            .map(async (c) => {
-              try {
-                const logs = await getCirculationLogs(c.id, 50);
-                const todayLogs = logs.filter((log) =>
-                  log.completed_at.startsWith(todayStr),
-                );
-                stats[c.id] = {
-                  count: todayLogs.length,
-                  progress: todayLogs.reduce(
-                    (sum, log) => sum + (log.count || 0),
-                    0,
-                  ),
-                };
-              } catch {
-                stats[c.id] = { count: 0, progress: 0 };
-              }
-            }),
-        );
-        setTodayStats(stats);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
+  // Load today's stats for count-type circulations
   useEffect(() => {
-    if (!isLoaded.current) {
-      isLoaded.current = true;
-      loadCirculations();
-    }
-  }, []);
+    const loadStats = async () => {
+      const stats: Record<string, TodayStats> = {};
+      const todayStr = new Date().toISOString().split("T")[0];
+      const countCirculations = todayCirculations.filter(
+        (c) => c.circulation_type === "count",
+      );
+      await Promise.all(
+        countCirculations.map(async (c) => {
+          try {
+            const logs = await getCirculationLogs(c.id, 50);
+            const todayLogs = logs.filter((log) =>
+              log.completed_at.startsWith(todayStr),
+            );
+            stats[c.id] = {
+              count: todayLogs.length,
+              progress: todayLogs.reduce((sum, log) => sum + (log.count || 0), 0),
+            };
+          } catch {
+            stats[c.id] = { count: 0, progress: 0 };
+          }
+        }),
+      );
+      setTodayStats(stats);
+    };
+    loadStats();
+  }, [todayCirculations]);
 
   // Check if circulation was completed today
   const isCompletedToday = (c: Circulation): boolean => {
@@ -447,8 +449,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   ) {
     setCheckinLoading(true);
     try {
-      await checkinCirculation(circulation.id, note, count);
-      await loadCirculations();
+      await checkinMutation.mutateAsync({ id: circulation.id, note, count });
       setCheckinTarget(null);
     } catch (e) {
       console.error(e);
@@ -462,8 +463,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   async function handleUndo(circulation: Circulation) {
     if (!confirm("确定要撤销今天的打卡吗？")) return;
     try {
-      await undoCheckinCirculation(circulation.id);
-      await loadCirculations();
+      await undoMutation.mutateAsync(circulation.id);
     } catch (e) {
       console.error(e);
     }
@@ -509,11 +509,10 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   async function handleSaveForm(data: CirculationFormData) {
     try {
       if (editingCirculation) {
-        await updateCirculation(editingCirculation.id, data);
+        await updateMutation.mutateAsync({ id: editingCirculation.id, ...data });
       } else {
-        await createCirculation(data);
+        await createMutation.mutateAsync(data);
       }
-      await loadCirculations();
       closeForm();
     } catch (e) {
       console.error(e);
@@ -525,8 +524,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   async function handleDelete(id: string) {
     if (!confirm("确定要删除这个打卡项吗？")) return;
     try {
-      await deleteCirculation(id);
-      await loadCirculations();
+      await deleteMutation.mutateAsync(id);
     } catch (e) {
       console.error(e);
     }

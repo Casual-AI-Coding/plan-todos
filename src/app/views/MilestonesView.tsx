@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import {
   Card,
   Button,
@@ -12,96 +12,84 @@ import {
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 import { useToast } from "@/components/ui/Toast";
 import {
-  getMilestones,
-  getPlans,
-  getTargets,
-  getTasks,
-  getCirculations,
-  createMilestone,
-  updateMilestone,
-  deleteMilestone,
-  Milestone,
-  Plan,
-  Target,
-  Task,
-  Circulation,
-} from "@/lib/api";
+  useMilestones,
+  useCreateMilestone,
+  useUpdateMilestone,
+  useDeleteMilestone,
+  usePlansForMilestone,
+  useTargetsForMilestone,
+  useCirculationsForMilestone,
+} from "@/hooks/useMilestones";
+import type { Milestone } from "@/lib/api";
 
 export function MilestonesView() {
   const toast = useToast();
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [circulations, setCirculations] = useState<Circulation[]>([]);
+
+  // Data fetching with React Query - parallel loading
+  const { data: milestones = [], isLoading: milestonesLoading } = useMilestones();
+  const { data: plans = [] } = usePlansForMilestone();
+  const { data: targets = [] } = useTargetsForMilestone();
+  const { data: circulations = [] } = useCirculationsForMilestone();
+
+  // Mutations
+  const createMilestoneMutation = useCreateMilestone({
+    onSuccess: () => {
+      toast.success("里程碑创建成功");
+      closeForm();
+    },
+    onError: (error) => {
+      alert(error instanceof Error ? error.message : "Failed to create milestone");
+      toast.error("创建失败");
+    },
+  });
+
+  const updateMilestoneMutation = useUpdateMilestone({
+    onError: () => {
+      toast.error("操作失败");
+    },
+  });
+
+  const deleteMilestoneMutation = useDeleteMilestone({
+    onSuccess: () => {
+      toast.success("里程碑已删除");
+    },
+    onError: () => {
+      toast.error("操作失败");
+    },
+  });
+
+  // UI State
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [targetDate, setTargetDate] = useState("");
-  const [linkType, setLinkType] = useState<
-    "plan" | "target" | "task" | "circulation"
-  >("plan");
+  const [linkType, setLinkType] = useState<"plan" | "target" | "task" | "circulation">("plan");
   const [linkId, setLinkId] = useState("");
 
-  const isLoaded = useRef(false);
-
-  async function loadData() {
-    try {
-      const [m, p, t, tk, c] = await Promise.all([
-        getMilestones(),
-        getPlans(),
-        getTargets(),
-        getTasks(),
-        getCirculations(),
-      ]);
-      if (isLoaded.current) {
-        setMilestones(m);
-        setPlans(p);
-        setTargets(t);
-        setTasks(tk);
-        setCirculations(c);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  function closeForm() {
+    setShowForm(false);
+    setTitle("");
+    setTargetDate("");
+    setLinkId("");
   }
 
-  useEffect(() => {
-    if (isLoaded.current) return;
-    isLoaded.current = true;
-    loadData();
-  }, []);
-
-  async function handleSubmit() {
+  function handleSubmit() {
     if (!title.trim() || !linkId) return;
-    try {
-      await createMilestone({
-        title,
-        target_date: targetDate || undefined,
-        biz_type: linkType,
-        biz_id: linkId,
-      });
-      toast.success("里程碑创建成功");
-      setShowForm(false);
-      setTitle("");
-      setTargetDate("");
-      setLinkId("");
-      loadData();
-    } catch (e: unknown) {
-      alert(e instanceof Error ? e.message : "Failed to create milestone");
-      toast.error("创建失败");
-    }
+
+    createMilestoneMutation.mutate({
+      title,
+      target_date: targetDate || undefined,
+      biz_type: linkType,
+      biz_id: linkId,
+    });
   }
 
-  async function handleDelete(id: string) {
-    await deleteMilestone(id);
-    toast.success("里程碑已删除");
-    loadData();
+  function handleDelete(id: string) {
+    deleteMilestoneMutation.mutate(id);
   }
 
-  async function handleToggle(m: Milestone) {
+  function handleToggle(m: Milestone) {
     const next = m.status === "completed" ? "pending" : "completed";
-    await updateMilestone(m.id, { status: next });
-    loadData();
+    updateMilestoneMutation.mutate({ id: m.id, status: next });
   }
 
   const getLinkLabel = (m: Milestone) => {
@@ -110,11 +98,27 @@ export function MilestonesView() {
     if (m.biz_type === "target")
       return `🎯 ${targets.find((t) => t.id === m.biz_id)?.title || "Target"}`;
     if (m.biz_type === "task")
-      return `📋 ${tasks.find((t) => t.id === m.biz_id)?.title || "Task"}`;
+      return `📋 Task`;
     if (m.biz_type === "circulation")
       return `🔄 ${circulations.find((c) => c.id === m.biz_id)?.title || "Circulation"}`;
     return "未关联";
   };
+
+  if (milestonesLoading) {
+    return (
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2
+            className="text-2xl font-semibold"
+            style={{ color: "var(--color-text)" }}
+          >
+            MILESTONES
+          </h2>
+        </div>
+        <div className="text-center py-12 text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -193,12 +197,7 @@ export function MilestonesView() {
       <Modal
         open={showForm}
         title="新建 Milestone"
-        onClose={() => {
-          setShowForm(false);
-          setTitle("");
-          setTargetDate("");
-          setLinkId("");
-        }}
+        onClose={closeForm}
         footer={
           <>
             <Button variant="secondary" onClick={() => setShowForm(false)}>
