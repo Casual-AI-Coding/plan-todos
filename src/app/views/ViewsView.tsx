@@ -11,6 +11,8 @@ import { getSteps, type Todo, type Plan, type Task, type Target, type Step, type
 import { ViewsFilters } from "@/components/views/ViewsFilters";
 import { ViewsList } from "@/components/views/ViewsList";
 import { ViewsBoard } from "@/components/views/ViewsBoard";
+import { ViewsCalendar } from "@/components/views/ViewsCalendar";
+import { ViewsGantt } from "@/components/views/ViewsGantt";
 import { useTargetSteps } from "@/hooks/useTargets";
 
 export function ViewsView() {
@@ -1167,8 +1169,33 @@ export function ViewsView() {
       <Card>
         {viewMode === "list" && renderListView()}
         {viewMode === "board" && renderBoardView()}
-        {viewMode === "calendar" && renderCalendarView()}
-        {viewMode === "gantt" && renderGanttView()}
+        {viewMode === "calendar" && (
+          <ViewsCalendar
+            todos={todos}
+            allTasks={allTasks}
+            targets={targets}
+            milestones={milestones}
+            filters={filters}
+            calendarDate={calendarDate}
+            setCalendarDate={setCalendarDate}
+            hoveredItem={hoveredItem}
+            setHoveredItem={setHoveredItem}
+            hoverPosition={hoverPosition}
+            setHoverPosition={setHoverPosition}
+          />
+        )}
+        {viewMode === "gantt" && (
+          <ViewsGantt
+            todos={todos}
+            allTasks={allTasks}
+            plans={plans}
+            targets={targets}
+            milestones={milestones}
+            filters={filters}
+            ganttZoom={ganttZoom}
+            setGanttZoom={setGanttZoom}
+          />
+        )}
       </Card>
     </div>
   );
