@@ -89,6 +89,7 @@ pub fn run() {
             commands::circulations::checkin_circulation,
             commands::circulations::undo_checkin_circulation,
             commands::circulations::get_circulation_logs,
+            commands::circulations::get_circulation_logs_batch,
             commands::tags::get_tags,
             commands::tags::create_tag,
             commands::tags::update_tag,

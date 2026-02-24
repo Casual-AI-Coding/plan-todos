@@ -1334,6 +1334,26 @@ export async function getCirculationLogs(
   });
 }
 
+/**
+ * Get circulation logs for multiple circulations in a single batch call
+ * This prevents N+1 query problem and reduces Tauri command overhead
+ */
+export async function getCirculationLogsBatch(
+  circulationIds: string[],
+  limit?: number,
+): Promise<Record<string, CirculationLog[]>> {
+  if (!isTauri()) {
+    console.warn("Running outside Tauri - data not available");
+    return {};
+  }
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<Record<string, CirculationLog[]>>("get_circulation_logs_batch", {
+    circulationIds,
+    limit: limit || 50,
+  });
+}
+
+
 // ============================================================================
 // Data Management - Seed & Reset
 // ============================================================================

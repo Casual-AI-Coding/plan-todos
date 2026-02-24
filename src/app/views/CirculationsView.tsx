@@ -349,6 +349,9 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   // React Query for data fetching
   const { data: circulations = [], isLoading } = useCirculations();
 
+  // Track if stats are being loaded
+  const [statsLoading, setStatsLoading] = useState(false);
+
   // React Query mutations
   const createMutation = useCreateCirculation();
   const updateMutation = useUpdateCirculation();
@@ -370,18 +373,25 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     });
   }, [circulations]);
 
-  // Ordered circulations for DnD - sync with todayCirculations
-  const [todayCirculationsOrdered, setTodayCirculationsOrdered] = useState<
-    Circulation[]
-  >([]);
-
-  // Initialize ordered list when todayCirculations changes
+  // Ordered circulations for DnD - initialized from todayCirculations
+  // Using state to preserve user's drag-and-drop order
+  const [todayCirculationsOrdered, setTodayCirculationsOrdered] = useState<Circulation[]>([]);
+  
+  // Initialize ordered list when todayCirculations changes (only if empty or length differs)
   useEffect(() => {
-    setTodayCirculationsOrdered(todayCirculations);
+    setTodayCirculationsOrdered(prev => {
+      // Only update if length differs (avoids unnecessary re-renders)
+      if (prev.length !== todayCirculations.length) {
+        return todayCirculations;
+      }
+      return prev;
+    });
   }, [todayCirculations]);
 
-  // Stats for count-type circulations (N+1 pattern - fetch logs for each)
+  // Stats for count-type circulations (BATCHED - prevents N+1 query problem)
   const [todayStats, setTodayStats] = useState<Record<string, TodayStats>>({});
+
+
 
   // Settings tabs
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("periodic");
@@ -405,7 +415,102 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   const [detailCirculation, setDetailCirculation] =
     useState<Circulation | null>(null);
 
-  // Load today's stats for count-type circulations
+  // Load today's stats for count-type circulations (BATCHED to prevent N+1 problem)
+  useEffect(() => {
+    const loadStats = async () => {
+      const stats: Record<string, TodayStats> = {};
+      const todayStr = new Date().toISOString().split("T")[0];
+      const countCirculations = todayCirculations.filter(
+        (c) => c.circulation_type === "count",
+      );
+      
+      // Early return if no count-type circulations
+      if (countCirculations.length === 0) {
+        setTodayStats({});
+        setStatsLoading(false);
+        return;
+      }
+      
+      setStatsLoading(true);
+      
+      try {
+        // BATCH: Get all logs in a single Tauri command call
+        const { getCirculationLogsBatch } = await import("@/lib/api");
+        const allLogs = await getCirculationLogsBatch(
+          countCirculations.map(c => c.id),
+          50
+        );
+        
+        // Process logs for each circulation
+        countCirculations.forEach((c) => {
+          const logs = allLogs[c.id] || [];
+          const todayLogs = logs.filter((log) =>
+            log.completed_at.startsWith(todayStr),
+          );
+          stats[c.id] = {
+            count: todayLogs.length,
+            progress: todayLogs.reduce((sum, log) => sum + (log.count || 0), 0),
+          };
+        });
+      } catch (error) {
+        console.error("Failed to load circulation stats:", error);
+        // Set empty stats on error
+        countCirculations.forEach((c) => {
+          stats[c.id] = { count: 0, progress: 0 };
+        });
+      } finally {
+        setStatsLoading(false);
+      }
+      
+      setTodayStats(stats);
+    };
+    loadStats();
+  }, [todayCirculations]);
+  useEffect(() => {
+    const loadStats = async () => {
+      const stats: Record<string, TodayStats> = {};
+      const todayStr = new Date().toISOString().split("T")[0];
+      const countCirculations = todayCirculations.filter(
+        (c) => c.circulation_type === "count",
+      );
+      
+      // Early return if no count-type circulations
+      if (countCirculations.length === 0) {
+        setTodayStats({});
+        return;
+      }
+      
+      try {
+        // BATCH: Get all logs in a single Tauri command call
+        const { getCirculationLogsBatch } = await import("@/lib/api");
+        const allLogs = await getCirculationLogsBatch(
+          countCirculations.map(c => c.id),
+          50
+        );
+        
+        // Process logs for each circulation
+        countCirculations.forEach((c) => {
+          const logs = allLogs[c.id] || [];
+          const todayLogs = logs.filter((log) =>
+            log.completed_at.startsWith(todayStr),
+          );
+          stats[c.id] = {
+            count: todayLogs.length,
+            progress: todayLogs.reduce((sum, log) => sum + (log.count || 0), 0),
+          };
+        });
+      } catch (error) {
+        console.error("Failed to load circulation stats:", error);
+        // Set empty stats on error
+        countCirculations.forEach((c) => {
+          stats[c.id] = { count: 0, progress: 0 };
+        });
+      }
+      
+      setTodayStats(stats);
+    };
+    loadStats();
+  }, [todayCirculations]);
   useEffect(() => {
     const loadStats = async () => {
       const stats: Record<string, TodayStats> = {};
