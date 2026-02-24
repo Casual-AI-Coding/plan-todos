@@ -579,8 +579,8 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     setTodayCirculationsOrdered(newOrder);
   }
 
-  // Dnd-kit sensors
-  const sensors = useSensors(
+  // Dnd-kit sensors - memoized to prevent re-creation on every render
+  const sensors = useMemo(() => useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
@@ -589,7 +589,8 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
-  );
+  ), []);
+
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
