@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Card, ProgressBar } from "@/components/ui";
 import { useTodos } from "@/hooks/useTodos";
 import { usePlans } from "@/hooks/usePlans";
-import { useTargets } from "@/hooks/useTargets";
+import { useTargets, targetKeys } from "@/hooks/useTargets";
 import { useMilestones } from "@/hooks/useMilestones";
 import { useTasks } from "@/hooks/useTasks";
 import { getSteps, type Todo, type Plan, type Task, type Target, type Step, type Milestone } from "@/lib/api";
@@ -13,7 +13,7 @@ import { ViewsList } from "@/components/views/ViewsList";
 import { ViewsBoard } from "@/components/views/ViewsBoard";
 import { ViewsCalendar } from "@/components/views/ViewsCalendar";
 import { ViewsGantt } from "@/components/views/ViewsGantt";
-import { useTargetSteps } from "@/hooks/useTargets";
+import { useQueries } from "@tanstack/react-query";
 
 export function ViewsView() {
   const [viewMode, setViewMode] = useState<
@@ -61,12 +61,20 @@ export function ViewsView() {
     return map;
   }, [allTasks]);
 
-  // Load steps for each target using React Query (no more N+1)
+  // Load steps for all targets using useQueries (parallel fetching)
+  const targetStepsResults = useQueries({
+    queries: targets.map((target) => ({
+      queryKey: targetKeys.targetSteps(target.id),
+      queryFn: () => getSteps(target.id),
+      enabled: !!target.id,
+    })),
+  });
+
+  // Transform results into a Record<targetId, steps[]>
   const targetSteps: Record<string, Step[]> = {};
-  for (const target of targets) {
-    const { data: steps = [] } = useTargetSteps(target.id);
-    targetSteps[target.id] = steps;
-  }
+  targets.forEach((target, index) => {
+    targetSteps[target.id] = targetStepsResults[index]?.data ?? [];
+  });
 
   const viewModes = [
     { id: "list", icon: "📋", label: "列表" },

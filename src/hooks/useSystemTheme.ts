@@ -26,6 +26,7 @@ export function useSystemTheme(): SystemTheme {
     // Get initial system preference
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const initialTheme: SystemTheme = mediaQuery.matches ? "dark" : "light";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSystemTheme(initialTheme);
 
     // Listen for changes

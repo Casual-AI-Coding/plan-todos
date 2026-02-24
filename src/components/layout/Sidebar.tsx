@@ -66,11 +66,13 @@ export function Sidebar({
   useEffect(() => {
     if (isMobile) {
       // Mobile mode: always expanded
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCollapsed(false);
       return;
     }
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCollapsed(true);
     }
   }, [isMobile]);

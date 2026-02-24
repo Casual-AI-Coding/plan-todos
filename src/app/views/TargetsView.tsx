@@ -25,6 +25,147 @@ import {
 import { useTags } from "@/hooks/useTags";
 import type { Target, Step } from "@/lib/api";
 
+interface TargetCardProps {
+  target: Target;
+  index: number;
+  expandedTargets: Set<string>;
+  toggleTarget: (id: string) => void;
+  selectedTargetId: string;
+  setSelectedTargetId: (id: string) => void;
+  setShowStepForm: (show: boolean) => void;
+  handleDeleteTarget: (id: string) => void;
+  handleToggleStep: (step: Step) => void;
+  handleDeleteStep: (id: string) => void;
+}
+
+function TargetCard({
+  target,
+  index,
+  expandedTargets,
+  toggleTarget,
+  setSelectedTargetId,
+  setShowStepForm,
+  handleDeleteTarget,
+  handleToggleStep,
+  handleDeleteStep,
+}: TargetCardProps) {
+  const { data: targetTags = [] } = useTargetTags(target.id);
+  const { data: targetSteps = [] } = useTargetSteps(target.id);
+
+  const totalWeight = targetSteps.reduce((sum, s) => sum + s.weight, 0);
+
+  return (
+    <FadeIn key={target.id} delay={index * 0.05} direction="up">
+      <Card>
+        <div
+          onClick={() => toggleTarget(target.id)}
+          className="cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-lg">
+                {expandedTargets.has(target.id) ? "▼" : "▶"}
+              </span>
+              <span
+                className="font-semibold"
+                style={{ color: "var(--color-text)" }}
+              >
+                {target.title}
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-orange-500 font-medium">
+                {target.progress}%
+              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedTargetId(target.id);
+                  setShowStepForm(true);
+                }}
+                className="text-orange-500 hover:bg-orange-50 px-2 py-1 rounded text-sm"
+              >
+                + Step
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteTarget(target.id);
+                }}
+                className="text-gray-400 hover:text-red-500 px-2"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+          <ProgressBar
+            value={target.progress}
+            color="orange"
+            size="sm"
+            className="mt-2"
+          />
+          {/* Tags display */}
+          {targetTags.length > 0 && (
+            <div className="flex gap-1 mt-2 flex-wrap">
+              {targetTags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="px-2 py-0.5 rounded text-xs"
+                  style={{
+                    backgroundColor: `${tag.color}20`,
+                    color: tag.color,
+                  }}
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="text-xs text-gray-500 mt-1">
+            权重总和: {totalWeight}/100
+            {target.due_date && (
+              <span className="ml-2">📅 {target.due_date}</span>
+            )}
+          </div>
+          {expandedTargets.has(target.id) && (
+            <div className="mt-4 pl-6 space-y-2 border-l-2 border-orange-200 ml-4">
+              {targetSteps.map((step) => (
+                <div
+                  key={step.id}
+                  className="flex items-center gap-3 p-2 bg-gray-50 rounded"
+                >
+                  <Checkbox
+                    checked={step.status === "completed"}
+                    onChange={() => handleToggleStep(step)}
+                  />
+                  <span className="flex-1">{step.title}</span>
+                  <span className="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded">
+                    {step.weight}%
+                  </span>
+                  <button
+                    onClick={() => handleDeleteStep(step.id)}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))}
+              {targetSteps.length === 0 && (
+                <p className="text-gray-400 text-sm">暂无步骤</p>
+              )}
+              {totalWeight < 100 && (
+                <p className="text-xs text-orange-500 mt-2">
+                  剩余可用权重: {100 - totalWeight}%
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </Card>
+    </FadeIn>
+  );
+}
+
 export function TargetsView() {
   const toast = useToast();
 
@@ -232,124 +373,21 @@ export function TargetsView() {
       </div>
 
       <div className="space-y-4">
-        {filteredTargets.map((target, index) => {
-          // Fetch tags and steps for this target
-          const { data: targetTags = [] } = useTargetTags(target.id);
-          const { data: targetSteps = [] } = useTargetSteps(target.id);
-
-          const totalWeight = targetSteps.reduce((sum, s) => sum + s.weight, 0);
-
-          return (
-            <FadeIn key={target.id} delay={index * 0.05} direction="up">
-              <Card>
-                <div
-                  onClick={() => toggleTarget(target.id)}
-                  className="cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">
-                        {expandedTargets.has(target.id) ? "▼" : "▶"}
-                      </span>
-                      <span
-                        className="font-semibold"
-                        style={{ color: "var(--color-text)" }}
-                      >
-                        {target.title}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-orange-500 font-medium">
-                        {target.progress}%
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedTargetId(target.id);
-                          setShowStepForm(true);
-                        }}
-                        className="text-orange-500 hover:bg-orange-50 px-2 py-1 rounded text-sm"
-                      >
-                        + Step
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteTarget(target.id);
-                        }}
-                        className="text-gray-400 hover:text-red-500 px-2"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                  <ProgressBar
-                    value={target.progress}
-                    color="orange"
-                    size="sm"
-                    className="mt-2"
-                  />
-                  {/* Tags display */}
-                  {targetTags.length > 0 && (
-                    <div className="flex gap-1 mt-2 flex-wrap">
-                      {targetTags.map((tag) => (
-                        <span
-                          key={tag.id}
-                          className="px-2 py-0.5 rounded text-xs"
-                          style={{
-                            backgroundColor: `${tag.color}20`,
-                            color: tag.color,
-                          }}
-                        >
-                          {tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="text-xs text-gray-500 mt-1">
-                    权重总和: {totalWeight}/100
-                    {target.due_date && (
-                      <span className="ml-2">📅 {target.due_date}</span>
-                    )}
-                  </div>
-                  {expandedTargets.has(target.id) && (
-                    <div className="mt-4 pl-6 space-y-2 border-l-2 border-orange-200 ml-4">
-                      {targetSteps.map((step) => (
-                        <div
-                          key={step.id}
-                          className="flex items-center gap-3 p-2 bg-gray-50 rounded"
-                        >
-                          <Checkbox
-                            checked={step.status === "completed"}
-                            onChange={() => handleToggleStep(step)}
-                          />
-                          <span className="flex-1">{step.title}</span>
-                          <span className="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded">
-                            {step.weight}%
-                          </span>
-                          <button
-                            onClick={() => handleDeleteStep(step.id)}
-                            className="text-gray-400 hover:text-red-500"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      ))}
-                      {targetSteps.length === 0 && (
-                        <p className="text-gray-400 text-sm">暂无步骤</p>
-                      )}
-                      {totalWeight < 100 && (
-                        <p className="text-xs text-orange-500 mt-2">
-                          剩余可用权重: {100 - totalWeight}%
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            </FadeIn>
-          );
-        })}
+        {filteredTargets.map((target, index) => (
+          <TargetCard
+            key={target.id}
+            target={target}
+            index={index}
+            expandedTargets={expandedTargets}
+            toggleTarget={toggleTarget}
+            selectedTargetId={selectedTargetId}
+            setSelectedTargetId={setSelectedTargetId}
+            setShowStepForm={setShowStepForm}
+            handleDeleteTarget={handleDeleteTarget}
+            handleToggleStep={handleToggleStep}
+            handleDeleteStep={handleDeleteStep}
+          />
+        ))}
         {filteredTargets.length === 0 && (
           <EmptyStateCard
             icon="🎯"
