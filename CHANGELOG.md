@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ViewsView: 使用 useQueries 修复 hooks-in-loop 错误
 - PlansView: 提取 PlanCard 子组件，修复 hooks-in-callback 错误
 
+**CirculationsView 无限循环修复** (2026-02-25):
+- 移除重复的 useEffect，修复 "Maximum update depth exceeded" 错误
+- 移除 useMemo 包裹的 useSensors，修复 "Do not call Hooks inside useMemo" 错误
+
 **ESLint 错误修复**:
 - SettingsDailySummaryView、page.tsx、Sidebar、useSystemTheme: 添加 eslint-disable 注释修复 setState-in-effect 警告
 
@@ -23,14 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - useCirculations: 修正 CirculationType 和 PeriodicFrequency 类型定义
 - SettingsChannelsView: 移除无效的 plugin_type 参数
 - SettingsDailySummaryView: 修正 includePending 参数名
-
-### Added
-
-**新 Hooks**:
-- useDailySummarySettings: 日常摘要设置 React Query hook
-- useNotificationPlugins: 通知插件 React Query hook
-
----
 
 ## [0.5.3] - 2026-02-23
 
