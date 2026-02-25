@@ -9,6 +9,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.4] - 2026-02-24
 
+### Added
+
+**React Query + Zustand 基础设施**:
+- `@tanstack/react-query`: 数据获取、缓存、乐观更新
+- `zustand`: 集中式状态管理
+- `QueryProvider`: React Query Provider 配置
+- `src/lib/store.ts`: Zustand 全局状态 Store
+
+**React Query Hooks**:
+- `useTodos`: Todo CRUD 操作 + 乐观更新
+- `usePlans`: Plan CRUD 操作 + 乐观更新
+- `useTags`: Tag CRUD 操作
+- `useTargets`: Target CRUD 操作 + 乐观更新
+- `useMilestones`: Milestone CRUD 操作
+- `useTasks`: Task CRUD 操作
+- `useDashboard`: Dashboard 数据获取
+- `useStatistics`: 统计数据获取
+- `useCirculations`: Circulation CRUD 操作
+- `useDailySummarySettings`: 日常摘要设置
+- `useNotificationPlugins`: 通知插件管理
+
+**ViewsView 组件提取**:
+- `ViewsFilters`: 筛选器组件
+- `ViewsList`: 列表视图组件
+- `ViewsBoard`: 看板视图组件
+- `ViewsCalendar`: 日历视图组件
+- `ViewsGantt`: 甘特图视图组件
+
+**Rust 后端**:
+- `get_circulation_logs_batch`: 批量获取 circulation logs，解决 N+1 查询问题
+
+### Changed
+
+**视图迁移到 React Query** (11 个视图):
+- Dashboard: 移除手动 useEffect，使用 useDashboard
+- TodosView: 移除手动 useEffect，使用 useTodos
+- PlansView: 重构为 React Query + 提取 PlanCard 子组件
+- TargetsView: 重构为 React Query + 提取 TargetCard 子组件
+- MilestonesView: 移除手动 useEffect，使用 useMilestones
+- StatisticsView: 移除手动 useEffect，使用 useStatistics
+- SettingsTagsView: 移除手动 useEffect，使用 useTags
+- SettingsChannelsView: 移除手动 useEffect，使用 useNotificationPlugins
+- SettingsDailySummaryView: 移除手动 useEffect，使用 useDailySummarySettings
+- CirculationsView: 重构为 React Query + 批量 API
+- ViewsView: 重构为 React Query + useQueries
+
 ### Fixed
 
 **React Hooks 违规修复**:
@@ -27,7 +73,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - useCirculations: 修正 CirculationType 和 PeriodicFrequency 类型定义
 - SettingsChannelsView: 移除无效的 plugin_type 参数
 - SettingsDailySummaryView: 修正 includePending 参数名
-
 ## [0.5.3] - 2026-02-23
 
 ### Added
