@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Rust 后端**:
 - `get_circulation_logs_batch`: 批量获取 circulation logs，解决 N+1 查询问题
 
+**CI/CD**:
+- 添加 iOS 构建 workflow (实验性支持)
+- 支持 Xcode Personal Team 签名和 App Store Connect API 签名
 ### Changed
 
 **视图迁移到 React Query** (11 个视图):
