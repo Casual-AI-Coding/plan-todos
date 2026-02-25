@@ -45,8 +45,19 @@ export interface ThemeColors {
   error: string;
 
   // Shadows
-  shadowCard: string;
-  shadowElevated: string;
+  shadows: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    glow: string;
+  };
+
+  // Glass effects
+  glass: {
+    borderGlow: string;
+    innerShadow: string;
+  };
 
   // Special
   accent: string;
@@ -82,8 +93,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#22C55E",
       warning: "#F59E0B",
       error: "#EF4444",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.15)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03)",
+        md: "0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04)",
+        lg: "0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06)",
+        xl: "0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08)",
+        glow: "0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
+      },
       accent: "#0D9488",
     },
   },
@@ -109,8 +129,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#4ADE80",
       warning: "#FBBF24",
       error: "#F87171",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(45, 212, 191, 0.4), 0 0 40px rgba(45, 212, 191, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#14B8A6",
     },
   },
@@ -136,8 +165,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#50FA7B",
       warning: "#F1FA8C",
       error: "#FF5555",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(189, 147, 249, 0.4), 0 0 40px rgba(189, 147, 249, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#BD93F9",
     },
   },
@@ -163,8 +201,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#A3BE8C",
       warning: "#EBCB8B",
       error: "#BF616A",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(136, 192, 208, 0.4), 0 0 40px rgba(136, 192, 208, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#88C0D0",
     },
   },
@@ -190,8 +237,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#A6E22E",
       warning: "#E6DB74",
       error: "#F92672",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(249, 38, 114, 0.4), 0 0 40px rgba(249, 38, 114, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#F92672",
     },
   },
@@ -217,8 +273,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#10B981",
       warning: "#F59E0B",
       error: "#EF4444",
-      shadowCard: "0 4px 12px rgba(120, 53, 15, 0.1)",
-      shadowElevated: "0 8px 24px rgba(120, 53, 15, 0.15)",
+      shadows: {
+        sm: "0 1px 2px rgba(120, 53, 15, 0.08), 0 2px 4px rgba(120, 53, 15, 0.05)",
+        md: "0 4px 8px rgba(120, 53, 15, 0.12), 0 8px 16px rgba(120, 53, 15, 0.06)",
+        lg: "0 8px 16px rgba(120, 53, 15, 0.16), 0 16px 32px rgba(120, 53, 15, 0.08)",
+        xl: "0 12px 24px rgba(120, 53, 15, 0.2), 0 24px 48px rgba(120, 53, 15, 0.1)",
+        glow: "0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.15)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+        innerShadow: "inset 0 1px 2px rgba(120, 53, 15, 0.08)"
+      },
       accent: "#F59E0B",
     },
   },
@@ -245,8 +310,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#16A34A",
       warning: "#F59E0B",
       error: "#DC2626",
-      shadowCard: "0 1px 3px rgba(220, 38, 38, 0.1)",
-      shadowElevated: "0 4px 12px rgba(220, 38, 38, 0.15)",
+      shadows: {
+        sm: "0 1px 2px rgba(220, 38, 38, 0.08), 0 2px 4px rgba(220, 38, 38, 0.05)",
+        md: "0 4px 8px rgba(220, 38, 38, 0.12), 0 8px 16px rgba(220, 38, 38, 0.06)",
+        lg: "0 8px 16px rgba(220, 38, 38, 0.16), 0 16px 32px rgba(220, 38, 38, 0.08)",
+        xl: "0 12px 24px rgba(220, 38, 38, 0.2), 0 24px 48px rgba(220, 38, 38, 0.1)",
+        glow: "0 0 20px rgba(220, 38, 38, 0.4), 0 0 40px rgba(220, 38, 38, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+        innerShadow: "inset 0 1px 2px rgba(220, 38, 38, 0.08)"
+      },
       accent: "#DC2626",
     },
   },
@@ -273,8 +347,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#a6e3a1",
       warning: "#f9e2af",
       error: "#f38ba8",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(203, 166, 247, 0.4), 0 0 40px rgba(203, 166, 247, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#cba6f7",
     },
   },
@@ -301,8 +384,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#9ece6a",
       warning: "#e0af68",
       error: "#f7768e",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(122, 162, 247, 0.4), 0 0 40px rgba(122, 162, 247, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#7aa2f7",
     },
   },
@@ -329,8 +421,17 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       success: "#98c379",
       warning: "#e5c07b",
       error: "#e06c75",
-      shadowCard: "0 1px 3px rgba(0, 0, 0, 0.3)",
-      shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.4)",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(198, 120, 221, 0.4), 0 0 40px rgba(198, 120, 221, 0.2)"
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+      },
       accent: "#c678dd",
     },
   },
@@ -372,8 +473,17 @@ export const systemThemeDisplay: Theme = {
     success: "#22C55E",
     warning: "#F59E0B",
     error: "#EF4444",
-    shadowCard: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    shadowElevated: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    shadows: {
+      sm: "0 1px 2px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03)",
+      md: "0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04)",
+      lg: "0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06)",
+      xl: "0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08)",
+      glow: "0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1)"
+    },
+    glass: {
+      borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+      innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
+    },
     accent: "#0D9488",
   },
 };

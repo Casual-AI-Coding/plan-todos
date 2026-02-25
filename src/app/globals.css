@@ -31,9 +31,15 @@
   --color-error: #ef4444;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --color-accent: #0d9488;
-  --color-primary: #0d9488;
-  --color-secondary: #14b8a6;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08);
+  --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.5);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
 
 /* Dark Theme - with transparency */
@@ -52,9 +58,15 @@
   --color-error: #f87171;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --color-accent: #2dd4bf;
-  --color-primary: #2dd4bf;
-  --color-secondary: #5eead4;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(45, 212, 191, 0.4), 0 0 40px rgba(45, 212, 191, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Dracula Theme - with transparency */
@@ -73,9 +85,16 @@
   --color-error: #ff5555;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --color-accent: #bd93f9;
-  --color-primary: #bd93f9;
   --color-secondary: #ff79c6;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(189, 147, 249, 0.4), 0 0 40px rgba(189, 147, 249, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Nord Theme - with transparency */
@@ -94,9 +113,16 @@
   --color-error: #bf616a;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --color-accent: #88c0d0;
-  --color-primary: #88c0d0;
   --color-secondary: #81a1c1;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(136, 192, 208, 0.4), 0 0 40px rgba(136, 192, 208, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Monokai Theme - with transparency */
@@ -115,9 +141,16 @@
   --color-error: #f92672;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --color-accent: #f92672;
-  --color-primary: #f92672;
   --color-secondary: #a6e22e;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(249, 38, 114, 0.4), 0 0 40px rgba(249, 38, 114, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Warm Theme - with transparency */
@@ -136,10 +169,17 @@
   --color-error: #ef4444;
   --shadow-card: 0 4px 12px rgba(120, 53, 15, 0.1);
   --shadow-elevated: 0 8px 24px rgba(120, 53, 15, 0.15);
-  --color-accent: #f59e0b;
-  --color-primary: #f59e0b;
   --color-secondary: #ef4444;
   --color-cta: #f97316;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(120, 53, 15, 0.08), 0 2px 4px rgba(120, 53, 15, 0.05);
+  --shadow-md: 0 4px 8px rgba(120, 53, 15, 0.12), 0 8px 16px rgba(120, 53, 15, 0.06);
+  --shadow-lg: 0 8px 16px rgba(120, 53, 15, 0.16), 0 16px 32px rgba(120, 53, 15, 0.08);
+  --shadow-xl: 0 12px 24px rgba(120, 53, 15, 0.2), 0 24px 48px rgba(120, 53, 15, 0.1);
+  --shadow-glow: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.15);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.5);
+  --glass-inner-shadow: inset 0 1px 2px rgba(120, 53, 15, 0.08);
 }
 
 /* Spring Theme - Chinese New Year */
@@ -158,10 +198,17 @@
   --color-error: #dc2626;
   --shadow-card: 0 1px 3px rgba(220, 38, 38, 0.1);
   --shadow-elevated: 0 4px 12px rgba(220, 38, 38, 0.15);
-  --color-accent: #dc2626;
-  --color-primary: #dc2626;
   --color-secondary: #f97316;
   --color-cta: #fbbf24;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(220, 38, 38, 0.08), 0 2px 4px rgba(220, 38, 38, 0.05);
+  --shadow-md: 0 4px 8px rgba(220, 38, 38, 0.12), 0 8px 16px rgba(220, 38, 38, 0.06);
+  --shadow-lg: 0 8px 16px rgba(220, 38, 38, 0.16), 0 16px 32px rgba(220, 38, 38, 0.08);
+  --shadow-xl: 0 12px 24px rgba(220, 38, 38, 0.2), 0 24px 48px rgba(220, 38, 38, 0.1);
+  --shadow-glow: 0 0 20px rgba(220, 38, 38, 0.4), 0 0 40px rgba(220, 38, 38, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.5);
+  --glass-inner-shadow: inset 0 1px 2px rgba(220, 38, 38, 0.08);
 }
 
 /* Catppuccin Theme */
@@ -180,10 +227,17 @@
   --color-error: #f38ba8;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --color-accent: #cba6f7;
-  --color-primary: #cba6f7;
   --color-secondary: #f5c2e7;
   --color-cta: #f38ba8;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(203, 166, 247, 0.4), 0 0 40px rgba(203, 166, 247, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Tokyo Night Theme */
@@ -202,10 +256,17 @@
   --color-error: #f7768e;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --color-accent: #7aa2f7;
-  --color-primary: #7aa2f7;
   --color-secondary: #bb9af7;
   --color-cta: #f7768e;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(122, 162, 247, 0.4), 0 0 40px rgba(122, 162, 247, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* One Dark Theme */
@@ -224,10 +285,17 @@
   --color-error: #e06c75;
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --color-accent: #c678dd;
-  --color-primary: #c678dd;
   --color-secondary: #98c379;
   --color-cta: #e06c75;
+  /* New shadow levels */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4);
+  --shadow-xl: 0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(198, 120, 221, 0.4), 0 0 40px rgba(198, 120, 221, 0.2);
+  /* Glass effects */
+  --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* All themes - Transparent background to show desktop in Tauri */
@@ -964,9 +1032,20 @@ body {
   color: var(--color-accent);
 }
 
-/* Shadows */
 .shadow-sm {
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
+}
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
 }
 .shadow-md {
   box-shadow: var(--shadow-elevated);
@@ -982,7 +1061,15 @@ body {
 
 /* Dropdown shadow */
 .shadow-lg {
-  box-shadow: var(--shadow-elevated);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Glass enhancement classes */
+.glass-border-glow {
+  box-shadow: var(--glass-border-glow), var(--shadow-sm);
+}
+.glass-inner-shadow {
+  box-shadow: var(--glass-inner-shadow), var(--shadow-sm);
 }
 
 /* Hover border */
