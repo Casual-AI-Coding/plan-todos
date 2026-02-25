@@ -39,7 +39,6 @@ import {
   useUndoCheckinCirculation,
 } from "@/hooks/useCirculations";
 import {
-  getCirculationLogs,
   type Circulation,
   type CirculationType,
   type PeriodicFrequency,
@@ -466,78 +465,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     };
     loadStats();
   }, [todayCirculations]);
-  useEffect(() => {
-    const loadStats = async () => {
-      const stats: Record<string, TodayStats> = {};
-      const todayStr = new Date().toISOString().split("T")[0];
-      const countCirculations = todayCirculations.filter(
-        (c) => c.circulation_type === "count",
-      );
-      
-      // Early return if no count-type circulations
-      if (countCirculations.length === 0) {
-        setTodayStats({});
-        return;
-      }
-      
-      try {
-        // BATCH: Get all logs in a single Tauri command call
-        const { getCirculationLogsBatch } = await import("@/lib/api");
-        const allLogs = await getCirculationLogsBatch(
-          countCirculations.map(c => c.id),
-          50
-        );
-        
-        // Process logs for each circulation
-        countCirculations.forEach((c) => {
-          const logs = allLogs[c.id] || [];
-          const todayLogs = logs.filter((log) =>
-            log.completed_at.startsWith(todayStr),
-          );
-          stats[c.id] = {
-            count: todayLogs.length,
-            progress: todayLogs.reduce((sum, log) => sum + (log.count || 0), 0),
-          };
-        });
-      } catch (error) {
-        console.error("Failed to load circulation stats:", error);
-        // Set empty stats on error
-        countCirculations.forEach((c) => {
-          stats[c.id] = { count: 0, progress: 0 };
-        });
-      }
-      
-      setTodayStats(stats);
-    };
-    loadStats();
-  }, [todayCirculations]);
-  useEffect(() => {
-    const loadStats = async () => {
-      const stats: Record<string, TodayStats> = {};
-      const todayStr = new Date().toISOString().split("T")[0];
-      const countCirculations = todayCirculations.filter(
-        (c) => c.circulation_type === "count",
-      );
-      await Promise.all(
-        countCirculations.map(async (c) => {
-          try {
-            const logs = await getCirculationLogs(c.id, 50);
-            const todayLogs = logs.filter((log) =>
-              log.completed_at.startsWith(todayStr),
-            );
-            stats[c.id] = {
-              count: todayLogs.length,
-              progress: todayLogs.reduce((sum, log) => sum + (log.count || 0), 0),
-            };
-          } catch {
-            stats[c.id] = { count: 0, progress: 0 };
-          }
-        }),
-      );
-      setTodayStats(stats);
-    };
-    loadStats();
-  }, [todayCirculations]);
+
 
   // Check if circulation was completed today
   const isCompletedToday = (c: Circulation): boolean => {
@@ -579,8 +507,8 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     setTodayCirculationsOrdered(newOrder);
   }
 
-  // Dnd-kit sensors - memoized to prevent re-creation on every render
-  const sensors = useMemo(() => useSensors(
+  // Dnd-kit sensors - useSensors handles memoization internally
+  const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
@@ -589,7 +517,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
-  ), []);
+  );
 
 
   const handleDragEnd = (event: DragEndEvent) => {
