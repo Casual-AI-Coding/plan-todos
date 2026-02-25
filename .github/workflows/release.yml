@@ -279,14 +279,14 @@ jobs:
       # Option 2: Use App Store Connect API for distribution signing
       # Requires: APPLE_API_ISSUER, APPLE_API_KEY, APPLE_API_KEY_PATH secrets
       - name: Configure App Store signing (if secrets available)
-        if: ${{ secrets.APPLE_API_ISSUER != '' }}
         run: |
-          echo "App Store Connect API signing configured"
+          if [ -n "${{ secrets.APPLE_API_ISSUER }}" ]; then
+            echo "App Store Connect API signing configured"
+          fi
         env:
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ secrets.APPLE_API_KEY_PATH }}
-
       - name: Build iOS (Release)
         run: |
           # Build for iOS device (ARM64)
