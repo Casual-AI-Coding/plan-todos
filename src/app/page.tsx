@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { TitleBar } from "@/components/ui/TitleBar";
+import { PageSlide } from "@/components/ui/animations";
 import {
   Dashboard,
   TodosView,
@@ -60,49 +61,64 @@ export default function Home() {
   }, []);
 
   const renderContent = () => {
+    let view;
     switch (activeMenu) {
       case "dashboard":
-        return <Dashboard />;
+        view = <Dashboard />;
+        break;
       case "todos":
       case "todos-all":
       case "todos-today":
       case "todos-upcoming":
       case "todos-completed":
-        return <TodosView />;
+        view = <TodosView />;
+        break;
       case "plans":
       case "plans-active":
       case "plans-archived":
-        return <PlansView />;
+        view = <PlansView />;
+        break;
       case "goals":
       case "goals-active":
       case "goals-completed":
-        return <TargetsView />;
+        view = <TargetsView />;
+        break;
       case "milestones":
-        return <MilestonesView />;
+        view = <MilestonesView />;
+        break;
       case "views":
-        return <ViewsView />;
+        view = <ViewsView />;
+        break;
       case "circulations":
       case "circulations-today":
-        return <CirculationsView mode="today" />;
+        view = <CirculationsView mode="today" />;
+        break;
       case "circulations-settings":
-        return <CirculationsView mode="settings" />;
+        view = <CirculationsView mode="settings" />;
+        break;
       case "statistics":
-        return <StatisticsView />;
+        view = <StatisticsView />;
+        break;
       case "settings":
-        return <SettingsGeneralView />;
       case "settings-general":
-        return <SettingsGeneralView />;
+        view = <SettingsGeneralView />;
+        break;
       case "settings-tags":
-        return <SettingsTagsView />;
+        view = <SettingsTagsView />;
+        break;
       case "settings-channels":
-        return <SettingsChannelsView />;
+        view = <SettingsChannelsView />;
+        break;
       case "settings-daily-summary":
-        return <SettingsDailySummaryView />;
+        view = <SettingsDailySummaryView />;
+        break;
       case "settings-about":
-        return <SettingsAboutView />;
+        view = <SettingsAboutView />;
+        break;
       default:
-        return <Dashboard />;
+        view = <Dashboard />;
     }
+    return <PageSlide key={activeMenu}>{view}</PageSlide>;
   };
 
   return (

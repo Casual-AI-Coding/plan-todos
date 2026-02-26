@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Button, FadeIn } from "@/components/ui";
+import { Card, Button } from "@/components/ui";
+import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { Calendar } from "@/components/ui/Calendar";
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 import { useToast } from "@/components/ui/Toast";
@@ -207,29 +208,29 @@ export function TodosView() {
       {isLoading ? (
         <div className="text-gray-500">加载中...</div>
       ) : viewMode === "list" ? (
-        /* List */
-        <div className="space-y-2">
-          {filteredTodos.map((todo, index) => (
-            <FadeIn key={todo.id} delay={index * 0.05} direction="up">
-              <TodoItem
-                todo={todo}
-                onToggle={handleToggle}
-                onDelete={handleDelete}
-                onClick={handleEditClick}
-              />
-            </FadeIn>
-          ))}
-          {filteredTodos.length === 0 && (
-            <EmptyStateCard
-              icon="📋"
-              title="暂无待办事项"
-              description="创建你的第一个待办事项来开始使用"
-              action={
-                <Button onClick={() => setShowForm(true)}>+ 创建待办</Button>
-              }
-            />
-          )}
-        </div>
+        filteredTodos.length > 0 ? (
+          <StaggeredList className="space-y-2" staggerDelay={50}>
+            {filteredTodos.map((todo) => (
+              <StaggeredListItem key={todo.id}>
+                <TodoItem
+                  todo={todo}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onClick={handleEditClick}
+                />
+              </StaggeredListItem>
+            ))}
+          </StaggeredList>
+        ) : (
+          <EmptyStateCard
+            icon="📋"
+            title="暂无待办事项"
+            description="创建你的第一个待办事项来开始使用"
+            action={
+              <Button onClick={() => setShowForm(true)}>+ 创建待办</Button>
+            }
+          />
+        )
       ) : (
         /* Calendar */
         <Card>

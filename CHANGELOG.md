@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.5] - 2026-02-27
+
+### Added
+
+**UI/UX Enhancement - Design System**:
+- Extended shadow system with 5 levels (sm, md, lg, xl, glow) for all 9 themes
+- Glass effect enhancements (borderGlow, innerShadow) in theme registry
+- CSS variables for animation timing (--animation-easing-spring, --animation-duration-*)
+
+**UI/UX Enhancement - Animation Components**:
+- `RippleEffect`: Click ripple animation for buttons/cards
+- `StaggeredList` / `StaggeredListItem`: Staggered entrance animations for lists
+- `HoverCard`: Enhanced hover effects with shadow/glow
+- `PageSlide`: Page transition animations
+- All animations use spring easing (cubic-bezier: 0.22, 1, 0.36, 1)
+
+**UI/UX Enhancement - Button Component**:
+- Click ripple effect using Framer Motion
+- Hover scale and glow effects
+- Loading spinner animation
+- Icon support with proper spacing
+
+**UI/UX Enhancement - Modal Component**:
+- Spring animation (scale + fade + y translation)
+- Blur backdrop effect using --glass-blur
+- All theme colors via CSS variables
+- Added "xl" width option
+
+**UI/UX Enhancement - Data Visualization**:
+- `GaugeChart`: Circular progress indicator with animated fill
+- `TrendChart`: Line/area/bar chart for trend visualization
+- `HeatmapCalendar`: GitHub-style activity heatmap
+- All charts support theme colors via CSS variables
+
+### Changed
+
+- Theme registry extended with `shadows` and `glass` objects
+- globals.css extended with shadow variables and utility classes
+- Button component refactored with Framer Motion
+- Modal component enhanced with AnimatePresence
+
+### Technical
+
+- All components use theme CSS variables for colors
+- Full TypeScript strict mode support
+- Framer Motion for all animations
+- Test coverage for new components
+
+---
+
 ## [0.5.4] - 2026-02-24
 
 ### Added

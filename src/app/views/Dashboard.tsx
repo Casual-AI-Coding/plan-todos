@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, ProgressBar, Checkbox, FadeIn } from "@/components/ui";
+import { Card, ProgressBar, Checkbox } from "@/components/ui";
+import { StaggeredList, StaggeredListItem, HoverCard } from "@/components/ui/animations";
 import { useDashboard } from "@/hooks/useDashboard";
 import { StatCard } from "@/components/features/StatCard";
 import { EntityCountCard } from "@/components/features/EntityCountCard";
@@ -61,46 +62,66 @@ export function Dashboard() {
       </h2>
 
       {/* Stats Cards - Responsive: 1 col mobile, 2 col tablet, 3 col desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <FadeIn delay={0}>
-          <StatCard value={overview.today_todos_count} label="今日待办" />
-        </FadeIn>
-        <FadeIn delay={0.1}>
-          <StatCard
-            value={overview.upcoming_3days_count}
-            label="即将到期 (3天内)"
-            color="var(--color-warning)"
-          />
-        </FadeIn>
-        <FadeIn delay={0.2}>
-          <StatCard value={overview.completed_today_count} label="今日完成" />
-        </FadeIn>
-      </div>
+      <StaggeredList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" staggerDelay={100}>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-4} glowOnHover className="p-4">
+            <StatCard value={overview.today_todos_count} label="今日待办" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-4} glowOnHover className="p-4">
+            <StatCard
+              value={overview.upcoming_3days_count}
+              label="即将到期 (3天内)"
+              color="var(--color-warning)"
+            />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-4} glowOnHover className="p-4">
+            <StatCard value={overview.completed_today_count} label="今日完成" />
+          </HoverCard>
+        </StaggeredListItem>
+      </StaggeredList>
 
       {/* Entity Counts - Responsive: 3 col mobile, 5 col tablet, 7 col desktop */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2">
-        <FadeIn delay={0.3}>
-          <EntityCountCard count={counts.todo} label="待办" />
-        </FadeIn>
-        <FadeIn delay={0.35}>
-          <EntityCountCard count={counts.plan} label="计划" />
-        </FadeIn>
-        <FadeIn delay={0.4}>
-          <EntityCountCard count={counts.task} label="任务" />
-        </FadeIn>
-        <FadeIn delay={0.45}>
-          <EntityCountCard count={counts.target} label="目标" />
-        </FadeIn>
-        <FadeIn delay={0.5}>
-          <EntityCountCard count={counts.milestone} label="里程碑" />
-        </FadeIn>
-        <FadeIn delay={0.55}>
-          <EntityCountCard count={counts.circulation || 0} label="打卡" />
-        </FadeIn>
-        <FadeIn delay={0.6}>
-          <EntityCountCard count={week.completed_count} label="本周完成" />
-        </FadeIn>
-      </div>
+      <StaggeredList className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2" staggerDelay={50}>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={counts.todo} label="待办" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={counts.plan} label="计划" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={counts.task} label="任务" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={counts.target} label="目标" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={counts.milestone} label="里程碑" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={counts.circulation || 0} label="打卡" />
+          </HoverCard>
+        </StaggeredListItem>
+        <StaggeredListItem>
+          <HoverCard hoverElevation={-2} glowOnHover className="p-2">
+            <EntityCountCard count={week.completed_count} label="本周完成" />
+          </HoverCard>
+        </StaggeredListItem>
+      </StaggeredList>
 
       {/* Circulation Stats */}
       {dashboard.circulation_stats && (

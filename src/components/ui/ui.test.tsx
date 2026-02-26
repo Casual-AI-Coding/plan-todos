@@ -168,8 +168,8 @@ describe("Modal", () => {
         Content
       </Modal>,
     );
-    // Click on the backdrop (first div with bg-black/50)
-    const backdrop = document.querySelector(".bg-black\\/50");
+    // Click on the backdrop
+    const backdrop = document.querySelector(".modal-backdrop");
     if (backdrop) {
       fireEvent.click(backdrop);
     }

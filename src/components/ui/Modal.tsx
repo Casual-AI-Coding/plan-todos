@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ModalProps {
   open: boolean;
@@ -8,7 +9,7 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
-  width?: "sm" | "md" | "lg";
+  width?: "sm" | "md" | "lg" | "xl";
 }
 
 export function Modal({
@@ -37,61 +38,106 @@ export function Modal({
     };
   }, [open, handleEscape]);
 
-  if (!open) return null;
-
   const widthStyles = {
     sm: "max-w-sm",
     md: "max-w-md",
     lg: "max-w-lg",
+    xl: "max-w-xl",
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Modal content */}
-      <div
-        className={`relative bg-white rounded-xl shadow-xl w-full ${widthStyles[width]} mx-4 transform transition-all`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-teal-100">
-          <h3 className="text-lg font-semibold" style={{ color: "#134E4A" }}>
-            {title}
-          </h3>
-          <button
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop with blur */}
+          <motion.div
+            className="absolute inset-0 modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backdropFilter: "blur(var(--glass-blur, 10px))",
+              WebkitBackdropFilter: "blur(var(--glass-blur, 10px))",
+            }}
+          />
+
+          {/* Modal content */}
+          <motion.div
+            className={`relative w-full ${widthStyles[width]} mx-4`}
+            style={{
+              backgroundColor: "var(--color-bg-card)",
+              boxShadow: "var(--shadow-lg)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "0.75rem",
+            }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{
+              duration: 0.3,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            {/* Header */}
+            <div
+              className="flex items-center justify-between px-6 py-4 border-b"
+              style={{ borderColor: "var(--color-border)" }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: "var(--color-text)" }}
+              >
+                {title}
+              </h3>
+              <button
+                onClick={onClose}
+                className="transition-colors hover:opacity-70"
+                style={{ color: "var(--color-text-muted)" }}
+                aria-label="Close modal"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div
+              className="px-6 py-4"
+              style={{ color: "var(--color-text)" }}
+            >
+              {children}
+            </div>
+
+            {/* Footer */}
+            {footer && (
+              <div
+                className="flex justify-end gap-3 px-6 py-4 border-t"
+                style={{
+                  borderColor: "var(--color-border)",
+                  backgroundColor: "var(--color-bg-hover)",
+                  borderRadius: "0 0 0.75rem 0.75rem",
+                }}
+              >
+                {footer}
+              </div>
+            )}
+          </motion.div>
         </div>
-
-        {/* Body */}
-        <div className="px-6 py-4">{children}</div>
-
-        {/* Footer */}
-        {footer && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-teal-100 bg-gray-50 rounded-b-xl">
-            {footer}
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }
