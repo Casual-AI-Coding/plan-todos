@@ -141,9 +141,9 @@ export function HeatmapCalendar({
         </div>
         
         {/* Grid - fill remaining width */}
-        <div className="flex-1 flex gap-[2px] overflow-x-auto">
+        <div className="flex-1 flex gap-[3px] overflow-x-auto">
           {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="flex flex-col gap-[2px] flex-shrink-0">
+            <div key={weekIndex} className="flex flex-col gap-[3px] flex-shrink-0">
               {week.map((day, dayIndex) => {
                 const dateStr = format(day.date, "yyyy-MM-dd");
                 const count = dataMap.get(dateStr) || 0;
@@ -157,8 +157,8 @@ export function HeatmapCalendar({
                     transition={{ delay: weekIndex * 0.003, duration: 0.1 }}
                     className="rounded-[2px] cursor-pointer hover:ring-1 hover:ring-offset-1 flex-shrink-0"
                     style={{
-                      width: "10px",
-                      height: "10px",
+                      width: "14px",
+                      height: "14px",
                       backgroundColor: bgColor,
                     }}
                     onClick={() => onCellClick?.(dateStr)}

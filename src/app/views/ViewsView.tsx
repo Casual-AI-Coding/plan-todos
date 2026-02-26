@@ -558,16 +558,16 @@ export function ViewsView() {
     };
 
     return (
-      <div className="relative">
+      <div className="relative h-full">
         {renderTooltip()}
-        <div className="grid grid-cols-3 gap-4" style={{ maxHeight: "calc(100vh - 350px)" }}>
+        <div className="grid grid-cols-3 gap-4 h-full">
           {columns.map((col) => (
             <div
               key={col.id}
-              className="rounded-lg p-4 flex flex-col"
+              className="rounded-lg p-4 flex flex-col overflow-hidden"
               style={{
                 backgroundColor: "var(--color-bg-hover)",
-                maxHeight: "100%",
+                height: "100%",
               }}
             >
               <h3
