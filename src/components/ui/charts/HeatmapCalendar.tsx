@@ -72,7 +72,7 @@ export function HeatmapCalendar({
 
   return (
     <div className={`p-4 ${className}`}>
-      <div className="grid grid-cols-[repeat(7,1fr)] gap-1">
+      <div className="grid grid-cols-[repeat(7,1fr)] gap-0.5">
         {days.map((day, index) => {
           const bgColor = getIntensityColor(day.count, maxCount, color);
           return (
@@ -81,7 +81,7 @@ export function HeatmapCalendar({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.002, duration: 0.15 }}
-              className="aspect-square rounded-sm cursor-pointer"
+              className="w-2.5 h-2.5 rounded-sm cursor-pointer"
               style={{
                 backgroundColor: bgColor,
                 border: "1px solid var(--color-border)",

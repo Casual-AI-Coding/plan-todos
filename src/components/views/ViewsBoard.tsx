@@ -98,7 +98,7 @@ export function ViewsBoard({
               {getItemsByStatus(col.id).length}
             </span>
           </h3>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 max-h-[60vh] overflow-y-auto pr-1">
             {getItemsByStatus(col.id).map((item, idx) => (
               <div key={`${item.type}-${idx}`}>
                 <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">

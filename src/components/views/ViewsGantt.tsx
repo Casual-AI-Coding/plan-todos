@@ -212,7 +212,7 @@ export function ViewsGantt({
   const timelineWidth = Math.max(800, 100 * ganttZoom);
 
   return (
-    <div className="w-full">
+    <div className="w-full p-4 rounded-lg" style={{ backgroundColor: "var(--color-bg-hover)" }}>
       <div className="flex items-center gap-3 mb-4 px-2">
         <span className="text-xs text-gray-500">显示范围:</span>
         <input
@@ -243,7 +243,7 @@ export function ViewsGantt({
             ))}
           </div>
 
-          <div className="relative space-y-1">
+          <div className="relative space-y-1 p-2 rounded" style={{ backgroundColor: "var(--color-bg-card)" }}>
             {allItems.map((item, idx) => {
               const startPos = item.start
                 ? getPosition(item.start)
@@ -258,18 +258,24 @@ export function ViewsGantt({
               return (
                 <div
                   key={`${item.type}-${idx}`}
-                  className="flex items-center h-6 group"
+                  className="flex items-center h-8 group"
                 >
-                  <div className="w-28 flex-shrink-0 text-xs truncate pr-2 text-gray-600">
+                  <div className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium" style={{ color: "var(--color-text)" }}>
+                    <span className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                      item.type === "plan" ? "bg-purple-500" :
+                      item.type === "target" ? "bg-orange-500" :
+                      item.type === "todo" ? "bg-blue-500" : "bg-pink-500"
+                    }`}></span>
                     {item.title}
                   </div>
-                  <div className="flex-1 h-full relative">
+                  <div className="flex-1 h-full relative rounded" style={{ backgroundColor: "var(--color-bg-hover)" }}>
                     <div
-                      className={`absolute h-4 top-1 rounded-sm ${getTypeColor(item.type, item.status)}`}
+                      className={`absolute h-6 top-1 rounded ${getTypeColor(item.type, item.status)}`}
                       style={{
                         left: `${startPos}%`,
-                        width: `${Math.max(width || 3, 3)}%`,
-                        minWidth: "16px",
+                        width: `${Math.max(width || 5, 5)}%`,
+                        minWidth: "20px",
+                        boxShadow: "var(--shadow-sm)",
                       }}
                     >
                       {item.progress !== undefined && item.progress < 100 && (

@@ -97,40 +97,48 @@ export function ViewsCalendar({
   };
 
   return (
-    <div className="flex items-center justify-center mb-4 gap-4">
-      <button
-        onClick={prevMonth}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-      >
-        ◀️
-      </button>
-      <h3
-        className="text-xl font-semibold"
-        style={{ color: "var(--color-text)" }}
-      >
-        {monthNames[currentMonth]} {currentYear}
-      </h3>
-      <button
-        onClick={nextMonth}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-      >
-        ▶️
-      </button>
+    <div className="space-y-4">
+      {/* Header with navigation */}
+      <div className="flex items-center justify-center gap-4">
+        <button
+          onClick={prevMonth}
+          className="p-2 rounded-lg transition-colors hover:opacity-70"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          ◀
+        </button>
+        <h3
+          className="text-xl font-semibold"
+          style={{ color: "var(--color-text)" }}
+        >
+          {monthNames[currentMonth]} {currentYear}
+        </h3>
+        <button
+          onClick={nextMonth}
+          className="p-2 rounded-lg transition-colors hover:opacity-70"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          ▶
+        </button>
+      </div>
 
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      {/* Day names header */}
+      <div className="grid grid-cols-7 gap-1">
         {dayNames.map((day, i) => (
           <div
             key={day}
-            className={`text-center text-sm font-medium py-2 ${i >= 5 ? "text-red-500" : "text-gray-500"}`}
+            className="text-center text-sm font-medium py-2"
+            style={{ color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)" }}
           >
             {day}
           </div>
         ))}
       </div>
 
+      {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: firstDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="h-28 bg-gray-50 rounded"></div>
+          <div key={`empty-${i}`} className="h-24 rounded" style={{ backgroundColor: "var(--color-bg-hover)" }}></div>
         ))}
 
         {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -145,7 +153,7 @@ export function ViewsCalendar({
           return (
             <div
               key={day}
-              className={`h-28 p-1 border rounded transition-colors ${
+              className={`h-24 p-1 border rounded transition-colors ${
                 isToday
                   ? "bg-teal-50 border-teal-300"
                   : isWeekendDay
@@ -158,7 +166,7 @@ export function ViewsCalendar({
               >
                 {day}
               </div>
-              <div className="mt-1 space-y-1 overflow-y-auto max-h-18">
+              <div className="mt-1 space-y-1 overflow-y-auto max-h-14">
                 {items.map((item, idx) => (
                   <div
                     key={idx}
@@ -181,26 +189,27 @@ export function ViewsCalendar({
         })}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-4 justify-center">
+      {/* Legend */}
+      <div className="flex flex-wrap gap-4 justify-center text-xs">
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-blue-100"></span>
-          <span className="text-xs text-gray-600">待办</span>
+          <span style={{ color: "var(--color-text-muted)" }}>待办</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-teal-100"></span>
-          <span className="text-xs text-gray-600">任务</span>
+          <span style={{ color: "var(--color-text-muted)" }}>任务</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-orange-100"></span>
-          <span className="text-xs text-gray-600">目标</span>
+          <span style={{ color: "var(--color-text-muted)" }}>目标</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-purple-100"></span>
-          <span className="text-xs text-gray-600">里程碑</span>
+          <span style={{ color: "var(--color-text-muted)" }}>里程碑</span>
         </div>
         <div className="flex items-center gap-1 ml-4">
           <span className="w-3 h-3 rounded bg-red-50 border border-red-100"></span>
-          <span className="text-xs text-gray-600">周末</span>
+          <span style={{ color: "var(--color-text-muted)" }}>周末</span>
         </div>
       </div>
     </div>
