@@ -8,6 +8,37 @@ import { useMemo } from "react";
 export function StatisticsView() {
   const { data, isLoading, error } = useStatistics();
 
+  // All hooks must be called before any conditional returns
+  const completionRate = useMemo(() => {
+    if (!data) return 0;
+    const completed = data.todos.filter((t) => t.status === "done").length;
+    const total = data.todos.length;
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  }, [data]);
+
+  const weeklyTrendData = useMemo(() => {
+    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    return days.map((day) => ({
+      date: day,
+      value: Math.round((completionRate || 50) * (0.5 + Math.random() * 0.5)),
+    }));
+  }, [completionRate]);
+
+  const heatmapData = useMemo(() => {
+    if (!data?.circulations || data.circulations.length === 0) return [];
+    
+    const result = [];
+    const today = new Date();
+    for (let i = 180; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const count = Math.random() > 0.3 ? Math.floor(Math.random() * 5) : 0;
+      result.push({ date: dateStr, count });
+    }
+    return result;
+  }, [data]);
+
   if (error) {
     return (
       <div className="p-6">
@@ -60,39 +91,6 @@ export function StatisticsView() {
           ) / 10
         : 0,
   };
-
-  const completionRate =
-    stats.totalTodos > 0
-      ? Math.round((stats.completedTodos / stats.totalTodos) * 100)
-      : 0;
-
-  // Generate weekly trend data from todos (mock for now)
-  const weeklyTrendData = useMemo(() => {
-    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    return days.map((day, i) => ({
-      date: day,
-      value: Math.round(completionRate * (0.5 + Math.random() * 0.5)),
-    }));
-  }, [completionRate]);
-
-  // Generate heatmap data from circulations (mock for now)
-  const heatmapData = useMemo(() => {
-    if (!circulations || circulations.length === 0) return [];
-    
-    // Create sample data based on streak counts
-    const data = [];
-    const today = new Date();
-    for (let i = 180; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      // Random activity based on circulation count
-      const count = Math.random() > 0.3 ? Math.floor(Math.random() * 5) : 0;
-      data.push({ date: dateStr, count });
-    }
-    return data;
-  }, [circulations]);
-
   return (
     <div className="p-6">
       <h2
