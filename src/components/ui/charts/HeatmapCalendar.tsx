@@ -18,16 +18,17 @@ interface HeatmapCalendarProps {
   className?: string;
 }
 
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
+// Only show odd weekdays to save space (matching GitHub style)
+const WEEKDAYS = ["", "一", "", "三", "", "五", ""];
 const MONTHS = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 
 function getIntensityColor(count: number, maxCount: number, baseColor: string): string {
-  if (count === 0) return "var(--color-bg-hover)";
-  const intensity = count / maxCount;
+  if (count === 0) return "var(--color-border)";
+  const intensity = count / Math.max(maxCount, 1);
   if (intensity > 0.75) return baseColor;
-  if (intensity > 0.5) return `color-mix(in srgb, ${baseColor} 70%, transparent)`;
-  if (intensity > 0.25) return `color-mix(in srgb, ${baseColor} 40%, transparent)`;
-  return `color-mix(in srgb, ${baseColor} 20%, transparent)`;
+  if (intensity > 0.5) return `color-mix(in srgb, ${baseColor} 60%, transparent)`;
+  if (intensity > 0.25) return `color-mix(in srgb, ${baseColor} 35%, transparent)`;
+  return `color-mix(in srgb, ${baseColor} 15%, transparent)`;
 }
 
 export function HeatmapCalendar({
@@ -48,12 +49,11 @@ export function HeatmapCalendar({
 
   const maxCount = useMemo(() => Math.max(...data.map((d) => d.count), 1), [data]);
 
-  // Generate weeks data
+  // Generate weeks data - each week is a column
   const weeks = useMemo(() => {
     const result: { date: Date; dayOfWeek: number }[][] = [];
     let currentWeek: { date: Date; dayOfWeek: number }[] = [];
     
-    // Start from the Sunday of the week containing startDate
     let current = startOfWeek(startDate, { weekStartsOn: 0 });
     const end = endOfWeek(endDate, { weekStartsOn: 0 });
     
@@ -76,9 +76,9 @@ export function HeatmapCalendar({
     return result;
   }, [startDate, endDate]);
 
-  // Get month labels positions
+  // Get month labels
   const monthLabels = useMemo(() => {
-    const labels: { month: number; weekIndex: number }[] = [];
+    const labels: { month: string; weekIndex: number }[] = [];
     let lastMonth = -1;
     
     weeks.forEach((week, weekIndex) => {
@@ -86,7 +86,7 @@ export function HeatmapCalendar({
       if (firstDay) {
         const month = firstDay.getMonth();
         if (month !== lastMonth) {
-          labels.push({ month, weekIndex });
+          labels.push({ month: MONTHS[month], weekIndex });
           lastMonth = month;
         }
       }
@@ -96,42 +96,54 @@ export function HeatmapCalendar({
   }, [weeks]);
 
   return (
-    <div className={`${className}`}>
+    <div className={`w-full ${className}`}>
       {/* Month labels */}
-      <div className="flex mb-2 ml-8">
-        {monthLabels.map(({ month, weekIndex }, i) => (
-          <div
-            key={`${month}-${i}`}
-            className="text-xs"
-            style={{ 
-              color: "var(--color-text-muted)",
-              marginLeft: i === 0 ? `${weekIndex * 12}px` : `${(weekIndex - monthLabels[i-1].weekIndex - 1) * 12}px`,
-              width: "40px"
-            }}
-          >
-            {MONTHS[month]}
-          </div>
-        ))}
+      <div 
+        className="flex mb-1 text-xs relative" 
+        style={{ color: "var(--color-text-muted)", paddingLeft: "28px" }}
+      >
+        {monthLabels.map((label, i) => {
+          const nextLabel = monthLabels[i + 1];
+          const width = nextLabel 
+            ? `${(nextLabel.weekIndex - label.weekIndex) * 12}px`
+            : "auto";
+            
+          return (
+            <span
+              key={`${label.month}-${i}`}
+              className="flex-shrink-0"
+              style={{ width, minWidth: "30px" }}
+            >
+              {label.month}
+            </span>
+          );
+        })}
       </div>
       
-      <div className="flex">
+      <div className="flex w-full">
         {/* Weekday labels */}
-        <div className="flex flex-col gap-0.5 mr-1">
+        <div 
+          className="flex flex-col justify-between flex-shrink-0 pr-1" 
+          style={{ width: "26px" }}
+        >
           {WEEKDAYS.map((day, i) => (
             <div 
-              key={day} 
-              className="h-2.5 text-[10px] flex items-center"
-              style={{ color: "var(--color-text-muted)", visibility: i % 2 === 0 ? "hidden" : "visible" }}
+              key={i} 
+              className="text-[10px] text-right leading-none"
+              style={{ 
+                color: "var(--color-text-muted)", 
+                height: "10px",
+              }}
             >
               {day}
             </div>
           ))}
         </div>
         
-        {/* Grid */}
-        <div className="flex gap-0.5">
+        {/* Grid - fill remaining width */}
+        <div className="flex-1 flex gap-[2px] overflow-x-auto">
           {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="flex flex-col gap-0.5">
+            <div key={weekIndex} className="flex flex-col gap-[2px] flex-shrink-0">
               {week.map((day, dayIndex) => {
                 const dateStr = format(day.date, "yyyy-MM-dd");
                 const count = dataMap.get(dateStr) || 0;
@@ -142,9 +154,11 @@ export function HeatmapCalendar({
                     key={`${weekIndex}-${dayIndex}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: weekIndex * 0.01 }}
-                    className="w-2.5 h-2.5 rounded-sm cursor-pointer hover:ring-1 hover:ring-offset-1"
+                    transition={{ delay: weekIndex * 0.003, duration: 0.1 }}
+                    className="rounded-[2px] cursor-pointer hover:ring-1 hover:ring-offset-1 flex-shrink-0"
                     style={{
+                      width: "10px",
+                      height: "10px",
                       backgroundColor: bgColor,
                     }}
                     onClick={() => onCellClick?.(dateStr)}
@@ -158,14 +172,22 @@ export function HeatmapCalendar({
       </div>
       
       {/* Legend */}
-      <div className="flex items-center gap-1 mt-3 ml-8">
-        <span className="text-xs mr-2" style={{ color: "var(--color-text-muted)" }}>少</span>
-        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "var(--color-bg-hover)" }}></div>
-        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: `color-mix(in srgb, ${color} 20%, transparent)` }}></div>
-        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: `color-mix(in srgb, ${color} 40%, transparent)` }}></div>
-        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: `color-mix(in srgb, ${color} 70%, transparent)` }}></div>
-        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: color }}></div>
-        <span className="text-xs ml-2" style={{ color: "var(--color-text-muted)" }}>多</span>
+      <div className="flex items-center gap-[3px] mt-2 text-xs" style={{ marginLeft: "28px" }}>
+        <span style={{ color: "var(--color-text-muted)" }}>少</span>
+        {[0, 0.15, 0.35, 0.6, 1].map((opacity, i) => (
+          <div 
+            key={i}
+            className="rounded-[2px] flex-shrink-0"
+            style={{ 
+              width: "10px", 
+              height: "10px", 
+              backgroundColor: opacity === 0 
+                ? "var(--color-border)" 
+                : `color-mix(in srgb, ${color} ${opacity * 100}%, transparent)` 
+            }} 
+          />
+        ))}
+        <span style={{ color: "var(--color-text-muted)" }}>多</span>
       </div>
     </div>
   );
