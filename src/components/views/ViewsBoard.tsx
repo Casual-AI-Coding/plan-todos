@@ -83,22 +83,16 @@ export function ViewsBoard({
   return (
     <div className="grid grid-cols-3 gap-4">
       {columns.map((col) => (
-        <div key={col.id} className="bg-gray-100 rounded-lg p-4">
-          <h3
-            className="font-semibold mb-4 flex items-center gap-2"
-            style={{
-              color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}`,
-            }}
-          >
-            <span
-              className={`w-3 h-3 rounded-full bg-${col.color}-500`}
-            ></span>
+        <div key={col.id} className="rounded-lg p-4 flex flex-col" style={{ backgroundColor: "var(--color-bg-hover)", maxHeight: "60vh" }}>
+          <h3 className="font-semibold mb-4 flex items-center gap-2 flex-shrink-0" style={{ color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}` }}>
+            <span className={`w-3 h-3 rounded-full bg-${col.color}-500`}></span>
             {col.label}
-            <span className="ml-auto text-sm text-gray-500">
+            <span className="ml-auto text-sm" style={{ color: "var(--color-text-muted)" }}>
               {getItemsByStatus(col.id).length}
             </span>
           </h3>
-          <div className="space-y-1.5 max-h-[60vh] overflow-y-auto pr-1">
+          <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 pr-1">
+
             {getItemsByStatus(col.id).map((item, idx) => (
               <div key={`${item.type}-${idx}`}>
                 <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">

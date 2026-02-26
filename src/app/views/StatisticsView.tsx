@@ -4,6 +4,7 @@ import { Card, ProgressBar } from "@/components/ui";
 import { TrendChart, HeatmapCalendar } from "@/components/ui/charts";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useMemo } from "react";
+import { format, subDays } from "date-fns";
 
 export function StatisticsView() {
   const { data, isLoading, error } = useStatistics();
@@ -16,28 +17,100 @@ export function StatisticsView() {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   }, [data]);
 
+  // Replace the weeklyTrendData useMemo:
   const weeklyTrendData = useMemo(() => {
-    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    return days.map((day) => ({
-      date: day,
-      value: Math.round((completionRate || 50) * (0.5 + Math.random() * 0.5)),
-    }));
-  }, [completionRate]);
-
-  const heatmapData = useMemo(() => {
-    if (!data?.circulations || data.circulations.length === 0) return [];
+    if (!data?.todos) return [];
     
-    const result = [];
+    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
     const today = new Date();
+    const dayOfWeek = today.getDay();
+    
+    // Get counts for each day of the current week
+    return days.map((day, i) => {
+      const dayDate = new Date(today);
+      dayDate.setDate(today.getDate() - dayOfWeek + i + (i < dayOfWeek ? 0 : -7) + 1);
+      const dateStr = format(dayDate, "yyyy-MM-dd");
+      
+      // Count todos due or completed on this day
+      const dueCount = data.todos.filter(t => t.due_date === dateStr).length;
+      const completedCount = data.todos.filter(t => 
+        t.status === "done" && t.due_date === dateStr
+      ).length;
+      
+      return {
+        date: day,
+        value: completedCount + Math.round(dueCount * 0.3), // Weight: completed + 30% of due
+      };
+    });
+  }, [data]);
+
+  // Replace the heatmapData useMemo:
+  const heatmapData = useMemo(() => {
+    if (!data?.todos || !data?.circulations) return [];
+    
+    const result: { date: string; count: number }[] = [];
+    const today = new Date();
+    
+    // Build a map of activity by date
+    const activityMap = new Map<string, number>();
+    
+    // Add todo due dates
+    data.todos.forEach(todo => {
+      if (todo.due_date) {
+        const count = activityMap.get(todo.due_date) || 0;
+        activityMap.set(todo.due_date, count + 1);
+      }
+    });
+    
+    // Add todo completions (approximate by updated_at for done todos)
+    data.todos.forEach(todo => {
+      if (todo.status === "done" && todo.updated_at) {
+        const date = todo.updated_at.split('T')[0];
+        const count = activityMap.get(date) || 0;
+        activityMap.set(date, count + 1);
+      }
+    });
+    
+    // Add circulation logs if available
+    data.circulations.forEach(circ => {
+      // Use streak_count as a proxy for activity
+      for (let i = 0; i < Math.min(circ.streak_count, 30); i++) {
+        const date = subDays(today, i);
+        const dateStr = format(date, "yyyy-MM-dd");
+        const count = activityMap.get(dateStr) || 0;
+        activityMap.set(dateStr, count + 1);
+      }
+    });
+    
+    // Generate 180 days of data
     for (let i = 180; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      const count = Math.random() > 0.3 ? Math.floor(Math.random() * 5) : 0;
-      result.push({ date: dateStr, count });
+      const date = subDays(new Date(), i);
+      const dateStr = format(date, "yyyy-MM-dd");
+      result.push({
+        date: dateStr,
+        count: activityMap.get(dateStr) || 0,
+      });
     }
+    
     return result;
   }, [data]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   if (error) {
     return (
