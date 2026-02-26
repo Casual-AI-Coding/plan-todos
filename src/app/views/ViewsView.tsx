@@ -560,24 +560,29 @@ export function ViewsView() {
     return (
       <div className="relative">
         {renderTooltip()}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4" style={{ maxHeight: "calc(100vh - 350px)" }}>
           {columns.map((col) => (
-            <div key={col.id} className="bg-gray-100 rounded-lg p-4">
+            <div
+              key={col.id}
+              className="rounded-lg p-4 flex flex-col"
+              style={{
+                backgroundColor: "var(--color-bg-hover)",
+                maxHeight: "100%",
+              }}
+            >
               <h3
-                className="font-semibold mb-4 flex items-center gap-2"
+                className="font-semibold mb-4 flex items-center gap-2 flex-shrink-0"
                 style={{
                   color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}`,
                 }}
               >
-                <span
-                  className={`w-3 h-3 rounded-full bg-${col.color}-500`}
-                ></span>
+                <span className={`w-3 h-3 rounded-full bg-${col.color}-500`}></span>
                 {col.label}
-                <span className="ml-auto text-sm text-gray-500">
+                <span className="ml-auto text-sm" style={{ color: "var(--color-text-muted)" }}>
                   {getItemsByStatus(col.id).length}
                 </span>
               </h3>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 pr-1">
                 {getItemsByStatus(col.id).map((item, idx) => (
                   <div
                     key={`${item.type}-${idx}`}
@@ -622,7 +627,7 @@ export function ViewsView() {
                   </div>
                 ))}
                 {getItemsByStatus(col.id).length === 0 && (
-                  <p className="text-gray-400 text-sm text-center py-4">无</p>
+                  <p className="text-center py-4" style={{ color: "var(--color-text-muted)" }}>无</p>
                 )}
               </div>
             </div>
@@ -630,6 +635,7 @@ export function ViewsView() {
         </div>
       </div>
     );
+
   };
 
   // ========== CALENDAR VIEW ==========
