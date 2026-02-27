@@ -37,9 +37,15 @@
   --shadow-lg: 0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06);
   --shadow-xl: 0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08);
   --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1);
-  /* Glass effects */
   --glass-border-glow: inset 0 1px 0 rgba(255,255,255,0.5);
   --glass-inner-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  
+  /* Animation timing */
+  --animation-easing-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --animation-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-duration-fast: 150ms;
+  --animation-duration-normal: 250ms;
+  --animation-duration-slow: 400ms;
 }
 
 /* Dark Theme - with transparency */
