@@ -83,7 +83,7 @@ export function ViewsBoard({
   return (
     <div className="grid grid-cols-3 gap-4">
       {columns.map((col) => (
-        <div key={col.id} className="rounded-lg p-4 flex flex-col" style={{ backgroundColor: "var(--color-bg-hover)", maxHeight: "60vh" }}>
+        <div key={col.id} className="rounded-lg p-4 flex flex-col h-[60vh]" style={{ backgroundColor: "var(--color-bg-hover)" }}>
           <h3 className="font-semibold mb-4 flex items-center gap-2 flex-shrink-0" style={{ color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}` }}>
             <span className={`w-3 h-3 rounded-full bg-${col.color}-500`}></span>
             {col.label}
@@ -91,7 +91,7 @@ export function ViewsBoard({
               {getItemsByStatus(col.id).length}
             </span>
           </h3>
-          <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 pr-1">
+          <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 scroll-smooth scrollbar-hide-column">
 
             {getItemsByStatus(col.id).map((item, idx) => (
               <div key={`${item.type}-${idx}`}>
@@ -136,7 +136,18 @@ export function ViewsBoard({
               <p className="text-gray-400 text-sm text-center py-4">无</p>
             )}
           </div>
+          <style jsx global>{`
+            .scrollbar-hide-column::-webkit-scrollbar {
+              display: none;
+            }
+            .scrollbar-hide-column {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+              scroll-behavior: smooth;
+            }
+          `}</style>
         </div>
+
       ))}
     </div>
   );

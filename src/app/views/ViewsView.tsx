@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Card, ProgressBar } from "@/components/ui";
 import { useTodos } from "@/hooks/useTodos";
 import { usePlans } from "@/hooks/usePlans";
@@ -42,12 +42,41 @@ export function ViewsView() {
   // Gantt timeline zoom state (number of months)
   const [ganttZoom, setGanttZoom] = useState(3);
 
+  // Scroll indicator state for board view
+  const scrollContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [scrollIndicators, setScrollIndicators] = useState<Record<string, boolean>>({});
+
+  const handleScroll = (columnId: string, e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 10;
+    setScrollIndicators(prev => ({ ...prev, [columnId]: !isAtBottom }));
+  };
+
+  const checkScrollNeeded = (columnId: string) => {
+    const container = scrollContainerRefs.current[columnId];
+    if (container) {
+      const needsScroll = container.scrollHeight > container.clientHeight + 10;
+      setScrollIndicators(prev => ({ ...prev, [columnId]: needsScroll }));
+    }
+  };
+
   // React Query for data fetching
   const { data: todos = [] } = useTodos();
   const { data: plans = [] } = usePlans();
   const { data: targets = [] } = useTargets();
   const { data: milestones = [] } = useMilestones();
   const { data: allTasks = [] } = useTasks();
+
+  // Check scroll on mount and when data changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      ['pending', 'in-progress', 'done'].forEach(checkScrollNeeded);
+    }, 100);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todos, allTasks, plans, targets, milestones, filters]);
+
+  // Group tasks by plan ID using useMemo
 
   // Group tasks by plan ID using useMemo
   const tasksByPlan = useMemo(() => {
@@ -564,10 +593,9 @@ export function ViewsView() {
           {columns.map((col) => (
             <div
               key={col.id}
-              className="rounded-lg p-4 flex flex-col overflow-hidden"
+              className="rounded-lg p-4 flex flex-col overflow-hidden h-[65vh] relative"
               style={{
                 backgroundColor: "var(--color-bg-hover)",
-                height: "100%",
               }}
             >
               <h3
@@ -582,60 +610,98 @@ export function ViewsView() {
                   {getItemsByStatus(col.id).length}
                 </span>
               </h3>
-              <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 pr-1">
-                {getItemsByStatus(col.id).map((item, idx) => (
-                  <div
-                    key={`${item.type}-${idx}`}
-                    onMouseEnter={(e) => handleMouseEnter(e, item)}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <span
-                          className={`text-[10px] px-1 py-0.5 rounded ${
-                            item.type === "todo"
-                              ? "bg-blue-100 text-blue-700"
-                              : item.type === "task"
-                                ? "bg-teal-100 text-teal-700"
-                                : item.type === "plan"
-                                  ? "bg-purple-100 text-purple-700"
-                                  : item.type === "target"
-                                    ? "bg-orange-100 text-orange-700"
-                                    : "bg-gray-100 text-gray-700"
-                          }`}
-                        >
-                          {item.type}
-                        </span>
-                      </div>
-                      <div className="font-medium text-xs">
-                        {"title" in item.data ? item.data.title : ""}
-                      </div>
-                      {"progress" in item.data && (
-                        <div className="mt-1.5">
-                          <ProgressBar
-                            value={item.data.progress}
-                            color={
-                              col.color === "green"
-                                ? "teal"
-                                : (col.color as "gray" | "orange" | "teal")
-                            }
-                            size="sm"
-                          />
+              <div className="relative flex-1 min-h-0">
+                <div
+                  ref={(el) => { scrollContainerRefs.current[col.id] = el; }}
+                  className="space-y-1.5 overflow-y-auto h-full scroll-smooth scrollbar-hide-board"
+                  onScroll={(e) => handleScroll(col.id, e)}
+                >
+                  {getItemsByStatus(col.id).map((item, idx) => (
+                    <div
+                      key={`${item.type}-${idx}`}
+                      onMouseEnter={(e) => handleMouseEnter(e, item)}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span
+                            className={`text-[10px] px-1 py-0.5 rounded ${
+                              item.type === "todo"
+                                ? "bg-blue-100 text-blue-700"
+                                : item.type === "task"
+                                  ? "bg-teal-100 text-teal-700"
+                                  : item.type === "plan"
+                                    ? "bg-purple-100 text-purple-700"
+                                    : item.type === "target"
+                                      ? "bg-orange-100 text-orange-700"
+                                      : "bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            {item.type}
+                          </span>
                         </div>
-                      )}
-                    </Card>
+                        <div className="font-medium text-xs">
+                          {"title" in item.data ? item.data.title : ""}
+                        </div>
+                        {"progress" in item.data && (
+                          <div className="mt-1.5">
+                            <ProgressBar
+                              value={item.data.progress}
+                              color={
+                                col.color === "green"
+                                  ? "teal"
+                                  : (col.color as "gray" | "orange" | "teal")
+                              }
+                              size="sm"
+                            />
+                          </div>
+                        )}
+                      </Card>
+                    </div>
+                  ))}
+                  {getItemsByStatus(col.id).length === 0 && (
+                    <p className="text-center py-4" style={{ color: "var(--color-text-muted)" }}>无</p>
+                  )}
+                </div>
+                {/* Scroll indicator */}
+                {scrollIndicators[col.id] && (
+                  <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none scroll-indicator-fade">
+                    <div className="flex flex-col items-center justify-end h-full pb-2">
+                      <div className="scroll-bounce-arrow">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                      </div>
+                      <span className="text-xs text-gray-400 mt-1 animate-pulse">向下滑动</span>
+                    </div>
                   </div>
-                ))}
-                {getItemsByStatus(col.id).length === 0 && (
-                  <p className="text-center py-4" style={{ color: "var(--color-text-muted)" }}>无</p>
                 )}
               </div>
             </div>
           ))}
         </div>
+        <style jsx global>{`
+          .scrollbar-hide-board::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide-board {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+          }
+          .scroll-indicator-fade {
+            background: linear-gradient(to top, var(--color-bg-hover) 0%, transparent 100%);
+          }
+          @keyframes bounce-arrow {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(4px); opacity: 1; }
+          }
+          .scroll-bounce-arrow {
+            animation: bounce-arrow 1.5s ease-in-out infinite;
+          }
+        `}</style>
       </div>
     );
-
   };
 
   // ========== CALENDAR VIEW ==========
