@@ -60,6 +60,7 @@ interface SortableCardProps {
   onCheckin: () => void;
   onUndo: () => void;
   onViewDetail: () => void;
+  index?: number;
 }
 
 function SortableCard({
@@ -69,7 +70,16 @@ function SortableCard({
   onCheckin,
   onUndo,
   onViewDetail,
+  index,
 }: SortableCardProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const delay = 30 + (index || 0) * 60;
+    const timer = setTimeout(() => setIsVisible(true), delay);
+    return () => clearTimeout(timer);
+  }, [index]);
+
   const {
     attributes,
     listeners,
@@ -88,11 +98,23 @@ function SortableCard({
 
   const isPeriodic = circulation.circulation_type === "periodic";
 
+  // Spring-like animation easing
+  const springEasing = isVisible
+    ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    : "cubic-bezier(0.22, 1, 0.36, 1)";
+
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className="col-span-1"
+      style={{
+        ...style,
+        transition: `all 500ms ${springEasing}`,
+      }}
+      className={`col-span-1 ${
+        isVisible
+          ? "opacity-100 translate-y-0 scale-100"
+          : "opacity-0 translate-y-8 scale-90"
+      }`}
       {...attributes}
       {...listeners}
     >
@@ -648,7 +670,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
                 (todayCirculationsOrdered.length > 0
                   ? todayCirculationsOrdered
                   : todayCirculations
-                ).map((c) => {
+                ).map((c, idx) => {
                   return (
                     <SortableCard
                       key={c.id}
@@ -658,6 +680,7 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
                       onCheckin={() => setCheckinTarget(c)}
                       onUndo={() => handleUndo(c)}
                       onViewDetail={() => setDetailCirculation(c)}
+                      index={idx}
                     />
                   );
                 })
