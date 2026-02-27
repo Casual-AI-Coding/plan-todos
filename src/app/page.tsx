@@ -153,11 +153,13 @@ export default function Home() {
       </div>
 
       {/* Mobile: with hamburger menu */}
-      <div className="md:hidden flex flex-col h-screen">
+      <div className="md:hidden flex flex-col h-full">
         {/* Mobile Header with hamburger */}
         <header
-          className="flex items-center h-12 px-4 border-b pt-[env(safe-area-inset-top)] fixed top-0 left-0 right-0 z-50"
+          className="flex items-center px-4 border-b fixed top-0 left-0 right-0 z-40"
           style={{
+            height: "calc(3.5rem + env(safe-area-inset-top))",
+            paddingTop: "env(safe-area-inset-top)",
             backgroundColor: "var(--color-bg-card)",
             borderColor: "var(--color-border)",
           }}
@@ -184,11 +186,11 @@ export default function Home() {
 
         {/* Main Content */}
         <main
-          className="flex-1 overflow-auto pb-14"
+          className="flex-1 overflow-auto"
           style={{
             backgroundColor: "var(--color-bg)",
+            paddingTop: "calc(3.5rem + env(safe-area-inset-top))",
             paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom))",
-            marginTop: "calc(3rem + env(safe-area-inset-top))",
           }}
         >
           {renderContent()}
@@ -199,12 +201,12 @@ export default function Home() {
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 z-40 bg-black/50"
+              className="fixed inset-0 z-50 bg-black/50"
               onClick={() => setMobileSidebarOpen(false)}
             />
             {/* Sidebar Panel */}
             <div
-              className="fixed left-0 top-0 h-full z-50 w-64 pt-12"
+              className="fixed left-0 top-0 h-full z-50 w-64"
               style={{
                 backgroundColor: "var(--color-bg-card)",
                 transform: "translateX(0)",
@@ -212,7 +214,13 @@ export default function Home() {
               }}
             >
               {/* Mobile sidebar header with close button */}
-              <div className="flex items-center justify-between px-4 h-12 border-b">
+              <div 
+                className="flex items-center justify-between px-4 border-b"
+                style={{
+                  height: "calc(3.5rem + env(safe-area-inset-top))",
+                  paddingTop: "env(safe-area-inset-top)",
+                }}
+              >
                 <span
                   className="font-semibold"
                   style={{ color: "var(--color-text)" }}

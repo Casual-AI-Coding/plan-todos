@@ -16,7 +16,7 @@ const navItems = [
 export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 md:hidden z-50 border-t pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 left-0 right-0 md:hidden z-40 border-t pb-[env(safe-area-inset-bottom)]"
       style={{
         backgroundColor: "var(--color-bg-card)",
         borderColor: "var(--color-border)",
@@ -32,7 +32,7 @@ export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
             <button
               key={item.id}
               onClick={() => onMenuChange(item.id)}
-              className="flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors"
+              className="flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors cursor-pointer"
               style={{
                 color: isActive
                   ? "var(--color-primary)"

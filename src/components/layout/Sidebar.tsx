@@ -178,7 +178,7 @@ export function Sidebar({
               onMenuChange(child.id);
               setHoveredMenu(null);
             }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:opacity-80"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:opacity-80 cursor-pointer"
             style={{
               backgroundColor:
                 activeMenu === child.id
@@ -307,41 +307,43 @@ export function Sidebar({
 
   return (
     <aside
-      className={`border-r flex flex-col h-screen transition-all duration-300`}
+      className={`${isMobile ? "" : "border-r"} flex flex-col h-full transition-all duration-300`}
       style={{
-        width: isCollapsed ? "4rem" : "13rem",
+        width: isMobile ? "100%" : isCollapsed ? "4rem" : "13rem",
         backgroundColor: "var(--color-bg-card)",
         borderColor: "var(--color-border)",
       }}
     >
-      {/* Header with Logo and Toggle */}
-      <div
-        className="p-4 border-b flex items-center justify-between"
-        style={{ borderColor: "var(--color-border)" }}
-      >
-        {!isCollapsed && (
-          <h1
-            className="text-xl font-bold"
-            style={{
-              color: "var(--color-text)",
-              fontFamily: "var(--font-mono)",
-            }}
-          >
-            Plan Todos
-          </h1>
-        )}
-        <button
-          onClick={toggleCollapse}
-          className="p-1 rounded hover:opacity-80 transition-opacity"
-          style={{ color: "var(--color-text-muted)" }}
-          title={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
+      {/* Header with Logo and Toggle - hidden in mobile mode */}
+      {!isMobile && (
+        <div
+          className="p-4 border-b flex items-center justify-between"
+          style={{ borderColor: "var(--color-border)" }}
         >
-          {isCollapsed ? "→" : "←"}
-        </button>
-      </div>
+          {!isCollapsed && (
+            <h1
+              className="text-xl font-bold"
+              style={{
+                color: "var(--color-text)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              Plan Todos
+            </h1>
+          )}
+          <button
+            onClick={toggleCollapse}
+            className="p-1 rounded hover:opacity-80 transition-opacity cursor-pointer"
+            style={{ color: "var(--color-text-muted)" }}
+            title={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
+          >
+            {isCollapsed ? "→" : "←"}
+          </button>
+        </div>
+      )}
 
-      {/* Search Bar */}
-      {!isCollapsed && (
+      {/* Search Bar - hidden in mobile mode */}
+      {!isMobile && !isCollapsed && (
         <div className="px-2 pb-2">
           <SearchBar
             onResultClick={(entityType, id) => {
