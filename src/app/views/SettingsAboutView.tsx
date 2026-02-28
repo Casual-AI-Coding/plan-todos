@@ -89,7 +89,6 @@ export function SettingsAboutView() {
         <h3 className="font-medium mb-3" style={{ color: "var(--color-text)" }}>
           其他
         </h3>
-
       </Card>
     </div>
   );

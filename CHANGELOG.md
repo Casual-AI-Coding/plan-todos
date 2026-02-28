@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.6] - 2026-03-01
+
+### Fixed
+
+**Mobile UI Fixes**:
+
+- Dashboard bottom content blocked by navigation bar (paddingBottom 4rem)
+- Sidebar background transparency issue (z-index z-[60])
+- Dark theme text unreadable in theme selector (white text)
+- Statistics heatmap cutoff and overlap (horizontal scroll + padding)
+- Dashboard card layout optimization (2 columns on mobile)
+- Chinese/English terminology unification (计划/目标)
+- TypeScript icon fix (📘)
+- About page navigation logic (back button)
+- Button text too long (+ 新建 Plan → + 新建)
+- Filter bar spacing optimization (mb-4 → mb-2)
+- Check update button styling
+- Tech stack cards centered vertically and horizontally
+
+**Test Enhancement**:
+
+- Added Button component variant/size tests
+- Added HoverCard style/event tests
+- Added RippleEffect click effect tests
+
+### Added
+
+**Documentation**:
+
+- Mobile UI fix design document
+- Task progress checklist
+- Backend test architecture redesign plan (v1.0)
+
+---
+
 ## [0.5.5] - 2026-02-28
 
 ### Added

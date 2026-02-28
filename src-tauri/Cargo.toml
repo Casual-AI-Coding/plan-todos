@@ -1,6 +1,6 @@
 [package]
 name = "plan-todos"
-version = "0.5.5"
+version = "0.5.6"
 description = "A todo + plan management application"
 authors = [""]
 edition = "2021"

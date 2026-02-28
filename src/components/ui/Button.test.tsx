@@ -44,7 +44,7 @@ describe("Button", () => {
 
   it("renders icon when provided", () => {
     render(
-      <Button icon={<span data-testid="icon">🎯</span>}>With Icon</Button>
+      <Button icon={<span data-testid="icon">🎯</span>}>With Icon</Button>,
     );
     expect(screen.getByTestId("icon")).toBeInTheDocument();
   });
@@ -79,7 +79,7 @@ describe("Button", () => {
     render(
       <Button disabled onClick={handleClick}>
         Disabled Click
-      </Button>
+      </Button>,
     );
     fireEvent.click(screen.getByRole("button"));
     expect(handleClick).not.toHaveBeenCalled();
@@ -90,7 +90,7 @@ describe("Button", () => {
     render(
       <Button loading onClick={handleClick}>
         Loading Click
-      </Button>
+      </Button>,
     );
     fireEvent.click(screen.getByRole("button"));
     expect(handleClick).not.toHaveBeenCalled();
@@ -106,7 +106,7 @@ describe("Button", () => {
     render(
       <Button disabled loading onClick={handleClick}>
         Both
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("disabled");

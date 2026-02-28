@@ -7,7 +7,7 @@ describe("HoverCard", () => {
     render(
       <HoverCard>
         <div>Card Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(screen.getByText("Card Content")).toBeInTheDocument();
   });
@@ -16,7 +16,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard className="custom-class">
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toHaveClass("custom-class");
   });
@@ -25,7 +25,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toHaveClass("rounded-lg", "border");
   });
@@ -34,7 +34,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard style={{ padding: "20px" }}>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     const element = container.firstChild as HTMLElement;
     expect(element.style.padding).toBe("20px");
@@ -45,7 +45,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard onClick={handleClick}>
         <div>Clickable Card</div>
-      </HoverCard>
+      </HoverCard>,
     );
     fireEvent.click(container.firstChild as HTMLElement);
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -55,7 +55,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard onClick={() => {}}>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toHaveStyle({ cursor: "pointer" });
   });
@@ -64,7 +64,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toHaveStyle({ cursor: "default" });
   });
@@ -73,7 +73,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard glowOnHover>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard hoverElevation={10}>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toBeInTheDocument();
   });
