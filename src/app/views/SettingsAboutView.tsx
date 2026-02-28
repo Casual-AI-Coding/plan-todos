@@ -64,10 +64,10 @@ export function SettingsAboutView() {
             {techStack.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
+                className="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-lg"
               >
                 <span className="text-lg">{item.icon}</span>
-                <div className="min-w-0">
+                <div className="min-w-0 text-center">
                   <div className="font-medium text-sm truncate">
                     {item.name}
                   </div>
