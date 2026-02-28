@@ -264,7 +264,6 @@ export function ThemeSelector() {
                 {t.icon}
               </div>
 
-
               <span
                 className="text-xs font-medium"
                 style={{
@@ -276,8 +275,6 @@ export function ThemeSelector() {
                 }}
               >
                 {t.name}
-
-
               </span>
             </button>
           );

@@ -120,7 +120,10 @@ export function StatisticsView() {
 
   if (error) {
     return (
-      <div className="p-6" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
+      <div
+        className="p-6"
+        style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}
+      >
         <h2
           className="text-2xl font-semibold mb-6"
           style={{ color: "var(--color-text)" }}
@@ -134,7 +137,10 @@ export function StatisticsView() {
 
   if (isLoading || !data) {
     return (
-      <div className="p-6" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
+      <div
+        className="p-6"
+        style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}
+      >
         <h2
           className="text-2xl font-semibold mb-6"
           style={{ color: "var(--color-text)" }}
@@ -172,7 +178,10 @@ export function StatisticsView() {
   };
 
   return (
-    <div className="p-6" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
+    <div
+      className="p-6"
+      style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}
+    >
       <h2
         className="text-2xl font-semibold mb-6"
         style={{ color: "var(--color-text)" }}

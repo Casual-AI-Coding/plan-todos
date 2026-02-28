@@ -204,7 +204,7 @@ export function PlansView() {
         >
           计划
         </h2>
-          + 新建计划
+        + 新建计划
       </div>
 
       {/* Tag filter */}
