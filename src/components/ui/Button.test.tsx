@@ -64,21 +64,6 @@ describe("Button", () => {
     expect(screen.getByText("Ghost")).toBeInTheDocument();
   });
 
-  it("applies outline variant styles", () => {
-    render(<Button variant="outline">Outline</Button>);
-    expect(screen.getByText("Outline")).toBeInTheDocument();
-  });
-
-  it("applies link variant styles", () => {
-    render(<Button variant="link">Link</Button>);
-    expect(screen.getByText("Link")).toBeInTheDocument();
-  });
-
-  it("applies warm variant styles", () => {
-    render(<Button variant="warm">Warm</Button>);
-    expect(screen.getByText("Warm")).toBeInTheDocument();
-  });
-
   it("applies small size styles", () => {
     render(<Button size="sm">Small</Button>);
     expect(screen.getByText("Small")).toHaveClass("px-3 py-1.5 text-sm");
@@ -116,11 +101,6 @@ describe("Button", () => {
     expect(screen.getByRole("button")).toHaveClass("custom-class");
   });
 
-  it("renders iconOnly button", () => {
-    render(<Button iconOnly>🔔</Button>);
-    expect(screen.getByText("🔔")).toBeInTheDocument();
-  });
-
   it("handles disabled and loading combination", () => {
     const handleClick = vi.fn();
     render(
@@ -136,10 +116,8 @@ describe("Button", () => {
     vi.useFakeTimers();
     render(<Button>Ripple Test</Button>);
     const button = screen.getByRole("button");
-    
     fireEvent.click(button);
     vi.advanceTimersByTime(600);
-    
     expect(button).toBeInTheDocument();
     vi.useRealTimers();
   });

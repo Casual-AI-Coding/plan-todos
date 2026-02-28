@@ -7,15 +7,6 @@ import { useGlassSettings } from "@/hooks/useGlassSettings";
 import { Modal, Button } from "@/components/ui";
 
 // Custom theme order: System -> Light -> Dark -> Glass -> Dracula -> Nord -> Monokai -> Spring -> Catppuccin -> Tokyo Night -> One Dark
-const darkThemes: ThemeId[] = [
-  "dracula",
-  "nord",
-  "monokai",
-  "catppuccin",
-  "tokyoNight",
-  "oneDark",
-];
-
 const themeOrder: ThemeId[] = [
   "system",
   "light",
@@ -234,7 +225,6 @@ export function ThemeSelector() {
       <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
         {orderedThemes.map((t) => {
           const isActive = theme === t.id;
-          const isDarkTheme = darkThemes.includes(t.id);
 
           return (
             <button
@@ -263,15 +253,12 @@ export function ThemeSelector() {
               >
                 {t.icon}
               </div>
-
               <span
                 className="text-xs font-medium"
                 style={{
                   color: isActive
                     ? "var(--color-primary)"
-                    : isDarkTheme
-                      ? "#FFFFFF"
-                      : "var(--color-text)",
+                    : "var(--color-text)",
                 }}
               >
                 {t.name}

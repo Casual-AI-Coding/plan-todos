@@ -13,7 +13,7 @@ export function SettingsAboutView() {
     { icon: "⚡", name: "Tauri", desc: "Rust 桌面框架" },
     { icon: "⚛️", name: "Next.js", desc: "React 前端" },
     { icon: "🗄️", name: "SQLite", desc: "本地数据库" },
-    { icon: "📘", name: "TypeScript", desc: "类型安全" },
+    { icon: "🎨", name: "TypeScript", desc: "类型安全" },
   ];
 
   return (

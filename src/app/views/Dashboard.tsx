@@ -93,7 +93,7 @@ export function Dashboard() {
 
       {/* Entity Counts - Responsive: 3 col mobile, 5 col tablet, 7 col desktop */}
       <StaggeredList
-        className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-7 gap-2"
+        className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2"
         staggerDelay={50}
       >
         <StaggeredListItem>
