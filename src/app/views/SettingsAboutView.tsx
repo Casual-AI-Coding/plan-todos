@@ -11,9 +11,15 @@ export function SettingsAboutView() {
 
   const techStack = [
     { icon: "⚡", name: "Tauri", desc: "Rust 桌面框架" },
-    { icon: "⚛️", name: "Next.js", desc: "React 前端" },
+    { icon: "⚛️", name: "Next.js", desc: "React 全栈框架" },
     { icon: "🗄️", name: "SQLite", desc: "本地数据库" },
-    { icon: "🎨", name: "TypeScript", desc: "类型安全" },
+    { icon: "📘", name: "TypeScript", desc: "类型安全" },
+    { icon: "🗂️", name: "Zustand", desc: "状态管理" },
+    { icon: "🎯", name: "dnd-kit", desc: "拖拽交互" },
+    { icon: "✨", name: "Framer Motion", desc: "动画效果" },
+    { icon: "🔄", name: "TanStack Query", desc: "数据获取" },
+    { icon: "🕐", name: "date-fns", desc: "日期处理" },
+    { icon: "🎨", name: "Tailwind CSS", desc: "样式框架" },
   ];
 
   return (
