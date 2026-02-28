@@ -120,7 +120,7 @@ export function StatisticsView() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-6" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
         <h2
           className="text-2xl font-semibold mb-6"
           style={{ color: "var(--color-text)" }}
@@ -134,7 +134,7 @@ export function StatisticsView() {
 
   if (isLoading || !data) {
     return (
-      <div className="p-6">
+      <div className="p-6" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
         <h2
           className="text-2xl font-semibold mb-6"
           style={{ color: "var(--color-text)" }}
@@ -172,7 +172,7 @@ export function StatisticsView() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
       <h2
         className="text-2xl font-semibold mb-6"
         style={{ color: "var(--color-text)" }}
@@ -181,7 +181,7 @@ export function StatisticsView() {
       </h2>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card className="text-center">
           <div className="text-3xl font-bold text-teal-600">
             {stats.totalTodos}
@@ -257,6 +257,20 @@ export function StatisticsView() {
       </div>
 
       {/* Activity Heatmap - Last 6 Months */}
+      <Card className="mb-6">
+        <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+          活动热力图 (近6个月)
+        </h3>
+        <div className="overflow-x-auto pb-4">
+          <div className="min-w-[600px]">
+            <HeatmapCalendar
+              data={heatmapData}
+              months={6}
+              color="var(--color-primary)"
+            />
+          </div>
+        </div>
+      </Card>
       <Card className="mb-6">
         <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
           活动热力图 (近6个月)

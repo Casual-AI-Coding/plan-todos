@@ -299,7 +299,7 @@ export function TargetsView() {
             className="text-2xl font-semibold"
             style={{ color: "var(--color-text)" }}
           >
-            GOALS
+            目标
           </h2>
         </div>
         <div className="text-center py-12 text-gray-500">Loading...</div>
@@ -321,7 +321,7 @@ export function TargetsView() {
           className="text-2xl font-semibold"
           style={{ color: "var(--color-text)" }}
         >
-          GOALS
+          目标
         </h2>
         <Button
           onClick={() => {
@@ -329,7 +329,7 @@ export function TargetsView() {
             setShowForm(true);
           }}
         >
-          + 新建 Target
+          + 新建目标
         </Button>
       </div>
 
@@ -401,7 +401,7 @@ export function TargetsView() {
 
       <Modal
         open={showForm}
-        title="新建 Target"
+        title="新建目标"
         onClose={closeForm}
         footer={
           <>

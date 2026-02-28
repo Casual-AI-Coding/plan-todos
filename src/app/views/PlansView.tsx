@@ -178,7 +178,7 @@ export function PlansView() {
             className="text-2xl font-semibold"
             style={{ color: "var(--color-text)" }}
           >
-            PLANS
+            计划
           </h2>
         </div>
         <div className="text-center py-12 text-gray-500">Loading...</div>
@@ -202,9 +202,9 @@ export function PlansView() {
           className="text-2xl font-semibold"
           style={{ color: "var(--color-text)" }}
         >
-          PLANS
+          计划
         </h2>
-        <Button onClick={() => setShowForm(true)}>+ 新建 Plan</Button>
+          + 新建计划
       </div>
 
       {/* Tag filter */}
@@ -268,13 +268,13 @@ export function PlansView() {
           icon="📝"
           title="暂无计划"
           description="创建你的第一个计划来开始使用"
-          action={<Button onClick={() => setShowForm(true)}>+ 创建计划</Button>}
+          action={<Button onClick={() => setShowForm(true)}>+ 新建计划</Button>}
         />
       )}
 
       <Modal
         open={showForm}
-        title={editingPlan ? "编辑 Plan" : "新建 Plan"}
+        title={editingPlan ? "编辑计划" : "新建计划"}
         onClose={closeForm}
         footer={
           <>

@@ -164,24 +164,37 @@ export default function Home() {
             borderColor: "var(--color-border)",
           }}
         >
-          <button
-            onClick={() => setMobileSidebarOpen(true)}
-            className="p-2 -ml-2 rounded hover:opacity-80"
-            style={{ color: "var(--color-text)" }}
-            aria-label="打开菜单"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <rect x="2" y="4" width="16" height="1.5" />
-              <rect x="2" y="9" width="16" height="1.5" />
-              <rect x="2" y="14" width="16" height="1.5" />
-            </svg>
-          </button>
-          <h1
-            className="ml-2 text-lg font-semibold"
-            style={{ color: "var(--color-text)" }}
-          >
-            Plan Todos
-          </h1>
+          {/* Sub-pages show back button, main pages show hamburger */}
+          {activeMenu.startsWith("settings-") ? (
+            <button
+              onClick={() => setActiveMenu("settings")}
+              className="p-2 -ml-2 rounded hover:opacity-80 flex items-center"
+              style={{ color: "var(--color-text)" }}
+              aria-label="返回"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 4l-6 6 6 6V4z" />
+              </svg>
+              <span className="ml-1 text-sm">返回</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="p-2 -ml-2 rounded hover:opacity-80"
+              style={{ color: "var(--color-text)" }}
+              aria-label="打开菜单"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <rect x="2" y="4" width="16" height="1.5" />
+                <rect x="2" y="9" width="16" height="1.5" />
+                <rect x="2" y="14" width="16" height="1.5" />
+              </svg>
+            </button>
+          )}
+          {activeMenu.startsWith("settings-")
+            ? activeMenu.replace("settings-", "").charAt(0).toUpperCase() +
+              activeMenu.replace("settings-", "").slice(1)
+            : "Plan Todos"}
         </header>
 
         {/* Main Content */}
@@ -190,7 +203,7 @@ export default function Home() {
           style={{
             backgroundColor: "var(--color-bg)",
             paddingTop: "calc(3.5rem + env(safe-area-inset-top))",
-            paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom))",
+            paddingBottom: "calc(4rem + env(safe-area-inset-bottom))",
           }}
         >
           {renderContent()}
@@ -201,12 +214,12 @@ export default function Home() {
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 z-50 bg-black/50"
+              className="fixed inset-0 z-[60] bg-black/50"
               onClick={() => setMobileSidebarOpen(false)}
             />
             {/* Sidebar Panel */}
             <div
-              className="fixed left-0 top-0 h-full z-50 w-64"
+              className="fixed left-0 top-0 h-full z-[60] w-64"
               style={{
                 backgroundColor: "var(--color-bg-card)",
                 transform: "translateX(0)",
