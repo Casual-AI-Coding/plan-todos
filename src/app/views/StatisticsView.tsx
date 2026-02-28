@@ -271,16 +271,6 @@ export function StatisticsView() {
           </div>
         </div>
       </Card>
-      <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
-          活动热力图 (近6个月)
-        </h3>
-        <HeatmapCalendar
-          data={heatmapData}
-          months={6}
-          color="var(--color-primary)"
-        />
-      </Card>
 
       {/* Details Grid */}
       <div className="grid grid-cols-2 gap-6">
