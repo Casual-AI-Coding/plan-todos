@@ -116,11 +116,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             variant === "primary"
               ? "var(--shadow-md), var(--shadow-glow)"
               : "var(--shadow-md)",
-          transition: { duration: 0.15, ease: [0.22, 1, 0.36, 1] },
+          transition: { 
+            duration: 0.15, 
+            ease: [0.22, 1, 0.36, 1] 
+          },
         }}
         whileTap={{
           scale: disabled || loading ? 1 : 0.95,
-          transition: { duration: 0.1 },
+          transition: { 
+            duration: 0.1,
+            ease: [0.22, 1, 0.36, 1] 
+          },
         }}
         {...(props as HTMLMotionProps<"button">)}
       >
@@ -144,7 +150,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               initial={{ opacity: 0.5, scale: 0 }}
               animate={{ opacity: 0, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ 
+                duration: 0.6, 
+                ease: [0.22, 1, 0.36, 1] 
+              }}
               className="absolute pointer-events-none"
               style={{
                 left: ripple.x,

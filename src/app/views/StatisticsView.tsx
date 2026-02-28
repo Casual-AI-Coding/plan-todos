@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, ProgressBar } from "@/components/ui";
-import { TrendChart, HeatmapCalendar } from "@/components/ui/charts";
+import { TrendChart, HeatmapCalendar, DistributionChart } from "@/components/ui/charts";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useMemo } from "react";
 import { format, subDays } from "date-fns";
@@ -95,22 +95,20 @@ export function StatisticsView() {
     return result;
   }, [data]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // Todo distribution data for DistributionChart
+  const todoDistributionData = useMemo(() => {
+    if (!data?.todos) return [];
+    
+    const done = data.todos.filter((t) => t.status === "done").length;
+    const todo = data.todos.filter((t) => t.status === "pending").length;
+    const inProgress = data.todos.filter((t) => t.status === "in-progress").length;
+    
+    return [
+      { label: "已完成", value: done, color: "#22c55e" },
+      { label: "待办", value: todo, color: "#f59e0b" },
+      { label: "进行中", value: inProgress, color: "#3b82f6" },
+    ].filter(item => item.value > 0);
+  }, [data]);
 
   if (error) {
     return (
@@ -164,6 +162,7 @@ export function StatisticsView() {
           ) / 10
         : 0,
   };
+
   return (
     <div className="p-6">
       <h2
@@ -216,19 +215,33 @@ export function StatisticsView() {
         </div>
       </Card>
 
-      {/* Activity Trend - Last 7 Days */}
-      <Card className="mb-6">
-        <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
-          完成趋势 (近7天)
-        </h3>
-        <TrendChart
-          data={weeklyTrendData}
-          type="area"
-          color="var(--color-primary)"
-          height={150}
-          animated
-        />
-      </Card>
+      {/* Todo Distribution & Activity Trend */}
+      <div className="grid grid-cols-2 gap-6 mb-6">
+        <Card>
+          <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+            待办状态分布
+          </h3>
+          <DistributionChart
+            data={todoDistributionData}
+            showValues={true}
+            
+            animated={true}
+          />
+        </Card>
+
+        <Card>
+          <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+            完成趋势 (近7天)
+          </h3>
+          <TrendChart
+            data={weeklyTrendData}
+            type="area"
+            color="var(--color-primary)"
+            height={150}
+            animated
+          />
+        </Card>
+      </div>
 
       {/* Activity Heatmap - Last 6 Months */}
       <Card className="mb-6">

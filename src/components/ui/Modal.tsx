@@ -55,7 +55,10 @@ export function Modal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ 
+              duration: 0.2,
+              ease: [0.4, 0, 0.2, 1] // smooth easing
+            }}
             onClick={onClose}
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -78,7 +81,7 @@ export function Modal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{
               duration: 0.3,
-              ease: [0.22, 1, 0.36, 1],
+              ease: [0.22, 1, 0.36, 1], // spring easing
             }}
           >
             {/* Header */}
@@ -115,12 +118,7 @@ export function Modal({
             </div>
 
             {/* Body */}
-            <div
-              className="px-6 py-4"
-              style={{ color: "var(--color-text)" }}
-            >
-              {children}
-            </div>
+            <div className="px-6 py-4">{children}</div>
 
             {/* Footer */}
             {footer && (
@@ -128,8 +126,8 @@ export function Modal({
                 className="flex justify-end gap-3 px-6 py-4 border-t"
                 style={{
                   borderColor: "var(--color-border)",
-                  backgroundColor: "var(--color-bg-hover)",
-                  borderRadius: "0 0 0.75rem 0.75rem",
+                  borderBottomLeftRadius: "0.75rem",
+                  borderBottomRightRadius: "0.75rem",
                 }}
               >
                 {footer}
