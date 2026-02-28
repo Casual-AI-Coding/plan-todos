@@ -10,16 +10,16 @@ export function SettingsAboutView() {
   };
 
   const techStack = [
+    { icon: "📘", name: "TypeScript", desc: "类型安全" },
     { icon: "⚡", name: "Tauri", desc: "Rust 桌面框架" },
     { icon: "⚛️", name: "Next.js", desc: "React 全栈框架" },
     { icon: "🗄️", name: "SQLite", desc: "本地数据库" },
-    { icon: "📘", name: "TypeScript", desc: "类型安全" },
+    { icon: "🎨", name: "Tailwind CSS", desc: "样式框架" },
     { icon: "🗂️", name: "Zustand", desc: "状态管理" },
     { icon: "🎯", name: "dnd-kit", desc: "拖拽交互" },
     { icon: "✨", name: "Framer Motion", desc: "动画效果" },
     { icon: "🔄", name: "TanStack Query", desc: "数据获取" },
     { icon: "🕐", name: "date-fns", desc: "日期处理" },
-    { icon: "🎨", name: "Tailwind CSS", desc: "样式框架" },
   ];
 
   return (
@@ -50,6 +50,13 @@ export function SettingsAboutView() {
               本地优先的跨平台任务管理应用
             </p>
           </div>
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={handleCheckUpdate}
+          >
+            检查更新
+          </Button>
         </Card>
 
         {/* Tech Stack */}
@@ -60,7 +67,7 @@ export function SettingsAboutView() {
           >
             技术栈
           </h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {techStack.map((item, index) => (
               <div
                 key={index}
@@ -82,13 +89,7 @@ export function SettingsAboutView() {
         <h3 className="font-medium mb-3" style={{ color: "var(--color-text)" }}>
           其他
         </h3>
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={handleCheckUpdate}
-        >
-          检查更新
-        </Button>
+
       </Card>
     </div>
   );
