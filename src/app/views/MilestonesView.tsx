@@ -26,7 +26,8 @@ export function MilestonesView() {
   const toast = useToast();
 
   // Data fetching with React Query - parallel loading
-  const { data: milestones = [], isLoading: milestonesLoading } = useMilestones();
+  const { data: milestones = [], isLoading: milestonesLoading } =
+    useMilestones();
   const { data: plans = [] } = usePlansForMilestone();
   const { data: targets = [] } = useTargetsForMilestone();
   const { data: circulations = [] } = useCirculationsForMilestone();
@@ -38,7 +39,9 @@ export function MilestonesView() {
       closeForm();
     },
     onError: (error) => {
-      alert(error instanceof Error ? error.message : "Failed to create milestone");
+      alert(
+        error instanceof Error ? error.message : "Failed to create milestone",
+      );
       toast.error("创建失败");
     },
   });
@@ -62,7 +65,9 @@ export function MilestonesView() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [targetDate, setTargetDate] = useState("");
-  const [linkType, setLinkType] = useState<"plan" | "target" | "task" | "circulation">("plan");
+  const [linkType, setLinkType] = useState<
+    "plan" | "target" | "task" | "circulation"
+  >("plan");
   const [linkId, setLinkId] = useState("");
 
   function closeForm() {
@@ -97,8 +102,7 @@ export function MilestonesView() {
       return `🚀 ${plans.find((p) => p.id === m.biz_id)?.title || "Plan"}`;
     if (m.biz_type === "target")
       return `🎯 ${targets.find((t) => t.id === m.biz_id)?.title || "Target"}`;
-    if (m.biz_type === "task")
-      return `📋 Task`;
+    if (m.biz_type === "task") return `📋 Task`;
     if (m.biz_type === "circulation")
       return `🔄 ${circulations.find((c) => c.id === m.biz_id)?.title || "Circulation"}`;
     return "未关联";

@@ -1347,12 +1347,14 @@ export async function getCirculationLogsBatch(
     return {};
   }
   const { invoke } = await import("@tauri-apps/api/core");
-  return invoke<Record<string, CirculationLog[]>>("get_circulation_logs_batch", {
-    circulationIds,
-    limit: limit || 50,
-  });
+  return invoke<Record<string, CirculationLog[]>>(
+    "get_circulation_logs_batch",
+    {
+      circulationIds,
+      limit: limit || 50,
+    },
+  );
 }
-
 
 // ============================================================================
 // Data Management - Seed & Reset

@@ -1,7 +1,4 @@
-import {
-  useQuery,
-  type UseQueryOptions,
-} from "@tanstack/react-query";
+import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import { getDashboard, type Dashboard } from "@/lib/api";
 
 // Query Keys
@@ -13,10 +10,7 @@ export const dashboardKeys = {
  * Get dashboard data
  */
 export function useDashboard(
-  options?: Omit<
-    UseQueryOptions<Dashboard, Error>,
-    "queryKey" | "queryFn"
-  >,
+  options?: Omit<UseQueryOptions<Dashboard, Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Dashboard, Error>({
     queryKey: dashboardKeys.dashboard,

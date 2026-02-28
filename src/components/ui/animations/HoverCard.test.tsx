@@ -7,7 +7,7 @@ describe("HoverCard", () => {
     render(
       <HoverCard>
         <div>Card Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(screen.getByText("Card Content")).toBeInTheDocument();
   });
@@ -16,7 +16,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard className="custom-class">
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toHaveClass("custom-class");
   });
@@ -25,7 +25,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     expect(container.firstChild).toHaveClass("rounded-lg", "border");
   });
@@ -34,7 +34,7 @@ describe("HoverCard", () => {
     const { container } = render(
       <HoverCard style={{ padding: "20px" }}>
         <div>Content</div>
-      </HoverCard>
+      </HoverCard>,
     );
     const element = container.firstChild as HTMLElement;
     expect(element.style.padding).toBe("20px");

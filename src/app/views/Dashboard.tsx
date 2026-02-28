@@ -1,7 +1,11 @@
 "use client";
 
 import { Card, ProgressBar, Checkbox } from "@/components/ui";
-import { StaggeredList, StaggeredListItem, HoverCard } from "@/components/ui/animations";
+import {
+  StaggeredList,
+  StaggeredListItem,
+  HoverCard,
+} from "@/components/ui/animations";
 import { useDashboard } from "@/hooks/useDashboard";
 import { StatCard } from "@/components/features/StatCard";
 import { EntityCountCard } from "@/components/features/EntityCountCard";
@@ -62,7 +66,10 @@ export function Dashboard() {
       </h2>
 
       {/* Stats Cards - Responsive: 1 col mobile, 2 col tablet, 3 col desktop */}
-      <StaggeredList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" staggerDelay={100}>
+      <StaggeredList
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        staggerDelay={100}
+      >
         <StaggeredListItem>
           <HoverCard hoverElevation={-4} glowOnHover className="p-4">
             <StatCard value={overview.today_todos_count} label="今日待办" />
@@ -85,7 +92,10 @@ export function Dashboard() {
       </StaggeredList>
 
       {/* Entity Counts - Responsive: 3 col mobile, 5 col tablet, 7 col desktop */}
-      <StaggeredList className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2" staggerDelay={50}>
+      <StaggeredList
+        className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2"
+        staggerDelay={50}
+      >
         <StaggeredListItem>
           <HoverCard hoverElevation={-2} glowOnHover className="p-2">
             <EntityCountCard count={counts.todo} label="待办" />

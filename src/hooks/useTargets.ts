@@ -121,7 +121,11 @@ export function useTarget(
  */
 export function useCreateTarget(
   options?: Omit<
-    UseMutationOptions<Target, Error, CreateTargetInput & { tagIds?: string[] }>,
+    UseMutationOptions<
+      Target,
+      Error,
+      CreateTargetInput & { tagIds?: string[] }
+    >,
     "mutationFn"
   >,
 ) {

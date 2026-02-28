@@ -56,10 +56,7 @@ function TargetCard({
 
   return (
     <Card>
-      <div
-        onClick={() => toggleTarget(target.id)}
-        className="cursor-pointer"
-      >
+      <div onClick={() => toggleTarget(target.id)} className="cursor-pointer">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-lg">
@@ -197,7 +194,9 @@ export function TargetsView() {
       closeStepForm();
     },
     onError: (error) => {
-      alert(error instanceof Error ? error.message : "Weight would exceed 100%");
+      alert(
+        error instanceof Error ? error.message : "Weight would exceed 100%",
+      );
     },
   });
 
@@ -218,7 +217,9 @@ export function TargetsView() {
 
   // UI State
   const [tagFilters, setTagFilters] = useState<string[]>([]);
-  const [expandedTargets, setExpandedTargets] = useState<Set<string>>(new Set());
+  const [expandedTargets, setExpandedTargets] = useState<Set<string>>(
+    new Set(),
+  );
   const [showForm, setShowForm] = useState(false);
   const [showStepForm, setShowStepForm] = useState(false);
   const [selectedTargetId, setSelectedTargetId] = useState<string>("");
@@ -394,9 +395,7 @@ export function TargetsView() {
           icon="🎯"
           title="暂无目标"
           description="创建你的第一个目标来开始使用"
-          action={
-            <Button onClick={() => setShowForm(true)}>+ 创建目标</Button>
-          }
+          action={<Button onClick={() => setShowForm(true)}>+ 创建目标</Button>}
         />
       )}
 

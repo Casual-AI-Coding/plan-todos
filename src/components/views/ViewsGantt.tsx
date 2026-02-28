@@ -100,16 +100,12 @@ export function ViewsGantt({
   const getPosition = (dateStr: string | null) => {
     if (!dateStr) return null;
     const date = new Date(dateStr);
-    const days =
-      (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const days = (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
     if (days < 0 || days > totalDays) return null;
     return (days / totalDays) * 100;
   };
 
-  const getWidth = (
-    startDateStr: string | null,
-    endDateStr: string | null,
-  ) => {
+  const getWidth = (startDateStr: string | null, endDateStr: string | null) => {
     if (!startDateStr || !endDateStr) return null;
     const start = new Date(startDateStr);
     const end = new Date(endDateStr);
@@ -201,18 +197,19 @@ export function ViewsGantt({
   const getTypeColor = (type: string, status: string) => {
     const completed = status === "done" || status === "completed";
     if (type === "plan") return completed ? "bg-purple-500" : "bg-purple-400";
-    if (type === "target")
-      return completed ? "bg-orange-500" : "bg-orange-400";
+    if (type === "target") return completed ? "bg-orange-500" : "bg-orange-400";
     if (type === "todo") return completed ? "bg-blue-500" : "bg-blue-400";
-    if (type === "milestone")
-      return completed ? "bg-pink-500" : "bg-pink-400";
+    if (type === "milestone") return completed ? "bg-pink-500" : "bg-pink-400";
     return "bg-gray-400";
   };
 
   const timelineWidth = Math.max(800, 100 * ganttZoom);
 
   return (
-    <div className="w-full p-4 rounded-lg" style={{ backgroundColor: "var(--color-bg-hover)" }}>
+    <div
+      className="w-full p-4 rounded-lg"
+      style={{ backgroundColor: "var(--color-bg-hover)" }}
+    >
       <div className="flex items-center gap-3 mb-4 px-2">
         <span className="text-xs text-gray-500">显示范围:</span>
         <input
@@ -243,7 +240,10 @@ export function ViewsGantt({
             ))}
           </div>
 
-          <div className="relative space-y-1 p-2 rounded" style={{ backgroundColor: "var(--color-bg-card)" }}>
+          <div
+            className="relative space-y-1 p-2 rounded"
+            style={{ backgroundColor: "var(--color-bg-card)" }}
+          >
             {allItems.map((item, idx) => {
               const startPos = item.start
                 ? getPosition(item.start)
@@ -260,15 +260,27 @@ export function ViewsGantt({
                   key={`${item.type}-${idx}`}
                   className="flex items-center h-8 group"
                 >
-                  <div className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium" style={{ color: "var(--color-text)" }}>
-                    <span className={`inline-block w-2 h-2 rounded-full mr-1 ${
-                      item.type === "plan" ? "bg-purple-500" :
-                      item.type === "target" ? "bg-orange-500" :
-                      item.type === "todo" ? "bg-blue-500" : "bg-pink-500"
-                    }`}></span>
+                  <div
+                    className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium"
+                    style={{ color: "var(--color-text)" }}
+                  >
+                    <span
+                      className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                        item.type === "plan"
+                          ? "bg-purple-500"
+                          : item.type === "target"
+                            ? "bg-orange-500"
+                            : item.type === "todo"
+                              ? "bg-blue-500"
+                              : "bg-pink-500"
+                      }`}
+                    ></span>
                     {item.title}
                   </div>
-                  <div className="flex-1 h-full relative rounded" style={{ backgroundColor: "var(--color-bg-hover)" }}>
+                  <div
+                    className="flex-1 h-full relative rounded"
+                    style={{ backgroundColor: "var(--color-bg-hover)" }}
+                  >
                     <div
                       className={`absolute h-6 top-1 rounded ${getTypeColor(item.type, item.status)}`}
                       style={{

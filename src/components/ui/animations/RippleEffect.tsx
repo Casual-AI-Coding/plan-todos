@@ -50,7 +50,7 @@ export function RippleEffect({
       createRipple(e);
       onClick?.(e);
     },
-    [createRipple, onClick]
+    [createRipple, onClick],
   );
 
   return (

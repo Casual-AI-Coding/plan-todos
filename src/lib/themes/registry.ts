@@ -98,11 +98,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04)",
         lg: "0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06)",
         xl: "0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08)",
-        glow: "0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1)"
+        glow: "0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
       },
       accent: "#0D9488",
     },
@@ -134,11 +134,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(45, 212, 191, 0.4), 0 0 40px rgba(45, 212, 191, 0.2)"
+        glow: "0 0 20px rgba(45, 212, 191, 0.4), 0 0 40px rgba(45, 212, 191, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#14B8A6",
     },
@@ -170,11 +170,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(189, 147, 249, 0.4), 0 0 40px rgba(189, 147, 249, 0.2)"
+        glow: "0 0 20px rgba(189, 147, 249, 0.4), 0 0 40px rgba(189, 147, 249, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#BD93F9",
     },
@@ -206,11 +206,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(136, 192, 208, 0.4), 0 0 40px rgba(136, 192, 208, 0.2)"
+        glow: "0 0 20px rgba(136, 192, 208, 0.4), 0 0 40px rgba(136, 192, 208, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#88C0D0",
     },
@@ -242,11 +242,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(249, 38, 114, 0.4), 0 0 40px rgba(249, 38, 114, 0.2)"
+        glow: "0 0 20px rgba(249, 38, 114, 0.4), 0 0 40px rgba(249, 38, 114, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#F92672",
     },
@@ -278,11 +278,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(120, 53, 15, 0.12), 0 8px 16px rgba(120, 53, 15, 0.06)",
         lg: "0 8px 16px rgba(120, 53, 15, 0.16), 0 16px 32px rgba(120, 53, 15, 0.08)",
         xl: "0 12px 24px rgba(120, 53, 15, 0.2), 0 24px 48px rgba(120, 53, 15, 0.1)",
-        glow: "0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.15)"
+        glow: "0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.15)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
-        innerShadow: "inset 0 1px 2px rgba(120, 53, 15, 0.08)"
+        innerShadow: "inset 0 1px 2px rgba(120, 53, 15, 0.08)",
       },
       accent: "#F59E0B",
     },
@@ -315,11 +315,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(220, 38, 38, 0.12), 0 8px 16px rgba(220, 38, 38, 0.06)",
         lg: "0 8px 16px rgba(220, 38, 38, 0.16), 0 16px 32px rgba(220, 38, 38, 0.08)",
         xl: "0 12px 24px rgba(220, 38, 38, 0.2), 0 24px 48px rgba(220, 38, 38, 0.1)",
-        glow: "0 0 20px rgba(220, 38, 38, 0.4), 0 0 40px rgba(220, 38, 38, 0.2)"
+        glow: "0 0 20px rgba(220, 38, 38, 0.4), 0 0 40px rgba(220, 38, 38, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
-        innerShadow: "inset 0 1px 2px rgba(220, 38, 38, 0.08)"
+        innerShadow: "inset 0 1px 2px rgba(220, 38, 38, 0.08)",
       },
       accent: "#DC2626",
     },
@@ -352,11 +352,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(203, 166, 247, 0.4), 0 0 40px rgba(203, 166, 247, 0.2)"
+        glow: "0 0 20px rgba(203, 166, 247, 0.4), 0 0 40px rgba(203, 166, 247, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#cba6f7",
     },
@@ -389,11 +389,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(122, 162, 247, 0.4), 0 0 40px rgba(122, 162, 247, 0.2)"
+        glow: "0 0 20px rgba(122, 162, 247, 0.4), 0 0 40px rgba(122, 162, 247, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#7aa2f7",
     },
@@ -426,11 +426,11 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
         md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
         lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
         xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
-        glow: "0 0 20px rgba(198, 120, 221, 0.4), 0 0 40px rgba(198, 120, 221, 0.2)"
+        glow: "0 0 20px rgba(198, 120, 221, 0.4), 0 0 40px rgba(198, 120, 221, 0.2)",
       },
       glass: {
         borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
-        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)"
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
       },
       accent: "#c678dd",
     },
@@ -478,11 +478,11 @@ export const systemThemeDisplay: Theme = {
       md: "0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04)",
       lg: "0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06)",
       xl: "0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08)",
-      glow: "0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1)"
+      glow: "0 0 20px rgba(13, 148, 136, 0.3), 0 0 40px rgba(13, 148, 136, 0.1)",
     },
     glass: {
       borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
-      innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
+      innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
     },
     accent: "#0D9488",
   },

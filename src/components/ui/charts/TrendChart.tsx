@@ -28,8 +28,7 @@ export function TrendChart({
   height = 200,
 }: TrendChartProps) {
   const { maxValue, points, barWidth } = useMemo(() => {
-    if (data.length === 0)
-      return { maxValue: 0, points: "", barWidth: 0 };
+    if (data.length === 0) return { maxValue: 0, points: "", barWidth: 0 };
 
     const maxValue = Math.max(...data.map((d) => d.value), 1);
     const chartWidth = 100;
@@ -73,7 +72,10 @@ export function TrendChart({
         {/* Y-axis labels */}
         <div
           className="flex flex-col justify-between text-xs pr-2 pb-6"
-          style={{ color: "var(--color-text-muted)", height: "calc(100% - 20px)" }}
+          style={{
+            color: "var(--color-text-muted)",
+            height: "calc(100% - 20px)",
+          }}
         >
           <span>{Math.round(maxValue)}</span>
           <span>{Math.round(maxValue / 2)}</span>
@@ -178,7 +180,9 @@ export function TrendChart({
             {data.length > 0 && (
               <>
                 <span>{data[0].date}</span>
-                {data.length > 2 && <span>{data[Math.floor(data.length / 2)].date}</span>}
+                {data.length > 2 && (
+                  <span>{data[Math.floor(data.length / 2)].date}</span>
+                )}
                 <span>{data[data.length - 1].date}</span>
               </>
             )}

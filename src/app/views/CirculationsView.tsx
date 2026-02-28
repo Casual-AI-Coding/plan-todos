@@ -396,11 +396,13 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
 
   // Ordered circulations for DnD - initialized from todayCirculations
   // Using state to preserve user's drag-and-drop order
-  const [todayCirculationsOrdered, setTodayCirculationsOrdered] = useState<Circulation[]>([]);
-  
+  const [todayCirculationsOrdered, setTodayCirculationsOrdered] = useState<
+    Circulation[]
+  >([]);
+
   // Initialize ordered list when todayCirculations changes (only if empty or length differs)
   useEffect(() => {
-    setTodayCirculationsOrdered(prev => {
+    setTodayCirculationsOrdered((prev) => {
       // Only update if length differs (avoids unnecessary re-renders)
       if (prev.length !== todayCirculations.length) {
         return todayCirculations;
@@ -411,8 +413,6 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
 
   // Stats for count-type circulations (BATCHED - prevents N+1 query problem)
   const [todayStats, setTodayStats] = useState<Record<string, TodayStats>>({});
-
-
 
   // Settings tabs
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("periodic");
@@ -444,24 +444,24 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
       const countCirculations = todayCirculations.filter(
         (c) => c.circulation_type === "count",
       );
-      
+
       // Early return if no count-type circulations
       if (countCirculations.length === 0) {
         setTodayStats({});
         setStatsLoading(false);
         return;
       }
-      
+
       setStatsLoading(true);
-      
+
       try {
         // BATCH: Get all logs in a single Tauri command call
         const { getCirculationLogsBatch } = await import("@/lib/api");
         const allLogs = await getCirculationLogsBatch(
-          countCirculations.map(c => c.id),
-          50
+          countCirculations.map((c) => c.id),
+          50,
         );
-        
+
         // Process logs for each circulation
         countCirculations.forEach((c) => {
           const logs = allLogs[c.id] || [];
@@ -482,12 +482,11 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
       } finally {
         setStatsLoading(false);
       }
-      
+
       setTodayStats(stats);
     };
     loadStats();
   }, [todayCirculations]);
-
 
   // Check if circulation was completed today
   const isCompletedToday = (c: Circulation): boolean => {
@@ -541,7 +540,6 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
     }),
   );
 
-
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -565,7 +563,10 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   async function handleSaveForm(data: CirculationFormData) {
     try {
       if (editingCirculation) {
-        await updateMutation.mutateAsync({ id: editingCirculation.id, ...data });
+        await updateMutation.mutateAsync({
+          id: editingCirculation.id,
+          ...data,
+        });
       } else {
         await createMutation.mutateAsync(data);
       }

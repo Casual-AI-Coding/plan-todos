@@ -7,16 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.5.5] - 2026-02-27
+## [0.5.5] - 2026-02-28
 
 ### Added
 
 **UI/UX Enhancement - Design System**:
+
 - Extended shadow system with 5 levels (sm, md, lg, xl, glow) for all 9 themes
 - Glass effect enhancements (borderGlow, innerShadow) in theme registry
-- CSS variables for animation timing (--animation-easing-spring, --animation-duration-*)
+- CSS variables for animation timing (--animation-easing-spring, --animation-duration-\*)
 
 **UI/UX Enhancement - Animation Components**:
+
 - `RippleEffect`: Click ripple animation for buttons/cards
 - `StaggeredList` / `StaggeredListItem`: Staggered entrance animations for lists
 - `HoverCard`: Enhanced hover effects with shadow/glow
@@ -24,18 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All animations use spring easing (cubic-bezier: 0.22, 1, 0.36, 1)
 
 **UI/UX Enhancement - Button Component**:
+
 - Click ripple effect using Framer Motion
 - Hover scale and glow effects
 - Loading spinner animation
 - Icon support with proper spacing
 
 **UI/UX Enhancement - Modal Component**:
+
 - Spring animation (scale + fade + y translation)
 - Blur backdrop effect using --glass-blur
 - All theme colors via CSS variables
 - Added "xl" width option
 
 **UI/UX Enhancement - Data Visualization**:
+
 - `GaugeChart`: Circular progress indicator with animated fill
 - `TrendChart`: Line/area/bar chart for trend visualization
 - `HeatmapCalendar`: GitHub-style activity heatmap
@@ -62,12 +67,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 **React Query + Zustand 基础设施**:
+
 - `@tanstack/react-query`: 数据获取、缓存、乐观更新
 - `zustand`: 集中式状态管理
 - `QueryProvider`: React Query Provider 配置
 - `src/lib/store.ts`: Zustand 全局状态 Store
 
 **React Query Hooks**:
+
 - `useTodos`: Todo CRUD 操作 + 乐观更新
 - `usePlans`: Plan CRUD 操作 + 乐观更新
 - `useTags`: Tag CRUD 操作
@@ -81,6 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `useNotificationPlugins`: 通知插件管理
 
 **ViewsView 组件提取**:
+
 - `ViewsFilters`: 筛选器组件
 - `ViewsList`: 列表视图组件
 - `ViewsBoard`: 看板视图组件
@@ -88,14 +96,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ViewsGantt`: 甘特图视图组件
 
 **Rust 后端**:
+
 - `get_circulation_logs_batch`: 批量获取 circulation logs，解决 N+1 查询问题
 
 **CI/CD**:
+
 - 添加 iOS 构建 workflow (实验性支持)
 - 支持 Xcode Personal Team 签名和 App Store Connect API 签名
+
 ### Changed
 
 **视图迁移到 React Query** (11 个视图):
+
 - Dashboard: 移除手动 useEffect，使用 useDashboard
 - TodosView: 移除手动 useEffect，使用 useTodos
 - PlansView: 重构为 React Query + 提取 PlanCard 子组件
@@ -111,21 +123,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 **React Hooks 违规修复**:
+
 - TargetsView: 提取 TargetCard 子组件，修复 hooks-in-callback 错误
 - ViewsView: 使用 useQueries 修复 hooks-in-loop 错误
 - PlansView: 提取 PlanCard 子组件，修复 hooks-in-callback 错误
 
 **CirculationsView 无限循环修复** (2026-02-25):
+
 - 移除重复的 useEffect，修复 "Maximum update depth exceeded" 错误
 - 移除 useMemo 包裹的 useSensors，修复 "Do not call Hooks inside useMemo" 错误
 
 **ESLint 错误修复**:
+
 - SettingsDailySummaryView、page.tsx、Sidebar、useSystemTheme: 添加 eslint-disable 注释修复 setState-in-effect 警告
 
 **类型修复**:
+
 - useCirculations: 修正 CirculationType 和 PeriodicFrequency 类型定义
 - SettingsChannelsView: 移除无效的 plugin_type 参数
 - SettingsDailySummaryView: 修正 includePending 参数名
+
 ## [0.5.3] - 2026-02-23
 
 ### Added

@@ -20,11 +20,7 @@ import {
   useUpdatePlan,
   useDeletePlan,
 } from "@/hooks/usePlans";
-import {
-  useCreateTask,
-  useUpdateTask,
-  useDeleteTask,
-} from "@/hooks/useTasks";
+import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useTags } from "@/hooks/useTags";
 import type { Plan, Task } from "@/lib/api";
 
@@ -272,9 +268,7 @@ export function PlansView() {
           icon="📝"
           title="暂无计划"
           description="创建你的第一个计划来开始使用"
-          action={
-            <Button onClick={() => setShowForm(true)}>+ 创建计划</Button>
-          }
+          action={<Button onClick={() => setShowForm(true)}>+ 创建计划</Button>}
         />
       )}
 
@@ -460,10 +454,7 @@ function PlanCard({
 
   return (
     <Card>
-      <div
-        onClick={() => togglePlan(plan.id)}
-        className="cursor-pointer"
-      >
+      <div onClick={() => togglePlan(plan.id)} className="cursor-pointer">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-lg">
@@ -499,12 +490,7 @@ function PlanCard({
             </button>
           </div>
         </div>
-        <ProgressBar
-          value={progress}
-          color="teal"
-          size="sm"
-          className="mt-2"
-        />
+        <ProgressBar value={progress} color="teal" size="sm" className="mt-2" />
         {/* Tags display */}
         {planTags.length > 0 && (
           <div className="flex gap-1 mt-2 flex-wrap">
@@ -524,8 +510,7 @@ function PlanCard({
         )}
         <div className="text-xs text-gray-500 mt-1">
           {plan.start_date && `📅 ${plan.start_date}`}{" "}
-          {plan.start_date && plan.end_date && "~"}{" "}
-          {plan.end_date || "进行中"}
+          {plan.start_date && plan.end_date && "~"} {plan.end_date || "进行中"}
           {planTasks.length > 0 && (
             <span className="ml-2">
               ({doneCount}/{planTasks.length} Task)

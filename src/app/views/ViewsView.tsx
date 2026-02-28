@@ -7,7 +7,15 @@ import { usePlans } from "@/hooks/usePlans";
 import { useTargets, targetKeys } from "@/hooks/useTargets";
 import { useMilestones } from "@/hooks/useMilestones";
 import { useTasks } from "@/hooks/useTasks";
-import { getSteps, type Todo, type Plan, type Task, type Target, type Step, type Milestone } from "@/lib/api";
+import {
+  getSteps,
+  type Todo,
+  type Plan,
+  type Task,
+  type Target,
+  type Step,
+  type Milestone,
+} from "@/lib/api";
 import { ViewsFilters } from "@/components/views/ViewsFilters";
 import { ViewsList } from "@/components/views/ViewsList";
 import { ViewsBoard } from "@/components/views/ViewsBoard";
@@ -44,18 +52,21 @@ export function ViewsView() {
 
   // Scroll indicator state for board view
   const scrollContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [scrollIndicators, setScrollIndicators] = useState<Record<string, { showTop: boolean; showBottom: boolean }>>({});
+  const [scrollIndicators, setScrollIndicators] = useState<
+    Record<string, { showTop: boolean; showBottom: boolean }>
+  >({});
 
   const handleScroll = (columnId: string, e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
     const isAtTop = target.scrollTop <= 10;
-    const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 10;
-    setScrollIndicators(prev => ({
+    const isAtBottom =
+      target.scrollTop + target.clientHeight >= target.scrollHeight - 10;
+    setScrollIndicators((prev) => ({
       ...prev,
       [columnId]: {
         showTop: !isAtTop,
-        showBottom: !isAtBottom
-      }
+        showBottom: !isAtBottom,
+      },
     }));
   };
 
@@ -65,18 +76,20 @@ export function ViewsView() {
       const hasScroll = container.scrollHeight > container.clientHeight + 10;
       if (hasScroll) {
         const isAtTop = container.scrollTop <= 10;
-        const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 10;
-        setScrollIndicators(prev => ({
+        const isAtBottom =
+          container.scrollTop + container.clientHeight >=
+          container.scrollHeight - 10;
+        setScrollIndicators((prev) => ({
           ...prev,
           [columnId]: {
             showTop: !isAtTop,
-            showBottom: !isAtBottom
-          }
+            showBottom: !isAtBottom,
+          },
         }));
       } else {
-        setScrollIndicators(prev => ({
+        setScrollIndicators((prev) => ({
           ...prev,
-          [columnId]: { showTop: false, showBottom: false }
+          [columnId]: { showTop: false, showBottom: false },
         }));
       }
     }
@@ -92,10 +105,10 @@ export function ViewsView() {
   // Check scroll on mount and when data changes
   useEffect(() => {
     const timer = setTimeout(() => {
-      ['pending', 'in-progress', 'done'].forEach(checkScrollNeeded);
+      ["pending", "in-progress", "done"].forEach(checkScrollNeeded);
     }, 100);
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todos, allTasks, plans, targets, milestones, filters]);
 
   // Group tasks by plan ID using useMemo
@@ -626,15 +639,22 @@ export function ViewsView() {
                   color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}`,
                 }}
               >
-                <span className={`w-3 h-3 rounded-full bg-${col.color}-500`}></span>
+                <span
+                  className={`w-3 h-3 rounded-full bg-${col.color}-500`}
+                ></span>
                 {col.label}
-                <span className="ml-auto text-sm" style={{ color: "var(--color-text-muted)" }}>
+                <span
+                  className="ml-auto text-sm"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
                   {getItemsByStatus(col.id).length}
                 </span>
               </h3>
               <div className="relative flex-1 min-h-0">
                 <div
-                  ref={(el) => { scrollContainerRefs.current[col.id] = el; }}
+                  ref={(el) => {
+                    scrollContainerRefs.current[col.id] = el;
+                  }}
                   className="space-y-1.5 overflow-y-auto h-full scroll-smooth scrollbar-hide-board"
                   onScroll={(e) => handleScroll(col.id, e)}
                 >
@@ -682,37 +702,70 @@ export function ViewsView() {
                     </div>
                   ))}
                   {getItemsByStatus(col.id).length === 0 && (
-                    <p className="text-center py-4" style={{ color: "var(--color-text-muted)" }}>无</p>
+                    <p
+                      className="text-center py-4"
+                      style={{ color: "var(--color-text-muted)" }}
+                    >
+                      无
+                    </p>
                   )}
                 </div>
                 {/* Top scroll indicator - CSS transition for smooth enter/exit */}
-                <div 
+                <div
                   className={`absolute top-0 left-0 right-0 h-14 pointer-events-none scroll-indicator-fade-top transition-all duration-300 ease-out ${
-                    scrollIndicators[col.id]?.showTop ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+                    scrollIndicators[col.id]?.showTop
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-4"
                   }`}
                 >
                   <div className="flex flex-col items-center justify-start h-full pt-2">
                     <div className="scroll-bounce-arrow-up">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 10l7-7m0 0l7 7m-7-7v18"
+                        />
                       </svg>
                     </div>
-                    <span className="text-xs text-gray-400 animate-pulse">向上滑动</span>
+                    <span className="text-xs text-gray-400 animate-pulse">
+                      向上滑动
+                    </span>
                   </div>
                 </div>
                 {/* Bottom scroll indicator - CSS transition for smooth enter/exit */}
-                <div 
+                <div
                   className={`absolute bottom-0 left-0 right-0 h-14 pointer-events-none scroll-indicator-fade-bottom transition-all duration-3000 ease-out ${
-                    scrollIndicators[col.id]?.showBottom ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    scrollIndicators[col.id]?.showBottom
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4"
                   }`}
                 >
                   <div className="flex flex-col items-center justify-end h-full pb-2">
                     <div className="scroll-bounce-arrow">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
                       </svg>
                     </div>
-                    <span className="text-xs text-gray-400 mt-0.5 animate-pulse">向下滑动</span>
+                    <span className="text-xs text-gray-400 mt-0.5 animate-pulse">
+                      向下滑动
+                    </span>
                   </div>
                 </div>
               </div>
@@ -729,21 +782,47 @@ export function ViewsView() {
             scroll-behavior: smooth;
           }
           .scroll-indicator-fade {
-            background: linear-gradient(to top, var(--color-bg-hover) 0%, transparent 100%);
+            background: linear-gradient(
+              to top,
+              var(--color-bg-hover) 0%,
+              transparent 100%
+            );
           }
           .scroll-indicator-fade-top {
-            background: linear-gradient(to bottom, var(--color-bg-hover) 0%, transparent 100%);
+            background: linear-gradient(
+              to bottom,
+              var(--color-bg-hover) 0%,
+              transparent 100%
+            );
           }
           .scroll-indicator-fade-bottom {
-            background: linear-gradient(to top, var(--color-bg-hover) 0%, transparent 100%);
+            background: linear-gradient(
+              to top,
+              var(--color-bg-hover) 0%,
+              transparent 100%
+            );
           }
           @keyframes bounce-arrow {
-            0%, 100% { transform: translateY(0); opacity: 0.6; }
-            50% { transform: translateY(4px); opacity: 1; }
+            0%,
+            100% {
+              transform: translateY(0);
+              opacity: 0.6;
+            }
+            50% {
+              transform: translateY(4px);
+              opacity: 1;
+            }
           }
           @keyframes bounce-arrow-up {
-            0%, 100% { transform: translateY(0); opacity: 0.6; }
-            50% { transform: translateY(-4px); opacity: 1; }
+            0%,
+            100% {
+              transform: translateY(0);
+              opacity: 0.6;
+            }
+            50% {
+              transform: translateY(-4px);
+              opacity: 1;
+            }
           }
           .scroll-bounce-arrow {
             animation: bounce-arrow 1.5s ease-in-out infinite;

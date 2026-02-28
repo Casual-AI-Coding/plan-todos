@@ -302,21 +302,21 @@ jobs:
       - name: Rename iOS artifacts
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          
+
           # Find and rename .ipa files
           IPA_PATH="src-tauri/target/aarch64-apple-ios/release/iphoneos/PlanTodos.ipa"
           if [ -f "$IPA_PATH" ]; then
             mkdir -p artifacts
             cp "$IPA_PATH" "artifacts/PlanTodos_${VERSION}_ios-arm64.ipa"
           fi
-          
+
           # Find and rename .app for simulator
           APP_PATH="src-tauri/target/aarch64-apple-ios-sim/release/iphonesimulator/PlanTodos.app"
           if [ -d "$APP_PATH" ]; then
             cd src-tauri/target/aarch64-apple-ios-sim/release/iphonesimulator
             zip -r "../../../../../../artifacts/PlanTodos_${VERSION}_ios-simulator.zip" PlanTodos.app
           fi
-          
+
           # Also check for xcarchive
           ARCHIVE_PATH=$(find src-tauri -name "*.xcarchive" -type d 2>/dev/null | head -1)
           if [ -n "$ARCHIVE_PATH" ]; then

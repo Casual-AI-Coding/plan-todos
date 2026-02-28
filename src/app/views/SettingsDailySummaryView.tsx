@@ -11,8 +11,10 @@ import type { NotificationPlugin } from "@/lib/api";
 
 export function SettingsDailySummaryView() {
   // React Query for data fetching
-  const { data: settings, isLoading: settingsLoading } = useDailySummarySettings();
-  const { data: allPlugins = [], isLoading: pluginsLoading } = useNotificationPlugins();
+  const { data: settings, isLoading: settingsLoading } =
+    useDailySummarySettings();
+  const { data: allPlugins = [], isLoading: pluginsLoading } =
+    useNotificationPlugins();
   const updateSettings = useUpdateDailySummarySettings();
 
   const plugins = allPlugins.filter((p) => p.enabled);

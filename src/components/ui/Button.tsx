@@ -1,9 +1,18 @@
 "use client";
 
-import { ButtonHTMLAttributes, forwardRef, useState, useCallback, ReactNode } from "react";
+import {
+  ButtonHTMLAttributes,
+  forwardRef,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
 
-interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onDrag" | "onDragStart" | "onDragEnd" | "onTransitionEnd"> {
+interface ButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "onDrag" | "onDragStart" | "onDragEnd" | "onTransitionEnd"
+> {
   variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
@@ -34,27 +43,30 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const [ripples, setRipples] = useState<Ripple[]>([]);
 
-    const createRipple = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-      if (disabled || loading) return;
+    const createRipple = useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (disabled || loading) return;
 
-      const rect = e.currentTarget.getBoundingClientRect();
-      const size = Math.max(rect.width, rect.height);
-      const x = e.clientX - rect.left - size / 2;
-      const y = e.clientY - rect.top - size / 2;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
 
-      const newRipple: Ripple = {
-        id: Date.now(),
-        x,
-        y,
-        size,
-      };
+        const newRipple: Ripple = {
+          id: Date.now(),
+          x,
+          y,
+          size,
+        };
 
-      setRipples((prev) => [...prev, newRipple]);
+        setRipples((prev) => [...prev, newRipple]);
 
-      setTimeout(() => {
-        setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
-      }, 600);
-    }, [disabled, loading]);
+        setTimeout(() => {
+          setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
+        }, 600);
+      },
+      [disabled, loading],
+    );
 
     const handleClick = useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -116,16 +128,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             variant === "primary"
               ? "var(--shadow-md), var(--shadow-glow)"
               : "var(--shadow-md)",
-          transition: { 
-            duration: 0.15, 
-            ease: [0.22, 1, 0.36, 1] 
+          transition: {
+            duration: 0.15,
+            ease: [0.22, 1, 0.36, 1],
           },
         }}
         whileTap={{
           scale: disabled || loading ? 1 : 0.95,
-          transition: { 
+          transition: {
             duration: 0.1,
-            ease: [0.22, 1, 0.36, 1] 
+            ease: [0.22, 1, 0.36, 1],
           },
         }}
         {...(props as HTMLMotionProps<"button">)}
@@ -150,9 +162,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               initial={{ opacity: 0.5, scale: 0 }}
               animate={{ opacity: 0, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ 
-                duration: 0.6, 
-                ease: [0.22, 1, 0.36, 1] 
+              transition={{
+                duration: 0.6,
+                ease: [0.22, 1, 0.36, 1],
               }}
               className="absolute pointer-events-none"
               style={{

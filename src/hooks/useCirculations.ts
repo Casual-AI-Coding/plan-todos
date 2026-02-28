@@ -51,10 +51,7 @@ export type UpdateCirculationInput = {
  * Get all circulations
  */
 export function useCirculations(
-  options?: Omit<
-    UseQueryOptions<Circulation[], Error>,
-    "queryKey" | "queryFn"
-  >,
+  options?: Omit<UseQueryOptions<Circulation[], Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Circulation[], Error>({
     queryKey: circulationKeys.circulations,
@@ -68,10 +65,7 @@ export function useCirculations(
  */
 export function useCirculation(
   id: string,
-  options?: Omit<
-    UseQueryOptions<Circulation, Error>,
-    "queryKey" | "queryFn"
-  >,
+  options?: Omit<UseQueryOptions<Circulation, Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Circulation, Error>({
     queryKey: circulationKeys.circulation(id),
@@ -134,10 +128,13 @@ export function useUpdateCirculation(
   return useMutation<Circulation, Error, UpdateCirculationInput>({
     mutationFn: ({ id, ...data }) => updateCirculation(id, data),
     onSuccess: (data) => {
-      queryClient.setQueryData<Circulation[]>(circulationKeys.circulations, (old) => {
-        if (!old) return old;
-        return old.map((c) => (c.id === data.id ? data : c));
-      });
+      queryClient.setQueryData<Circulation[]>(
+        circulationKeys.circulations,
+        (old) => {
+          if (!old) return old;
+          return old.map((c) => (c.id === data.id ? data : c));
+        },
+      );
     },
     ...options,
   });
@@ -147,10 +144,7 @@ export function useUpdateCirculation(
  * Delete a circulation
  */
 export function useDeleteCirculation(
-  options?: Omit<
-    UseMutationOptions<void, Error, string>,
-    "mutationFn"
-  >,
+  options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
 ) {
   const queryClient = useQueryClient();
 
@@ -168,13 +162,21 @@ export function useDeleteCirculation(
  */
 export function useCheckinCirculation(
   options?: Omit<
-    UseMutationOptions<Circulation, Error, { id: string; note?: string; count?: number }>,
+    UseMutationOptions<
+      Circulation,
+      Error,
+      { id: string; note?: string; count?: number }
+    >,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation<Circulation, Error, { id: string; note?: string; count?: number }>({
+  return useMutation<
+    Circulation,
+    Error,
+    { id: string; note?: string; count?: number }
+  >({
     mutationFn: async ({ id, note, count }) => {
       const result = await checkinCirculation(id, note, count);
       return result;
@@ -196,10 +198,7 @@ export function useCheckinCirculation(
  * Undo today's checkin
  */
 export function useUndoCheckinCirculation(
-  options?: Omit<
-    UseMutationOptions<Circulation, Error, string>,
-    "mutationFn"
-  >,
+  options?: Omit<UseMutationOptions<Circulation, Error, string>, "mutationFn">,
 ) {
   const queryClient = useQueryClient();
 

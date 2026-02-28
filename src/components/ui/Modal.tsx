@@ -55,9 +55,9 @@ export function Modal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ 
+            transition={{
               duration: 0.2,
-              ease: [0.4, 0, 0.2, 1] // smooth easing
+              ease: [0.4, 0, 0.2, 1], // smooth easing
             }}
             onClick={onClose}
             style={{

@@ -6,7 +6,12 @@ import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { Calendar } from "@/components/ui/Calendar";
 import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
 import { useToast } from "@/components/ui/Toast";
-import { useTodos, useCreateTodo, useUpdateTodo, useDeleteTodo } from "@/hooks/useTodos";
+import {
+  useTodos,
+  useCreateTodo,
+  useUpdateTodo,
+  useDeleteTodo,
+} from "@/hooks/useTodos";
 import { useTags } from "@/hooks/useTags";
 import { setEntityTags, type Todo, type Priority } from "@/lib/api";
 import { TodoItem } from "@/components/features/TodoItem";
@@ -21,7 +26,9 @@ interface CalendarEvent {
 }
 
 export function TodosView() {
-  const [filter, setFilter] = useState<"all" | "today" | "upcoming" | "completed">("all");
+  const [filter, setFilter] = useState<
+    "all" | "today" | "upcoming" | "completed"
+  >("all");
   const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
@@ -71,8 +78,10 @@ export function TodosView() {
     // Tag filter (OR logic - multiple tags)
     if (tagFilters.length > 0) {
       // Note: This needs entity tags loaded - simplified for now
-      const hasTag = tagFilters.some((tagId) => 
-        (t as unknown as { tags?: { id: string }[] }).tags?.some(tag => tag.id === tagId)
+      const hasTag = tagFilters.some((tagId) =>
+        (t as unknown as { tags?: { id: string }[] }).tags?.some(
+          (tag) => tag.id === tagId,
+        ),
       );
       if (!hasTag) return false;
     }

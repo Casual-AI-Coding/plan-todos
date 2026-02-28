@@ -39,7 +39,9 @@ describe("Button", () => {
   });
 
   it("renders icon when provided", () => {
-    render(<Button icon={<span data-testid="icon">🎯</span>}>With Icon</Button>);
+    render(
+      <Button icon={<span data-testid="icon">🎯</span>}>With Icon</Button>,
+    );
     expect(screen.getByTestId("icon")).toBeInTheDocument();
   });
 

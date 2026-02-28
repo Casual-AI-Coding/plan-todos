@@ -12,31 +12,31 @@
 
 ### 🔴 P0 - 严重问题（必须立即修复）
 
-| 序号 | 问题描述 | 影响页面 | 截图证据 | 严重程度 |
-|------|----------|----------|----------|----------|
-| 1 | Dashboard底部内容被导航栏遮挡 | Dashboard | mobile_dashboard.png | 🔴 高 |
-| 2 | 侧边栏背景透明，底层内容穿透 | 所有页面 | mobile_sidebar.png | 🔴 高 |
-| 3 | 底部"N"图标遮挡导航栏"首页" | 所有页面 | mobile_dashboard.png | 🔴 高 |
-| 4 | 主题选择器深色主题文字不可读 | 设置页 | mobile_settings_1.png | 🔴 高 |
-| 5 | 数据统计热力图右侧截断、图例重叠 | 数据统计 | mobile_statistics_1.png | 🔴 高 |
+| 序号 | 问题描述                         | 影响页面  | 截图证据                | 严重程度 |
+| ---- | -------------------------------- | --------- | ----------------------- | -------- |
+| 1    | Dashboard底部内容被导航栏遮挡    | Dashboard | mobile_dashboard.png    | 🔴 高    |
+| 2    | 侧边栏背景透明，底层内容穿透     | 所有页面  | mobile_sidebar.png      | 🔴 高    |
+| 3    | 底部"N"图标遮挡导航栏"首页"      | 所有页面  | mobile_dashboard.png    | 🔴 高    |
+| 4    | 主题选择器深色主题文字不可读     | 设置页    | mobile_settings_1.png   | 🔴 高    |
+| 5    | 数据统计热力图右侧截断、图例重叠 | 数据统计  | mobile_statistics_1.png | 🔴 高    |
 
 ### 🟡 P1 - 中等问题（本周修复）
 
-| 序号 | 问题描述 | 影响页面 | 严重程度 |
-|------|----------|----------|----------|
-| 6 | Header未适配安全区域（刘海屏） | 所有页面 | 🟡 中 |
-| 7 | Dashboard卡片布局不均（三列拥挤） | Dashboard | 🟡 中 |
-| 8 | 中英文术语不统一 | Plans/Goals | 🟡 中 |
-| 9 | 图标风格不统一 | 全局 | 🟡 中 |
-| 10 | 关于页导航逻辑错误（应显示返回箭头） | 关于页 | 🟡 中 |
+| 序号 | 问题描述                             | 影响页面    | 严重程度 |
+| ---- | ------------------------------------ | ----------- | -------- |
+| 6    | Header未适配安全区域（刘海屏）       | 所有页面    | 🟡 中    |
+| 7    | Dashboard卡片布局不均（三列拥挤）    | Dashboard   | 🟡 中    |
+| 8    | 中英文术语不统一                     | Plans/Goals | 🟡 中    |
+| 9    | 图标风格不统一                       | 全局        | 🟡 中    |
+| 10   | 关于页导航逻辑错误（应显示返回箭头） | 关于页      | 🟡 中    |
 
 ### 🟢 P2 - 轻微问题（后续优化）
 
-| 序号 | 问题描述 | 影响页面 | 严重程度 |
-|------|----------|----------|----------|
-| 11 | 按钮文字过长 | Goals/Plans | 🟢 低 |
-| 12 | 顶部筛选栏占用空间过多 | Todos | 🟢 低 |
-| 13 | "检查更新"按钮辨识度低 | 关于页 | 🟢 低 |
+| 序号 | 问题描述               | 影响页面    | 严重程度 |
+| ---- | ---------------------- | ----------- | -------- |
+| 11   | 按钮文字过长           | Goals/Plans | 🟢 低    |
+| 12   | 顶部筛选栏占用空间过多 | Todos       | 🟢 低    |
+| 13   | "检查更新"按钮辨识度低 | 关于页      | 🟢 低    |
 
 ---
 
@@ -45,9 +45,11 @@
 ### 问题1: Dashboard底部内容被导航栏遮挡
 
 #### 问题描述
+
 Dashboard页面最底部的三张卡片（今日待打卡、今日已完成打卡、当前最长连续）被底部固定导航栏完全遮挡，用户无法看到或点击。
 
 #### 根本原因
+
 `page.tsx` 中 main 内容区域的 `padding-bottom` 计算不正确，没有考虑到 BottomNav 的实际高度。
 
 #### 修复方案
@@ -107,9 +109,11 @@ Dashboard页面最底部的三张卡片（今日待打卡、今日已完成打�
 ### 问题2: 侧边栏背景透明，底层内容穿透
 
 #### 问题描述
+
 打开侧边栏菜单时，背景呈半透明状态，底层页面内容（如主题选择卡片、"设置>通用"文字）穿透显示在侧边栏之上，形成白色块和重影。
 
 #### 根本原因
+
 1. Backdrop（遮罩层）z-index 不够高
 2. Sidebar Panel 背景可能使用了透明度
 
@@ -190,9 +194,11 @@ Dashboard页面最底部的三张卡片（今日待打卡、今日已完成打�
 ### 问题3: 底部"N"图标遮挡导航栏"首页"
 
 #### 问题描述
+
 左下角有一个黑色的圆形悬浮按钮（带有"N"字样），完全遮挡了底部导航栏的第一个图标"首页"及其文字。
 
 #### 根本原因
+
 悬浮按钮（可能是某种全局功能按钮）位置固定在了左下角，与底部导航栏重叠。
 
 #### 修复方案
@@ -204,6 +210,7 @@ grep -r "N" src/components --include="*.tsx" | grep -i "button\|icon\|fab"
 ```
 
 可能的文件位置:
+
 - `src/app/page.tsx` - 检查是否有悬浮按钮组件
 - `src/components/ui/FloatingButton.tsx`
 - `src/components/layout/` 目录
@@ -214,14 +221,16 @@ grep -r "N" src/components --include="*.tsx" | grep -i "button\|icon\|fab"
 
 ```tsx
 // 在移动端隐藏
-{!isMobile && <FloatingNButton />}
+{
+  !isMobile && <FloatingNButton />;
+}
 ```
 
 **选项B: 调整位置到不冲突区域**
 
 ```tsx
 // 改为右下角或其他位置
-<button 
+<button
   className="fixed bottom-20 right-4 z-50" // 上移避免与导航栏冲突
   // ...
 />
@@ -259,9 +268,11 @@ grep -r "N" src/components --include="*.tsx" | grep -i "button\|icon\|fab"
 ### 问题4: 主题选择器深色主题文字不可读
 
 #### 问题描述
+
 设置页面的主题选择器中，深色主题卡片（Dracula、Nord、Monokai、Catppuccin、Tokyo Night、One Dark）上的文字颜色为深绿色，与深色背景几乎融为一体，无法辨认。
 
 #### 根本原因
+
 主题卡片使用统一的文字颜色，没有根据背景色动态调整。
 
 #### 修复方案
@@ -272,27 +283,36 @@ grep -r "N" src/components --include="*.tsx" | grep -i "button\|icon\|fab"
 
 ```tsx
 // 定义深色主题列表
-const darkThemes = ['dracula', 'nord', 'monokai', 'catppuccin', 'tokyo-night', 'one-dark'];
+const darkThemes = [
+  "dracula",
+  "nord",
+  "monokai",
+  "catppuccin",
+  "tokyo-night",
+  "one-dark",
+];
 
 // 在渲染主题卡片时
-{themes.map((theme) => {
-  const isDark = darkThemes.includes(theme.id);
-  
-  return (
-    <button
-      key={theme.id}
-      className="..."
-      style={{
-        backgroundColor: theme.bgColor,
-        // 深色主题使用白色文字，浅色主题使用深色文字
-        color: isDark ? '#FFFFFF' : '#0F172A',
-      }}
-    >
-      {theme.icon}
-      <span>{theme.name}</span>
-    </button>
-  );
-})}
+{
+  themes.map((theme) => {
+    const isDark = darkThemes.includes(theme.id);
+
+    return (
+      <button
+        key={theme.id}
+        className="..."
+        style={{
+          backgroundColor: theme.bgColor,
+          // 深色主题使用白色文字，浅色主题使用深色文字
+          color: isDark ? "#FFFFFF" : "#0F172A",
+        }}
+      >
+        {theme.icon}
+        <span>{theme.name}</span>
+      </button>
+    );
+  });
+}
 ```
 
 **或使用 Tailwind 类:**
@@ -335,6 +355,7 @@ const darkThemes = ['dracula', 'nord', 'monokai', 'catppuccin', 'tokyo-night', '
 ### 问题5: 数据统计热力图显示问题
 
 #### 问题描述
+
 1. 热力图最右侧（2月份）被容器截断
 2. 底部"少...多"图例与导航栏重叠
 3. 顶部四个统计卡片过于拥挤
@@ -346,18 +367,22 @@ const darkThemes = ['dracula', 'nord', 'monokai', 'catppuccin', 'tokyo-night', '
 **修改1: 热力图容器添加横向滚动**
 
 ```tsx
-{/* 热力图容器 */}
+{
+  /* 热力图容器 */
+}
 <div className="overflow-x-auto pb-4">
-  <div className="min-w-[600px]"> {/* 确保最小宽度 */}
+  <div className="min-w-[600px]">
+    {" "}
+    {/* 确保最小宽度 */}
     {/* 热力图内容 */}
   </div>
-</div>
+</div>;
 ```
 
 **修改2: 添加底部padding避免图例被遮挡**
 
 ```tsx
-<div 
+<div
   className="..."
   style={{
     paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))'
@@ -370,7 +395,7 @@ const darkThemes = ['dracula', 'nord', 'monokai', 'catppuccin', 'tokyo-night', '
 ```tsx
 // 从4列改为2x2
 <div className="grid grid-cols-2 gap-4">
-  {stats.map(stat => (
+  {stats.map((stat) => (
     <StatCard key={stat.id} {...stat} />
   ))}
 </div>
@@ -403,6 +428,7 @@ const darkThemes = ['dracula', 'nord', 'monokai', 'catppuccin', 'tokyo-night', '
 ### 问题6: Header未适配安全区域
 
 #### 问题描述
+
 Header顶部间距过小，在刘海屏手机上可能与系统状态栏（时间、电量图标）重叠。
 
 #### 修复方案
@@ -427,6 +453,7 @@ Header顶部间距过小，在刘海屏手机上可能与系统状态栏（时�
 ### 问题7: Dashboard卡片布局不均
 
 #### 问题描述
+
 三列小卡片布局在窄屏上过于拥挤，"本周完成"卡片单独占据一行，右侧留白。
 
 #### 修复方案
@@ -436,7 +463,7 @@ Header顶部间距过小，在刘海屏手机上可能与系统状态栏（时�
 ```tsx
 // 从3列改为2列
 <div className="grid grid-cols-2 gap-4">
-  {smallCards.map(card => (
+  {smallCards.map((card) => (
     <SmallCard key={card.id} {...card} />
   ))}
 </div>
@@ -453,6 +480,7 @@ Header顶部间距过小，在刘海屏手机上可能与系统状态栏（时�
 ### 问题8: 中英文术语不统一
 
 #### 问题描述
+
 - Plans页面：标题"PLANS"，按钮"+ 新建 Plan"，中间"+ 创建计划"
 - Goals页面：标题"GOALS"，按钮"+ 新建 Target"，中间"+ 创建目标"
 
@@ -460,17 +488,18 @@ Header顶部间距过小，在刘海屏手机上可能与系统状态栏（时�
 
 **统一使用中文:**
 
-| 页面 | 原标题 | 新标题 | 原按钮 | 新按钮 |
-|------|--------|--------|--------|--------|
-| Plans | PLANS | 计划 | + 新建 Plan | + 新建计划 |
-| Goals | GOALS | 目标 | + 新建 Target | + 新建目标 |
-| Milestones | MILESTONES | 里程碑 | + 新建 | + 新建 |
+| 页面       | 原标题     | 新标题 | 原按钮        | 新按钮     |
+| ---------- | ---------- | ------ | ------------- | ---------- |
+| Plans      | PLANS      | 计划   | + 新建 Plan   | + 新建计划 |
+| Goals      | GOALS      | 目标   | + 新建 Target | + 新建目标 |
+| Milestones | MILESTONES | 里程碑 | + 新建        | + 新建     |
 
 ---
 
 ### 问题9: 图标风格不统一
 
 #### 问题描述
+
 - 技术栈图标：TypeScript使用了调色盘🎨（语义错误）
 - 底部导航栏："首页"是黑底N字，其他是彩色插画
 
@@ -480,9 +509,9 @@ Header顶部间距过小，在刘海屏手机上可能与系统状态栏（时�
 
 ```tsx
 // 从
-icon: "🎨"
+icon: "🎨";
 // 改为
-icon: <TypeScriptLogo /> // 或 "TS"
+icon: <TypeScriptLogo />; // 或 "TS"
 ```
 
 **统一底部导航图标风格:**
@@ -490,7 +519,7 @@ icon: <TypeScriptLogo /> // 或 "TS"
 建议使用 Lucide Icons:
 
 ```tsx
-import { Home, CheckSquare, RotateCw, Rocket, Settings } from 'lucide-react';
+import { Home, CheckSquare, RotateCw, Rocket, Settings } from "lucide-react";
 
 const navItems = [
   { id: "dashboard", icon: Home, label: "首页" },
@@ -506,6 +535,7 @@ const navItems = [
 ### 问题10: 关于页导航逻辑错误
 
 #### 问题描述
+
 关于页面左上角的汉堡菜单（打开侧边栏）不符合二级页面逻辑，应该显示返回箭头。
 
 #### 修复方案
@@ -533,18 +563,18 @@ const isSubPage = ['settings-about', 'settings-general', ...].includes(activeMen
 
 ## 📁 文件修改清单
 
-| 序号 | 文件路径 | 修改类型 | 修复问题 |
-|------|----------|----------|----------|
-| 1 | `src/app/page.tsx` | 修改 | 1, 2, 6 |
-| 2 | `src/components/layout/BottomNav.tsx` | 修改 | 2, 3 |
-| 3 | `src/components/layout/Sidebar.tsx` | 修改 | 2 |
-| 4 | `src/app/views/settings/SettingsGeneralView.tsx` | 修改 | 4 |
-| 5 | `src/app/views/StatisticsView.tsx` | 修改 | 5 |
-| 6 | `src/app/views/DashboardView.tsx` | 修改 | 7 |
-| 7 | `src/app/views/PlansView.tsx` | 修改 | 8 |
-| 8 | `src/app/views/TargetsView.tsx` | 修改 | 8 |
-| 9 | `src/app/views/SettingsAboutView.tsx` | 修改 | 10 |
-| 10 | `src/components/layout/` | 新增/修改 | 9 |
+| 序号 | 文件路径                                         | 修改类型  | 修复问题 |
+| ---- | ------------------------------------------------ | --------- | -------- |
+| 1    | `src/app/page.tsx`                               | 修改      | 1, 2, 6  |
+| 2    | `src/components/layout/BottomNav.tsx`            | 修改      | 2, 3     |
+| 3    | `src/components/layout/Sidebar.tsx`              | 修改      | 2        |
+| 4    | `src/app/views/settings/SettingsGeneralView.tsx` | 修改      | 4        |
+| 5    | `src/app/views/StatisticsView.tsx`               | 修改      | 5        |
+| 6    | `src/app/views/DashboardView.tsx`                | 修改      | 7        |
+| 7    | `src/app/views/PlansView.tsx`                    | 修改      | 8        |
+| 8    | `src/app/views/TargetsView.tsx`                  | 修改      | 8        |
+| 9    | `src/app/views/SettingsAboutView.tsx`            | 修改      | 10       |
+| 10   | `src/components/layout/`                         | 新增/修改 | 9        |
 
 ---
 

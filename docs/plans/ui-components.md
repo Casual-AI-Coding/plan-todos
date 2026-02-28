@@ -31,17 +31,17 @@ import { RippleEffect } from "@/components/ui/animations";
 
 <RippleEffect>
   <button className="px-4 py-2 bg-primary">Click Me</button>
-</RippleEffect>
+</RippleEffect>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | required | Child element to wrap |
-| `className` | `string` | `""` | Additional CSS classes |
-| `color` | `string` | `"rgba(255, 255, 255, 0.4)"` | Ripple color |
-| `onClick` | `(e: MouseEvent) => void` | - | Click handler |
+| Prop        | Type                      | Default                      | Description            |
+| ----------- | ------------------------- | ---------------------------- | ---------------------- |
+| `children`  | `ReactNode`               | required                     | Child element to wrap  |
+| `className` | `string`                  | `""`                         | Additional CSS classes |
+| `color`     | `string`                  | `"rgba(255, 255, 255, 0.4)"` | Ripple color           |
+| `onClick`   | `(e: MouseEvent) => void` | -                            | Click handler          |
 
 ---
 
@@ -58,17 +58,17 @@ import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
   <StaggeredListItem>Item 1</StaggeredListItem>
   <StaggeredListItem>Item 2</StaggeredListItem>
   <StaggeredListItem>Item 3</StaggeredListItem>
-</StaggeredList>
+</StaggeredList>;
 ```
 
 **Props - StaggeredList:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | required | List items |
-| `className` | `string` | `""` | Container CSS classes |
-| `staggerDelay` | `number` | `50` | Delay between items (ms) |
-| `animationDuration` | `number` | `0.3` | Animation duration (seconds) |
+| Prop                | Type        | Default  | Description                  |
+| ------------------- | ----------- | -------- | ---------------------------- |
+| `children`          | `ReactNode` | required | List items                   |
+| `className`         | `string`    | `""`     | Container CSS classes        |
+| `staggerDelay`      | `number`    | `50`     | Delay between items (ms)     |
+| `animationDuration` | `number`    | `0.3`    | Animation duration (seconds) |
 
 ---
 
@@ -81,25 +81,21 @@ Enhanced card with hover effects including elevation and glow.
 ```tsx
 import { HoverCard } from "@/components/ui/animations";
 
-<HoverCard 
-  hoverElevation={-4} 
-  glowOnHover={true}
-  className="p-4"
->
+<HoverCard hoverElevation={-4} glowOnHover={true} className="p-4">
   <h3>Card Title</h3>
   <p>Card content</p>
-</HoverCard>
+</HoverCard>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | required | Card content |
-| `className` | `string` | `""` | Additional CSS classes |
-| `hoverElevation` | `number` | `-4` | Vertical movement on hover (px) |
-| `glowOnHover` | `boolean` | `true` | Enable glow effect |
-| `style` | `CSSProperties` | - | Inline styles |
+| Prop             | Type            | Default  | Description                     |
+| ---------------- | --------------- | -------- | ------------------------------- |
+| `children`       | `ReactNode`     | required | Card content                    |
+| `className`      | `string`        | `""`     | Additional CSS classes          |
+| `hoverElevation` | `number`        | `-4`     | Vertical movement on hover (px) |
+| `glowOnHover`    | `boolean`       | `true`   | Enable glow effect              |
+| `style`          | `CSSProperties` | -        | Inline styles                   |
 
 ---
 
@@ -114,17 +110,17 @@ import { PageSlide } from "@/components/ui/animations";
 
 <PageSlide direction="up" duration={0.4}>
   <div>Page content</div>
-</PageSlide>
+</PageSlide>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | `ReactNode` | required | Page content |
-| `className` | `string` | `""` | Additional CSS classes |
-| `direction` | `"left" \| "right" \| "up" \| "down"` | `"up"` | Slide direction |
-| `duration` | `number` | `0.4` | Animation duration (seconds) |
+| Prop        | Type                                  | Default  | Description                  |
+| ----------- | ------------------------------------- | -------- | ---------------------------- |
+| `children`  | `ReactNode`                           | required | Page content                 |
+| `className` | `string`                              | `""`     | Additional CSS classes       |
+| `direction` | `"left" \| "right" \| "up" \| "down"` | `"up"`   | Slide direction              |
+| `duration`  | `number`                              | `0.4`    | Animation duration (seconds) |
 
 ---
 
@@ -139,26 +135,26 @@ Circular progress indicator with animated fill.
 ```tsx
 import { GaugeChart } from "@/components/ui/charts";
 
-<GaugeChart 
-  value={75} 
-  size="md" 
+<GaugeChart
+  value={75}
+  size="md"
   label="Completion Rate"
   color="var(--color-primary)"
   animated={true}
-/>
+/>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `number` | required | Progress value (0-100) |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Chart size |
-| `color` | `string` | `var(--color-primary)` | Primary color |
-| `secondaryColor` | `string` | `var(--color-secondary)` | Gradient end color |
-| `showValue` | `boolean` | `true` | Show value in center |
-| `animated` | `boolean` | `true` | Enable animation |
-| `label` | `string` | - | Label below chart |
+| Prop             | Type                   | Default                  | Description            |
+| ---------------- | ---------------------- | ------------------------ | ---------------------- |
+| `value`          | `number`               | required                 | Progress value (0-100) |
+| `size`           | `"sm" \| "md" \| "lg"` | `"md"`                   | Chart size             |
+| `color`          | `string`               | `var(--color-primary)`   | Primary color          |
+| `secondaryColor` | `string`               | `var(--color-secondary)` | Gradient end color     |
+| `showValue`      | `boolean`              | `true`                   | Show value in center   |
+| `animated`       | `boolean`              | `true`                   | Enable animation       |
+| `label`          | `string`               | -                        | Label below chart      |
 
 ---
 
@@ -177,26 +173,26 @@ const data = [
   { date: "2024-03", value: 18 },
 ];
 
-<TrendChart 
+<TrendChart
   data={data}
   type="area"
   color="var(--color-primary)"
   showGrid={true}
   animated={true}
   height={200}
-/>
+/>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `data` | `TrendData[]` | required | Array of {date, value} |
-| `type` | `"line" \| "area" \| "bar"` | `"line"` | Chart type |
-| `color` | `string` | `var(--color-primary)` | Chart color |
-| `showGrid` | `boolean` | `true` | Show grid lines |
-| `animated` | `boolean` | `true` | Enable animation |
-| `height` | `number` | `200` | Chart height (px) |
+| Prop       | Type                        | Default                | Description            |
+| ---------- | --------------------------- | ---------------------- | ---------------------- |
+| `data`     | `TrendData[]`               | required               | Array of {date, value} |
+| `type`     | `"line" \| "area" \| "bar"` | `"line"`               | Chart type             |
+| `color`    | `string`                    | `var(--color-primary)` | Chart color            |
+| `showGrid` | `boolean`                   | `true`                 | Show grid lines        |
+| `animated` | `boolean`                   | `true`                 | Enable animation       |
+| `height`   | `number`                    | `200`                  | Chart height (px)      |
 
 ---
 
@@ -215,22 +211,22 @@ const data = [
   { date: "2024-01-03", count: 8 },
 ];
 
-<HeatmapCalendar 
+<HeatmapCalendar
   data={data}
   months={6}
   color="var(--color-primary)"
   onCellClick={(date) => console.log(date)}
-/>
+/>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `data` | `HeatmapData[]` | required | Array of {date, count} |
-| `months` | `number` | `6` | Number of months to show |
-| `color` | `string` | `var(--color-primary)` | Base color |
-| `onCellClick` | `(date: string) => void` | - | Cell click handler |
+| Prop          | Type                     | Default                | Description              |
+| ------------- | ------------------------ | ---------------------- | ------------------------ |
+| `data`        | `HeatmapData[]`          | required               | Array of {date, count}   |
+| `months`      | `number`                 | `6`                    | Number of months to show |
+| `color`       | `string`                 | `var(--color-primary)` | Base color               |
+| `onCellClick` | `(date: string) => void` | -                      | Cell click handler       |
 
 ---
 
@@ -249,24 +245,24 @@ const data = [
   { label: "Pending", value: 25, color: "#f59e0b" },
 ];
 
-<DistributionChart 
+<DistributionChart
   data={data}
   title="Task Distribution"
   showValues={true}
   animated={true}
-/>
+/>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `data` | `DistributionItem[]` | required | Array of {label, value, color?} |
-| `title` | `string` | - | Chart title |
-| `showValues` | `boolean` | `true` | Show values on bars |
-| `showPercentage` | `boolean` | `true` | Show percentages |
-| `animated` | `boolean` | `true` | Enable animation |
-| `maxHeight` | `number` | `300` | Max container height (px) |
+| Prop             | Type                 | Default  | Description                     |
+| ---------------- | -------------------- | -------- | ------------------------------- |
+| `data`           | `DistributionItem[]` | required | Array of {label, value, color?} |
+| `title`          | `string`             | -        | Chart title                     |
+| `showValues`     | `boolean`            | `true`   | Show values on bars             |
+| `showPercentage` | `boolean`            | `true`   | Show percentages                |
+| `animated`       | `boolean`            | `true`   | Enable animation                |
+| `maxHeight`      | `number`             | `300`    | Max container height (px)       |
 
 ---
 
@@ -293,46 +289,31 @@ Components use these CSS variables for theming:
 
 ```css
 /* Colors */
---color-primary: Primary brand color
---color-secondary: Secondary accent color
---color-bg: Background color
---color-bg-card: Card background
---color-text: Primary text
---color-text-muted: Secondary text
---color-border: Border color
-
-/* Shadows */
---shadow-sm: Small shadow
---shadow-md: Medium shadow
---shadow-lg: Large shadow
---shadow-xl: Extra large shadow
---shadow-glow: Glow effect
-
-/* Animation */
---animation-easing-spring: cubic-bezier(0.22, 1, 0.36, 1)
---animation-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1)
---animation-duration-fast: 150ms
---animation-duration-normal: 250ms
---animation-duration-slow: 400ms
-
-/* Glass Effects */
---glass-blur: Blur amount
---glass-opacity: Transparency
---glass-border-glow: Border glow
---glass-inner-shadow: Inner shadow
+--color-primary: Primary brand color --color-secondary: Secondary accent color
+  --color-bg: Background color --color-bg-card: Card background
+  --color-text: Primary text --color-text-muted: Secondary text
+  --color-border: Border color /* Shadows */ --shadow-sm: Small shadow
+  --shadow-md: Medium shadow --shadow-lg: Large shadow --shadow-xl: Extra large
+  shadow --shadow-glow: Glow effect /* Animation */
+  --animation-easing-spring: cubic-bezier(0.22, 1, 0.36, 1)
+  --animation-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1)
+  --animation-duration-fast: 150ms --animation-duration-normal: 250ms
+  --animation-duration-slow: 400ms /* Glass Effects */ --glass-blur: Blur amount
+  --glass-opacity: Transparency --glass-border-glow: Border glow
+  --glass-inner-shadow: Inner shadow;
 ```
 
 ### Usage Example
 
 ```tsx
 // Component automatically uses theme colors
-<GaugeChart 
+<GaugeChart
   value={75}
   color="var(--color-primary)"  // Uses current theme primary
 />
 
 // Override for specific use case
-<GaugeChart 
+<GaugeChart
   value={75}
   color="#ff0000"  // Custom color
 />

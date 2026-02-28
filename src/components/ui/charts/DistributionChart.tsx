@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useId } from "react";
+import { useId, useMemo } from "react";
 
 interface DistributionItem {
   label: string;
@@ -48,24 +48,33 @@ export function DistributionChart({
   const gradientId = `distribution-gradient-${useId()}`;
 
   // Calculate angles for pie/donut
-  let currentAngle = 0;
-  const segments = data.map((item, index) => {
-    const percentage = item.value / total;
-    const angle = percentage * 360;
-    const startAngle = currentAngle;
-    currentAngle += angle;
-    const color = item.color || defaultColors[index % defaultColors.length];
-    return {
-      ...item,
-      percentage,
-      angle,
-      startAngle,
-      color,
-    };
-  });
+  // Calculate segments with angles using useMemo
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const segments = useMemo(() => {
+    let currentAngle = 0;
+    return data.map((item, index) => {
+      const percentage = item.value / total;
+      const angle = percentage * 360;
+      const startAngle = currentAngle;
+      currentAngle += angle;
+      const color = item.color || defaultColors[index % defaultColors.length];
+      return {
+        ...item,
+        percentage,
+        angle,
+        startAngle,
+        color,
+      };
+    });
+  }, [data, total]);
 
   // Polar to Cartesian coordinates
-  const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
+  const polarToCartesian = (
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleInDegrees: number,
+  ) => {
     const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
       x: centerX + radius * Math.cos(angleInRadians),
@@ -74,11 +83,33 @@ export function DistributionChart({
   };
 
   // Create SVG arc path
-  const createArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number) => {
+  const createArc = (
+    x: number,
+    y: number,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+  ) => {
     const start = polarToCartesian(x, y, radius, endAngle);
     const end = polarToCartesian(x, y, radius, startAngle);
     const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-    return ["M", x, y, "L", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y, "Z"].join(" ");
+    return [
+      "M",
+      x,
+      y,
+      "L",
+      start.x,
+      start.y,
+      "A",
+      radius,
+      radius,
+      0,
+      largeArcFlag,
+      0,
+      end.x,
+      end.y,
+      "Z",
+    ].join(" ");
   };
 
   // Create donut arc path (with hole)
@@ -88,7 +119,7 @@ export function DistributionChart({
     outerRadius: number,
     innerRadius: number,
     startAngle: number,
-    endAngle: number
+    endAngle: number,
   ) => {
     const startOuter = polarToCartesian(x, y, outerRadius, endAngle);
     const endOuter = polarToCartesian(x, y, outerRadius, startAngle);
@@ -140,7 +171,12 @@ export function DistributionChart({
     <div className={`flex flex-col items-center ${className}`}>
       {type === "bar" ? (
         // Bar Chart
-        <svg width={barChartData.length * (barWidth + 8)} height={barHeight + 24} role="img" aria-label="Distribution bar chart">
+        <svg
+          width={barChartData.length * (barWidth + 8)}
+          height={barHeight + 24}
+          role="img"
+          aria-label="Distribution bar chart"
+        >
           {barChartData.map((item, index) =>
             animated ? (
               <motion.rect
@@ -152,7 +188,11 @@ export function DistributionChart({
                 fill={item.color}
                 initial={{ height: 0, y: barHeight }}
                 animate={{ height: item.height, y: barHeight - item.height }}
-                transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
               />
             ) : (
               <rect
@@ -164,7 +204,7 @@ export function DistributionChart({
                 rx={4}
                 fill={item.color}
               />
-            )
+            ),
           )}
           {/* Labels */}
           {barChartData.map((item, index) => (
@@ -182,10 +222,22 @@ export function DistributionChart({
         </svg>
       ) : (
         // Pie or Donut Chart
-        <svg width={width} height={width} role="img" aria-label={`Distribution ${type} chart`}>
+        <svg
+          width={width}
+          height={width}
+          role="img"
+          aria-label={`Distribution ${type} chart`}
+        >
           <defs>
             {segments.map((item, index) => (
-              <linearGradient key={`grad-${index}`} id={`${gradientId}-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient
+                key={`grad-${index}`}
+                id={`${gradientId}-${index}`}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
                 <stop offset="0%" stopColor={item.color} />
                 <stop offset="100%" stopColor={item.color} stopOpacity={0.7} />
               </linearGradient>
@@ -197,29 +249,59 @@ export function DistributionChart({
                 key={item.label}
                 d={
                   type === "donut"
-                    ? createDonutArc(centerX, centerY, outerRadius, innerRadius, item.startAngle, item.startAngle + item.angle)
-                    : createArc(centerX, centerY, outerRadius, item.startAngle, item.startAngle + item.angle)
+                    ? createDonutArc(
+                        centerX,
+                        centerY,
+                        outerRadius,
+                        innerRadius,
+                        item.startAngle,
+                        item.startAngle + item.angle,
+                      )
+                    : createArc(
+                        centerX,
+                        centerY,
+                        outerRadius,
+                        item.startAngle,
+                        item.startAngle + item.angle,
+                      )
                 }
                 fill={`url(#${gradientId}-${index})`}
                 stroke="var(--color-bg-card)"
                 strokeWidth={2}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.4,
+                  delay: index * 0.1,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
               />
             ) : (
               <path
                 key={item.label}
                 d={
                   type === "donut"
-                    ? createDonutArc(centerX, centerY, outerRadius, innerRadius, item.startAngle, item.startAngle + item.angle)
-                    : createArc(centerX, centerY, outerRadius, item.startAngle, item.startAngle + item.angle)
+                    ? createDonutArc(
+                        centerX,
+                        centerY,
+                        outerRadius,
+                        innerRadius,
+                        item.startAngle,
+                        item.startAngle + item.angle,
+                      )
+                    : createArc(
+                        centerX,
+                        centerY,
+                        outerRadius,
+                        item.startAngle,
+                        item.startAngle + item.angle,
+                      )
                 }
                 fill={`url(#${gradientId}-${index})`}
                 stroke="var(--color-bg-card)"
                 strokeWidth={2}
               />
-            )
+            ),
           )}
           {type === "donut" && (
             <text
@@ -242,10 +324,17 @@ export function DistributionChart({
         <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           {segments.map((item) => (
             <div key={item.label} className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="text-[var(--color-text-muted)] truncate max-w-[80px]">{item.label}</span>
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-[var(--color-text-muted)] truncate max-w-[80px]">
+                {item.label}
+              </span>
               {showValues && (
-                <span className="text-[var(--color-text)] font-medium">{Math.round(item.percentage * 100)}%</span>
+                <span className="text-[var(--color-text)] font-medium">
+                  {Math.round(item.percentage * 100)}%
+                </span>
               )}
             </div>
           ))}

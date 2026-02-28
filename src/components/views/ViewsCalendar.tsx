@@ -16,12 +16,20 @@ export interface ViewsCalendarProps {
   };
   calendarDate: Date;
   setCalendarDate: React.Dispatch<React.SetStateAction<Date>>;
-  hoveredItem: { type: string; data: Todo | Task | Plan | Target | Milestone } | null;
+  hoveredItem: {
+    type: string;
+    data: Todo | Task | Plan | Target | Milestone;
+  } | null;
   setHoveredItem: React.Dispatch<
-    React.SetStateAction<{ type: string; data: Todo | Task | Plan | Target | Milestone } | null>
+    React.SetStateAction<{
+      type: string;
+      data: Todo | Task | Plan | Target | Milestone;
+    } | null>
   >;
   hoverPosition: { x: number; y: number };
-  setHoverPosition: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  setHoverPosition: React.Dispatch<
+    React.SetStateAction<{ x: number; y: number }>
+  >;
 }
 
 export function ViewsCalendar({
@@ -128,7 +136,9 @@ export function ViewsCalendar({
           <div
             key={day}
             className="text-center text-sm font-medium py-2"
-            style={{ color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)" }}
+            style={{
+              color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)",
+            }}
           >
             {day}
           </div>
@@ -138,7 +148,11 @@ export function ViewsCalendar({
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: firstDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="h-24 rounded" style={{ backgroundColor: "var(--color-bg-hover)" }}></div>
+          <div
+            key={`empty-${i}`}
+            className="h-24 rounded"
+            style={{ backgroundColor: "var(--color-bg-hover)" }}
+          ></div>
         ))}
 
         {Array.from({ length: daysInMonth }).map((_, i) => {

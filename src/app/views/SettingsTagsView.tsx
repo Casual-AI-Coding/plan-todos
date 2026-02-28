@@ -18,7 +18,12 @@ export function SettingsTagsView() {
   const deleteTag = useDeleteTag();
 
   const [showForm, setShowForm] = useState(false);
-  const [editingTag, setEditingTag] = useState<{ id: string; name: string; color: string; description?: string | null } | null>(null);
+  const [editingTag, setEditingTag] = useState<{
+    id: string;
+    name: string;
+    color: string;
+    description?: string | null;
+  } | null>(null);
   const [name, setName] = useState("");
   const [color, setColor] = useState("#3B82F6");
   const [description, setDescription] = useState("");
@@ -83,7 +88,12 @@ export function SettingsTagsView() {
     }
   }
 
-  function handleEdit(tag: { id: string; name: string; color: string; description?: string | null }) {
+  function handleEdit(tag: {
+    id: string;
+    name: string;
+    color: string;
+    description?: string | null;
+  }) {
     setEditingTag(tag);
     setName(tag.name);
     setColor(tag.color);
@@ -175,17 +185,18 @@ export function SettingsTagsView() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                onClick={resetForm}
-              >
+              <Button variant="secondary" onClick={resetForm}>
                 取消
               </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={createTag.isPending || updateTag.isPending}
               >
-                {createTag.isPending || updateTag.isPending ? "保存中..." : editingTag ? "保存" : "创建"}
+                {createTag.isPending || updateTag.isPending
+                  ? "保存中..."
+                  : editingTag
+                    ? "保存"
+                    : "创建"}
               </Button>
             </div>
           </div>

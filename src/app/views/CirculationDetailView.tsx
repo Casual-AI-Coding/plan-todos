@@ -21,15 +21,13 @@ export function CirculationDetailView({
   onBack,
   onClose,
 }: CirculationDetailViewProps) {
-  const [checkinTarget, setCheckinTarget] = useState<{ id: string } | null>(null);
+  const [checkinTarget, setCheckinTarget] = useState<{ id: string } | null>(
+    null,
+  );
 
   const isModal = !!onClose;
 
-  const {
-    data: circulation,
-    isLoading,
-    error,
-  } = useCirculation(id);
+  const { data: circulation, isLoading, error } = useCirculation(id);
 
   const { data: logs = [] } = useCirculationLogs(id, 20);
 

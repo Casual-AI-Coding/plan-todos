@@ -214,7 +214,7 @@ export default function Home() {
               }}
             >
               {/* Mobile sidebar header with close button */}
-              <div 
+              <div
                 className="flex items-center justify-between px-4 border-b"
                 style={{
                   height: "calc(3.5rem + env(safe-area-inset-top))",

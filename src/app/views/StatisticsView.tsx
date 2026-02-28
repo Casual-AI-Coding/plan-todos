@@ -1,7 +1,11 @@
 "use client";
 
 import { Card, ProgressBar } from "@/components/ui";
-import { TrendChart, HeatmapCalendar, DistributionChart } from "@/components/ui/charts";
+import {
+  TrendChart,
+  HeatmapCalendar,
+  DistributionChart,
+} from "@/components/ui/charts";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useMemo } from "react";
 import { format, subDays } from "date-fns";
@@ -20,23 +24,25 @@ export function StatisticsView() {
   // Replace the weeklyTrendData useMemo:
   const weeklyTrendData = useMemo(() => {
     if (!data?.todos) return [];
-    
-    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+    const days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
     const today = new Date();
     const dayOfWeek = today.getDay();
-    
+
     // Get counts for each day of the current week
     return days.map((day, i) => {
       const dayDate = new Date(today);
-      dayDate.setDate(today.getDate() - dayOfWeek + i + (i < dayOfWeek ? 0 : -7) + 1);
+      dayDate.setDate(
+        today.getDate() - dayOfWeek + i + (i < dayOfWeek ? 0 : -7) + 1,
+      );
       const dateStr = format(dayDate, "yyyy-MM-dd");
-      
+
       // Count todos due or completed on this day
-      const dueCount = data.todos.filter(t => t.due_date === dateStr).length;
-      const completedCount = data.todos.filter(t => 
-        t.status === "done" && t.due_date === dateStr
+      const dueCount = data.todos.filter((t) => t.due_date === dateStr).length;
+      const completedCount = data.todos.filter(
+        (t) => t.status === "done" && t.due_date === dateStr,
       ).length;
-      
+
       return {
         date: day,
         value: completedCount + Math.round(dueCount * 0.3), // Weight: completed + 30% of due
@@ -47,32 +53,32 @@ export function StatisticsView() {
   // Replace the heatmapData useMemo:
   const heatmapData = useMemo(() => {
     if (!data?.todos || !data?.circulations) return [];
-    
+
     const result: { date: string; count: number }[] = [];
     const today = new Date();
-    
+
     // Build a map of activity by date
     const activityMap = new Map<string, number>();
-    
+
     // Add todo due dates
-    data.todos.forEach(todo => {
+    data.todos.forEach((todo) => {
       if (todo.due_date) {
         const count = activityMap.get(todo.due_date) || 0;
         activityMap.set(todo.due_date, count + 1);
       }
     });
-    
+
     // Add todo completions (approximate by updated_at for done todos)
-    data.todos.forEach(todo => {
+    data.todos.forEach((todo) => {
       if (todo.status === "done" && todo.updated_at) {
-        const date = todo.updated_at.split('T')[0];
+        const date = todo.updated_at.split("T")[0];
         const count = activityMap.get(date) || 0;
         activityMap.set(date, count + 1);
       }
     });
-    
+
     // Add circulation logs if available
-    data.circulations.forEach(circ => {
+    data.circulations.forEach((circ) => {
       // Use streak_count as a proxy for activity
       for (let i = 0; i < Math.min(circ.streak_count, 30); i++) {
         const date = subDays(today, i);
@@ -81,7 +87,7 @@ export function StatisticsView() {
         activityMap.set(dateStr, count + 1);
       }
     });
-    
+
     // Generate 180 days of data
     for (let i = 180; i >= 0; i--) {
       const date = subDays(new Date(), i);
@@ -91,23 +97,25 @@ export function StatisticsView() {
         count: activityMap.get(dateStr) || 0,
       });
     }
-    
+
     return result;
   }, [data]);
 
   // Todo distribution data for DistributionChart
   const todoDistributionData = useMemo(() => {
     if (!data?.todos) return [];
-    
+
     const done = data.todos.filter((t) => t.status === "done").length;
     const todo = data.todos.filter((t) => t.status === "pending").length;
-    const inProgress = data.todos.filter((t) => t.status === "in-progress").length;
-    
+    const inProgress = data.todos.filter(
+      (t) => t.status === "in-progress",
+    ).length;
+
     return [
       { label: "已完成", value: done, color: "#22c55e" },
       { label: "待办", value: todo, color: "#f59e0b" },
       { label: "进行中", value: inProgress, color: "#3b82f6" },
-    ].filter(item => item.value > 0);
+    ].filter((item) => item.value > 0);
   }, [data]);
 
   if (error) {
@@ -218,19 +226,24 @@ export function StatisticsView() {
       {/* Todo Distribution & Activity Trend */}
       <div className="grid grid-cols-2 gap-6 mb-6">
         <Card>
-          <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+          <h3
+            className="font-medium mb-4"
+            style={{ color: "var(--color-text)" }}
+          >
             待办状态分布
           </h3>
           <DistributionChart
             data={todoDistributionData}
             showValues={true}
-            
             animated={true}
           />
         </Card>
 
         <Card>
-          <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+          <h3
+            className="font-medium mb-4"
+            style={{ color: "var(--color-text)" }}
+          >
             完成趋势 (近7天)
           </h3>
           <TrendChart

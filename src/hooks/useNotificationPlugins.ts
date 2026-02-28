@@ -20,11 +20,8 @@ export function useCreateNotificationPlugin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: {
-      name: string;
-      plugin_type: string;
-      config: string;
-    }) => createNotificationPlugin(data.name, data.plugin_type, data.config),
+    mutationFn: (data: { name: string; plugin_type: string; config: string }) =>
+      createNotificationPlugin(data.name, data.plugin_type, data.config),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["notificationPlugins"],
@@ -43,12 +40,7 @@ export function useUpdateNotificationPlugin() {
       enabled: boolean;
       config: string;
     }) =>
-      updateNotificationPlugin(
-        data.id,
-        data.name,
-        data.enabled,
-        data.config,
-      ),
+      updateNotificationPlugin(data.id, data.name, data.enabled, data.config),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["notificationPlugins"],
