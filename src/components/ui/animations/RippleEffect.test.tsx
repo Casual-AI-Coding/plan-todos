@@ -7,7 +7,7 @@ describe("RippleEffect", () => {
     render(
       <RippleEffect>
         <button>Click Me</button>
-      </RippleEffect>,
+      </RippleEffect>
     );
     expect(screen.getByText("Click Me")).toBeInTheDocument();
   });
@@ -17,7 +17,7 @@ describe("RippleEffect", () => {
     render(
       <RippleEffect onClick={handleClick}>
         <button>Click</button>
-      </RippleEffect>,
+      </RippleEffect>
     );
     fireEvent.click(screen.getByText("Click"));
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -27,7 +27,7 @@ describe("RippleEffect", () => {
     const { container } = render(
       <RippleEffect className="custom-class">
         <div>Content</div>
-      </RippleEffect>,
+      </RippleEffect>
     );
     expect(container.firstChild).toHaveClass("custom-class");
   });
@@ -36,8 +36,22 @@ describe("RippleEffect", () => {
     const { container } = render(
       <RippleEffect>
         <div>Content</div>
-      </RippleEffect>,
+      </RippleEffect>
     );
     expect(container.firstChild).toHaveClass("relative", "overflow-hidden");
+  });
+
+  it("handles multiple rapid clicks", () => {
+    render(
+      <RippleEffect>
+        <button>Click</button>
+      </RippleEffect>
+    );
+    
+    fireEvent.click(screen.getByText("Click"));
+    fireEvent.click(screen.getByText("Click"));
+    fireEvent.click(screen.getByText("Click"));
+    
+    expect(screen.getByText("Click")).toBeInTheDocument();
   });
 });
