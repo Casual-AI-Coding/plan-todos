@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import { Card, Checkbox } from "@/components/ui";
 import type { Todo } from "@/lib/api";
 
@@ -10,7 +12,12 @@ export interface TodoItemProps {
   onClick: (todo: Todo) => void;
 }
 
-export function TodoItem({ todo, onToggle, onDelete, onClick }: TodoItemProps) {
+export const TodoItem = React.memo(function TodoItem({
+  todo,
+  onToggle,
+  onDelete,
+  onClick,
+}: TodoItemProps) {
   const priorityColors: Record<string, string> = {
     P0: "bg-red-100 text-red-700",
     P1: "bg-orange-100 text-orange-700",
@@ -75,4 +82,4 @@ export function TodoItem({ todo, onToggle, onDelete, onClick }: TodoItemProps) {
       </div>
     </Card>
   );
-}
+});
