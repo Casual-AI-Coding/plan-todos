@@ -6,6 +6,8 @@ import {
   validatePriority,
   validateStatus,
   validateTodo,
+  VALID_PRIORITIES,
+  VALID_STATUSES,
 } from "./validation";
 
 describe("validation", () => {
@@ -34,6 +36,13 @@ describe("validation", () => {
     it("should return null for valid value", () => {
       expect(required("test", "title")).toBeNull();
     });
+
+    it("should return error for whitespace-only string", () => {
+      expect(required("   ", "title")).toEqual({
+        field: "title",
+        message: "title不能为空",
+      });
+    });
   });
 
   describe("maxLength", () => {
@@ -46,6 +55,10 @@ describe("validation", () => {
 
     it("should return null for valid length", () => {
       expect(maxLength("a".repeat(500), 500, "title")).toBeNull();
+    });
+
+    it("should return null for empty string", () => {
+      expect(maxLength("", 500, "title")).toBeNull();
     });
   });
 
@@ -60,6 +73,12 @@ describe("validation", () => {
     it("should return null for valid priority", () => {
       expect(validatePriority("P1")).toBeNull();
     });
+
+    it("should validate all valid priorities", () => {
+      VALID_PRIORITIES.forEach((p) => {
+        expect(validatePriority(p)).toBeNull();
+      });
+    });
   });
 
   describe("validateStatus", () => {
@@ -72,6 +91,12 @@ describe("validation", () => {
 
     it("should return null for valid status", () => {
       expect(validateStatus("pending")).toBeNull();
+    });
+
+    it("should validate all valid statuses", () => {
+      VALID_STATUSES.forEach((s) => {
+        expect(validateStatus(s)).toBeNull();
+      });
     });
   });
 
@@ -91,6 +116,11 @@ describe("validation", () => {
         priority: "P1",
         status: "pending",
       });
+      expect(errors).toEqual([]);
+    });
+
+    it("should skip validation for undefined fields", () => {
+      const errors = validateTodo({});
       expect(errors).toEqual([]);
     });
   });

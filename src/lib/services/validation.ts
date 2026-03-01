@@ -4,11 +4,26 @@ export interface ValidationError {
   message: string;
 }
 
+/** 有效优先级列表 */
+export const VALID_PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
+
+/** 有效状态列表 */
+export const VALID_STATUSES = [
+  "pending",
+  "in_progress",
+  "completed",
+  "cancelled",
+] as const;
+
 export function required(
   value: unknown,
   fieldName: string,
 ): ValidationError | null {
   if (value === null || value === undefined || value === "") {
+    return { field: fieldName, message: `${fieldName}不能为空` };
+  }
+  // 检查纯空白字符串
+  if (typeof value === "string" && value.trim() === "") {
     return { field: fieldName, message: `${fieldName}不能为空` };
   }
   return null;
@@ -26,21 +41,25 @@ export function maxLength(
 }
 
 export function validatePriority(priority: string): ValidationError | null {
-  if (!["P0", "P1", "P2", "P3"].includes(priority)) {
+  if (
+    !VALID_PRIORITIES.includes(priority as (typeof VALID_PRIORITIES)[number])
+  ) {
     return { field: "priority", message: "无效的优先级" };
   }
   return null;
 }
 
 export function validateStatus(status: string): ValidationError | null {
-  const validStatuses = ["pending", "in_progress", "completed", "cancelled"];
-  if (!validStatuses.includes(status)) {
+  if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
     return { field: "status", message: "无效的状态" };
   }
   return null;
 }
 
-// 领域验证器
+/**
+ * 领域验证器 - 执行部分验证
+ * 注意：undefined 字段会被跳过，只验证提供的字段
+ */
 export function validateTodo(data: {
   title?: string;
   priority?: string;
