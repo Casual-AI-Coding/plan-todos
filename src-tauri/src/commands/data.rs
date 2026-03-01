@@ -152,7 +152,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, title, content, due_date, status, priority) in todos {
             conn.execute(
-                "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, title, content, due_date, status, priority, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.todos += 1;
@@ -187,7 +187,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, title, description, start_date, end_date, status) in plans {
             conn.execute(
-                "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, title, description, start_date, end_date, status, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.plans += 1;
@@ -348,7 +348,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, plan_id, title, description, start_date, end_date, status, priority) in tasks {
             conn.execute(
-                "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, plan_id, title, description, start_date, end_date, status, priority, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.tasks += 1;
@@ -399,7 +399,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, title, description, due_date, status, progress) in targets {
             conn.execute(
-                "INSERT INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, title, description, due_date, status, progress, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.targets += 1;
@@ -490,7 +490,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, target_id, title, weight, status, priority) in steps {
             conn.execute(
-                "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, target_id, title, weight, status, priority, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.steps += 1;
@@ -546,7 +546,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, title, target_date, biz_type, biz_id, status, progress) in milestones {
             conn.execute(
-                "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO milestones (id, title, target_date, biz_type, biz_id, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, title, target_date, biz_type, biz_id, status, progress, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.milestones += 1;
@@ -611,7 +611,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, title, content, freq, streak, best_streak, status) in periodic_circulations {
             conn.execute(
-                "INSERT INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, 'periodic', ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO circulations (id, title, content, circulation_type, frequency, streak_count, best_streak, status, created_at, updated_at) VALUES (?, ?, ?, 'periodic', ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![id, title, content, freq, streak, best_streak, status, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.circulations += 1;
@@ -638,7 +638,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
         ];
         for (id, title, content, target_count, current_count, status) in count_circulations {
             conn.execute(
-                "INSERT INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, 'count', ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO circulations (id, title, content, circulation_type, target_count, current_count, status, created_at, updated_at) VALUES (?, ?, ?, 'count', ?, ?, ?, ?, ?)",
                 rusqlite::params![id, title, content, target_count, current_count, status, &now, &now],
             ).map_err(|e| e.to_string())?;
             result.circulations += 1;
@@ -653,9 +653,10 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
             let completed_at = completed_at.to_rfc3339();
 
             conn.execute(
-                "INSERT INTO circulation_logs (id, circulation_id, completed_at, count) VALUES (?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO circulation_logs (id, circulation_id, completed_at, count) VALUES (?, ?, ?, ?)",
                 rusqlite::params![log_id, circ_id, completed_at, 1],
             ).map_err(|e| e.to_string())?;
+
             result.circulation_logs += 1;
         }
 
@@ -696,6 +697,8 @@ pub fn reset_data(
         conn.execute("DELETE FROM todos", [])
             .map_err(|e| e.to_string())?;
         conn.execute("DELETE FROM notification_settings", [])
+            .map_err(|e| e.to_string())?;
+        conn.execute("DELETE FROM schema_migrations", [])
             .map_err(|e| e.to_string())?;
 
         // Optionally keep tags
