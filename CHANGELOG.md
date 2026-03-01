@@ -47,6 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **UI 修复**:
 - SearchBar 响应式适配
 
+**Bug 修复**:
+- 修复 seed_test_data 使用 INSERT OR IGNORE 避免重复数据失败
+- 修复 reset_data 遗漏 schema_migrations 表清理
+- SearchBar 响应式适配
+
 ### Changed
 
 - 测试覆盖率从 ~90% 提升至 95.43%
