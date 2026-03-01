@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, Button } from "@/components/ui";
 import {
   useDailySummarySettings,
@@ -26,17 +26,12 @@ export function SettingsDailySummaryView() {
   const [includeOverdue, setIncludeOverdue] = useState(true);
   const [includeCompleted, setIncludeCompleted] = useState(true);
   const [selectedPlugins, setSelectedPlugins] = useState<string[]>([]);
-
-  // Initialize form state from settings
-  useEffect(() => {
-    if (settings) {
-      setEnabled(settings.enabled);
-      setTime(settings.time);
-      setIncludePending(settings.include_pending);
-      setIncludeOverdue(settings.include_overdue);
-      setIncludeCompleted(settings.include_completed);
-    }
-  }, [settings]);
+  // Use settings directly when available
+  const displayEnabled = settings?.enabled ?? enabled;
+  const displayTime = settings?.time ?? time;
+  const displayIncludePending = settings?.include_pending ?? includePending;
+  const displayIncludeOverdue = settings?.include_overdue ?? includeOverdue;
+  const displayIncludeCompleted = settings?.include_completed ?? includeCompleted;
 
   const isLoading = settingsLoading || pluginsLoading;
 
@@ -110,7 +105,7 @@ export function SettingsDailySummaryView() {
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={enabled}
+                checked={displayEnabled}
                 onChange={(e) => setEnabled(e.target.checked)}
                 className="sr-only peer"
               />
@@ -125,7 +120,7 @@ export function SettingsDailySummaryView() {
             </label>
             <input
               type="time"
-              value={time}
+              value={displayTime}
               onChange={(e) => setTime(e.target.value)}
               className="px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
@@ -140,7 +135,7 @@ export function SettingsDailySummaryView() {
               <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={includePending}
+                  checked={displayIncludePending}
                   onChange={(e) => setIncludePending(e.target.checked)}
                   className="w-4 h-4 text-teal-500 rounded focus:ring-teal-500"
                 />
@@ -149,7 +144,7 @@ export function SettingsDailySummaryView() {
               <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={includeOverdue}
+                  checked={displayIncludeOverdue}
                   onChange={(e) => setIncludeOverdue(e.target.checked)}
                   className="w-4 h-4 text-teal-500 rounded focus:ring-teal-500"
                 />
@@ -158,7 +153,7 @@ export function SettingsDailySummaryView() {
               <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={includeCompleted}
+                  checked={displayIncludeCompleted}
                   onChange={(e) => setIncludeCompleted(e.target.checked)}
                   className="w-4 h-4 text-teal-500 rounded focus:ring-teal-500"
                 />

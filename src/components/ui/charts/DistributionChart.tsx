@@ -47,24 +47,28 @@ export function DistributionChart({
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const gradientId = `distribution-gradient-${useId()}`;
 
-  // Calculate angles for pie/donut
   // Calculate segments with angles using useMemo
   const segments = useMemo(() => {
-    let currentAngle = 0;
-    return data.map((item, index) => {
-      const percentage = item.value / total;
-      const angle = percentage * 360;
-      const startAngle = currentAngle;
-      currentAngle += angle;
-      const color = item.color || defaultColors[index % defaultColors.length];
-      return {
-        ...item,
-        percentage,
-        angle,
-        startAngle,
-        color,
-      };
-    });
+    // Calculate angles for each item
+    const items = data.map((item, index) => ({
+      item,
+      percentage: item.value / total,
+      angle: (item.value / total) * 360,
+      color: item.color || defaultColors[index % defaultColors.length],
+    }));
+    // Calculate start angles by computing prefix sums
+    const startAngles = items.reduce<number[]>((acc, { angle }) => {
+      const prev = acc.length > 0 ? acc[acc.length - 1] : 0;
+      return [...acc, prev + angle];
+    }, []);
+    // Combine into final segments
+    return items.map(({ item, percentage, angle, color }, idx) => ({
+      ...item,
+      percentage,
+      angle,
+      startAngle: idx === 0 ? 0 : startAngles[idx - 1],
+      color,
+    }));
   }, [data, total]);
 
   // Polar to Cartesian coordinates

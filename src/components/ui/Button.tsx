@@ -7,7 +7,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
