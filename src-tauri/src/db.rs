@@ -349,13 +349,6 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         ) {
             warn!("Migration warning: {}", e);
         }
-
-        if let Err(e) = conn.execute(
-            "INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)",
-            [migration_id, &now],
-        ) {
-            warn!("Migration warning: {}", e);
-        }
     }
 
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
