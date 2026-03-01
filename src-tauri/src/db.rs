@@ -1,6 +1,6 @@
 // Database initialization and seed data
 
-use log::info;
+use log::{info, warn};
 use rusqlite::Connection;
 
 pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
@@ -234,12 +234,12 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
-    // Add count column if not exists (migration)
-    conn.execute(
+    if let Err(e) = conn.execute(
         "ALTER TABLE circulation_logs ADD COLUMN count INTEGER DEFAULT 1",
         [],
-    )
-    .ok(); // Ignore error if column already exists
+    ) {
+        warn!("Migration warning: {}", e);
+    }
 
     // Indexes for circulations
     conn.execute(
@@ -255,37 +255,42 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
-    // Migration: Add missing columns
-    conn.execute(
+    if let Err(e) = conn.execute(
         "ALTER TABLE targets ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0",
         [],
-    )
-    .ok();
-    conn.execute(
+    ) {
+        warn!("Migration warning: {}", e);
+    }
+    if let Err(e) = conn.execute(
         "ALTER TABLE milestones ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0",
         [],
-    )
-    .ok();
-    conn.execute(
+    ) {
+        warn!("Migration warning: {}", e);
+    }
+    if let Err(e) = conn.execute(
         "ALTER TABLE plans ADD COLUMN IF NOT EXISTS start_date TEXT",
         [],
-    )
-    .ok();
-    conn.execute(
+    ) {
+        warn!("Migration warning: {}", e);
+    }
+    if let Err(e) = conn.execute(
         "ALTER TABLE plans ADD COLUMN IF NOT EXISTS end_date TEXT",
         [],
-    )
-    .ok();
-    conn.execute(
+    ) {
+        warn!("Migration warning: {}", e);
+    }
+    if let Err(e) = conn.execute(
         "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS start_date TEXT",
         [],
-    )
-    .ok();
-    conn.execute(
+    ) {
+        warn!("Migration warning: {}", e);
+    }
+    if let Err(e) = conn.execute(
         "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS end_date TEXT",
         [],
-    )
-    .ok();
+    ) {
+        warn!("Migration warning: {}", e);
+    }
 
     // Migration: Add biz_type and biz_id columns with data migration from legacy fields
     // Only run migration once - check if already applied
@@ -313,36 +318,44 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             .unwrap_or(false);
 
         if has_legacy_data {
-            // Migrate plan_id -> biz_type='plan', biz_id=plan_id
-            conn.execute(
+            if let Err(e) = conn.execute(
                 "UPDATE milestones SET biz_type = 'plan', biz_id = plan_id WHERE plan_id IS NOT NULL",
                 [],
-            )
-            .ok();
+            ) {
+                warn!("Migration warning: {}", e);
+            }
 
-            // Migrate task_id -> biz_type='task', biz_id=task_id
-            conn.execute(
+            if let Err(e) = conn.execute(
                 "UPDATE milestones SET biz_type = 'task', biz_id = task_id WHERE task_id IS NOT NULL",
                 [],
-            )
-            .ok();
+            ) {
+                warn!("Migration warning: {}", e);
+            }
 
-            // Migrate target_id -> biz_type='target', biz_id=target_id
-            conn.execute(
+            if let Err(e) = conn.execute(
                 "UPDATE milestones SET biz_type = 'target', biz_id = target_id WHERE target_id IS NOT NULL",
                 [],
-            ).ok();
-
+            ) {
+                warn!("Migration warning: {}", e);
+            }
             info!("Migrated milestone legacy data to biz_type/biz_id");
         }
 
         // Record migration as done
         let now = chrono::Utc::now().to_rfc3339();
-        conn.execute(
+        if let Err(e) = conn.execute(
             "INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)",
             [migration_id, &now],
-        )
-        .ok();
+        ) {
+            warn!("Migration warning: {}", e);
+        }
+
+        if let Err(e) = conn.execute(
+            "INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)",
+            [migration_id, &now],
+        ) {
+            warn!("Migration warning: {}", e);
+        }
     }
 
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
