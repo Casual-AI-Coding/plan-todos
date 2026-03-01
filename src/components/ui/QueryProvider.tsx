@@ -24,7 +24,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
             // Retry: 3 times on failure
             retry: 3,
             // Refetch on window focus
-            refetchOnWindowFocus: true,
+            refetchOnWindowFocus: false,
           },
           mutations: {
             // Retry mutations once on failure
