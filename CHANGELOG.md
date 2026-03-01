@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.7] - 2026-03-02
+
+### Added
+
+**服务层重构**:
+- 新增 `src/lib/services/` 目录，实现前后端业务逻辑解耦
+- `validation.ts` - 通用验证函数（17 个测试）
+- `planService.ts` - 计划进度计算、排序（9 个测试）
+- `todoService.ts` - Todo 过滤、分组、排序（10 个测试）
+- `circulationService.ts` - 打卡统计、趋势（8 个测试）
+- `targetService.ts` - 目标进度、分类（11 个测试）
+- `milestoneService.ts` - 里程碑管理（11 个测试）
+
+**UI/UX 改进**:
+- ErrorBoundary 全局错误边界组件
+- Icons 统一图标管理组件
+- 交互工具类 (cursor-pointer, hover, focus)
+- React Query 配置优化
+
+### Fixed
+
+**后端安全与稳定性**:
+- SQL 注入防护 - 使用参数化查询替代字符串拼接
+- XSS 防护 - dangerouslySetInnerHTML 脚本外部化
+- 输入验证 - Rust validation.rs 模块
+- 事务处理 - import 操作添加 commit/rollback 逻辑
+- 错误日志 - 移除静默吞没，添加日志记录
+
+**性能优化**:
+- N+1 查询修复 - useTodos 直接调用 API
+- React.memo - TodoItem 添加自定义比较函数
+- 移除死代码 - 删除未使用的 Zustand store
+
+**无障碍改进**:
+- aria-label 支持
+- 键盘导航支持
+
+**UI 修复**:
+- SearchBar 响应式适配
+
+### Changed
+
+- 测试覆盖率从 ~90% 提升至 95.43%
+- 移除未使用的 Zustand store
+
+---
+
 ## [0.5.6] - 2026-03-01
 
 ### Fixed
