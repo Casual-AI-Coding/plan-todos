@@ -49,7 +49,6 @@ export function DistributionChart({
 
   // Calculate angles for pie/donut
   // Calculate segments with angles using useMemo
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const segments = useMemo(() => {
     let currentAngle = 0;
     return data.map((item, index) => {

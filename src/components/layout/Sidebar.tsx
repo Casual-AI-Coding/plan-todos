@@ -72,7 +72,6 @@ export function Sidebar({
     }
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved === "true") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCollapsed(true);
     }
   }, [isMobile]);

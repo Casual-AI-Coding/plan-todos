@@ -30,15 +30,10 @@ export function SettingsDailySummaryView() {
   // Initialize form state from settings
   useEffect(() => {
     if (settings) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEnabled(settings.enabled);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTime(settings.time);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIncludePending(settings.include_pending);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIncludeOverdue(settings.include_overdue);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIncludeCompleted(settings.include_completed);
     }
   }, [settings]);

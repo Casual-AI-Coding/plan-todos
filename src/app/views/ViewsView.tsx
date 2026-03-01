@@ -108,7 +108,6 @@ export function ViewsView() {
       ["pending", "in-progress", "done"].forEach(checkScrollNeeded);
     }, 100);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todos, allTasks, plans, targets, milestones, filters]);
 
   // Group tasks by plan ID using useMemo
