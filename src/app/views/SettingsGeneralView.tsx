@@ -5,10 +5,21 @@ import { Card, Button, Input, Modal, Checkbox } from "@/components/ui";
 import { ImportExportView } from "./ImportExportView";
 import { ThemeSelector } from "@/components/ui/ThemeSelector";
 import { seedTestData, resetData } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys as todoKeys } from "@/hooks/useTodos";
+import { planKeys } from "@/hooks/usePlans";
+import { targetKeys } from "@/hooks/useTargets";
+import { taskKeys } from "@/hooks/useTasks";
+import { tagKeys } from "@/hooks/useTags";
+import { circulationKeys } from "@/hooks/useCirculations";
+import { dashboardKeys } from "@/hooks/useDashboard";
+import { statisticsKeys } from "@/hooks/useStatistics";
+import { milestoneKeys } from "@/hooks/useMilestones";
 
 export function SettingsGeneralView() {
   const [language, setLanguage] = useState<"zh" | "en">("zh");
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   // Operation result messages
   const [message, setMessage] = useState<{
@@ -30,6 +41,16 @@ export function SettingsGeneralView() {
     setMessage(null);
     try {
       const seedResult = await seedTestData();
+      // Invalidate all queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: todoKeys.todos });
+      queryClient.invalidateQueries({ queryKey: planKeys.plans });
+      queryClient.invalidateQueries({ queryKey: targetKeys.targets });
+      queryClient.invalidateQueries({ queryKey: taskKeys.tasks });
+      queryClient.invalidateQueries({ queryKey: tagKeys.tags });
+      queryClient.invalidateQueries({ queryKey: circulationKeys.circulations });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: statisticsKeys.statistics });
+      queryClient.invalidateQueries({ queryKey: milestoneKeys.milestones });
       setMessage({
         type: "success",
         text: `测试数据生成成功！已添加 ${seedResult.todos} 个待办、${seedResult.plans} 个计划、${seedResult.circulations} 个打卡等`,
@@ -51,6 +72,16 @@ export function SettingsGeneralView() {
     setMessage(null);
     try {
       await resetData({ keep_tags: keepTags, keep_settings: keepSettings });
+      // Invalidate all queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: todoKeys.todos });
+      queryClient.invalidateQueries({ queryKey: planKeys.plans });
+      queryClient.invalidateQueries({ queryKey: targetKeys.targets });
+      queryClient.invalidateQueries({ queryKey: taskKeys.tasks });
+      queryClient.invalidateQueries({ queryKey: tagKeys.tags });
+      queryClient.invalidateQueries({ queryKey: circulationKeys.circulations });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: statisticsKeys.statistics });
+      queryClient.invalidateQueries({ queryKey: milestoneKeys.milestones });
       const kept = [];
       if (keepTags) kept.push("标签");
       if (keepSettings) kept.push("设置");
