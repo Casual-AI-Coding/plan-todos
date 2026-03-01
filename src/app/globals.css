@@ -1321,3 +1321,18 @@ body {
     scrollbar-width: none;
   }
 }
+
+/* ============================================
+   Interactive Utility Classes
+   ============================================ */
+@layer utilities {
+  .interactive {
+    @apply cursor-pointer transition-colors duration-200;
+  }
+  .interactive-hover:hover {
+    @apply bg-primary/80;
+  }
+  .interactive-focus:focus {
+    @apply outline-none ring-2 ring-primary;
+  }
+}
