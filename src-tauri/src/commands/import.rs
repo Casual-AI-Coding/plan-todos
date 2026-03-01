@@ -50,13 +50,14 @@ fn import_merge(
     conn: &rusqlite::Connection,
     data: &ExportDataContent,
 ) -> Result<ImportResult, String> {
+    let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
     let mut imported = 0usize;
     let mut skipped = 0usize;
     let mut errors = Vec::new();
 
     // Import tags first (dependencies)
     for tag in &data.tags {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM tags WHERE id = ?)",
                 [&tag.id],
@@ -67,7 +68,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
                 rusqlite::params![tag.id, tag.name, tag.color, tag.description, tag.created_at],
             ) {
@@ -79,7 +80,7 @@ fn import_merge(
 
     // Import plans
     for plan in &data.plans {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM plans WHERE id = ?)",
                 [&plan.id],
@@ -90,7 +91,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![plan.id, plan.title, plan.description, plan.start_date, plan.end_date, plan.status, plan.created_at, plan.updated_at],
             ) {
@@ -102,7 +103,7 @@ fn import_merge(
 
     // Import targets
     for target in &data.targets {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM targets WHERE id = ?)",
                 [&target.id],
@@ -113,7 +114,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![target.id, target.title, target.description, target.due_date, target.status, target.progress, target.created_at, target.updated_at],
             ) {
@@ -125,7 +126,7 @@ fn import_merge(
 
     // Import todos
     for todo in &data.todos {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM todos WHERE id = ?)",
                 [&todo.id],
@@ -136,7 +137,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![todo.id, todo.title, todo.content, todo.due_date, todo.status, todo.priority, todo.created_at, todo.updated_at],
             ) {
@@ -148,7 +149,7 @@ fn import_merge(
 
     // Import tasks
     for task in &data.tasks {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM tasks WHERE id = ?)",
                 [&task.id],
@@ -159,7 +160,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![task.id, task.plan_id, task.title, task.description, task.start_date, task.end_date, task.status, task.priority, task.created_at, task.updated_at],
             ) {
@@ -171,7 +172,7 @@ fn import_merge(
 
     // Import steps
     for step in &data.steps {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM steps WHERE id = ?)",
                 [&step.id],
@@ -182,7 +183,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![step.id, step.target_id, step.title, step.weight, step.status, step.priority, step.created_at, step.updated_at],
             ) {
@@ -194,7 +195,7 @@ fn import_merge(
 
     // Import milestones
     for milestone in &data.milestones {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM milestones WHERE id = ?)",
                 [&milestone.id],
@@ -205,7 +206,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.biz_type, milestone.biz_id, milestone.status, milestone.created_at, milestone.updated_at],
             ) {
@@ -217,7 +218,7 @@ fn import_merge(
 
     // Import entity_tags
     for et in &data.entity_tags {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM entity_tags WHERE entity_type = ? AND entity_id = ? AND tag_id = ?)",
                 [&et.entity_type, &et.entity_id, &et.tag_id],
@@ -228,7 +229,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
                 rusqlite::params![et.entity_type, et.entity_id, et.tag_id],
             ) {
@@ -240,15 +241,15 @@ fn import_merge(
 
     // Import settings
     if let Some(ref settings) = data.settings.daily_summary_settings {
-        conn.execute("DELETE FROM daily_summary_settings", []).ok();
-        conn.execute(
+        tx.execute("DELETE FROM daily_summary_settings", []).ok();
+        tx.execute(
             "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
         ).ok();
     }
 
     for plugin in &data.settings.notification_plugins {
-        let exists: bool = conn
+        let exists: bool = tx
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM notification_plugins WHERE id = ?)",
                 [&plugin.id],
@@ -259,7 +260,7 @@ fn import_merge(
         if exists {
             skipped += 1;
         } else {
-            match conn.execute(
+            match tx.execute(
                 "INSERT INTO notification_plugins (id, name, plugin_type, enabled, config, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 rusqlite::params![plugin.id, plugin.name, plugin.plugin_type, plugin.enabled, plugin.config, plugin.created_at, plugin.updated_at],
             ) {
@@ -269,6 +270,7 @@ fn import_merge(
         }
     }
 
+    tx.commit().map_err(|e| e.to_string())?;
     Ok(ImportResult {
         imported,
         skipped,
@@ -284,25 +286,26 @@ fn import_replace(
     conn: &rusqlite::Connection,
     data: &ExportDataContent,
 ) -> Result<ImportResult, String> {
+    let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
     let mut imported = 0usize;
     let skipped = 0usize; // No skipped items in replace mode
     let mut errors = Vec::new();
 
     // Clear all tables (in reverse dependency order)
-    conn.execute("DELETE FROM entity_tags", []).ok();
-    conn.execute("DELETE FROM milestones", []).ok();
-    conn.execute("DELETE FROM steps", []).ok();
-    conn.execute("DELETE FROM tasks", []).ok();
-    conn.execute("DELETE FROM todos", []).ok();
-    conn.execute("DELETE FROM targets", []).ok();
-    conn.execute("DELETE FROM plans", []).ok();
-    conn.execute("DELETE FROM daily_summary_settings", []).ok();
-    conn.execute("DELETE FROM notification_plugins", []).ok();
-    conn.execute("DELETE FROM tags", []).ok();
+    tx.execute("DELETE FROM entity_tags", []).ok();
+    tx.execute("DELETE FROM milestones", []).ok();
+    tx.execute("DELETE FROM steps", []).ok();
+    tx.execute("DELETE FROM tasks", []).ok();
+    tx.execute("DELETE FROM todos", []).ok();
+    tx.execute("DELETE FROM targets", []).ok();
+    tx.execute("DELETE FROM plans", []).ok();
+    tx.execute("DELETE FROM daily_summary_settings", []).ok();
+    tx.execute("DELETE FROM notification_plugins", []).ok();
+    tx.execute("DELETE FROM tags", []).ok();
 
     // Import tags
     for tag in &data.tags {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
             rusqlite::params![tag.id, tag.name, tag.color, tag.description, tag.created_at],
         ) {
@@ -313,7 +316,7 @@ fn import_replace(
 
     // Import plans
     for plan in &data.plans {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![plan.id, plan.title, plan.description, plan.start_date, plan.end_date, plan.status, plan.created_at, plan.updated_at],
         ) {
@@ -324,7 +327,7 @@ fn import_replace(
 
     // Import targets
     for target in &data.targets {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![target.id, target.title, target.description, target.due_date, target.status, target.progress, target.created_at, target.updated_at],
         ) {
@@ -335,7 +338,7 @@ fn import_replace(
 
     // Import todos
     for todo in &data.todos {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![todo.id, todo.title, todo.content, todo.due_date, todo.status, todo.priority, todo.created_at, todo.updated_at],
         ) {
@@ -346,7 +349,7 @@ fn import_replace(
 
     // Import tasks
     for task in &data.tasks {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![task.id, task.plan_id, task.title, task.description, task.start_date, task.end_date, task.status, task.priority, task.created_at, task.updated_at],
         ) {
@@ -357,7 +360,7 @@ fn import_replace(
 
     // Import steps
     for step in &data.steps {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![step.id, step.target_id, step.title, step.weight, step.status, step.priority, step.created_at, step.updated_at],
         ) {
@@ -368,7 +371,7 @@ fn import_replace(
 
     // Import milestones
     for milestone in &data.milestones {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO milestones (id, title, target_date, biz_type, biz_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.biz_type, milestone.biz_id, milestone.status, milestone.created_at, milestone.updated_at],
         ) {
@@ -379,7 +382,7 @@ fn import_replace(
 
     // Import entity_tags
     for et in &data.entity_tags {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
             rusqlite::params![et.entity_type, et.entity_id, et.tag_id],
         ) {
@@ -390,14 +393,14 @@ fn import_replace(
 
     // Import settings
     if let Some(ref settings) = data.settings.daily_summary_settings {
-        conn.execute(
+        tx.execute(
             "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
         ).ok();
     }
 
     for plugin in &data.settings.notification_plugins {
-        match conn.execute(
+        match tx.execute(
             "INSERT INTO notification_plugins (id, name, plugin_type, enabled, config, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![plugin.id, plugin.name, plugin.plugin_type, plugin.enabled, plugin.config, plugin.created_at, plugin.updated_at],
         ) {
@@ -406,6 +409,7 @@ fn import_replace(
         }
     }
 
+    tx.commit().map_err(|e| e.to_string())?;
     Ok(ImportResult {
         imported,
         skipped,
@@ -421,13 +425,14 @@ fn import_update(
     conn: &rusqlite::Connection,
     data: &ExportDataContent,
 ) -> Result<ImportResult, String> {
+    let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
     let mut imported = 0usize;
     let skipped = 0usize; // No skipped items in upsert mode
     let mut errors = Vec::new();
 
     // Import tags (upsert)
     for tag in &data.tags {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
             rusqlite::params![tag.id, tag.name, tag.color, tag.description, tag.created_at],
         ) {
@@ -438,7 +443,7 @@ fn import_update(
 
     // Import plans (upsert)
     for plan in &data.plans {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![plan.id, plan.title, plan.description, plan.start_date, plan.end_date, plan.status, plan.created_at, plan.updated_at],
         ) {
@@ -449,7 +454,7 @@ fn import_update(
 
     // Import targets (upsert)
     for target in &data.targets {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO targets (id, title, description, due_date, status, progress, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![target.id, target.title, target.description, target.due_date, target.status, target.progress, target.created_at, target.updated_at],
         ) {
@@ -460,7 +465,7 @@ fn import_update(
 
     // Import todos (upsert)
     for todo in &data.todos {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO todos (id, title, content, due_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![todo.id, todo.title, todo.content, todo.due_date, todo.status, todo.priority, todo.created_at, todo.updated_at],
         ) {
@@ -471,7 +476,7 @@ fn import_update(
 
     // Import tasks (upsert)
     for task in &data.tasks {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO tasks (id, plan_id, title, description, start_date, end_date, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![task.id, task.plan_id, task.title, task.description, task.start_date, task.end_date, task.status, task.priority, task.created_at, task.updated_at],
         ) {
@@ -482,7 +487,7 @@ fn import_update(
 
     // Import steps (upsert)
     for step in &data.steps {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO steps (id, target_id, title, weight, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![step.id, step.target_id, step.title, step.weight, step.status, step.priority, step.created_at, step.updated_at],
         ) {
@@ -493,7 +498,7 @@ fn import_update(
 
     // Import milestones (upsert)
     for milestone in &data.milestones {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO milestones (id, title, target_date, biz_type, biz_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![milestone.id, milestone.title, milestone.target_date, milestone.biz_type, milestone.biz_id, milestone.status, milestone.created_at, milestone.updated_at],
         ) {
@@ -504,7 +509,7 @@ fn import_update(
 
     // Import entity_tags (upsert)
     for et in &data.entity_tags {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
             rusqlite::params![et.entity_type, et.entity_id, et.tag_id],
         ) {
@@ -514,16 +519,16 @@ fn import_update(
     }
 
     // Import settings (replace)
-    conn.execute("DELETE FROM daily_summary_settings", []).ok();
+    tx.execute("DELETE FROM daily_summary_settings", []).ok();
     if let Some(ref settings) = data.settings.daily_summary_settings {
-        conn.execute(
+        tx.execute(
             "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
         ).ok();
     }
 
     for plugin in &data.settings.notification_plugins {
-        match conn.execute(
+        match tx.execute(
             "INSERT OR REPLACE INTO notification_plugins (id, name, plugin_type, enabled, config, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![plugin.id, plugin.name, plugin.plugin_type, plugin.enabled, plugin.config, plugin.created_at, plugin.updated_at],
         ) {
@@ -532,6 +537,7 @@ fn import_update(
         }
     }
 
+    tx.commit().map_err(|e| e.to_string())?;
     Ok(ImportResult {
         imported,
         skipped,
