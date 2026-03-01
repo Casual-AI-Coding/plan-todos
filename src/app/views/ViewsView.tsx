@@ -113,7 +113,6 @@ export function ViewsView() {
   // Group tasks by plan ID using useMemo
 
   // Group tasks by plan ID using useMemo
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const tasksByPlan = useMemo(() => {
     const map: Record<string, Task[]> = {};
     for (const task of allTasks) {
