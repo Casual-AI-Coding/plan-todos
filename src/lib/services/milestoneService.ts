@@ -1,18 +1,22 @@
 // src/lib/services/milestoneService.ts
 
+/** 里程碑状态类型 */
+export type MilestoneStatus = "pending" | "in_progress" | "completed";
+
 export interface Milestone {
   id: string;
   title: string;
-  status?: string;
+  status?: MilestoneStatus;
   dueDate?: string;
 }
 
 export function filterMilestonesByStatus(
   milestones: Milestone[],
-  status: string,
+  status: MilestoneStatus,
 ): Milestone[] {
   return milestones.filter((m) => m.status === status);
 }
+
 
 export function sortMilestonesByDueDate(milestones: Milestone[]): Milestone[] {
   return [...milestones].sort((a, b) => {

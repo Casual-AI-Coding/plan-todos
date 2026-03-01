@@ -12,12 +12,26 @@ describe("milestoneService", () => {
   describe("filterMilestonesByStatus", () => {
     it("should filter milestones by status", () => {
       const milestones = [
-        { id: "1", title: "M1", status: "completed" },
-        { id: "2", title: "M2", status: "pending" },
-        { id: "3", title: "M3", status: "completed" },
+        { id: "1", title: "M1", status: "completed" as const },
+        { id: "2", title: "M2", status: "pending" as const },
+        { id: "3", title: "M3", status: "completed" as const },
       ];
       const result = filterMilestonesByStatus(milestones, "completed");
       expect(result.length).toBe(2);
+    });
+
+    it("should handle milestones without status", () => {
+      const milestones = [
+        { id: "1", title: "M1" },
+        { id: "2", title: "M2", status: "completed" as const },
+      ];
+      const result = filterMilestonesByStatus(milestones, "completed");
+      expect(result.length).toBe(1);
+    });
+
+    it("should return empty array for empty input", () => {
+      const result = filterMilestonesByStatus([], "completed");
+      expect(result).toEqual([]);
     });
   });
 
@@ -42,6 +56,15 @@ describe("milestoneService", () => {
       ];
       const result = sortMilestonesByDueDate(milestones);
       expect(result[2].id).toBe("2");
+    });
+
+    it("should handle all milestones without dueDate", () => {
+      const milestones = [
+        { id: "1", title: "M1" },
+        { id: "2", title: "M2" },
+      ];
+      const result = sortMilestonesByDueDate(milestones);
+      expect(result.length).toBe(2);
     });
   });
 
@@ -82,13 +105,13 @@ describe("milestoneService", () => {
           id: "1",
           title: "M1",
           dueDate: yesterday.toISOString(),
-          status: "pending",
+          status: "pending" as const,
         },
         {
           id: "2",
           title: "M2",
           dueDate: yesterday.toISOString(),
-          status: "completed",
+          status: "completed" as const,
         },
         { id: "3", title: "M3", dueDate: "2099-12-31" },
       ];
@@ -101,11 +124,17 @@ describe("milestoneService", () => {
   describe("getCompletedMilestones", () => {
     it("should return completed milestones", () => {
       const milestones = [
-        { id: "1", title: "M1", status: "completed" },
-        { id: "2", title: "M2", status: "pending" },
+        { id: "1", title: "M1", status: "completed" as const },
+        { id: "2", title: "M2", status: "pending" as const },
       ];
       const result = getCompletedMilestones(milestones);
       expect(result.length).toBe(1);
+    });
+
+    it("should return empty array when no completed milestones", () => {
+      const milestones = [{ id: "1", title: "M1", status: "pending" as const }];
+      const result = getCompletedMilestones(milestones);
+      expect(result).toEqual([]);
     });
   });
 });
