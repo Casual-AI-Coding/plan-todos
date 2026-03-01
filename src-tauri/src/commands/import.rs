@@ -270,13 +270,19 @@ fn import_merge(
         }
     }
 
-    tx.commit().map_err(|e| e.to_string())?;
+    // Rollback if there are errors, otherwise commit
+    if errors.is_empty() {
+        tx.commit().map_err(|e| e.to_string())?;
+    } else {
+        tx.rollback().map_err(|e| e.to_string())?;
+    }
     Ok(ImportResult {
         imported,
         skipped,
         errors,
     })
 }
+
 
 // ============================================================================
 // Replace Mode - Clear all and import
@@ -409,13 +415,24 @@ fn import_replace(
         }
     }
 
-    tx.commit().map_err(|e| e.to_string())?;
+    // Rollback if there are errors, otherwise commit
+    if errors.is_empty() {
+        tx.commit().map_err(|e| e.to_string())?;
+    } else {
+        tx.rollback().map_err(|e| e.to_string())?;
+    }
+
     Ok(ImportResult {
         imported,
         skipped,
         errors,
     })
 }
+
+// ============================================================================
+// Update Mode - Upsert (update if exists, insert if not)
+// ============================================================================
+
 
 // ============================================================================
 // Update Mode - Upsert (update if exists, insert if not)
@@ -537,10 +554,18 @@ fn import_update(
         }
     }
 
-    tx.commit().map_err(|e| e.to_string())?;
+    // Rollback if there are errors, otherwise commit
+
+    // Rollback if there are errors, otherwise commit
+    if errors.is_empty() {
+        tx.commit().map_err(|e| e.to_string())?;
+    } else {
+        tx.rollback().map_err(|e| e.to_string())?;
+    }
     Ok(ImportResult {
         imported,
         skipped,
         errors,
     })
 }
+
