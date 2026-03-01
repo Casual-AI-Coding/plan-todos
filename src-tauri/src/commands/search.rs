@@ -21,16 +21,15 @@ pub fn search_all(
     log_command!("search_all", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let mut results = Vec::new();
-        let pattern = format!("%{}%", query);
 
         // Search todos (title, content)
         let mut stmt = conn
             .prepare(
-                "SELECT id, title, content, status FROM todos WHERE title LIKE ? OR content LIKE ?",
+                "SELECT id, title, content, status FROM todos WHERE title LIKE '%' || ? || '%' OR content LIKE '%' || ? || '%'",
             )
             .map_err(|e| e.to_string())?;
         let todos = stmt
-            .query_map([&pattern, &pattern], |row| {
+            .query_map([&query, &query], |row| {
                 Ok(SearchResult {
                     entity_type: "todo".to_string(),
                     id: row.get(0)?,
@@ -44,10 +43,10 @@ pub fn search_all(
 
         // Search plans (title, description)
         let mut stmt = conn
-            .prepare("SELECT id, title, description, status FROM plans WHERE title LIKE ? OR description LIKE ?")
+            .prepare("SELECT id, title, description, status FROM plans WHERE title LIKE '%' || ? || '%' OR description LIKE '%' || ? || '%'")
             .map_err(|e| e.to_string())?;
         let plans = stmt
-            .query_map([&pattern, &pattern], |row| {
+            .query_map([&query, &query], |row| {
                 Ok(SearchResult {
                     entity_type: "plan".to_string(),
                     id: row.get(0)?,
@@ -61,10 +60,10 @@ pub fn search_all(
 
         // Search tasks (title, description)
         let mut stmt = conn
-            .prepare("SELECT id, title, description, status FROM tasks WHERE title LIKE ? OR description LIKE ?")
+            .prepare("SELECT id, title, description, status FROM tasks WHERE title LIKE '%' || ? || '%' OR description LIKE '%' || ? || '%'")
             .map_err(|e| e.to_string())?;
         let tasks = stmt
-            .query_map([&pattern, &pattern], |row| {
+            .query_map([&query, &query], |row| {
                 Ok(SearchResult {
                     entity_type: "task".to_string(),
                     id: row.get(0)?,
@@ -78,10 +77,10 @@ pub fn search_all(
 
         // Search targets (title, description)
         let mut stmt = conn
-            .prepare("SELECT id, title, description, status FROM targets WHERE title LIKE ? OR description LIKE ?")
+            .prepare("SELECT id, title, description, status FROM targets WHERE title LIKE '%' || ? || '%' OR description LIKE '%' || ? || '%'")
             .map_err(|e| e.to_string())?;
         let targets = stmt
-            .query_map([&pattern, &pattern], |row| {
+            .query_map([&query, &query], |row| {
                 Ok(SearchResult {
                     entity_type: "target".to_string(),
                     id: row.get(0)?,
@@ -95,10 +94,10 @@ pub fn search_all(
 
         // Search milestones (title only)
         let mut stmt = conn
-            .prepare("SELECT id, title, status FROM milestones WHERE title LIKE ?")
+            .prepare("SELECT id, title, status FROM milestones WHERE title LIKE '%' || ? || '%'")
             .map_err(|e| e.to_string())?;
         let milestones = stmt
-            .query_map([&pattern], |row| {
+            .query_map([&query], |row| {
                 Ok(SearchResult {
                     entity_type: "milestone".to_string(),
                     id: row.get(0)?,
