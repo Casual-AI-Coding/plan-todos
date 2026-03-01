@@ -52,6 +52,13 @@
   --transition-fast: 150ms;
   --transition-normal: 200ms;
   --transition-slow: 300ms;
+}
+
+/* Dark Theme - with transparency */
+[data-theme="dark"] {
+  --transition-fast: 150ms;
+  --transition-normal: 200ms;
+  --transition-slow: 300ms;
   --animation-duration-normal: 250ms;
   --animation-duration-slow: 400ms;
 }
