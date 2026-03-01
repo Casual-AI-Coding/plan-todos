@@ -12,6 +12,20 @@ export interface TodoItemProps {
   onClick: (todo: Todo) => void;
 }
 
+/**
+ * Custom comparison function for React.memo
+ * Only re-render if todo data changes
+ */
+function areEqual(prevProps: TodoItemProps, nextProps: TodoItemProps): boolean {
+  return (
+    prevProps.todo.id === nextProps.todo.id &&
+    prevProps.todo.title === nextProps.todo.title &&
+    prevProps.todo.status === nextProps.todo.status &&
+    prevProps.todo.priority === nextProps.todo.priority &&
+    JSON.stringify(prevProps.todo.tags) === JSON.stringify(nextProps.todo.tags)
+  );
+}
+
 export const TodoItem = React.memo(function TodoItem({
   todo,
   onToggle,
@@ -26,8 +40,8 @@ export const TodoItem = React.memo(function TodoItem({
   };
 
   return (
-    <Card 
-      hoverable 
+    <Card
+      hoverable
       onClick={() => onClick(todo)}
       onKeyDown={(e) => e.key === "Enter" && onClick(todo)}
       role="button"
@@ -88,4 +102,4 @@ export const TodoItem = React.memo(function TodoItem({
       </div>
     </Card>
   );
-});
+}, areEqual);
