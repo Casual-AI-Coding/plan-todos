@@ -1416,3 +1416,18 @@ export async function isMaximized(): Promise<boolean> {
   const { invoke } = await import("@tauri-apps/api/core");
   return invoke<boolean>("is_maximized");
 }
+import * as planService from "./services/planService";
+import * as todoService from "./services/todoService";
+import * as circulationService from "./services/circulationService";
+import * as targetService from "./services/targetService";
+import * as milestoneService from "./services/milestoneService";
+import * as validation from "./services/validation";
+
+export const services = {
+  plan: planService,
+  todo: todoService,
+  circulation: circulationService,
+  target: targetService,
+  milestone: milestoneService,
+  validation,
+};
