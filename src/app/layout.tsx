@@ -3,6 +3,7 @@ import { Fira_Code, Fira_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { QueryProvider } from "@/components/ui/QueryProvider";
 import { ToastProvider, ToastContainer } from "@/components/ui/Toast";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import "./globals.css";
 
 const firaCode = Fira_Code({
@@ -29,8 +30,8 @@ export const viewport = {
   width: "device-width",
   height: "device-height",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 
@@ -65,7 +66,7 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>
             <ToastProvider>
-              {children}
+              <ErrorBoundary>{children}</ErrorBoundary>
               <ToastContainer />
             </ToastProvider>
           </QueryProvider>

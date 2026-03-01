@@ -32,7 +32,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="搜索..."
-        className="w-full px-4 py-2 bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-700 placeholder-gray-400"
+        className="w-full sm:max-w-xs md:max-w-sm px-4 py-2 bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-700 placeholder-gray-400"
       />
       {isOpen && results.length > 0 && (
         <div className="absolute top-full left-0 w-80 max-h-96 overflow-y-auto bg-white shadow-lg rounded-lg mt-1 z-50 border border-teal-100">
