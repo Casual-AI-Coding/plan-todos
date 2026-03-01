@@ -6,6 +6,7 @@ import {
   type UseMutationOptions,
 } from "@tanstack/react-query";
 import {
+  getTodo,
   getTodos,
   createTodo,
   updateTodo,
@@ -63,14 +64,7 @@ export function useTodo(
 ) {
   return useQuery<Todo, Error>({
     queryKey: queryKeys.todo(id),
-    queryFn: () =>
-      getTodos().then((todos) => {
-        const todo = todos.find((t) => t.id === id);
-        if (!todo) {
-          throw new Error(`Todo with id "${id}" not found`);
-        }
-        return todo;
-      }),
+    queryFn: () => getTodo(id),
     enabled: !!id,
     ...options,
   });
