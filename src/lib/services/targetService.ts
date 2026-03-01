@@ -22,7 +22,9 @@ export function sortTargetsByProgress(targets: Target[]): Target[] {
 
 export function calculateTargetProgress(target: Target): TargetProgress {
   const progress =
-    target.target > 0 ? Math.min((target.current / target.target) * 100, 100) : 0;
+    target.target > 0
+      ? Math.min((target.current / target.target) * 100, 100)
+      : 0;
   return {
     id: target.id,
     progress: Math.round(progress),
