@@ -31,6 +31,7 @@ export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
           return (
             <button
               key={item.id}
+              aria-label={item.label}
               onClick={() => onMenuChange(item.id)}
               className="flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors cursor-pointer"
               style={{

@@ -26,7 +26,13 @@ export const TodoItem = React.memo(function TodoItem({
   };
 
   return (
-    <Card hoverable onClick={() => onClick(todo)}>
+    <Card 
+      hoverable 
+      onClick={() => onClick(todo)}
+      onKeyDown={(e) => e.key === "Enter" && onClick(todo)}
+      role="button"
+      tabIndex={0}
+    >
       <div className="flex items-center gap-3">
         <Checkbox
           checked={todo.status === "done"}

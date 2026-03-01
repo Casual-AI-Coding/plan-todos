@@ -17,6 +17,7 @@ interface ButtonProps extends Omit<
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   icon?: ReactNode;
+  label?: string;
 }
 
 interface Ripple {
@@ -37,6 +38,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       disabled,
       onClick,
+      label,
       ...props
     },
     ref,
@@ -140,7 +142,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             ease: [0.22, 1, 0.36, 1],
           },
         }}
-        {...(props as HTMLMotionProps<"button">)}
+        {...(props as React.ComponentProps<typeof motion.button>)}
+        aria-label={label || (typeof children === "string" ? children : undefined)}
       >
         {loading ? (
           <motion.div
