@@ -17,6 +17,7 @@ pub mod tags;
 pub mod targets;
 pub mod tasks;
 pub mod todos;
+pub mod validation;
 
 pub mod data;
 pub mod window;

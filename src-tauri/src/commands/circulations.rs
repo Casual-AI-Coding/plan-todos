@@ -1,5 +1,6 @@
 // Circulation CRUD commands
 
+use crate::commands::validation;
 use crate::log_command;
 use crate::models::{Circulation, CirculationLog};
 use crate::AppState;
@@ -139,22 +140,18 @@ pub fn create_circulation(
     frequency_config: Option<String>,
     target_count: Option<i32>,
 ) -> Result<Circulation, String> {
+    // Validate inputs
+    validation::validate_title(&title)?;
+    validation::validate_circulation_type(&circulation_type)?;
+    if let Some(ref f) = frequency {
+        validation::validate_frequency(f)?;
+    }
+
     log_command!("create_circulation", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let id = uuid::Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();
-
-        // Validate
-        if title.trim().is_empty() {
-            return Err("Title cannot be empty".to_string());
-        }
-        if circulation_type != "periodic" && circulation_type != "count" {
-            return Err("Invalid circulation_type. Use 'periodic' or 'count'".to_string());
-        }
-        if circulation_type == "periodic" && frequency.is_none() {
-            return Err("frequency is required for periodic circulation".to_string());
-        }
 
         conn.execute(
             "INSERT INTO circulations (id, title, content, circulation_type, frequency, frequency_config, target_count, current_count, streak_count, best_streak, last_completed_at, status, created_at, updated_at)
@@ -192,6 +189,20 @@ pub fn update_circulation(
     target_count: Option<i32>,
     status: Option<String>,
 ) -> Result<Circulation, String> {
+    // Validate inputs
+    if let Some(ref t) = title {
+        validation::validate_title(t)?;
+    }
+    if let Some(ref ct) = circulation_type {
+        validation::validate_circulation_type(ct)?;
+    }
+    if let Some(ref f) = frequency {
+        validation::validate_frequency(f)?;
+    }
+    if let Some(ref s) = status {
+        validation::validate_circulation_status(s)?;
+    }
+
     log_command!("update_circulation", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
