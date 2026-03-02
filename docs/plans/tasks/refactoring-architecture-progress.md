@@ -59,13 +59,17 @@
 
 **完成时间**: 2026-03-02
 
-### Task 1.3: 更新导入路径
+### Task 1.3: 更新导入路径 ✅
 
-- [ ] 更新 `src/hooks/*.ts` 中的导入
-- [ ] 更新 `src/app/views/*.tsx` 中的导入
-- [ ] 更新 `src/components/**/*.tsx` 中的导入
-- [ ] 验证 TypeScript 编译通过
-- [ ] 验证所有测试通过
+- [x] 更新 `src/hooks/*.ts` 中的导入 (8 files)
+- [x] 更新 `src/app/views/*.tsx` 中的导入
+- [x] 更新 `src/components/**/*.tsx` 中的导入 (12 files)
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
+- [x] Code Review 通过 (Momus)
+
+**完成时间**: 2026-03-02
+**Commits**: 9938cfc, c2febba
 
 ### Task 1.4: 清理旧文件
 
