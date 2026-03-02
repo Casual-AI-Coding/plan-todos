@@ -169,12 +169,18 @@
 **完成时间**: 2026-03-02
 **Commit**: 97f067e
 
-### Task 3.2: 创建组件
+### Task 3.2: 创建组件 ✅
 
-- [ ] 创建 `src/app/views/components/ViewModeSelector.tsx`
-- [ ] 创建 `src/app/views/components/ScrollIndicators.tsx`
-- [ ] 创建 `src/app/views/components/BoardColumn.tsx`
-- [ ] 创建 `src/app/views/components/GanttRow.tsx`
+- [x] 创建 `src/app/views/components/ViewModeSelector.tsx`
+- [x] 创建 `src/app/views/components/ScrollIndicators.tsx`
+- [x] 创建 `src/app/views/components/index.ts`
+- [ ] 创建 `src/app/views/components/BoardColumn.tsx` (可选)
+- [ ] 创建 `src/app/views/components/GanttRow.tsx` (可选)
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
+
+**完成时间**: 2026-03-02
+**Commit**: d5671cc
 
 ### Task 3.3: 重构主组件
 
