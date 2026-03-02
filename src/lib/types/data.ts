@@ -1,8 +1,13 @@
 /**
- * Data management types - Seed and reset operations
+ * Data Management Types
+ *
+ * Type definitions for data seeding and reset operations.
  */
 
-/** Result of seeding test data */
+/**
+ * SeedResult - 种子数据结果
+ * Represents the result of seeding test data.
+ */
 export interface SeedResult {
   todos: number;
   plans: number;
@@ -15,7 +20,10 @@ export interface SeedResult {
   tags: number;
 }
 
-/** Options for resetting data */
+/**
+ * ResetOptions - 重置选项
+ * Options for resetting the database.
+ */
 export interface ResetOptions {
   keep_tags?: boolean;
   keep_settings?: boolean;

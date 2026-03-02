@@ -1,4 +1,15 @@
-// Types for Plan Todos Application
+/**
+ * Types for Plan Todos Application
+ *
+ * @deprecated Import types from @/lib/types instead
+ */
+
+// Re-export all types from types directory
+export * from "./types";
+
+// ============================================================================
+// Plan - 长期计划
+// ============================================================================
 
 // ============================================================================
 // Plan - 长期计划

@@ -1,7 +1,10 @@
 /**
- * Export/Import types - Data export and import operations
+ * Export/Import Types
+ *
+ * Type definitions for data export and import functionality.
  */
 
+import type { ImportMode } from "./common";
 import type { Todo } from "./todo";
 import type { Task } from "./task";
 import type { Plan } from "./plan";
@@ -11,7 +14,10 @@ import type { Milestone } from "./milestone";
 import type { Tag } from "./tag";
 import type { DailySummarySettings, NotificationPlugin } from "./notification";
 
-/** Export data structure */
+/**
+ * ExportData - 导出数据
+ * Represents the complete exported data structure.
+ */
 export interface ExportData {
   version: string;
   exported_at: string;
@@ -35,9 +41,15 @@ export interface ExportData {
   };
 }
 
-/** Result of importing data */
+/**
+ * ImportResult - 导入结果
+ * Represents the result of an import operation.
+ */
 export interface ImportResult {
   imported: number;
   skipped: number;
   errors: string[];
 }
+
+// Re-export ImportMode for convenience
+export type { ImportMode };
