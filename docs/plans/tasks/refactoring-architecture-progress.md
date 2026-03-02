@@ -211,13 +211,17 @@
 
 ## Phase 4: 拆分后端 `commands` (优先级: P3)
 
-### Task 4.1: 拆分 circulations.rs
+### Task 4.1: 拆分 circulations.rs ✅
 
-- [ ] 创建 `src-tauri/src/commands/circulations/` 目录
-- [ ] 创建 `mod.rs` - CRUD 和导出
-- [ ] 创建 `checkin.rs` - 打卡/撤销逻辑
-- [ ] 创建 `statistics.rs` - 打卡统计
-- [ ] 更新 `commands/mod.rs`
+- [x] 创建 `src-tauri/src/commands/circulations/` 目录
+- [x] 创建 `mod.rs` - CRUD 和导出
+- [x] 创建 `checkin.rs` - 打卡/撤销逻辑
+- [x] 创建 `statistics.rs` - 打卡统计
+- [x] 更新 `commands/mod.rs`
+- [x] Rust 编译通过
+
+**完成时间**: 2026-03-02
+**Commit**: 4f7b7c4
 
 ### Task 4.2: 拆分 data.rs
 
