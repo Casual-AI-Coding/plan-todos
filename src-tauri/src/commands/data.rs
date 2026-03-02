@@ -619,14 +619,7 @@ pub fn seed_test_data(state: tauri::State<AppState>) -> Result<SeedResult, Strin
 
         // Seed Circulations - Count type (2 circulations)
         let count_circulations = vec![
-            (
-                "circ-seed-7",
-                "喝水目标",
-                "每天喝 8 杯水",
-                8,
-                5,
-                "active",
-            ),
+            ("circ-seed-7", "喝水目标", "每天喝 8 杯水", 8, 5, "active"),
             (
                 "circ-seed-8",
                 "每日步数",
