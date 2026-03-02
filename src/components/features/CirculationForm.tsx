@@ -6,7 +6,7 @@ import type {
   Circulation,
   CirculationType,
   PeriodicFrequency,
-} from "@/lib/api";
+} from "@/lib/types";
 
 interface CirculationFormProps {
   open: boolean;

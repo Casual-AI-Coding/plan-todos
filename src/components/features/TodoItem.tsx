@@ -3,7 +3,7 @@
 import React from "react";
 
 import { Card, Checkbox } from "@/components/ui";
-import type { Todo } from "@/lib/api";
+import type { Todo } from "@/lib/types";
 
 export interface TodoItemProps {
   todo: Todo;

@@ -3,7 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, Button } from "@/components/ui";
-import type { Circulation } from "@/lib/api";
+import type { Circulation } from "@/lib/types";
 
 export interface TodayStats {
   count: number;

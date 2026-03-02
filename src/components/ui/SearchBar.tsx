@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { searchAll, SearchResult } from "@/lib/api";
+import { searchAll } from "@/lib/api";
+import type { SearchResult } from "@/lib/types";
 
 interface SearchBarProps {
   onResultClick: (entityType: string, id: string) => void;

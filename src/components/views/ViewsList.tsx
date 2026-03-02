@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, ProgressBar } from "@/components/ui";
-import type { Todo, Task, Plan, Target, Step, Milestone } from "@/lib/api";
+import type { Todo, Task, Plan, Target, Step, Milestone } from "@/lib/types";
 
 export interface ViewsListProps {
   todos: Todo[];

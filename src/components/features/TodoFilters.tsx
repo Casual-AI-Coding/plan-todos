@@ -1,6 +1,6 @@
 "use client";
 
-import type { Priority, Tag } from "@/lib/api";
+import type { Priority, Tag } from "@/lib/types";
 
 export type FilterType = "all" | "today" | "upcoming" | "completed";
 

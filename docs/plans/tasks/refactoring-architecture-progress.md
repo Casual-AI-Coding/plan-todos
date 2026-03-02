@@ -32,25 +32,32 @@
 **完成时间**: 2026-03-02
 **Commit**: cca9181
 
-### Task 1.2: 创建API目录结构
+### Task 1.2: 创建API目录结构 ✅
 
-- [ ] 创建 `src/lib/api/` 目录
-- [ ] 创建 `src/lib/api/client.ts` - isTauri, withTauriError
-- [ ] 创建 `src/lib/api/plans.ts` - Plan CRUD APIs
-- [ ] 创建 `src/lib/api/tasks.ts` - Task CRUD APIs
-- [ ] 创建 `src/lib/api/targets.ts` - Target CRUD APIs
-- [ ] 创建 `src/lib/api/steps.ts` - Step CRUD APIs
-- [ ] 创建 `src/lib/api/todos.ts` - Todo CRUD APIs
-- [ ] 创建 `src/lib/api/milestones.ts` - Milestone CRUD APIs
-- [ ] 创建 `src/lib/api/circulations.ts` - Circulation APIs
-- [ ] 创建 `src/lib/api/tags.ts` - Tag CRUD APIs
-- [ ] 创建 `src/lib/api/search.ts` - searchAll API
-- [ ] 创建 `src/lib/api/dashboard.ts` - getDashboard API
-- [ ] 创建 `src/lib/api/statistics.ts` - getStatistics API
-- [ ] 创建 `src/lib/api/bulk.ts` - 批量操作 APIs
-- [ ] 创建 `src/lib/api/notifications.ts` - 通知设置 APIs
-- [ ] 创建 `src/lib/api/data.ts` - seedTestData, resetData APIs
-- [ ] 创建 `src/lib/api/index.ts` - 统一导出
+- [x] 创建 `src/lib/api/` 目录
+- [x] 创建 `src/lib/api/client.ts` - isTauri, withTauriError
+- [x] 创建 `src/lib/api/plans.ts` - Plan CRUD APIs
+- [x] 创建 `src/lib/api/tasks.ts` - Task CRUD APIs
+- [x] 创建 `src/lib/api/targets.ts` - Target CRUD APIs
+- [x] 创建 `src/lib/api/steps.ts` - Step CRUD APIs
+- [x] 创建 `src/lib/api/todos.ts` - Todo CRUD APIs
+- [x] 创建 `src/lib/api/milestones.ts` - Milestone CRUD APIs
+- [x] 创建 `src/lib/api/circulations.ts` - Circulation APIs
+- [x] 创建 `src/lib/api/tags.ts` - Tag CRUD APIs
+- [x] 创建 `src/lib/api/search.ts` - searchAll API
+- [x] 创建 `src/lib/api/dashboard.ts` - getDashboard API
+- [x] 创建 `src/lib/api/statistics.ts` - getStatistics API
+- [x] 创建 `src/lib/api/bulk.ts` - 批量操作 APIs
+- [x] 创建 `src/lib/api/notifications.ts` - 通知设置 APIs
+- [x] 创建 `src/lib/api/data.ts` - seedTestData, resetData APIs
+- [x] 创建 `src/lib/api/export.ts` - Export/Import APIs
+- [x] 创建 `src/lib/api/index.ts` - 统一导出
+- [x] 更新 `src/lib/api.ts` 重新导出
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
+- [x] Code Review 通过 (Momus)
+
+**完成时间**: 2026-03-02
 
 ### Task 1.3: 更新导入路径
 

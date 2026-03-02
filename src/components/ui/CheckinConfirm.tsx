@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import { Circulation } from "@/lib/api";
+import type { Circulation } from "@/lib/types";
 
 interface CheckinConfirmProps {
   circulation: Circulation;
