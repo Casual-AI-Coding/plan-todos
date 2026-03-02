@@ -2,6 +2,7 @@
 
 use crate::log_command;
 use crate::AppState;
+use super::validation::{validate_tag_name, validate_and_normalize_color};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct Tag {
@@ -55,22 +56,17 @@ pub fn create_tag(
     log_command!("create_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-        // Validate name is not empty
+        // Validate name using centralized validation
+        validate_tag_name(&name)?;
         let name = name.trim().to_string();
-        if name.is_empty() {
-            return Err("Tag name cannot be empty".to_string());
-        }
+
 
         let id = uuid::Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();
 
-        // Validate and use default color
-        let color = color.unwrap_or_else(|| "#3B82F6".to_string());
-        let color = if color.starts_with('#') && color.len() == 7 {
-            color
-        } else {
-            "#3B82F6".to_string()
-        };
+        // Validate and normalize color using centralized validation
+        let color = validate_and_normalize_color(&color.unwrap_or_default());
+
 
         conn.execute(
             "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -115,24 +111,18 @@ pub fn update_tag(
             })
             .map_err(|e| e.to_string())?;
 
-        // Validate name if provided
-        let new_name = name.map(|n| n.trim().to_string());
-        if let Some(ref n) = new_name {
-            if n.is_empty() {
-                return Err("Tag name cannot be empty".to_string());
-            }
+        // Validate name if provided using centralized validation
+        if let Some(ref n) = name {
+            validate_tag_name(n)?;
         }
+
+        let new_name = name.unwrap_or(tag.name);
+
         let new_name = new_name.unwrap_or(tag.name);
 
-        // Validate color if provided
-        let new_color = color.map(|c| {
-            if c.starts_with('#') && c.len() == 7 {
-                c
-            } else {
-                tag.color.clone()
-            }
-        });
-        let new_color = new_color.unwrap_or(tag.color);
+        // Validate and normalize color if provided
+        let new_color = color.map(|c| validate_and_normalize_color(&c)).unwrap_or_else(|| tag.color.clone());
+
 
         // Description can be cleared (None) or set
         let new_description = description;

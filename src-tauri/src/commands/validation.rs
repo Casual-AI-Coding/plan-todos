@@ -103,6 +103,31 @@ pub fn validate_circulation_type(circulation_type: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Validates tag name: must be non-empty and length <= 100
+pub fn validate_tag_name(name: &str) -> Result<(), String> {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return Err("Tag name cannot be empty".to_string());
+    }
+    if trimmed.len() > 100 {
+        return Err("Tag name cannot exceed 100 characters".to_string());
+    }
+    Ok(())
+}
+
+/// Validates color: must be a valid hex color (#RRGGBB)
+/// Returns the validated color or default #3B82F6
+pub fn validate_and_normalize_color(color: &str) -> String {
+    if color.starts_with('#') && color.len() == 7 {
+        let hex_part = &color[1..];
+        if hex_part.chars().all(|c| c.is_ascii_hexdigit()) {
+            return color.to_string();
+        }
+    }
+    // Return default color if validation fails
+    "#3B82F6".to_string()
+}
+
 /// Validates frequency: must be one of daily, weekly, monthly
 pub fn validate_frequency(frequency: &str) -> Result<(), String> {
     let valid_frequencies = ["daily", "weekly", "monthly"];

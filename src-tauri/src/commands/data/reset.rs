@@ -31,7 +31,7 @@ pub fn reset_data(
         let mut conn = state.db.lock().map_err(|e| e.to_string())?;
 
         // Wrap all database operations in a transaction
-        let mut tx = conn.transaction().map_err(|e| e.to_string())?;
+        let tx = conn.transaction().map_err(|e| e.to_string())?;
 
         // Clear all business data (in reverse order due to foreign keys)
         tx.execute("DELETE FROM circulation_logs", [])

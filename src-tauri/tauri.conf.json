@@ -42,18 +42,7 @@
       "icons/Square284x284Logo.png",
       "icons/icon.png"
     ],
-"windows": {
-      "webviewInstallMode": {
-        "type": "downloadBootstrapper"
-      }
-    },
-    "macOS": {
-      "signingIdentity": null,
-      "entitlements": null,
-      "exceptionDomain": null,
-      "hardenedRuntime": true,
-      "providerShortName": null
-    }
+    "windows": {
       "webviewInstallMode": {
         "type": "downloadBootstrapper"
       }
