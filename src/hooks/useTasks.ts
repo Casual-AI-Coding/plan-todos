@@ -5,14 +5,13 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+import type { Task, Priority } from "@/lib/types";
 import {
   getTasks,
   getTasksByPlan,
   createTask,
   updateTask,
   deleteTask,
-  type Task,
-  type Priority,
 } from "@/lib/api";
 
 // Query Keys

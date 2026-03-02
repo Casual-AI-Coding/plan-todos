@@ -5,6 +5,12 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+import type {
+  Circulation,
+  CirculationLog,
+  CirculationType,
+  PeriodicFrequency,
+} from "@/lib/types";
 import {
   getCirculations,
   getCirculation,
@@ -14,10 +20,6 @@ import {
   deleteCirculation,
   checkinCirculation,
   undoCheckinCirculation,
-  type Circulation,
-  type CirculationLog,
-  type CirculationType,
-  type PeriodicFrequency,
 } from "@/lib/api";
 
 // Query Keys

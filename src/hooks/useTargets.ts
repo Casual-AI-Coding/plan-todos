@@ -5,6 +5,7 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+import type { Target, Step, Tag } from "@/lib/types";
 import {
   getTargets,
   getSteps,
@@ -16,9 +17,6 @@ import {
   createStep,
   updateStep,
   deleteStep,
-  type Target,
-  type Step,
-  type Tag,
 } from "@/lib/api";
 
 // Query Keys

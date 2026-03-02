@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import type { Todo, Priority, Tag } from "@/lib/api";
+import type { Todo, Priority, Tag } from "@/lib/types";
 
 export interface TodoFormData {
   title: string;

@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
-import { getDashboard, type Dashboard } from "@/lib/api";
+import type { Dashboard } from "@/lib/types";
+import { getDashboard } from "@/lib/api";
 
 // Query Keys
 export const dashboardKeys = {

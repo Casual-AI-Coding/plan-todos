@@ -5,6 +5,7 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+import type { Plan, Task, Tag } from "@/lib/types";
 import {
   getPlans,
   getTasksByPlan,
@@ -13,9 +14,6 @@ import {
   createPlan,
   updatePlan,
   deletePlan,
-  type Plan,
-  type Task,
-  type Tag,
 } from "@/lib/api";
 
 // Query Keys

@@ -5,14 +5,13 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+import type { Todo, Priority } from "@/lib/types";
 import {
   getTodo,
   getTodos,
   createTodo,
   updateTodo,
   deleteTodo,
-  type Todo,
-  type Priority,
 } from "@/lib/api";
 
 // Types for mutations

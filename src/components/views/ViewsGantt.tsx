@@ -1,6 +1,6 @@
 "use client";
 
-import type { Todo, Task, Plan, Target, Milestone } from "@/lib/api";
+import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
 
 export interface ViewsGanttProps {
   todos: Todo[];

@@ -5,7 +5,8 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
-import { getTags, createTag, updateTag, deleteTag, type Tag } from "@/lib/api";
+import type { Tag } from "@/lib/types";
+import { getTags, createTag, updateTag, deleteTag } from "@/lib/api";
 
 // Query Keys
 export const tagKeys = {
