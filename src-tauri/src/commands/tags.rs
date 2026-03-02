@@ -118,8 +118,6 @@ pub fn update_tag(
 
         let new_name = name.unwrap_or(tag.name);
 
-        let new_name = new_name.unwrap_or(tag.name);
-
         // Validate and normalize color if provided
         let new_color = color.map(|c| validate_and_normalize_color(&c)).unwrap_or_else(|| tag.color.clone());
 
