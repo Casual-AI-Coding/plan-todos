@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, Button } from "@/components/ui";
 import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { Calendar } from "@/components/ui/Calendar";
-import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { EmptyStateCard } from "@/components/features";
 import { useToast } from "@/components/ui/Toast";
 import {
   useTodos,

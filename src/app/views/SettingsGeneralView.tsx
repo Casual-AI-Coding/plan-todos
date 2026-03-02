@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, Button, Input, Modal, Checkbox } from "@/components/ui";
 import { ImportExportView } from "./ImportExportView";
-import { ThemeSelector } from "@/components/ui/ThemeSelector";
+import { ThemeSelector } from "@/components/features";
 import { seedTestData, resetData } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys as todoKeys } from "@/hooks/useTodos";

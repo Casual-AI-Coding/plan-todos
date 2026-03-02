@@ -9,7 +9,7 @@ import {
   ProgressBar,
   FadeIn,
 } from "@/components/ui";
-import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { EmptyStateCard } from "@/components/features";
 import { useToast } from "@/components/ui/Toast";
 import {
   useMilestones,

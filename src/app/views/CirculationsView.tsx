@@ -2,8 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Card, Button, Modal, Input } from "@/components/ui";
-import { CheckinConfirm } from "@/components/ui/CheckinConfirm";
-import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { CheckinConfirm, EmptyStateCard } from "@/components/features";
 import {
   DndContext,
   closestCenter,

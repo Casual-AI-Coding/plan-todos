@@ -17,7 +17,6 @@ export function filterMilestonesByStatus(
   return milestones.filter((m) => m.status === status);
 }
 
-
 export function sortMilestonesByDueDate(milestones: Milestone[]): Milestone[] {
   return [...milestones].sort((a, b) => {
     if (!a.dueDate && !b.dueDate) return 0;

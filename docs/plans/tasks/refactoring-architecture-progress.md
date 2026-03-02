@@ -71,35 +71,59 @@
 **完成时间**: 2026-03-02
 **Commits**: 9938cfc, c2febba
 
-### Task 1.4: 清理旧文件
+### Task 1.4: 清理旧文件 ✅
 
-- [ ] 删除或归档旧的 `src/lib/api.ts`
-- [ ] 更新 `src/lib/index.ts` (如果存在)
+- [x] 检查 `src/lib/api.ts` 当前内容
+- [x] 确认文件只包含统一导出语句（17行 < 100行）
+- [x] 确认没有重复的类型定义
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
+- [x] Code Review 通过 (Momus)
 
-**验收标准**:
+**完成时间**: 2026-03-02
+**Commit**: d289b14
 
-- [ ] `api.ts` 文件行数 < 100 (仅保留统一导出)
-- [ ] TypeScript 编译通过: `npm run typecheck`
-- [ ] 所有测试通过: `npm run test`
+---
+
+## ✅ Phase 1 完成
+
+**成果**:
+
+- `api.ts` 从 1421行 精简到 17行 (-98.8%)
+- 类型定义完全独立到 `types/` 目录
+- API 函数按实体拆分到 `api/` 目录
+- 所有导入路径已更新
+- TypeScript 编译通过
+- 257 个测试全部通过
 
 ---
 
 ## Phase 2: 分类 `components/ui` (优先级: P1)
 
-### Task 2.1: 创建目录结构
+### Task 2.1: 创建目录结构 ✅
 
-- [ ] 创建 `src/components/layout/` 目录
-- [ ] 移动 `TitleBar.tsx` 到 `layout/`
-- [ ] 创建 `src/components/layout/index.ts`
+- [x] 创建 `src/components/layout/` 目录
+- [x] 移动 `TitleBar.tsx` 到 `layout/`
+- [x] 创建 `src/components/layout/index.ts`
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
 
-### Task 2.2: 移动业务组件到 features
+**完成时间**: 2026-03-02
 
-- [ ] 移动 `CheckinConfirm.tsx` 到 `features/`
-- [ ] 移动 `SearchBar.tsx` 到 `features/`
-- [ ] 移动 `ThemeSelector.tsx` 到 `features/`
-- [ ] 移动 `EmptyStateCard.tsx` 到 `features/`
-- [ ] 移动 `SortableList.tsx` 到 `features/`
-- [ ] 更新 `features/index.ts` 导出
+### Task 2.2: 移动业务组件到 features ✅
+
+- [x] 移动 `CheckinConfirm.tsx` 到 `features/`
+- [x] 移动 `SearchBar.tsx` 到 `features/`
+- [x] 移动 `ThemeSelector.tsx` 到 `features/`
+- [x] 移动 `EmptyStateCard.tsx` 到 `features/`
+- [x] 移动 `SortableList.tsx` 到 `features/`
+- [x] 更新 `features/index.ts` 导出
+- [x] 更新所有引用这些组件的文件
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
+
+**完成时间**: 2026-03-02
+**Commit**: d9cd85e
 
 ### Task 2.3: 更新导入路径
 

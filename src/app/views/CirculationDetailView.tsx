@@ -8,7 +8,7 @@ import {
   useCheckinCirculation,
   useUndoCheckinCirculation,
 } from "@/hooks/useCirculations";
-import { CheckinConfirm } from "@/components/ui/CheckinConfirm";
+import { CheckinConfirm } from "@/components/features";
 
 interface CirculationDetailViewProps {
   id: string;

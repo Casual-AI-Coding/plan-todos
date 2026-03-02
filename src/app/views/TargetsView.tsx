@@ -10,7 +10,7 @@ import {
   Checkbox,
 } from "@/components/ui";
 import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
-import { EmptyStateCard } from "@/components/ui/EmptyStateCard";
+import { EmptyStateCard } from "@/components/features";
 import { useToast } from "@/components/ui/Toast";
 import {
   useTargets,

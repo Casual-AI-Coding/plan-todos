@@ -11,7 +11,6 @@ export async function getSteps(targetId: string): Promise<Step[]> {
   return getStepsByTarget(targetId);
 }
 
-
 export async function getStepsByTarget(targetId: string): Promise<Step[]> {
   if (!isTauri()) {
     console.warn("Running outside Tauri - data not available");

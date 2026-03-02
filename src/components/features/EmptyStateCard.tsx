@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "./Card";
-import { EmptyState, EmptyStateProps } from "./EmptyState";
+import { Card } from "@/components/ui";
+import { EmptyState, EmptyStateProps } from "@/components/ui/EmptyState";
 
 export interface EmptyStateCardProps extends Omit<
   EmptyStateProps,

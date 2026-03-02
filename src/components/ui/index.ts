@@ -5,7 +5,6 @@ export { ProgressRing } from "./ProgressRing";
 export { Input } from "./Input";
 export { Card } from "./Card";
 export { Checkbox } from "./Checkbox";
-export { SearchBar } from "./SearchBar";
 export { FadeIn } from "./FadeIn";
 export { ScaleIn } from "./ScaleIn";
 export { PageTransition } from "./PageTransition";

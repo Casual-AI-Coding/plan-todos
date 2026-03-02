@@ -31,7 +31,8 @@ export function SettingsDailySummaryView() {
   const displayTime = settings?.time ?? time;
   const displayIncludePending = settings?.include_pending ?? includePending;
   const displayIncludeOverdue = settings?.include_overdue ?? includeOverdue;
-  const displayIncludeCompleted = settings?.include_completed ?? includeCompleted;
+  const displayIncludeCompleted =
+    settings?.include_completed ?? includeCompleted;
 
   const isLoading = settingsLoading || pluginsLoading;
 

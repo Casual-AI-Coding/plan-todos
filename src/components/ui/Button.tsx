@@ -143,7 +143,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           },
         }}
         {...(props as React.ComponentProps<typeof motion.button>)}
-        aria-label={label || (typeof children === "string" ? children : undefined)}
+        aria-label={
+          label || (typeof children === "string" ? children : undefined)
+        }
       >
         {loading ? (
           <motion.div

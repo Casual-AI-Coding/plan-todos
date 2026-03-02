@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { SearchBar } from "@/components/ui/SearchBar";
+import { SearchBar } from "@/components/features";
 
 interface MenuItem {
   id: string;
