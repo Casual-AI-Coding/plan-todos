@@ -7,23 +7,30 @@
 
 ## Phase 1: 拆分 `api.ts` (优先级: P0)
 
-### Task 1.1: 创建类型目录结构
+### Task 1.1: 创建类型目录结构 ✅
 
-- [ ] 创建 `src/lib/types/` 目录
-- [ ] 创建 `src/lib/types/common.ts` - 通用类型 (Priority, EntityType)
-- [ ] 创建 `src/lib/types/plan.ts` - Plan 相关类型
-- [ ] 创建 `src/lib/types/task.ts` - Task 相关类型
-- [ ] 创建 `src/lib/types/target.ts` - Target 相关类型
-- [ ] 创建 `src/lib/types/step.ts` - Step 相关类型
-- [ ] 创建 `src/lib/types/todo.ts` - Todo 相关类型
-- [ ] 创建 `src/lib/types/milestone.ts` - Milestone 相关类型
-- [ ] 创建 `src/lib/types/circulation.ts` - Circulation 相关类型
-- [ ] 创建 `src/lib/types/tag.ts` - Tag 相关类型
-- [ ] 创建 `src/lib/types/statistics.ts` - Statistics 相关类型
-- [ ] 创建 `src/lib/types/search.ts` - SearchResult 类型
-- [ ] 创建 `src/lib/types/notification.ts` - Notification 相关类型
-- [ ] 创建 `src/lib/types/bulk.ts` - BatchUpdateResult 类型
-- [ ] 创建 `src/lib/types/index.ts` - 统一导出
+- [x] 创建 `src/lib/types/` 目录
+- [x] 创建 `src/lib/types/common.ts` - 通用类型 (Priority, EntityType)
+- [x] 创建 `src/lib/types/plan.ts` - Plan 相关类型
+- [x] 创建 `src/lib/types/task.ts` - Task 相关类型
+- [x] 创建 `src/lib/types/target.ts` - Target 相关类型
+- [x] 创建 `src/lib/types/step.ts` - Step 相关类型
+- [x] 创建 `src/lib/types/todo.ts` - Todo 相关类型
+- [x] 创建 `src/lib/types/milestone.ts` - Milestone 相关类型
+- [x] 创建 `src/lib/types/circulation.ts` - Circulation 相关类型
+- [x] 创建 `src/lib/types/tag.ts` - Tag 相关类型
+- [x] 创建 `src/lib/types/statistics.ts` - Statistics 相关类型
+- [x] 创建 `src/lib/types/search.ts` - SearchResult 类型
+- [x] 创建 `src/lib/types/notification.ts` - Notification 相关类型
+- [x] 创建 `src/lib/types/bulk.ts` - BatchUpdateResult 类型
+- [x] 创建 `src/lib/types/data.ts` - SeedResult, ResetOptions 类型
+- [x] 创建 `src/lib/types/export.ts` - ExportData, ImportResult 类型
+- [x] 创建 `src/lib/types/index.ts` - 统一导出
+- [x] TypeScript 编译通过
+- [x] Code Review 通过 (Momus)
+
+**完成时间**: 2026-03-02
+**Commit**: cca9181
 
 ### Task 1.2: 创建API目录结构
 
