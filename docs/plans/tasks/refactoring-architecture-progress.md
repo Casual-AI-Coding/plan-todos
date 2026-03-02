@@ -157,12 +157,17 @@
 
 ## Phase 3: 拆分 `ViewsView.tsx` (优先级: P2)
 
-### Task 3.1: 创建 Hooks
+### Task 3.1: 创建 Hooks ✅
 
-- [ ] 创建 `src/app/views/hooks/` 目录
-- [ ] 创建 `useViewsData.ts` - 数据获取
-- [ ] 创建 `useViewsFilters.ts` - 过滤逻辑
-- [ ] 创建 `useScrollIndicators.ts` - 滚动指示器逻辑
+- [x] 创建 `src/app/views/hooks/` 目录
+- [x] 创建 `useViewsData.ts` - 数据获取
+- [x] 创建 `useViewsFilters.ts` - 过滤逻辑
+- [x] 创建 `useScrollIndicators.ts` - 滚动指示器逻辑
+- [x] TypeScript 编译通过
+- [x] 257 个测试全部通过
+
+**完成时间**: 2026-03-02
+**Commit**: 97f067e
 
 ### Task 3.2: 创建组件
 
