@@ -15,7 +15,6 @@ export function SettingsAboutView() {
     { icon: "⚛️", name: "Next.js", desc: "React 全栈框架" },
     { icon: "🗄️", name: "SQLite", desc: "本地数据库" },
     { icon: "🎨", name: "Tailwind CSS", desc: "样式框架" },
-    { icon: "🗂️", name: "Zustand", desc: "状态管理" },
     { icon: "🎯", name: "dnd-kit", desc: "拖拽交互" },
     { icon: "✨", name: "Framer Motion", desc: "动画效果" },
     { icon: "🔄", name: "TanStack Query", desc: "数据获取" },
