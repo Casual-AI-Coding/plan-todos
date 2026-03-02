@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { TitleBar } from "@/components/ui/TitleBar";
+import { TitleBar } from "@/components/layout/TitleBar";
 import { PageSlide } from "@/components/ui/animations";
 import {
   Dashboard,
