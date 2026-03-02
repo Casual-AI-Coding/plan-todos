@@ -37,7 +37,9 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             // Get app data directory using Tauri v2 path API
-            let app_data_dir = app.path().app_data_dir()
+            let app_data_dir = app
+                .path()
+                .app_data_dir()
                 .expect("Failed to get app data directory");
 
             // Create directory if it doesn't exist
@@ -86,10 +88,10 @@ pub fn run() {
             commands::circulations::create_circulation,
             commands::circulations::update_circulation,
             commands::circulations::delete_circulation,
-            commands::circulations::checkin_circulation,
-            commands::circulations::undo_checkin_circulation,
-            commands::circulations::get_circulation_logs,
-            commands::circulations::get_circulation_logs_batch,
+            commands::circulations::checkin::checkin_circulation,
+            commands::circulations::checkin::undo_checkin_circulation,
+            commands::circulations::statistics::get_circulation_logs,
+            commands::circulations::statistics::get_circulation_logs_batch,
             commands::tags::get_tags,
             commands::tags::create_tag,
             commands::tags::update_tag,
