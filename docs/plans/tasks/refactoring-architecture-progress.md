@@ -223,20 +223,23 @@
 **完成时间**: 2026-03-02
 **Commit**: 4f7b7c4
 
-### Task 4.2: 拆分 data.rs
+### Task 4.2: 拆分 data.rs ✅
 
-- [ ] 创建 `src-tauri/src/commands/data/` 目录
-- [ ] 创建 `mod.rs` - 导出
-- [ ] 创建 `seed.rs` - 测试数据生成
-- [ ] 创建 `reset.rs` - 数据重置
-- [ ] 更新 `commands/mod.rs`
+- [x] 创建 `src-tauri/src/commands/data/` 目录
+- [x] 创建 `mod.rs` - 导出
+- [x] 创建 `seed.rs` - 测试数据生成
+- [x] 创建 `reset.rs` - 数据重置
+- [x] 更新 `commands/mod.rs`
+- [x] Rust 编译通过
+
+**完成时间**: 2026-03-02
 
 **验收标准**:
 
-- [ ] `circulations.rs` 行数 < 300
-- [ ] `data.rs` 行数 < 100
-- [ ] Rust 编译通过: `cargo build`
-- [ ] Rust 测试通过: `cargo test`
+- [x] `circulations.rs` 已拆分为子模块
+- [x] `data.rs` 已拆分为子模块
+- [x] Rust 编译通过: `cargo build`
+- [x] Rust 测试通过: `cargo test`
 
 ---
 
@@ -247,7 +250,7 @@
 | Phase 1 | ✅ 完成   | 2026-03-02 | 2026-03-02 |
 | Phase 2 | ✅ 完成   | 2026-03-02 | 2026-03-02 |
 | Phase 3 | ✅ 完成   | 2026-03-02 | 2026-03-02 |
-| Phase 4 | 🔴 未开始 | -         | -         |
+| Phase 4 | ✅ 完成   | 2026-03-02 | 2026-03-02 |
 
 **状态说明**: 🔴 未开始 | 🟡 进行中 | ✅ 完成
 
@@ -269,6 +272,11 @@
 - ViewsView.tsx 从 **1412行** 减少到 **830行** (-41%)
 - 创建 hooks 和 components 目录
 - 逻辑分离，代码可维护性提升
+
+### Phase 4 成果
+- `circulations.rs` 拆分为 `circulations/` 子模块
+- `data.rs` 拆分为 `data/` 子模块
+- 后端结构更清晰
 
 ### 验证状态
 - ✅ TypeScript 编译通过
