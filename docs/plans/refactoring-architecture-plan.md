@@ -797,3 +797,41 @@ Phase 4 (后端拆分) ← 独立，可随时进行
 - [AGENTS.md](../../AGENTS.md) - 项目开发指南
 - [api-design.md](./api-design.md) - API设计文档
 - [component-design.md](./component-design.md) - 组件设计文档
+
+---
+
+## 附录 D. 代码审查记录
+
+### v0.5.7 → HEAD 审查 (2026-03-03)
+
+**审查范围**: v0.5.7 → HEAD (18 commits)
+**文件变更**: 95 files, +4491/-3119 lines
+
+#### 发现的问题
+
+| 优先级 | 文件 | 问题描述 | 状态 |
+|--------|------|----------|------|
+| P1 | `src-tauri/src/commands/data/reset.rs` | 数据重置缺少事务包装，中途失败会导致数据不一致 | 待修复 |
+| P2 | `src-tauri/src/commands/circulations/statistics.rs` | 批量查询存在 N+1 问题 | 待修复 |
+| P2 | `src-tauri/src/validation/mod.rs` | 验证逻辑分散，缺少统一接口 | 待评估 |
+| P3 | 前端类型导入 | 类型导入路径不一致 (`@/lib/api` vs `@/lib/types`) | 待修复 |
+
+#### 安全检查结果
+
+| 检查项 | 状态 |
+|--------|------|
+| SQL 注入 | ✅ 安全 - 全部使用参数化查询 |
+| XSS | ✅ 安全 - Tauri 桌面应用 |
+| 输入验证 | ✅ 有 validation 模块 |
+| 敏感数据泄露 | ✅ 安全 |
+
+#### 架构改进亮点
+
+1. **模块拆分**: `circulations.rs` 和 `data.rs` 拆分为子模块，符合 SRP 原则
+2. **类型分离**: 前端类型从 API 模块分离到 `types` 模块
+3. **Hook 提取**: ViewsView 中提取 `useEntityFilters` hook
+4. **验证模块**: 新增 validation 模块集中处理输入验证
+
+- [AGENTS.md](../../AGENTS.md) - 项目开发指南
+- [api-design.md](./api-design.md) - API设计文档
+- [component-design.md](./component-design.md) - 组件设计文档
