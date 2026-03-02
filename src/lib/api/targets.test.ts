@@ -47,7 +47,8 @@ describe("Target API", () => {
         title: "Test Target",
         description: null,
         due_date: null,
-        status: "pending",
+        status: "active",
+        progress: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -94,7 +95,7 @@ describe("Target API", () => {
       mockInvoke.mockResolvedValue({
         id: "new-id",
         ...params,
-        status: "pending",
+        status: "active",
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       });

@@ -35,15 +35,20 @@ describe("Export API", () => {
       const mockExportData: ExportData = {
         version: "1.0",
         exported_at: "2024-01-01T00:00:00Z",
-        todos: [],
-        plans: [],
-        tasks: [],
-        targets: [],
-        steps: [],
-        milestones: [],
-        circulations: [],
-        tags: [],
-        settings: [],
+        data: {
+          todos: [],
+          plans: [],
+          tasks: [],
+          targets: [],
+          steps: [],
+          milestones: [],
+          tags: [],
+          entity_tags: [],
+          settings: {
+            daily_summary_settings: null,
+            notification_plugins: [],
+          },
+        },
       };
       mockInvoke.mockResolvedValue(mockExportData);
 
@@ -61,21 +66,28 @@ describe("Export API", () => {
   });
 
   describe("importData", () => {
-    it("should throw error when not running in Tauri", async () => {
-      vi.mocked(isTauri).mockReturnValue(false);
-      const mockData: ExportData = {
-        version: "1.0",
-        exported_at: "2024-01-01T00:00:00Z",
+    const createMockExportData = (): ExportData => ({
+      version: "1.0",
+      exported_at: "2024-01-01T00:00:00Z",
+      data: {
         todos: [],
         plans: [],
         tasks: [],
         targets: [],
         steps: [],
         milestones: [],
-        circulations: [],
         tags: [],
-        settings: [],
-      };
+        entity_tags: [],
+        settings: {
+          daily_summary_settings: null,
+          notification_plugins: [],
+        },
+      },
+    });
+
+    it("should throw error when not running in Tauri", async () => {
+      vi.mocked(isTauri).mockReturnValue(false);
+      const mockData = createMockExportData();
       await expect(importData(mockData, "merge")).rejects.toThrow(
         "This app must run in Tauri to import data",
       );
@@ -83,32 +95,10 @@ describe("Export API", () => {
 
     it("should call invoke with import_data command when in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
-      const mockData: ExportData = {
-        version: "1.0",
-        exported_at: "2024-01-01T00:00:00Z",
-        todos: [],
-        plans: [],
-        tasks: [],
-        targets: [],
-        steps: [],
-        milestones: [],
-        circulations: [],
-        tags: [],
-        settings: [],
-      };
+      const mockData = createMockExportData();
       const mockResult: ImportResult = {
-        success: true,
-        imported_counts: {
-          todos: 0,
-          plans: 0,
-          tasks: 0,
-          targets: 0,
-          steps: 0,
-          milestones: 0,
-          circulations: 0,
-          tags: 0,
-          settings: 0,
-        },
+        imported: 10,
+        skipped: 2,
         errors: [],
       };
       mockInvoke.mockResolvedValue(mockResult);
@@ -124,22 +114,10 @@ describe("Export API", () => {
 
     it("should handle replace mode", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
-      const mockData: ExportData = {
-        version: "1.0",
-        exported_at: "2024-01-01T00:00:00Z",
-        todos: [],
-        plans: [],
-        tasks: [],
-        targets: [],
-        steps: [],
-        milestones: [],
-        circulations: [],
-        tags: [],
-        settings: [],
-      };
+      const mockData = createMockExportData();
       mockInvoke.mockResolvedValue({
-        success: true,
-        imported_counts: {},
+        imported: 5,
+        skipped: 0,
         errors: [],
       });
 
@@ -153,19 +131,7 @@ describe("Export API", () => {
 
     it("should handle invoke error", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
-      const mockData: ExportData = {
-        version: "1.0",
-        exported_at: "2024-01-01T00:00:00Z",
-        todos: [],
-        plans: [],
-        tasks: [],
-        targets: [],
-        steps: [],
-        milestones: [],
-        circulations: [],
-        tags: [],
-        settings: [],
-      };
+      const mockData = createMockExportData();
       mockInvoke.mockRejectedValue(new Error("Import failed"));
       await expect(importData(mockData, "merge" as ImportMode)).rejects.toThrow(
         "Import failed",

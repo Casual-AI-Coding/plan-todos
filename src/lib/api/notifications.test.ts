@@ -58,6 +58,7 @@ describe("Notification API", () => {
         entity_type: "todo",
         entity_id: "entity-1",
         reminder_minutes: 30,
+        reminder_sent: false,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -135,6 +136,9 @@ describe("Notification API", () => {
         include_pending: true,
         include_overdue: true,
         include_completed: true,
+        id: "dss-1",
+        created_at: "2024-01-01",
+        updated_at: "2024-01-01",
       };
       mockInvoke.mockResolvedValue(mockSettings);
       const result = await getDailySummarySettings();
@@ -213,9 +217,11 @@ describe("Notification API", () => {
     it("should call invoke with get_daily_summary command", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
       const mockSummary: DailySummary = {
-        pending_count: 0,
-        overdue_count: 0,
-        completed_today_count: 0,
+        date: "2024-01-01",
+        pending_count: 5,
+        overdue_count: 2,
+        completed_count: 0,
+        upcoming_count: 0,
       };
       mockInvoke.mockResolvedValue(mockSummary);
       const result = await getDailySummary();
@@ -319,7 +325,7 @@ describe("Notification API", () => {
 
     it("should call invoke with send_notification command", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
-      const mockResult: SendNotificationResult = { success: true };
+      const mockResult: SendNotificationResult = { success: true, message: "Sent" };
       mockInvoke.mockResolvedValue(mockResult);
       const result = await sendNotification("plugin-1", "Title", "Content");
       expect(mockInvoke).toHaveBeenCalledWith("send_notification", {

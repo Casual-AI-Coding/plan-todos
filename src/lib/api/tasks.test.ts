@@ -46,8 +46,8 @@ describe("Task API", () => {
         description: null,
         start_date: null,
         end_date: null,
-        status: "pending",
-        priority: null,
+        status: "in-progress",
+        priority: "P2",
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -109,7 +109,7 @@ describe("Task API", () => {
         description: "Description",
         start_date: "2024-01-01",
         end_date: "2024-01-02",
-        priority: "high",
+        priority: "P0",
       };
       mockInvoke.mockResolvedValue({
         id: "new-id",
@@ -127,7 +127,7 @@ describe("Task API", () => {
         description: "Description",
         startDate: "2024-01-01",
         endDate: "2024-01-02",
-        priority: "high",
+        priority: "P0",
       });
     });
 
@@ -163,8 +163,8 @@ describe("Task API", () => {
         description: "New desc",
         start_date: "2024-01-01",
         end_date: "2024-01-02",
-        status: "completed",
-        priority: "low",
+        status: "done",
+        priority: "P3",
       };
       mockInvoke.mockResolvedValue({});
 
@@ -176,8 +176,8 @@ describe("Task API", () => {
         description: "New desc",
         startDate: "2024-01-01",
         endDate: "2024-01-02",
-        status: "completed",
-        priority: "low",
+        status: "done",
+        priority: "P3",
       });
     });
   });

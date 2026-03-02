@@ -11,7 +11,7 @@
 export * from "./api/index";
 
 // Re-export types from types directory (for backward compatibility)
-export * from "./types";
+export * from "@/lib/types";
 
 // Re-export services
 export { services } from "./services";

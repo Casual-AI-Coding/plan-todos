@@ -45,7 +45,7 @@ describe("Step API", () => {
           title: "Step 1",
           weight: 1,
           status: "pending",
-          priority: null,
+          priority: "P2",
           created_at: "2024-01-01",
           updated_at: "2024-01-01",
         },
@@ -99,7 +99,7 @@ describe("Step API", () => {
         target_id: "target-1",
         title: "New Step",
         weight: 1,
-        priority: "high",
+        priority: "P1",
       };
       mockInvoke.mockResolvedValue({
         id: "new-id",
@@ -115,10 +115,10 @@ describe("Step API", () => {
         targetId: "target-1",
         title: "New Step",
         weight: 1,
-        priority: "high",
+        priority: "P1",
       });
     });
-
+    
     it("should handle null priority", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
       const params: CreateStepParams = {
@@ -153,7 +153,7 @@ describe("Step API", () => {
         title: "Updated",
         weight: 2,
         status: "completed",
-        priority: "low",
+        priority: "P3",
       };
       mockInvoke.mockResolvedValue({});
 
@@ -164,7 +164,7 @@ describe("Step API", () => {
         title: "Updated",
         weight: 2,
         status: "completed",
-        priority: "low",
+        priority: "P3",
       });
     });
   });
