@@ -13,7 +13,8 @@ import {
   useDeleteTodo,
 } from "@/hooks/useTodos";
 import { useTags } from "@/hooks/useTags";
-import { setEntityTags, type Todo, type Priority } from "@/lib/api";
+import type { Todo, Priority } from "@/lib/types";
+import { setEntityTags } from "@/lib/api";
 import { TodoItem } from "@/components/features/TodoItem";
 import { TodoForm, type TodoFormData } from "@/components/features/TodoForm";
 import { TodoFilters } from "@/components/features/TodoFilters";

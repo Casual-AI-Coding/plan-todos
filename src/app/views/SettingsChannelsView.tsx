@@ -8,7 +8,8 @@ import {
   useUpdateNotificationPlugin,
   useDeleteNotificationPlugin,
 } from "@/hooks/useNotificationPlugins";
-import { sendNotification, type NotificationPlugin } from "@/lib/api";
+import type { NotificationPlugin } from "@/lib/types";
+import { sendNotification } from "@/lib/api";
 
 const PLUGIN_TYPE_LABELS: Record<string, { icon: string; label: string }> = {
   feishu: { icon: "🔔", label: "飞书/Lark" },
