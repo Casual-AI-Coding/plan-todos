@@ -152,7 +152,7 @@ fn reverse_circulation_in_tx(
             &circ.id,
             circ.frequency.as_deref().unwrap_or("daily"),
             &today,
-        );
+        )?;
         circ.streak_count = new_streak;
 
         // Find previous completion
@@ -258,7 +258,7 @@ fn update_circulation_in_tx(
             &circ.id,
             circ.frequency.as_deref().unwrap_or("daily"),
             today,
-        );
+        )?;
         updated_circ.streak_count = new_streak;
 
         // Update best streak if needed
@@ -320,20 +320,20 @@ fn calculate_streak(
     circulation_id: &str,
     frequency: &str,
     today: &str,
-) -> i32 {
+) -> Result<i32, String> {
     // Get all completion dates
     let mut stmt = conn
         .prepare("SELECT completed_at FROM circulation_logs WHERE circulation_id = ? ORDER BY completed_at DESC")
-        .unwrap();
+        .map_err(|e| format!("Failed to prepare statement: {}", e))?;
 
     let dates: Vec<String> = stmt
         .query_map([circulation_id], |row| row.get(0))
-        .unwrap()
+        .map_err(|e| format!("Failed to query: {}", e))?
         .filter_map(|r| r.ok())
         .collect();
 
     if dates.is_empty() {
-        return 1; // First check-in
+        return Ok(1); // First check-in
     }
 
     let today_date = chrono::NaiveDate::parse_from_str(today, "%Y-%m-%d")
@@ -357,7 +357,7 @@ fn calculate_streak(
                     }
                 }
             }
-            streak
+            Ok(streak)
         }
         "weekly" => {
             let mut streak = 1;
@@ -377,7 +377,7 @@ fn calculate_streak(
                     }
                 }
             }
-            streak
+            Ok(streak)
         }
         "monthly" => {
             let mut streak = 1;
@@ -406,9 +406,9 @@ fn calculate_streak(
                     }
                 }
             }
-            streak
+            Ok(streak)
         }
-        _ => 1,
+        _ => Ok(1),
     }
 }
 
@@ -417,20 +417,20 @@ fn calculate_streak_undo(
     circulation_id: &str,
     frequency: &str,
     today: &str,
-) -> i32 {
+) -> Result<i32, String> {
     // Similar to calculate_streak but starts from previous completion
     let mut stmt = conn
         .prepare("SELECT completed_at FROM circulation_logs WHERE circulation_id = ? ORDER BY completed_at DESC")
-        .unwrap();
+        .map_err(|e| format!("Failed to prepare statement: {}", e))?;
 
     let dates: Vec<String> = stmt
         .query_map([circulation_id], |row| row.get(0))
-        .unwrap()
+        .map_err(|e| format!("Failed to query: {}", e))?
         .filter_map(|r| r.ok())
         .collect();
 
     if dates.is_empty() {
-        return 0;
+        return Ok(0);
     }
 
     let today_date = chrono::NaiveDate::parse_from_str(today, "%Y-%m-%d")
@@ -452,8 +452,8 @@ fn calculate_streak_undo(
                     }
                 }
             }
-            streak
+            Ok(streak)
         }
-        _ => 1,
+        _ => Ok(1),
     }
 }
