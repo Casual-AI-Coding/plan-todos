@@ -116,16 +116,24 @@ pub fn validate_tag_name(name: &str) -> Result<(), String> {
 }
 
 /// Validates color: must be a valid hex color (#RRGGBB)
-/// Returns the validated color or default #3B82F6
-pub fn validate_and_normalize_color(color: &str) -> String {
-    if color.starts_with('#') && color.len() == 7 {
-        let hex_part = &color[1..];
-        if hex_part.chars().all(|c| c.is_ascii_hexdigit()) {
-            return color.to_string();
-        }
+/// Returns Ok(color) if valid, Err(message) otherwise
+pub fn validate_color(color: &str) -> Result<String, String> {
+    if !color.starts_with('#') || color.len() != 7 {
+        return Err(format!("Invalid color '{}'. Must be #RRGGBB", color));
     }
-    // Return default color if validation fails
-    "#3B82F6".to_string()
+    let hex_part = &color[1..];
+    if !hex_part.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err(format!(
+            "Invalid color '{}'. Contains non-hex characters",
+            color
+        ));
+    }
+    Ok(color.to_string())
+}
+
+/// Validates color and returns default #3B82F6 if invalid
+pub fn normalize_color_or_default(color: &str) -> String {
+    validate_color(color).unwrap_or_else(|_| "#3B82F6".to_string())
 }
 
 /// Validates frequency: must be one of daily, weekly, monthly

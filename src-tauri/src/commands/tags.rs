@@ -2,7 +2,7 @@
 
 use crate::log_command;
 use crate::AppState;
-use super::validation::{validate_tag_name, validate_and_normalize_color};
+use super::validation::{validate_tag_name, normalize_color_or_default};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct Tag {
@@ -65,7 +65,7 @@ pub fn create_tag(
         let now = chrono::Utc::now().to_rfc3339();
 
         // Validate and normalize color using centralized validation
-        let color = validate_and_normalize_color(&color.unwrap_or_default());
+        let color = normalize_color_or_default(&color.unwrap_or_default());
 
 
         conn.execute(
@@ -119,7 +119,7 @@ pub fn update_tag(
         let new_name = name.unwrap_or(tag.name);
 
         // Validate and normalize color if provided
-        let new_color = color.map(|c| validate_and_normalize_color(&c)).unwrap_or_else(|| tag.color.clone());
+        let new_color = color.map(|c| normalize_color_or_default(&c)).unwrap_or_else(|| tag.color.clone());
 
 
         // Description can be cleared (None) or set
