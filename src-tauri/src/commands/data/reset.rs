@@ -77,13 +77,13 @@ pub fn reset_data(
                 .query_row("SELECT COUNT(*) FROM daily_summary_settings", [], |row| {
                     row.get(0)
                 })
-                .unwrap_or(0);
+                .map_err(|e| format!("Failed to count daily_summary_settings: {}", e))?;
             if count == 0 {
                 let now = chrono::Utc::now().to_rfc3339();
                 tx.execute(
                     "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     rusqlite::params!["default", 1, "09:00", 1, 1, 1, &now, &now],
-                ).ok();
+                ).map_err(|e| format!("Failed to insert default daily_summary_settings: {}", e))?;
             }
         }
 
