@@ -118,7 +118,7 @@ describe("Step API", () => {
         priority: "P1",
       });
     });
-    
+
     it("should handle null priority", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
       const params: CreateStepParams = {

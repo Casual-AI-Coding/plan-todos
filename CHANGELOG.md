@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.5.8] - 2026-03-03
+
+### Added
+
+**Tag 过滤功能**:
+- 新增 `get_entities_by_tag` 命令 - 按标签查询实体
+- 前端标签过滤组件
+- Todo 列表支持按标签筛选
+
+### Fixed
+
+**P1 - 数据安全**:
+- `reset.rs` 数据重置添加事务包装，确保原子性
+
+**P2 - 性能优化**:
+- `statistics.rs` 批量查询优化，解决 N+1 问题
+- `validation.rs` 集中化验证逻辑，消除代码重复
+
+**P3 - 类型一致性**:
+- 统一前端类型导入路径为 `@/lib/types`
+- 修复测试类型定义与实际 API 匹配
+
+### Changed
+
+**测试覆盖率提升**:
+- 覆盖率从 79% 提升到 98.18%
+- 测试数量从 418 增加到 523
+- 新增 16 个 API 层测试文件
+
 ---
 
 ## [0.5.7] - 2026-03-02

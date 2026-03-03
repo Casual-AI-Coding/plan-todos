@@ -13,7 +13,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html"],
       exclude: [
-"src/lib/api.ts", // Tauri API wrapper - requires Tauri runtime
+        "src/lib/api.ts", // Tauri API wrapper - requires Tauri runtime
         "src/lib/api/client.ts", // Tauri API helper - auxiliary module
         "src/lib/api/index.ts", // API re-exports - pure exports
         "src/lib/types/**", // Type definitions - pure types

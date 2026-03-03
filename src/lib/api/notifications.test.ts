@@ -325,7 +325,10 @@ describe("Notification API", () => {
 
     it("should call invoke with send_notification command", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
-      const mockResult: SendNotificationResult = { success: true, message: "Sent" };
+      const mockResult: SendNotificationResult = {
+        success: true,
+        message: "Sent",
+      };
       mockInvoke.mockResolvedValue(mockResult);
       const result = await sendNotification("plugin-1", "Title", "Content");
       expect(mockInvoke).toHaveBeenCalledWith("send_notification", {

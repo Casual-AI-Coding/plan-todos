@@ -12,11 +12,11 @@ const { mockInvoke } = vi.hoisted(() => ({
 }));
 
 // Mock @tauri-apps/api/core
-  vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@tauri-apps/api/core", () => ({
   invoke: mockInvoke,
-  }));
+}));
 
-    describe("Window API", () => {
+describe("Window API", () => {
   beforeEach(() => {
     mockInvoke.mockReset();
   });

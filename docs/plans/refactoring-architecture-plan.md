@@ -809,21 +809,21 @@ Phase 4 (后端拆分) ← 独立，可随时进行
 
 #### 发现的问题
 
-| 优先级 | 文件 | 问题描述 | 状态 |
-|--------|------|----------|------|
-| P1 | `src-tauri/src/commands/data/reset.rs` | 数据重置缺少事务包装，中途失败会导致数据不一致 | ✅ 已修复 |
-| P2 | `src-tauri/src/commands/circulations/statistics.rs` | 批量查询存在 N+1 问题 | ✅ 已修复 |
-| P2 | `src-tauri/src/commands/validation.rs` | 验证逻辑分散，缺少统一接口 | ✅ 已评估合理 |
-| P3 | 前端类型导入 | 类型导入路径不一致 (`@/lib/api` vs `@/lib/types`) | ✅ 已修复 |
+| 优先级 | 文件                                                | 问题描述                                          | 状态          |
+| ------ | --------------------------------------------------- | ------------------------------------------------- | ------------- |
+| P1     | `src-tauri/src/commands/data/reset.rs`              | 数据重置缺少事务包装，中途失败会导致数据不一致    | ✅ 已修复     |
+| P2     | `src-tauri/src/commands/circulations/statistics.rs` | 批量查询存在 N+1 问题                             | ✅ 已修复     |
+| P2     | `src-tauri/src/commands/validation.rs`              | 验证逻辑分散，缺少统一接口                        | ✅ 已评估合理 |
+| P3     | 前端类型导入                                        | 类型导入路径不一致 (`@/lib/api` vs `@/lib/types`) | ✅ 已修复     |
 
 #### 安全检查结果
 
-| 检查项 | 状态 |
-|--------|------|
-| SQL 注入 | ✅ 安全 - 全部使用参数化查询 |
-| XSS | ✅ 安全 - Tauri 桌面应用 |
-| 输入验证 | ✅ 有 validation 模块 |
-| 敏感数据泄露 | ✅ 安全 |
+| 检查项       | 状态                         |
+| ------------ | ---------------------------- |
+| SQL 注入     | ✅ 安全 - 全部使用参数化查询 |
+| XSS          | ✅ 安全 - Tauri 桌面应用     |
+| 输入验证     | ✅ 有 validation 模块        |
+| 敏感数据泄露 | ✅ 安全                      |
 
 #### 架构改进亮点
 
@@ -834,12 +834,11 @@ Phase 4 (后端拆分) ← 独立，可随时进行
 
 #### 修复记录 (2026-03-03)
 
-| Commit | 描述 |
-|--------|------|
-| `a4ff66d` | fix(data): wrap reset_data in transaction for data integrity |
+| Commit    | 描述                                                               |
+| --------- | ------------------------------------------------------------------ |
+| `a4ff66d` | fix(data): wrap reset_data in transaction for data integrity       |
 | `26f1b08` | perf(circulations): optimize batch logs query to avoid N+1 problem |
-| `959c0ae` | refactor(frontend): separate type imports from API imports |
-
+| `959c0ae` | refactor(frontend): separate type imports from API imports         |
 
 - [api-design.md](./api-design.md) - API设计文档
 - [component-design.md](./component-design.md) - 组件设计文档

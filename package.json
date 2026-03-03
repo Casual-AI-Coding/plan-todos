@@ -1,6 +1,6 @@
 {
   "name": "plan-todos",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
     "test:coverage": "vitest run --coverage",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-"tauri:build": "tauri build",
+    "tauri:build": "tauri build",
     "tauri:android:init": "tauri android init",
     "tauri:android:build": "tauri android build",
     "android:copy-icons": "bash scripts/copy-android-icons.sh",
