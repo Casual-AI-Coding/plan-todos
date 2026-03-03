@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.9] - 2026-03-04
+
+### Fixed
+
+**P1 - 数据安全**:
+
+- `checkin_circulation` / `undo_checkin_circulation` 使用 IMMEDIATE 事务，修复 TOCTOU 竞态条件
+- `reset.rs` 传播错误而非静默吞没
+- `checkin.rs` 添加 count 参数上限验证 (防止越界)
+
+**P2 - 日志改进**:
+
+- `statistics.rs` 反序列化失败时添加警告日志
+
+**P3 - 类型严格化**:
+
+- 批量操作添加严格 status/priority 类型校验
+
+**CI**:
+
+- `release.yml` 添加 Android 图标复制步骤，修复 APK 图标缺失问题
+
+### Changed
+
+**代码重构**:
+
+- `circulations.rs` 魔法数字 → 命名常量 (MAX_DAILY_COUNT, MAX_TOTAL_COUNT)
+- `validation.rs` 颜色验证 API 返回 `Result` 类型
+
+**API 层标准化**:
+
+- 引入 `ensureTauri` / `withTauriError` 工具函数
+- 所有 API 模块统一错误处理模式
+- 提取 mock 数据到 `constants.ts`
+
+---
+
 ## [0.5.8] - 2026-03-03
 
 ### Added

@@ -164,7 +164,6 @@ jobs:
       - name: Initialize Android project
         run: npm run tauri android init
 
-
       - name: Copy Android icons
         run: |
           # Copy custom icons to Android project
@@ -194,7 +193,6 @@ jobs:
             fi
             echo "Icons copied successfully"
           fi
-
 
       - name: Setup Android signing
         run: |
