@@ -5,7 +5,16 @@ use crate::models::CirculationLog;
 use crate::AppState;
 
 // ============================================================================
+// Constants
+// ============================================================================
+const DEFAULT_CIRCULATION_LOGS_LIMIT: i32 = 20;
+const DEFAULT_LOGS_BATCH_LIMIT: i32 = 50;
+const MAX_LOGS_LIMIT: i32 = 100;
+
+// ============================================================================
 // Statistics Commands
+// ============================================================================
+
 // ============================================================================
 
 #[tauri::command]
@@ -16,7 +25,7 @@ pub fn get_circulation_logs(
 ) -> Result<Vec<CirculationLog>, String> {
     log_command!("get_circulation_logs", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-        let limit = limit.unwrap_or(20);
+        let limit = limit.unwrap_or(DEFAULT_CIRCULATION_LOGS_LIMIT).min(MAX_LOGS_LIMIT);
 
         let mut stmt = conn
             .prepare(
@@ -53,7 +62,7 @@ pub fn get_circulation_logs_batch(
 ) -> Result<std::collections::HashMap<String, Vec<CirculationLog>>, String> {
     log_command!("get_circulation_logs_batch", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-        let limit = limit.unwrap_or(50);
+        let limit = limit.unwrap_or(DEFAULT_LOGS_BATCH_LIMIT).min(MAX_LOGS_LIMIT);
         let mut result = std::collections::HashMap::new();
 
         // Early return if no circulation_ids provided
