@@ -6,6 +6,12 @@ use crate::AppState;
 use rusqlite::TransactionBehavior;
 
 // ============================================================================
+// Constants
+// ============================================================================
+
+const MAX_CHECKIN_COUNT: i32 = 1000;
+
+// ============================================================================
 // Check-in Commands
 // ============================================================================
 
@@ -17,6 +23,14 @@ pub fn checkin_circulation(
     count: Option<i32>,
 ) -> Result<Circulation, String> {
     log_command!("checkin_circulation", {
+        // Validate count parameter upper bound
+        if count.map(|c| c > MAX_CHECKIN_COUNT).unwrap_or(false) {
+            return Err(format!(
+                "Count exceeds maximum allowed ({})",
+                MAX_CHECKIN_COUNT
+            ));
+        }
+
         let mut conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
         let today = chrono::Local::now().format("%Y-%m-%d").to_string();
