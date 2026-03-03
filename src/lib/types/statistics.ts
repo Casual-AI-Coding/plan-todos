@@ -5,6 +5,12 @@
  * These types define the structure for analytics and overview data.
  */
 
+import type { Priority } from "./common";
+
+export type StatisticsTodoStatus = "pending" | "in-progress" | "done";
+export type StatisticsTaskStatus = "pending" | "in-progress" | "done";
+export type StatisticsStepStatus = "pending" | "completed";
+
 /**
  * Statistics - 统计分析
  * Represents comprehensive statistics about the user's data.
@@ -86,24 +92,24 @@ export interface Dashboard {
     id: string;
     title: string;
     due_date: string | null;
-    status: string;
-    priority: string;
+    status: StatisticsTodoStatus;
+    priority: Priority;
   }>;
   // 过期待办
   overdue_todos: Array<{
     id: string;
     title: string;
     due_date: string | null;
-    status: string;
-    priority: string;
+    status: StatisticsTodoStatus;
+    priority: Priority;
   }>;
   // 今日完成
   completed_today: Array<{
     id: string;
     title: string;
     due_date: string | null;
-    status: string;
-    priority: string;
+    status: StatisticsTodoStatus;
+    priority: Priority;
   }>;
   // 进行中的计划
   active_plans: Array<{
