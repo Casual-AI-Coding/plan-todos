@@ -88,8 +88,6 @@ describe("getPlans", () => {
     );
   });
 
-
-
   it("should call invoke with get_plans command", async () => {
     const mockPlans: Plan[] = [
       {

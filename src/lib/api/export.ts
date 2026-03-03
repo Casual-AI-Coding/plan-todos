@@ -5,23 +5,21 @@
  */
 
 import type { ExportData, ImportResult, ImportMode } from "@/lib/types";
-import { isTauri } from "./client";
+import { withTauriError } from "./utils";
 
 export async function exportData(): Promise<ExportData> {
-  if (!isTauri()) {
-    throw new Error("This app must run in Tauri to export data");
-  }
-  const { invoke } = await import("@tauri-apps/api/core");
-  return invoke<ExportData>("export_data");
+  return withTauriError("export data", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<ExportData>("export_data");
+  });
 }
 
 export async function importData(
   data: ExportData,
   mode: ImportMode,
 ): Promise<ImportResult> {
-  if (!isTauri()) {
-    throw new Error("This app must run in Tauri to import data");
-  }
-  const { invoke } = await import("@tauri-apps/api/core");
-  return invoke<ImportResult>("import_data", { data, mode });
+  return withTauriError("import data", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<ImportResult>("import_data", { data, mode });
+  });
 }

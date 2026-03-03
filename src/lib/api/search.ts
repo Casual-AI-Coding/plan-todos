@@ -5,13 +5,16 @@
  */
 
 import type { SearchResult } from "@/lib/types";
-import { isTauri } from "./client";
+import { withTauriFallback } from "./utils";
 
 export async function searchAll(query: string): Promise<SearchResult[]> {
-  if (!isTauri()) {
-    console.warn("Running outside Tauri - search not available");
-    return [];
-  }
-  const { invoke } = await import("@tauri-apps/api/core");
-  return invoke<SearchResult[]>("search_all", { query });
+  return withTauriFallback(
+    "search",
+    async () => {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return invoke<SearchResult[]>("search_all", { query });
+    },
+    [],
+    "Running outside Tauri - search not available",
+  );
 }

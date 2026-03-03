@@ -88,10 +88,11 @@ describe("Bulk API Functions", () => {
       };
       mockInvoke.mockResolvedValue(mockResult);
 
-      const result = await bulkUpdateTodoStatus(["todo-1", "todo-2"], "done",
-      );
+      const result = await bulkUpdateTodoStatus(["todo-1", "todo-2"], "done");
 
-      expect(mockInvoke).toHaveBeenCalledWith("bulk_update_todo_status", { ids: ["todo-1", "todo-2"], status: "done",
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_update_todo_status", {
+        ids: ["todo-1", "todo-2"],
+        status: "done",
       });
       expect(result).toEqual(mockResult);
     });
@@ -119,8 +120,7 @@ describe("Bulk API Functions", () => {
       };
       mockInvoke.mockResolvedValue(mockResult);
 
-      const result = await bulkUpdateTodoStatus(["todo-1", "todo-2"], "done",
-      );
+      const result = await bulkUpdateTodoStatus(["todo-1", "todo-2"], "done");
 
       expect(result.updated).toBe(1);
       expect(result.failed).toHaveLength(1);
@@ -131,9 +131,9 @@ describe("Bulk API Functions", () => {
       const error = new Error("Database error");
       mockInvoke.mockRejectedValue(error);
 
-      await expect(
-        bulkUpdateTodoStatus(["todo-1"], "done"),
-      ).rejects.toThrow("Database error");
+      await expect(bulkUpdateTodoStatus(["todo-1"], "done")).rejects.toThrow(
+        "Database error",
+      );
     });
   });
 
