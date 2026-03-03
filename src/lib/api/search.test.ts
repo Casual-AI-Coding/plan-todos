@@ -147,7 +147,7 @@ describe("searchAll", () => {
     it("should handle invoke throwing null", async () => {
       vi.mocked(invoke).mockRejectedValue(null);
 
-      await expect(searchAll("test")).rejects.toBeNull();
+      await expect(searchAll("test")).rejects.toThrow("Null error");
     });
 
     it("should handle search results with null content", async () => {

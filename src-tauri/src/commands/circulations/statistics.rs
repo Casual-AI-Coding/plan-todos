@@ -3,6 +3,8 @@
 use crate::log_command;
 use crate::models::CirculationLog;
 use crate::AppState;
+use log::warn;
+
 
 // ============================================================================
 // Constants
@@ -54,7 +56,7 @@ pub fn get_circulation_logs(
             .filter_map(|l| match l {
                 Ok(log) => Some(log),
                 Err(e) => {
-                    eprintln!("Warning: Failed to deserialize: {}", e);
+                    warn!("Failed to deserialize circulation log: {}", e);
                     None
                 }
             })
@@ -118,7 +120,7 @@ pub fn get_circulation_logs_batch(
             .filter_map(|l| match l {
                 Ok(log) => Some(log),
                 Err(e) => {
-                    eprintln!("Warning: Failed to deserialize: {}", e);
+                    warn!("Failed to deserialize circulation log: {}", e);
                     None
                 }
             })

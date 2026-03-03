@@ -325,8 +325,8 @@ describe("getStatistics", () => {
 
       vi.mocked(invoke).mockRejectedValue(null);
 
-      // When invoke rejects with null, the promise is rejected with null
-      await expect(getStatistics()).rejects.toBeNull();
+      // When invoke rejects with null, it should be converted to Error
+      await expect(getStatistics()).rejects.toThrow("Null error");
     });
 
     it("throws error when invoke rejects with undefined", async () => {
@@ -338,7 +338,7 @@ describe("getStatistics", () => {
 
       vi.mocked(invoke).mockRejectedValue(undefined);
 
-      await expect(getStatistics()).rejects.toThrow(undefined);
+      await expect(getStatistics()).rejects.toThrow("Undefined error");
     });
   });
 

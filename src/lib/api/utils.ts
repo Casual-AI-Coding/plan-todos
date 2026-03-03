@@ -39,9 +39,11 @@ export async function withTauriError<T>(
   ensureTauri(operation);
   try {
     return await fn();
-  } catch (error) {
-    if (error === null) throw null;
-    if (error === undefined) throw undefined;
+  } catch (error: unknown) {
+    // Convert null/undefined to Error for consistent handling
+    if (error === null || error === undefined) {
+      throw new Error(error === null ? "Null error" : "Undefined error");
+    }
     const prefix = isChineseOperation(operation)
       ? "操作失败"
       : "Operation failed";
@@ -73,9 +75,11 @@ export async function withTauriFallback<T>(
   }
   try {
     return await fn();
-  } catch (error) {
-    if (error === null) throw null;
-    if (error === undefined) throw undefined;
+  } catch (error: unknown) {
+    // Convert null/undefined to Error for consistent handling
+    if (error === null || error === undefined) {
+      throw new Error(error === null ? "Null error" : "Undefined error");
+    }
     const prefix = isChineseOperation(operation)
       ? "操作失败"
       : "Operation failed";
