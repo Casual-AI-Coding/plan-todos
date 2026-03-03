@@ -164,6 +164,38 @@ jobs:
       - name: Initialize Android project
         run: npm run tauri android init
 
+
+      - name: Copy Android icons
+        run: |
+          # Copy custom icons to Android project
+          chmod +x scripts/copy-android-icons.sh 2>/dev/null || true
+          if [ -f scripts/copy-android-icons.sh ]; then
+            ./scripts/copy-android-icons.sh
+          else
+            echo "Copying icons manually..."
+            # mipmap folders
+            for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+              src_dir="src-tauri/icons/android/mipmap-${density}"
+              dst_dir="src-tauri/gen/android/app/src/main/res/mipmap-${density}"
+              if [ -d "$src_dir" ]; then
+                mkdir -p "$dst_dir"
+                cp -f $src_dir/*.png "$dst_dir/"
+              fi
+            done
+            # adaptive icon (Android 8+)
+            if [ -d "src-tauri/icons/android/mipmap-anydpi-v26" ]; then
+              mkdir -p src-tauri/gen/android/app/src/main/res/mipmap-anydpi-v26
+              cp -f src-tauri/icons/android/mipmap-anydpi-v26/*.xml src-tauri/gen/android/app/src/main/res/mipmap-anydpi-v26/
+            fi
+            # background color
+            if [ -d "src-tauri/icons/android/values" ]; then
+              mkdir -p src-tauri/gen/android/app/src/main/res/values
+              cp -f src-tauri/icons/android/values/*.xml src-tauri/gen/android/app/src/main/res/values/
+            fi
+            echo "Icons copied successfully"
+          fi
+
+
       - name: Setup Android signing
         run: |
           # Create debug keystore for signing
