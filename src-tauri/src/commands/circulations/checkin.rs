@@ -60,103 +60,28 @@ pub fn undo_checkin_circulation(
     id: String,
 ) -> Result<Circulation, String> {
     log_command!("undo_checkin_circulation", {
-        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let mut conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
 
-        // Get latest log with count
-        let mut log_stmt = conn
-            .prepare("SELECT id, completed_at, period, COALESCE(count, 1) as count FROM circulation_logs WHERE circulation_id = ? ORDER BY completed_at DESC LIMIT 1")
+        // Use IMMEDIATE transaction for atomicity
+        let tx = conn
+            .transaction_with_behavior(TransactionBehavior::Immediate)
             .map_err(|e| e.to_string())?;
 
-        let log_result: Result<(String, String, Option<String>, i32), _> = log_stmt
-            .query_row([&id], |row| {
-                Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
-            });
+        // Get latest log within transaction
+        let log = get_latest_log_in_tx(&tx, &id)?;
 
-        let (log_id, _completed_at, _period, log_count) = match log_result {
-            Ok(r) => r,
-            Err(_) => return Err("No check-in history found".to_string()),
-        };
+        // Get circulation within transaction
+        let mut circ = get_circulation_in_tx(&tx, &id)?;
 
-        // Get circulation
-        let mut circ_stmt = conn
-            .prepare(
-                "SELECT id, title, content, circulation_type, frequency, frequency_config,
-                        target_count, current_count, streak_count, best_streak,
-                        last_completed_at, status, created_at, updated_at
-                 FROM circulations WHERE id = ?",
-            )
-            .map_err(|e| e.to_string())?;
+        // Reverse circulation data within transaction
+        circ = reverse_circulation_in_tx(&tx, &mut circ, &log, &now)?;
 
-        let mut circ: Circulation = circ_stmt
-            .query_row([&id], |row| {
-                Ok(Circulation {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    content: row.get(2)?,
-                    circulation_type: row.get(3)?,
-                    frequency: row.get(4)?,
-                    frequency_config: row.get(5)?,
-                    target_count: row.get(6)?,
-                    current_count: row.get(7)?,
-                    streak_count: row.get(8)?,
-                    best_streak: row.get(9)?,
-                    last_completed_at: row.get(10)?,
-                    status: row.get(11)?,
-                    created_at: row.get(12)?,
-                    updated_at: row.get(13)?,
-                })
-            })
-            .map_err(|e| e.to_string())?;
+        // Delete log within transaction
+        delete_log_in_tx(&tx, &log.id)?;
 
-        // Reverse based on type
-        if circ.circulation_type == "count" {
-            // Decrement by the logged count amount
-            circ.current_count = (circ.current_count - log_count).max(0);
-            // Find previous completion
-            let mut prev_stmt = conn
-                .prepare("SELECT completed_at FROM circulation_logs WHERE circulation_id = ? AND id != ? ORDER BY completed_at DESC LIMIT 1")
-                .map_err(|e| e.to_string())?;
+        tx.commit().map_err(|e| e.to_string())?;
 
-            circ.last_completed_at = prev_stmt
-                .query_row(rusqlite::params![id, log_id], |row| row.get(0))
-                .ok();
-
-            conn.execute(
-                "UPDATE circulations SET current_count = ?, last_completed_at = ?, updated_at = ? WHERE id = ?",
-                rusqlite::params![circ.current_count, circ.last_completed_at, now, id],
-            ).map_err(|e| e.to_string())?;
-        } else {
-            // Recalculate streak
-            let today = chrono::Local::now().format("%Y-%m-%d").to_string();
-            let new_streak = calculate_streak_undo(
-                &conn,
-                &id,
-                circ.frequency.as_deref().unwrap_or("daily"),
-                &today,
-            );
-            circ.streak_count = new_streak;
-
-            // Find previous completion
-            let mut prev_stmt = conn
-                .prepare("SELECT completed_at FROM circulation_logs WHERE circulation_id = ? AND id != ? ORDER BY completed_at DESC LIMIT 1")
-                .map_err(|e| e.to_string())?;
-
-            circ.last_completed_at = prev_stmt
-                .query_row(rusqlite::params![id, log_id], |row| row.get(0))
-                .ok();
-
-            conn.execute(
-                "UPDATE circulations SET streak_count = ?, last_completed_at = ?, updated_at = ? WHERE id = ?",
-                rusqlite::params![circ.streak_count, circ.last_completed_at, now, id],
-            ).map_err(|e| e.to_string())?;
-        }
-
-        // Delete log
-        conn.execute("DELETE FROM circulation_logs WHERE id = ?", [&log_id])
-            .map_err(|e| e.to_string())?;
-
-        circ.updated_at = now;
         Ok(circ)
     })
 }
@@ -165,11 +90,104 @@ pub fn undo_checkin_circulation(
 // Helper Functions
 // ============================================================================
 
-/// Get circulation within a transaction
-fn get_circulation_in_tx(
+/// Get latest log within a transaction
+fn get_latest_log_in_tx(
     tx: &rusqlite::Transaction,
-    id: &str,
+    circulation_id: &str,
+) -> Result<CirculationLog, String> {
+    let mut stmt = tx
+        .prepare(
+            "SELECT id, circulation_id, completed_at, note, period, COALESCE(count, 1) as count FROM circulation_logs WHERE circulation_id = ? ORDER BY completed_at DESC LIMIT 1",
+        )
+        .map_err(|e| e.to_string())?;
+
+    stmt.query_row([circulation_id], |row| {
+        Ok(CirculationLog {
+            id: row.get(0)?,
+            circulation_id: row.get(1)?,
+            completed_at: row.get(2)?,
+            note: row.get(3)?,
+            period: row.get(4)?,
+            count: row.get(5)?,
+        })
+    })
+    .map_err(|_| "No check-in history found".to_string())
+}
+
+/// Reverse circulation data within a transaction
+fn reverse_circulation_in_tx(
+    tx: &rusqlite::Transaction,
+    circ: &mut Circulation,
+    log: &CirculationLog,
+    now: &str,
 ) -> Result<Circulation, String> {
+    if circ.circulation_type == "count" {
+        // Decrement by the logged count amount
+        let log_count = log.count.unwrap_or(1);
+        circ.current_count = (circ.current_count - log_count).max(0);
+
+        // Find previous completion
+        let mut prev_stmt = tx
+            .prepare(
+                "SELECT completed_at FROM circulation_logs WHERE circulation_id = ? AND id != ? ORDER BY completed_at DESC LIMIT 1",
+            )
+            .map_err(|e| e.to_string())?;
+
+        circ.last_completed_at = prev_stmt
+            .query_row(rusqlite::params![log.circulation_id, log.id], |row| {
+                row.get(0)
+            })
+            .ok();
+
+        tx.execute(
+            "UPDATE circulations SET current_count = ?, last_completed_at = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![circ.current_count, circ.last_completed_at, now, circ.id],
+        )
+        .map_err(|e| e.to_string())?;
+    } else {
+        // Recalculate streak
+        let today = chrono::Local::now().format("%Y-%m-%d").to_string();
+        let new_streak = calculate_streak_undo(
+            tx,
+            &circ.id,
+            circ.frequency.as_deref().unwrap_or("daily"),
+            &today,
+        );
+        circ.streak_count = new_streak;
+
+        // Find previous completion
+        let mut prev_stmt = tx
+            .prepare(
+                "SELECT completed_at FROM circulation_logs WHERE circulation_id = ? AND id != ? ORDER BY completed_at DESC LIMIT 1",
+            )
+            .map_err(|e| e.to_string())?;
+
+        circ.last_completed_at = prev_stmt
+            .query_row(rusqlite::params![log.circulation_id, log.id], |row| {
+                row.get(0)
+            })
+            .ok();
+
+        tx.execute(
+            "UPDATE circulations SET streak_count = ?, last_completed_at = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![circ.streak_count, circ.last_completed_at, now, circ.id],
+        )
+        .map_err(|e| e.to_string())?;
+    }
+
+    circ.updated_at = now.to_string();
+    Ok(circ.clone())
+}
+
+/// Delete log within a transaction
+fn delete_log_in_tx(tx: &rusqlite::Transaction, log_id: &str) -> Result<(), String> {
+    tx.execute("DELETE FROM circulation_logs WHERE id = ?", [log_id])
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+/// Get circulation within a transaction
+fn get_circulation_in_tx(tx: &rusqlite::Transaction, id: &str) -> Result<Circulation, String> {
     let mut stmt = tx
         .prepare(
             "SELECT id, title, content, circulation_type, frequency, frequency_config,
@@ -278,7 +296,6 @@ fn insert_log_in_tx(
 
     Ok(())
 }
-
 
 fn calculate_period(frequency: &str, today: &str) -> String {
     match frequency {
