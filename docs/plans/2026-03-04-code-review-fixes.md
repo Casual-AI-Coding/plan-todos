@@ -520,20 +520,11 @@ async function bulkUpdateStatus(
 
 ---
 
-### 5.2 [P3-16] 减少 clone (可选)
-
-**位置**: `src-tauri/src/commands/circulations/statistics.rs:107`
-
-**修复方案**:
-
-```rust
-// 当前:
-acc.entry(log.circulation_id.clone())
-
-// 优化: 使用引用或更改数据结构
-// 但这是一个微优化，当前实现性能影响可忽略
-```
-
+#NP|
+#BM|**状态**: N/A - clone 开销在当前上下文可忽略
+#BM|- 数据库 I/O 是主要瓶颈（毫秒级），string clone 仅纳秒级
+#BM|- 字符串较短（UUID 20-40 字节），Rust SSO 有优化
+#BM|- 优化收益 << 1%，引入复杂度 > 收益
 ---
 
 ## 六、实施计划
