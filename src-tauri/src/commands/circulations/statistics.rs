@@ -50,7 +50,15 @@ pub fn get_circulation_logs(
             })
             .map_err(|e| e.to_string())?;
 
-        Ok(log_iter.filter_map(|l| l.ok()).collect())
+        Ok(log_iter
+            .filter_map(|l| match l {
+                Ok(log) => Some(log),
+                Err(e) => {
+                    eprintln!("Warning: Failed to deserialize: {}", e);
+                    None
+                }
+            })
+            .collect())
     })
 }
 
@@ -106,7 +114,15 @@ pub fn get_circulation_logs_batch(
             .map_err(|e| e.to_string())?;
 
         // Collect all logs
-        let all_logs: Vec<CirculationLog> = log_iter.filter_map(|l| l.ok()).collect();
+        let all_logs: Vec<CirculationLog> = log_iter
+            .filter_map(|l| match l {
+                Ok(log) => Some(log),
+                Err(e) => {
+                    eprintln!("Warning: Failed to deserialize: {}", e);
+                    None
+                }
+            })
+            .collect();
 
         // Group by circulation_id in Rust and limit each group
         for (circulation_id, logs) in
