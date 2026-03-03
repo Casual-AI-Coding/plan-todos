@@ -32,7 +32,7 @@ describe("getPlan", () => {
     });
 
     await expect(getPlan("plan-1")).rejects.toThrow(
-      "This app must run in Tauri to get plan",
+      "此操作需要在 Tauri 环境中运行: 获取 Plan",
     );
   });
 
@@ -77,31 +77,18 @@ describe("getPlans", () => {
     global.window = originalWindow;
   });
 
-  it("should return empty array when not in Tauri environment", async () => {
+  it("should throw error when not in Tauri environment", async () => {
     Object.defineProperty(global, "window", {
       value: {},
       writable: true,
     });
 
-    const result = await getPlans();
-
-    expect(result).toEqual([]);
-  });
-
-  it("should warn when not in Tauri environment", async () => {
-    Object.defineProperty(global, "window", {
-      value: {},
-      writable: true,
-    });
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    await getPlans();
-
-    expect(warnSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+    await expect(getPlans()).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取 Plan 列表",
     );
-    warnSpy.mockRestore();
   });
+
+
 
   it("should call invoke with get_plans command", async () => {
     const mockPlans: Plan[] = [
@@ -173,7 +160,7 @@ describe("createPlan", () => {
     const params: CreatePlanParams = { title: "New Plan" };
 
     await expect(createPlan(params)).rejects.toThrow(
-      "This app must run in Tauri to create plans",
+      "此操作需要在 Tauri 环境中运行: 创建 Plan",
     );
   });
 
@@ -341,7 +328,7 @@ describe("updatePlan", () => {
     const params: UpdatePlanParams = { title: "Updated Plan" };
 
     await expect(updatePlan("plan-1", params)).rejects.toThrow(
-      "This app must run in Tauri to update plans",
+      "此操作需要在 Tauri 环境中运行: 更新 Plan",
     );
   });
 
@@ -517,7 +504,7 @@ describe("deletePlan", () => {
     });
 
     await expect(deletePlan("plan-1")).rejects.toThrow(
-      "This app must run in Tauri to delete plans",
+      "此操作需要在 Tauri 环境中运行: 删除 Plan",
     );
   });
 

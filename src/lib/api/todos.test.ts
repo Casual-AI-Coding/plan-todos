@@ -37,7 +37,7 @@ describe("Todo API", () => {
       vi.mocked(isTauri).mockReturnValue(false);
 
       await expect(getTodo("test-id")).rejects.toThrow(
-        "This app must run in Tauri to get todo",
+        "此操作需要在 Tauri 环境中运行: 获取 Todo",
       );
     });
 
@@ -71,13 +71,12 @@ describe("Todo API", () => {
   });
 
   describe("getTodos", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
 
-      const result = await getTodos();
-
-      expect(result).toEqual([]);
-      expect(mockInvoke).not.toHaveBeenCalled();
+      await expect(getTodos()).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 获取 Todo 列表",
+      );
     });
 
     it("should call invoke with get_todos command when in Tauri", async () => {
@@ -122,13 +121,12 @@ describe("Todo API", () => {
   });
 
   describe("getTodosByTag", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
 
-      const result = await getTodosByTag("tag-1");
-
-      expect(result).toEqual([]);
-      expect(mockInvoke).not.toHaveBeenCalled();
+      await expect(getTodosByTag("tag-1")).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 获取标签下的 Todo 列表",
+      );
     });
 
     it("should call invoke with get_todos_by_tag command when in Tauri", async () => {
@@ -171,7 +169,7 @@ describe("Todo API", () => {
       const params: CreateTodoParams = { title: "New Todo" };
 
       await expect(createTodo(params)).rejects.toThrow(
-        "This app must run in Tauri to create todos",
+        "此操作需要在 Tauri 环境中运行: 创建 Todo",
       );
     });
 
@@ -250,7 +248,7 @@ describe("Todo API", () => {
       const params: UpdateTodoParams = { title: "Updated Title" };
 
       await expect(updateTodo("test-id", params)).rejects.toThrow(
-        "This app must run in Tauri to update todos",
+        "此操作需要在 Tauri 环境中运行: 更新 Todo",
       );
     });
 
@@ -360,7 +358,7 @@ describe("Todo API", () => {
       vi.mocked(isTauri).mockReturnValue(false);
 
       await expect(deleteTodo("test-id")).rejects.toThrow(
-        "This app must run in Tauri to delete todos",
+        "此操作需要在 Tauri 环境中运行: 删除 Todo",
       );
     });
 

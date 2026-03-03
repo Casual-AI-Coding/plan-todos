@@ -78,7 +78,7 @@ describe("circulations API", () => {
       });
 
       await expect(getCirculation("circulation-1")).rejects.toThrow(
-        "This app must run in Tauri to get circulation",
+        "此操作需要在 Tauri 环境中运行: 获取 Circulation",
       );
     });
 
@@ -101,14 +101,15 @@ describe("circulations API", () => {
   });
 
   describe("getCirculations", () => {
-    it("should return empty array when not in Tauri environment", async () => {
+    it("should throw error when not in Tauri environment", async () => {
       Object.defineProperty(global, "window", {
         value: {},
         writable: true,
       });
 
-      const result = await getCirculations();
-      expect(result).toEqual([]);
+      await expect(getCirculations()).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 获取 Circulation 列表",
+      );
     });
 
     it("should call invoke with get_circulations command", async () => {
@@ -130,14 +131,15 @@ describe("circulations API", () => {
   });
 
   describe("getCirculationsByType", () => {
-    it("should return empty array when not in Tauri environment", async () => {
+    it("should throw error when not in Tauri environment", async () => {
       Object.defineProperty(global, "window", {
         value: {},
         writable: true,
       });
 
-      const result = await getCirculationsByType("periodic");
-      expect(result).toEqual([]);
+      await expect(getCirculationsByType("periodic")).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 获取指定类型的 Circulation 列表",
+      );
     });
 
     it("should call invoke with get_circulations_by_type and type only", async () => {
@@ -186,7 +188,7 @@ describe("circulations API", () => {
       };
 
       await expect(createCirculation(params)).rejects.toThrow(
-        "This app must run in Tauri to create circulation",
+        "此操作需要在 Tauri 环境中运行: 创建 Circulation",
       );
     });
 
@@ -255,7 +257,7 @@ describe("circulations API", () => {
       });
 
       await expect(updateCirculation("circulation-1", {})).rejects.toThrow(
-        "This app must run in Tauri to update circulation",
+        "此操作需要在 Tauri 环境中运行: 更新 Circulation",
       );
     });
 
@@ -334,7 +336,7 @@ describe("circulations API", () => {
       });
 
       await expect(deleteCirculation("circulation-1")).rejects.toThrow(
-        "This app must run in Tauri to delete circulation",
+        "此操作需要在 Tauri 环境中运行: 删除 Circulation",
       );
     });
 
@@ -365,7 +367,7 @@ describe("circulations API", () => {
       });
 
       await expect(checkinCirculation("circulation-1")).rejects.toThrow(
-        "This app must run in Tauri to checkin",
+        "此操作需要在 Tauri 环境中运行: 打卡 Circulation",
       );
     });
 
@@ -427,7 +429,7 @@ describe("circulations API", () => {
       });
 
       await expect(undoCheckinCirculation("circulation-1")).rejects.toThrow(
-        "This app must run in Tauri to undo checkin",
+        "此操作需要在 Tauri 环境中运行: 撤销打卡",
       );
     });
 
@@ -452,14 +454,15 @@ describe("circulations API", () => {
   });
 
   describe("getCirculationLogs", () => {
-    it("should return empty array when not in Tauri environment", async () => {
+    it("should throw error when not in Tauri environment", async () => {
       Object.defineProperty(global, "window", {
         value: {},
         writable: true,
       });
 
-      const result = await getCirculationLogs("circulation-1");
-      expect(result).toEqual([]);
+      await expect(getCirculationLogs("circulation-1")).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 获取打卡记录",
+      );
     });
 
     it("should call invoke with get_circulation_logs command", async () => {
@@ -495,17 +498,15 @@ describe("circulations API", () => {
   });
 
   describe("getCirculationLogsBatch", () => {
-    it("should return empty object when not in Tauri environment", async () => {
+    it("should throw error when not in Tauri environment", async () => {
       Object.defineProperty(global, "window", {
         value: {},
         writable: true,
       });
 
-      const result = await getCirculationLogsBatch([
-        "circulation-1",
-        "circulation-2",
-      ]);
-      expect(result).toEqual({});
+      await expect(getCirculationLogsBatch(["circulation-1"])).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 批量获取打卡记录",
+      );
     });
 
     it("should call invoke with get_circulation_logs_batch command", async () => {

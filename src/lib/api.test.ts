@@ -111,14 +111,10 @@ describe("API Functions - Read operations (non-Tauri)", () => {
     });
   });
 
-  it("getPlans returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getPlans();
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getPlans throws error when not in Tauri", async () => {
+    await expect(getPlans()).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取 Plan 列表",
     );
-    consoleSpy.mockRestore();
   });
 
   it("getTasks returns empty array when not in Tauri", async () => {
@@ -161,14 +157,10 @@ describe("API Functions - Read operations (non-Tauri)", () => {
     consoleSpy.mockRestore();
   });
 
-  it("getTodos returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getTodos();
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getTodos throws error when not in Tauri", async () => {
+    await expect(getTodos()).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取 Todo 列表",
     );
-    consoleSpy.mockRestore();
   });
 
   it("getMilestones returns empty array when not in Tauri", async () => {
@@ -195,19 +187,19 @@ describe("API Functions - Plan Write Operations (non-Tauri)", () => {
 
   it("createPlan throws error when not in Tauri", async () => {
     await expect(createPlan({ title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to create plans",
+      "此操作需要在 Tauri 环境中运行: 创建 Plan",
     );
   });
 
   it("updatePlan throws error when not in Tauri", async () => {
     await expect(updatePlan("id", { title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to update plans",
+      "此操作需要在 Tauri 环境中运行: 更新 Plan",
     );
   });
 
   it("deletePlan throws error when not in Tauri", async () => {
     await expect(deletePlan("id")).rejects.toThrow(
-      "This app must run in Tauri to delete plans",
+      "此操作需要在 Tauri 环境中运行: 删除 Plan",
     );
   });
 });
@@ -315,19 +307,19 @@ describe("API Functions - Todo Write Operations (non-Tauri)", () => {
 
   it("createTodo throws error when not in Tauri", async () => {
     await expect(createTodo({ title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to create todos",
+      "此操作需要在 Tauri 环境中运行: 创建 Todo",
     );
   });
 
   it("updateTodo throws error when not in Tauri", async () => {
     await expect(updateTodo("id", { title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to update todos",
+      "此操作需要在 Tauri 环境中运行: 更新 Todo",
     );
   });
 
   it("deleteTodo throws error when not in Tauri", async () => {
     await expect(deleteTodo("id")).rejects.toThrow(
-      "This app must run in Tauri to delete todos",
+      "此操作需要在 Tauri 环境中运行: 删除 Todo",
     );
   });
 });
@@ -496,13 +488,13 @@ describe("API Functions - Priority in Create/Update (non-Tauri)", () => {
   it("createTodo accepts priority parameter", async () => {
     // Should not throw - priority is optional
     await expect(createTodo({ title: "Test", priority: "P0" })).rejects.toThrow(
-      "This app must run in Tauri to create todos",
+      "此操作需要在 Tauri 环境中运行: 创建 Todo",
     );
   });
 
   it("updateTodo accepts priority parameter", async () => {
     await expect(updateTodo("id", { priority: "P1" })).rejects.toThrow(
-      "This app must run in Tauri to update todos",
+      "此操作需要在 Tauri 环境中运行: 更新 Todo",
     );
   });
 
@@ -647,15 +639,16 @@ describe("API Functions - Todo with Tags (non-Tauri)", () => {
     });
   });
 
-  it("getTodos returns empty array when not in Tauri", async () => {
-    const todos = await getTodos();
-    expect(todos).toEqual([]);
+  it("getTodos throws error when not in Tauri", async () => {
+    await expect(getTodos()).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取 Todo 列表",
+    );
   });
 
   it("createTodo does not accept tags parameter (handled separately)", async () => {
     // Tags are set via setEntityTags after creation
     await expect(createTodo({ title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to create todos",
+      "此操作需要在 Tauri 环境中运行: 创建 Todo",
     );
   });
 });
@@ -796,28 +789,20 @@ describe("API Functions - Circulation (non-Tauri)", () => {
 
   it("getCirculation throws error when not in Tauri", async () => {
     await expect(getCirculation("circ-1")).rejects.toThrow(
-      "This app must run in Tauri to get circulation",
+      "此操作需要在 Tauri 环境中运行: 获取 Circulation",
     );
   });
 
-  it("getCirculations returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getCirculations();
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getCirculations throws error when not in Tauri", async () => {
+    await expect(getCirculations()).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取 Circulation 列表",
     );
-    consoleSpy.mockRestore();
   });
 
-  it("getCirculationsByType returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getCirculationsByType("periodic", "daily");
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getCirculationsByType throws error when not in Tauri", async () => {
+    await expect(getCirculationsByType("periodic", "daily")).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取指定类型的 Circulation 列表",
     );
-    consoleSpy.mockRestore();
   });
 
   it("createCirculation throws error when not in Tauri", async () => {
@@ -827,47 +812,43 @@ describe("API Functions - Circulation (non-Tauri)", () => {
         circulation_type: "periodic",
         frequency: "daily",
       }),
-    ).rejects.toThrow("This app must run in Tauri to create circulation");
+    ).rejects.toThrow("此操作需要在 Tauri 环境中运行: 创建 Circulation");
   });
 
   it("updateCirculation throws error when not in Tauri", async () => {
     await expect(
       updateCirculation("circ-1", { title: "Updated" }),
-    ).rejects.toThrow("This app must run in Tauri to update circulation");
+    ).rejects.toThrow("此操作需要在 Tauri 环境中运行: 更新 Circulation");
   });
 
   it("deleteCirculation throws error when not in Tauri", async () => {
     await expect(deleteCirculation("circ-1")).rejects.toThrow(
-      "This app must run in Tauri to delete circulation",
+      "此操作需要在 Tauri 环境中运行: 删除 Circulation",
     );
   });
 
   it("checkinCirculation throws error when not in Tauri", async () => {
     await expect(checkinCirculation("circ-1")).rejects.toThrow(
-      "This app must run in Tauri to checkin",
+      "此操作需要在 Tauri 环境中运行: 打卡 Circulation",
     );
   });
 
   it("checkinCirculation accepts note and count parameters", async () => {
     await expect(checkinCirculation("circ-1", "Great day", 5)).rejects.toThrow(
-      "This app must run in Tauri to checkin",
+      "此操作需要在 Tauri 环境中运行: 打卡 Circulation",
     );
   });
 
   it("undoCheckinCirculation throws error when not in Tauri", async () => {
     await expect(undoCheckinCirculation("circ-1")).rejects.toThrow(
-      "This app must run in Tauri to undo checkin",
+      "此操作需要在 Tauri 环境中运行: 撤销打卡",
     );
   });
 
-  it("getCirculationLogs returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getCirculationLogs("circ-1", 10);
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getCirculationLogs throws error when not in Tauri", async () => {
+    await expect(getCirculationLogs("circ-1", 10)).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取打卡记录",
     );
-    consoleSpy.mockRestore();
   });
 });
 
@@ -975,29 +956,27 @@ describe("API Functions - Edge Cases", () => {
     });
   });
 
-  it("getCirculationsByType works with only type parameter", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getCirculationsByType("count");
-    expect(result).toEqual([]);
-    consoleSpy.mockRestore();
+  it("getCirculationsByType throws error when not in Tauri", async () => {
+    await expect(getCirculationsByType("count")).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取指定类型的 Circulation 列表",
+    );
   });
 
-  it("getCirculationLogs works without limit parameter", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const result = await getCirculationLogs("circ-1");
-    expect(result).toEqual([]);
-    consoleSpy.mockRestore();
+  it("getCirculationLogs throws error when not in Tauri", async () => {
+    await expect(getCirculationLogs("circ-1")).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取打卡记录",
+    );
   });
 
   it("checkinCirculation works with only id parameter", async () => {
     await expect(checkinCirculation("circ-1")).rejects.toThrow(
-      "This app must run in Tauri to checkin",
+      "此操作需要在 Tauri 环境中运行: 打卡 Circulation",
     );
   });
 
   it("checkinCirculation works with zero count", async () => {
     await expect(checkinCirculation("circ-1", "", 0)).rejects.toThrow(
-      "This app must run in Tauri to checkin",
+      "此操作需要在 Tauri 环境中运行: 打卡 Circulation",
     );
   });
 });
