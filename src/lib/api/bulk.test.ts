@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { BatchUpdateResult } from "@/lib/types";
+import type { BulkTodoStatus } from "@/lib/api/bulk";
 import {
   bulkUpdateTodoStatus,
   bulkUpdateTaskStatus,
@@ -47,7 +48,7 @@ describe("Bulk API Functions", () => {
 
     it("bulkUpdateTodoStatus throws error when not in Tauri", async () => {
       await expect(
-        bulkUpdateTodoStatus(["todo-1", "todo-2"], "completed"),
+        bulkUpdateTodoStatus(["todo-1", "todo-2"], "done"),
       ).rejects.toThrow("This app must run in Tauri");
     });
 
@@ -87,14 +88,10 @@ describe("Bulk API Functions", () => {
       };
       mockInvoke.mockResolvedValue(mockResult);
 
-      const result = await bulkUpdateTodoStatus(
-        ["todo-1", "todo-2"],
-        "completed",
+      const result = await bulkUpdateTodoStatus(["todo-1", "todo-2"], "done",
       );
 
-      expect(mockInvoke).toHaveBeenCalledWith("bulk_update_todo_status", {
-        ids: ["todo-1", "todo-2"],
-        status: "completed",
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_update_todo_status", { ids: ["todo-1", "todo-2"], status: "done",
       });
       expect(result).toEqual(mockResult);
     });
@@ -122,9 +119,7 @@ describe("Bulk API Functions", () => {
       };
       mockInvoke.mockResolvedValue(mockResult);
 
-      const result = await bulkUpdateTodoStatus(
-        ["todo-1", "todo-2"],
-        "completed",
+      const result = await bulkUpdateTodoStatus(["todo-1", "todo-2"], "done",
       );
 
       expect(result.updated).toBe(1);
@@ -137,7 +132,7 @@ describe("Bulk API Functions", () => {
       mockInvoke.mockRejectedValue(error);
 
       await expect(
-        bulkUpdateTodoStatus(["todo-1"], "completed"),
+        bulkUpdateTodoStatus(["todo-1"], "done"),
       ).rejects.toThrow("Database error");
     });
   });
@@ -381,11 +376,11 @@ describe("Bulk API Functions", () => {
   // ============================================================================
   describe("Edge Cases", () => {
     it("should handle all status values", async () => {
-      const statuses = ["pending", "in-progress", "completed", "done"];
+      const todoStatuses: BulkTodoStatus[] = ["pending", "in-progress", "done"];
       const mockResult: BatchUpdateResult = { updated: 1, failed: [] };
       mockInvoke.mockResolvedValue(mockResult);
 
-      for (const status of statuses) {
+      for (const status of todoStatuses) {
         await bulkUpdateTodoStatus(["todo-1"], status);
         expect(mockInvoke).toHaveBeenCalledWith(
           expect.any(String),

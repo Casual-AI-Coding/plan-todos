@@ -7,9 +7,14 @@
 import type { BatchUpdateResult } from "@/lib/types";
 import { isTauri } from "./client";
 
+// Status types for bulk operations
+export type BulkTodoStatus = "pending" | "in-progress" | "done";
+export type BulkTaskStatus = "pending" | "in-progress" | "done";
+export type BulkStepStatus = "pending" | "completed";
+
 export async function bulkUpdateTodoStatus(
   ids: string[],
-  status: string,
+  status: BulkTodoStatus,
 ): Promise<BatchUpdateResult> {
   if (!isTauri()) {
     throw new Error("This app must run in Tauri");
@@ -20,7 +25,7 @@ export async function bulkUpdateTodoStatus(
 
 export async function bulkUpdateTaskStatus(
   ids: string[],
-  status: string,
+  status: BulkTaskStatus,
 ): Promise<BatchUpdateResult> {
   if (!isTauri()) {
     throw new Error("This app must run in Tauri");
@@ -31,7 +36,7 @@ export async function bulkUpdateTaskStatus(
 
 export async function bulkUpdateStepStatus(
   ids: string[],
-  status: string,
+  status: BulkStepStatus,
 ): Promise<BatchUpdateResult> {
   if (!isTauri()) {
     throw new Error("This app must run in Tauri");
