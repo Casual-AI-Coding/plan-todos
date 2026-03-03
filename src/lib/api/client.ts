@@ -12,14 +12,3 @@ export function isTauri(): boolean {
   return "__TAURI__" in window;
 }
 
-/**
- * Helper to wrap Tauri invoke calls with unified error handling
- */
-export async function withTauriError<T>(promise: Promise<T>): Promise<T> {
-  try {
-    return await promise;
-  } catch (e) {
-    console.error("[Tauri Error]", e);
-    throw e;
-  }
-}
