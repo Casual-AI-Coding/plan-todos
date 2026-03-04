@@ -368,13 +368,36 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
 }
 
 // Helper function to add column if it doesn't exist
+/// Validates table name against whitelist to prevent SQL injection
 fn add_column_if_not_exists(
     conn: &Connection,
     table: &str,
     column: &str,
     definition: &str,
 ) -> Result<(), rusqlite::Error> {
+    // Whitelist of valid table names to prevent SQL injection
+    const VALID_TABLES: &[&str] = &[
+        "todos", "plans", "tasks", "targets", "milestones", "steps",
+        "circulations", "circulation_logs", "todos_tags", "notification_plugins",
+    ];
+    
+    if !VALID_TABLES.contains(&table) {
+        return Err(rusqlite::Error::InvalidParameterName(format!(
+            "Invalid table name: {}",
+            table
+        )));
+    }
+    
+    // Validate column name (alphanumeric and underscore only)
+    if !column.chars().all(|c| c.is_alphanumeric() || c == '_') {
+        return Err(rusqlite::Error::InvalidParameterName(format!(
+            "Invalid column name: {}",
+            column
+        )));
+    }
+    
     // Check if column exists using PRAGMA table_info
+    // Safe: table name is validated against whitelist
     let mut stmt = conn.prepare(&format!("PRAGMA table_info({})", table))?;
     let columns: Vec<String> = stmt
         .query_map([], |row| row.get(1))?
@@ -382,6 +405,7 @@ fn add_column_if_not_exists(
         .collect();
 
     if !columns.contains(&column.to_string()) {
+        // Safe: table and column names are validated
         conn.execute(
             &format!("ALTER TABLE {} ADD COLUMN {} {}", table, column, definition),
             [],

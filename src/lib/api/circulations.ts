@@ -11,8 +11,7 @@ import type {
   UpdateCirculationParams,
 } from "@/lib/types";
 import type { CirculationType, PeriodicFrequency } from "@/lib/types";
-import { withTauriError } from "./utils";
-
+import { invoke, withTauriError } from "./utils";
 export async function getCirculation(id: string): Promise<Circulation> {
   return withTauriError("获取 Circulation", async () => {
     const { invoke } = await import("@tauri-apps/api/core");

@@ -21,7 +21,8 @@ vi.mock("@tauri-apps/api/core", () => ({
 
 // Mock client module to control isTauri behavior
 vi.mock("@/lib/api/client", () => ({
-  isTauri: vi.fn(),
+  isTauri: vi.fn(() => true),
+  invoke: mockInvoke,
 }));
 
 import { isTauri } from "@/lib/api/client";

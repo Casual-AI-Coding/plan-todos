@@ -37,19 +37,38 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             // Get app data directory using Tauri v2 path API
-            let app_data_dir = app
-                .path()
-                .app_data_dir()
-                .expect("Failed to get app data directory");
+            let app_data_dir = match app.path().app_data_dir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    log::error!("Failed to get app data directory: {}", e);
+                    return Err(Box::new(std::io::Error::new(
+                        std::io::ErrorKind::NotFound,
+                        format!("Failed to get app data directory: {}", e),
+                    )) as Box<dyn std::error::Error>);
+                }
+            };
 
             // Create directory if it doesn't exist
-            std::fs::create_dir_all(&app_data_dir).ok();
+            if let Err(e) = std::fs::create_dir_all(&app_data_dir) {
+                log::error!("Failed to create app data directory: {}", e);
+                return Err(Box::new(e) as Box<dyn std::error::Error>);
+            }
 
             let db_path = app_data_dir.join("data.db");
             info!("Database path: {:?}", db_path);
 
-            let conn = Connection::open(&db_path).expect("Failed to open database");
-            db::init_db(&conn).expect("Failed to initialize database");
+            let conn = match Connection::open(&db_path) {
+                Ok(c) => c,
+                Err(e) => {
+                    log::error!("Failed to open database at {:?}: {}", db_path, e);
+                    return Err(Box::new(e) as Box<dyn std::error::Error>);
+                }
+            };
+
+            if let Err(e) = db::init_db(&conn) {
+                log::error!("Failed to initialize database: {}", e);
+                return Err(Box::new(e) as Box<dyn std::error::Error>);
+            }
 
             // Create AppState and manage it
             let state = AppState {

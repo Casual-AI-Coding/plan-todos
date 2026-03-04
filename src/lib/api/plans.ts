@@ -5,8 +5,7 @@
  */
 
 import type { Plan, CreatePlanParams, UpdatePlanParams } from "@/lib/types";
-import { withTauriError } from "./utils";
-
+import { invoke, withTauriError } from "./utils";
 export async function getPlan(id: string): Promise<Plan> {
   return withTauriError("获取 Plan", async () => {
     const { invoke } = await import("@tauri-apps/api/core");

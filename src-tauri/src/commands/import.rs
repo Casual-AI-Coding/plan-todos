@@ -241,11 +241,14 @@ fn import_merge(
 
     // Import settings
     if let Some(ref settings) = data.settings.daily_summary_settings {
-        tx.execute("DELETE FROM daily_summary_settings", []).ok();
-        tx.execute(
+        if let Err(e) = tx.execute("DELETE FROM daily_summary_settings", []) {
+            warn!("Failed to clear daily_summary_settings: {}", e);
+        }
+        if let Err(e) = tx.execute(
             "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
-        ).ok();
+        ) {
+            warn!("Failed to import daily_summary_settings: {}", e);
     }
 
     for plugin in &data.settings.notification_plugins {
@@ -297,16 +300,23 @@ fn import_replace(
     let mut errors = Vec::new();
 
     // Clear all tables (in reverse dependency order)
-    tx.execute("DELETE FROM entity_tags", []).ok();
-    tx.execute("DELETE FROM milestones", []).ok();
-    tx.execute("DELETE FROM steps", []).ok();
-    tx.execute("DELETE FROM tasks", []).ok();
-    tx.execute("DELETE FROM todos", []).ok();
-    tx.execute("DELETE FROM targets", []).ok();
-    tx.execute("DELETE FROM plans", []).ok();
-    tx.execute("DELETE FROM daily_summary_settings", []).ok();
-    tx.execute("DELETE FROM notification_plugins", []).ok();
-    tx.execute("DELETE FROM tags", []).ok();
+    for table in ["entity_tags", "milestones", "steps", "tasks", "todos", "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"] {
+        if let Err(e) = tx.execute(&format!("DELETE FROM {}", table), []) {
+            warn!("Failed to clear table {}: {}", table, e);
+        }
+        }
+    }
+
+    // Clear all tables before import (in dependency order)
+    let tables = [
+        "entity_tags", "milestones", "steps", "tasks", "todos",
+        "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"
+    ];
+    for table in &tables {
+        if let Err(e) = tx.execute(&format!("DELETE FROM {}", table), []) {
+            warn!("Failed to clear table {}: {}", table, e);
+        }
+    }
 
     // Import tags
     for tag in &data.tags {
@@ -398,10 +408,19 @@ fn import_replace(
 
     // Import settings
     if let Some(ref settings) = data.settings.daily_summary_settings {
-        tx.execute(
+        if let Err(e) = tx.execute(
             "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
-        ).ok();
+        ) {
+            warn!("Failed to import daily_summary_settings: {}", e);
+        }
+    if let Some(ref settings) = data.settings.daily_summary_settings {
+        if let Err(e) = tx.execute(
+            "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
+        ) {
+            warn!("Failed to import daily_summary_settings: {}", e);
+        }
     }
 
     for plugin in &data.settings.notification_plugins {
@@ -534,6 +553,16 @@ fn import_update(
     }
 
     // Import settings (replace)
+    if let Err(e) = tx.execute("DELETE FROM daily_summary_settings", []) {
+        warn!("Failed to clear daily_summary_settings: {}", e);
+    }
+    if let Some(ref settings) = data.settings.daily_summary_settings {
+        if let Err(e) = tx.execute(
+            "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
+        ) {
+            warn!("Failed to import daily_summary_settings: {}", e);
+        }
     tx.execute("DELETE FROM daily_summary_settings", []).ok();
     if let Some(ref settings) = data.settings.daily_summary_settings {
         tx.execute(

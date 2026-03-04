@@ -4,7 +4,8 @@ import type { SearchResult } from "@/lib/types";
 
 // Mock the client module to control isTauri
 vi.mock("@/lib/api/client", () => ({
-  isTauri: vi.fn(),
+  isTauri: vi.fn(() => true),
+  invoke: vi.fn(),
 }));
 
 // Mock @tauri-apps/api/core

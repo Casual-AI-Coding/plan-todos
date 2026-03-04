@@ -4,7 +4,15 @@
  * Unified error handling for Tauri API calls.
  */
 
-import { isTauri } from "./client";
+import { isTauri as checkTauri, invoke as tauriInvoke } from "./client";
+
+// Re-export isTauri for convenience
+export const isTauri = checkTauri;
+
+/**
+ * Re-export invoke for convenience
+ */
+export const invoke = tauriInvoke;
 
 /**
  * Check if operation name is Chinese
