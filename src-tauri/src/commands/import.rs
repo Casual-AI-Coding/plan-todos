@@ -563,14 +563,9 @@ fn import_update(
         ) {
             warn!("Failed to import daily_summary_settings: {}", e);
         }
-    tx.execute("DELETE FROM daily_summary_settings", []).ok();
-    if let Some(ref settings) = data.settings.daily_summary_settings {
-        tx.execute(
-            "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
-        ).ok();
     }
 
+    for plugin in &data.settings.notification_plugins {
     for plugin in &data.settings.notification_plugins {
         match tx.execute(
             "INSERT OR REPLACE INTO notification_plugins (id, name, plugin_type, enabled, config, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
