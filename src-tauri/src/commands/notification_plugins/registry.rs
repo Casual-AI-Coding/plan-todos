@@ -2,45 +2,62 @@
 //! 
 //! Central registry for managing notification plugins using OCP pattern.
 
+use once_cell::sync::Lazy;
+use parking_lot::RwLock;
 use std::collections::HashMap;
-use super::trait::{NotificationSender, SendResult};
+use std::sync::Arc;
+
+use super::r#trait::{NotificationSender, SendResult};
+use super::feishu::FeishuSender;
+use super::dingtalk::DingTalkSender;
+use super::webhook::WebhookSender;
+use super::email::EmailSender;
+use super::feishu::FeishuSender;
+use super::dingtalk::DingTalkSender;
+use super::webhook::WebhookSender;
+use super::email::EmailSender;
+
+/// Sender reference type - Arc for shared ownership, Send + Sync for thread safety
+pub type SenderRef = Arc<dyn NotificationSender>;
 
 /// Plugin Registry - manages all notification senders
 /// 
 /// OCP: New notification types can be added without modifying existing code
 pub struct PluginRegistry {
-    senders: HashMap<String, Box<dyn NotificationSender>>,
+    senders: RwLock<HashMap<String, SenderRef>>,
 }
 
 impl PluginRegistry {
     pub fn new() -> Self {
         Self {
-            senders: HashMap::new(),
+            senders: RwLock::new(HashMap::new()),
         }
     }
     
     /// Register a new notification sender
-    pub fn register(&mut self, sender: Box<dyn NotificationSender>) {
+    pub fn register(&self, sender: SenderRef) {
         let sender_type = sender.sender_type().to_string();
-        self.senders.insert(sender_type, sender);
+        self.senders.write().insert(sender_type, sender);
     }
     
     /// Get a sender by type
-    pub fn get(&self, sender_type: &str) -> Option<&Box<dyn NotificationSender>> {
-        self.senders.get(sender_type)
+    pub fn get(&self, sender_type: &str) -> Option<SenderRef> {
+        self.senders.read().get(sender_type).cloned()
     }
     
     /// Send notification through a specific sender
-    pub fn send(&self, sender_type: &str, title: &str, content: &str) -> Result<SendResult, String> {
-        let sender = self.senders.get(sender_type)
+    pub async fn send(&self, sender_type: &str, title: &str, content: &str) -> Result<SendResult, String> {
+        let sender = self.senders.read()
+            .get(sender_type)
+            .cloned()
             .ok_or_else(|| format!("Unknown sender type: {}", sender_type))?;
         
-        sender.send(title, content)
+        sender.send(title, content).await
     }
     
     /// List all registered sender types
     pub fn list_types(&self) -> Vec<String> {
-        self.senders.keys().cloned().collect()
+        self.senders.read().keys().cloned().collect()
     }
 }
 
@@ -49,3 +66,25 @@ impl Default for PluginRegistry {
         Self::new()
     }
 }
+
+/// Global registry with all senders registered
+pub static GLOBAL_REGISTRY: Lazy<PluginRegistry> = Lazy::new(|| {
+    let registry = PluginRegistry::new();
+    
+    // Register default senders (with empty config)
+    // In real usage, users will provide their own config
+    if let Ok(feishu) = FeishuSender::new("{}") {
+        registry.register(Arc::new(feishu));
+    }
+    if let Ok(dingtalk) = DingTalkSender::new("{}") {
+        registry.register(Arc::new(dingtalk));
+    }
+    if let Ok(webhook) = WebhookSender::new("{}") {
+        registry.register(Arc::new(webhook));
+    }
+    if let Ok(email) = EmailSender::new("{}") {
+        registry.register(Arc::new(email));
+    }
+    
+    registry
+});

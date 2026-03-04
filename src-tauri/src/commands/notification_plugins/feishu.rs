@@ -2,8 +2,9 @@
 //! 
 //! Implementation for Feishu (飞书) webhook notifications.
 
+use async_trait::async_trait;
 use serde::Deserialize;
-use super::trait::{NotificationSender, SendResult};
+use super::r#trait::{NotificationSender, SendResult};
 
 /// Feishu configuration
 #[derive(Debug, Deserialize)]
@@ -21,26 +22,31 @@ pub struct FeishuSender {
 }
 
 impl FeishuSender {
-    pub fn new(config: FeishuConfig) -> Self {
-        Self { config }
+    pub fn new(config: &str) -> Result<Self, String> {
+        let config = serde_json::from_str::<FeishuConfig>(config)
+            .map_err(|e| format!("Invalid config: {}", e))?;
+        Ok(Self { config })
     }
 }
 
+#[async_trait]
 impl NotificationSender for FeishuSender {
     fn sender_type(&self) -> &str {
         "feishu"
     }
     
-    fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
+    async fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
         if let Some(webhook_url) = &self.config.webhook_url {
-            let payload = serde_json::json!({
-                "msg_type": "text",
-                "content": {
-                    "text": format!("{}: {}", title, content)
-                }
-            });
+            // TODO: 实际发送 HTTP 请求
+            // let payload = serde_json::json!({
+            //     "msg_type": "text",
+            //     "content": {
+            //         "text": format!("{}: {}", title, content)
+            //     }
+            // });
             
-            log::info!("[Feishu] Sending to webhook: {}", webhook_url);
+            log::info!("[Feishu] Would send to webhook: {}", webhook_url);
+            log::info!("[Feishu] Title: {}, Content: {}", title, content);
             
             Ok(SendResult {
                 success: true,
@@ -52,7 +58,7 @@ impl NotificationSender for FeishuSender {
         }
     }
     
-    fn validate_config(&self, config: &str) -> Result<(), String> {
+    fn validate_config(config: &str) -> Result<(), String> {
         serde_json::from_str::<FeishuConfig>(config)
             .map(|_| ())
             .map_err(|e| format!("Invalid Feishu config: {}", e))

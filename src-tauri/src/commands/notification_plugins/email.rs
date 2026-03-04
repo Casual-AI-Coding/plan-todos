@@ -2,8 +2,9 @@
 //! 
 //! Implementation for email notifications via SMTP.
 
+use async_trait::async_trait;
 use serde::Deserialize;
-use super::trait::{NotificationSender, SendResult};
+use super::r#trait::{NotificationSender, SendResult};
 
 /// Email configuration
 #[derive(Debug, Deserialize)]
@@ -25,17 +26,20 @@ pub struct EmailSender {
 }
 
 impl EmailSender {
-    pub fn new(config: EmailConfig) -> Self {
-        Self { config }
+    pub fn new(config: &str) -> Result<Self, String> {
+        let config = serde_json::from_str::<EmailConfig>(config)
+            .map_err(|e| format!("Invalid config: {}", e))?;
+        Ok(Self { config })
     }
 }
 
+#[async_trait]
 impl NotificationSender for EmailSender {
     fn sender_type(&self) -> &str {
         "email"
     }
     
-    fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
+    async fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
         if self.config.smtp_host.is_none() || self.config.to.is_none() {
             return Err("Email smtp_host and to are required".to_string());
         }
@@ -54,7 +58,7 @@ impl NotificationSender for EmailSender {
         })
     }
     
-    fn validate_config(&self, config: &str) -> Result<(), String> {
+    fn validate_config(config: &str) -> Result<(), String> {
         serde_json::from_str::<EmailConfig>(config)
             .map(|_| ())
             .map_err(|e| format!("Invalid Email config: {}", e))

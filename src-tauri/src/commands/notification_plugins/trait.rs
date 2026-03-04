@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 //! Notification Sender Trait
 //!
 //! Defines the interface for all notification plugins.
@@ -18,13 +20,14 @@ pub struct SendResult {
 /// - Email
 /// - Webhook
 /// - etc.
-pub trait NotificationSender {
+#[async_trait]
+pub trait NotificationSender: Send + Sync {
     /// Unique identifier for this sender type
     fn sender_type(&self) -> &str;
 
     /// Send a notification
-    fn send(&self, title: &str, content: &str) -> Result<SendResult, String>;
+    async fn send(&self, title: &str, content: &str) -> Result<SendResult, String>;
 
-    /// Validate the configuration
-    fn validate_config(&self, config: &str) -> Result<(), String>;
+    /// Validate the configuration (static method for validating config strings)
+    fn validate_config(config: &str) -> Result<(), String>;
 }

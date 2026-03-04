@@ -2,9 +2,10 @@
 //! 
 //! Implementation for generic webhook notifications.
 
+use async_trait::async_trait;
 use serde::Deserialize;
 use std::collections::HashMap;
-use super::trait::{NotificationSender, SendResult};
+use super::r#trait::{NotificationSender, SendResult};
 
 /// Webhook configuration
 #[derive(Debug, Deserialize)]
@@ -20,26 +21,30 @@ pub struct WebhookSender {
 }
 
 impl WebhookSender {
-    pub fn new(config: WebhookConfig) -> Self {
-        Self { config }
+    pub fn new(config: &str) -> Result<Self, String> {
+        let config = serde_json::from_str::<WebhookConfig>(config)
+            .map_err(|e| format!("Invalid config: {}", e))?;
+        Ok(Self { config })
     }
 }
 
+#[async_trait]
 impl NotificationSender for WebhookSender {
     fn sender_type(&self) -> &str {
         "webhook"
     }
     
-    fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
+    async fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
         if let Some(url) = &self.config.url {
-            let payload = serde_json::json!({
-                "title": title,
-                "content": content,
-                "timestamp": chrono::Utc::now().to_rfc3339(),
-            });
+            // TODO: 实际发送 HTTP 请求
+            // let payload = serde_json::json!({
+            //     "title": title,
+            //     "content": content,
+            //     "timestamp": chrono::Utc::now().to_rfc3339(),
+            // });
             
             log::info!(
-                "[Webhook] Sending to {}: {}",
+                "[Webhook] Would send to {}: {}",
                 self.config.method.as_deref().unwrap_or("POST"),
                 url
             );
@@ -54,7 +59,7 @@ impl NotificationSender for WebhookSender {
         }
     }
     
-    fn validate_config(&self, config: &str) -> Result<(), String> {
+    fn validate_config(config: &str) -> Result<(), String> {
         serde_json::from_str::<WebhookConfig>(config)
             .map(|_| ())
             .map_err(|e| format!("Invalid Webhook config: {}", e))
