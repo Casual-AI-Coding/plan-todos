@@ -1,0 +1,82 @@
+# Notification Plugins OCP 重构 - 任务进度追踪
+
+**设计文档**: `docs/plans/notification-plugins-ocp-refactor.md`
+
+**目标**: 解决 `notification_plugins.rs` 中的 OCP (Open/Closed Principle) 违反问题，使用 Trait + Registry 模式重构。
+
+---
+
+## 任务清单
+
+### 阶段一：基础设施准备
+
+| #   | 任务                                                          | 状态       | 负责 | 提交 |
+| --- | ------------------------------------------------------------- | ---------- | ---- | ---- |
+| 1.1 | 添加新依赖到 Cargo.toml (async-trait, parking_lot, once_cell) | ⬜ pending | -    | -    |
+| 1.2 | 创建 notification_plugins/ 模块目录结构                       | ⬜ pending | -    | -    |
+| 1.3 | 定义 NotificationSender trait                                 | ⬜ pending | -    | -    |
+| 1.4 | 定义 SendResult 结构体                                        | ⬜ pending | -    | -    |
+| 1.5 | 实现 PluginRegistry 注册表                                    | ⬜ pending | -    | -    |
+
+### 阶段二：迁移现有实现
+
+| #   | 任务                                | 状态       | 负责 | 提交 |
+| --- | ----------------------------------- | ---------- | ---- | ---- |
+| 2.1 | 创建 feishu.rs 并迁移飞书实现       | ⬜ pending | -    | -    |
+| 2.2 | 创建 dingtalk.rs 并迁移钉钉实现     | ⬜ pending | -    | -    |
+| 2.3 | 创建 email.rs 并迁移邮件实现        | ⬜ pending | -    | -    |
+| 2.4 | 创建 webhook.rs 并迁移 Webhook 实现 | ⬜ pending | -    | -    |
+
+### 阶段三：更新命令层
+
+| #   | 任务                                         | 状态       | 负责 | 提交 |
+| --- | -------------------------------------------- | ---------- | ---- | ---- |
+| 3.1 | 更新 mod.rs 导出模块                         | ⬜ pending | -    | -    |
+| 3.2 | 重构 send_notification 使用注册表            | ⬜ pending | -    | -    |
+| 3.3 | 添加 get_supported_plugin_types 命令         | ⬜ pending | -    | -    |
+| 3.4 | 更新 create_notification_plugin 添加配置验证 | ⬜ pending | -    | -    |
+| 3.5 | 删除旧的 send_xxx_notification 函数          | ⬜ pending | -    | -    |
+
+### 阶段四：测试与验证
+
+| #   | 任务                      | 状态       | 负责 | 提交 |
+| --- | ------------------------- | ---------- | ---- | ---- |
+| 4.1 | 编写 trait.rs 单元测试    | ⬜ pending | -    | -    |
+| 4.2 | 编写 registry.rs 单元测试 | ⬜ pending | -    | -    |
+| 4.3 | 编写各 Sender 实现测试    | ⬜ pending | -    | -    |
+| 4.4 | 运行全部测试验证          | ⬜ pending | -    | -    |
+
+### 阶段五：清理与文档
+
+| #   | 任务               | 状态       | 负责 | 提交 |
+| --- | ------------------ | ---------- | ---- | ---- |
+| 5.1 | 清理旧代码和注释   | ⬜ pending | -    | -    |
+| 5.2 | 更新代码注释和文档 | ⬜ pending | -    | -    |
+| 5.3 | 更新 CHANGELOG     | ⬜ pending | -    | -    |
+
+---
+
+## 验收标准
+
+- [ ] 所有现有测试通过 (`cargo test`)
+- [ ] 添加新插件类型无需修改 `send_notification` 函数
+- [ ] 每个插件 Sender 有独立的单元测试
+- [ ] 代码通过 `cargo clippy` 检查
+- [ ] 文档更新完整
+
+---
+
+## 进度统计
+
+- **总任务数**: 18
+- **已完成**: 0
+- **进行中**: 0
+- **待开始**: 18
+
+---
+
+## 执行日志
+
+| 时间 | 任务 | 结果 | 备注 |
+| ---- | ---- | ---- | ---- |
+| -    | -    | -    | -    |
