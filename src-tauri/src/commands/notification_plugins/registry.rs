@@ -12,10 +12,6 @@ use super::feishu::FeishuSender;
 use super::dingtalk::DingTalkSender;
 use super::webhook::WebhookSender;
 use super::email::EmailSender;
-use super::feishu::FeishuSender;
-use super::dingtalk::DingTalkSender;
-use super::webhook::WebhookSender;
-use super::email::EmailSender;
 
 /// Sender reference type - Arc for shared ownership, Send + Sync for thread safety
 pub type SenderRef = Arc<dyn NotificationSender>;

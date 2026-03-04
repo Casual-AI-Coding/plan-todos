@@ -1,10 +1,9 @@
-use async_trait::async_trait;
-
 //! Notification Sender Trait
 //!
 //! Defines the interface for all notification plugins.
 
-/// Result of sending a notification
+use async_trait::async_trait;
+
 #[derive(Debug, Clone)]
 pub struct SendResult {
     pub success: bool,
