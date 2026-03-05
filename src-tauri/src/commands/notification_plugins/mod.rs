@@ -171,26 +171,28 @@ pub async fn send_notification(
     title: String,
     content: String,
 ) -> Result<SendResult, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-
-    // Get plugin config
-    let (plugin_type, config): (String, String) = conn
-        .query_row(
-            "SELECT plugin_type, config FROM notification_plugins WHERE id = ?",
+    // Get plugin config in a separate scope to drop conn before await
+    let plugin_type = {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        
+        conn.query_row(
+            "SELECT plugin_type FROM notification_plugins WHERE id = ?",
             [&plugin_id],
-            |row| Ok((row.get(0)?, row.get(1)?)),
+            |row| row.get::<_, String>(0),
         )
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| e.to_string())?
+    };
 
     // Get sender from registry
-    let registry = &registry::GLOBAL_REGISTRY;
-    let sender = registry
+    let sender = registry::GLOBAL_REGISTRY
         .get(&plugin_type)
         .ok_or_else(|| format!("Unknown plugin type: {}", plugin_type))?;
 
     // Send notification
     sender.send(&title, &content).await
 }
+
+
 
 /// Get supported plugin types
 #[tauri::command]

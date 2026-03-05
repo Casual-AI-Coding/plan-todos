@@ -58,13 +58,17 @@ impl PluginRegistry {
     
     /// Send notification through a specific sender
     pub async fn send(&self, sender_type: &str, title: &str, content: &str) -> Result<SendResult, String> {
-        let sender = self.senders.read()
-            .get(sender_type)
-            .cloned()
-            .ok_or_else(|| format!("Unknown sender type: {}", sender_type))?;
+        // Clone the sender before the await to avoid holding the lock
+        let sender = {
+            let read_guard = self.senders.read();
+            read_guard.get(sender_type)
+                .cloned()
+                .ok_or_else(|| format!("Unknown sender type: {}", sender_type))?
+        };
         
         sender.send(title, content).await
     }
+
     
     /// List all registered sender types
     pub fn list_types(&self) -> Vec<String> {
