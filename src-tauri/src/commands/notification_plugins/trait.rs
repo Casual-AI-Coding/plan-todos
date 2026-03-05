@@ -3,8 +3,9 @@
 //! Defines the interface for all notification plugins.
 
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SendResult {
     pub success: bool,
     pub message: String,
@@ -27,6 +28,6 @@ pub trait NotificationSender: Send + Sync {
     /// Send a notification
     async fn send(&self, title: &str, content: &str) -> Result<SendResult, String>;
 
-    /// Validate the configuration (static method for validating config strings)
-    fn validate_config(config: &str) -> Result<(), String>;
+    /// Validate the configuration
+    fn validate_config(&self, config: &str) -> Result<(), String>;
 }

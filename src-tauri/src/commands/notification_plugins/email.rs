@@ -58,9 +58,9 @@ impl NotificationSender for EmailSender {
         })
     }
     
-    fn validate_config(config: &str) -> Result<(), String> {
-        serde_json::from_str::<EmailConfig>(config)
-            .map(|_| ())
-            .map_err(|e| format!("Invalid Email config: {}", e))
+    fn validate_config(&self, config: &str) -> Result<(), String> {
+        let _: EmailConfig = serde_json::from_str(config)
+            .map_err(|e| format!("Invalid config: {}", e))?;
+        Ok(())
     }
 }

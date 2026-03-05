@@ -59,9 +59,9 @@ impl NotificationSender for WebhookSender {
         }
     }
     
-    fn validate_config(config: &str) -> Result<(), String> {
-        serde_json::from_str::<WebhookConfig>(config)
-            .map(|_| ())
-            .map_err(|e| format!("Invalid Webhook config: {}", e))
+    fn validate_config(&self, config: &str) -> Result<(), String> {
+        let _: WebhookConfig = serde_json::from_str(config)
+            .map_err(|e| format!("Invalid config: {}", e))?;
+        Ok(())
     }
 }

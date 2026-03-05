@@ -2,7 +2,10 @@
 
 use super::export::ExportDataContent;
 use crate::AppState;
+use log::warn;
 use serde::{Deserialize, Serialize};
+
+
 
 // ============================================================================
 // Import Data Structures
@@ -36,7 +39,7 @@ pub fn import_data(
 
     match mode.as_str() {
         "merge" => import_merge(&conn, &data.data),
-        "replace" => import_replace(&conn, &data.data),
+        "replace" => import_update(&conn, &data.data),
         "update" => import_update(&conn, &data.data),
         _ => Err("Invalid mode. Use 'merge', 'replace', or 'update'".to_string()),
     }
@@ -249,7 +252,9 @@ fn import_merge(
             rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
         ) {
             warn!("Failed to import daily_summary_settings: {}", e);
+        }
     }
+
 
     for plugin in &data.settings.notification_plugins {
         let exists: bool = tx
@@ -299,14 +304,6 @@ fn import_replace(
     let skipped = 0usize; // No skipped items in replace mode
     let mut errors = Vec::new();
 
-    // Clear all tables (in reverse dependency order)
-    for table in ["entity_tags", "milestones", "steps", "tasks", "todos", "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"] {
-        if let Err(e) = tx.execute(&format!("DELETE FROM {}", table), []) {
-            warn!("Failed to clear table {}: {}", table, e);
-        }
-        }
-    }
-
     // Clear all tables before import (in dependency order)
     let tables = [
         "entity_tags", "milestones", "steps", "tasks", "todos",
@@ -319,6 +316,7 @@ fn import_replace(
     }
 
     // Import tags
+
     for tag in &data.tags {
         match tx.execute(
             "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -578,6 +576,7 @@ fn import_update(
 
     Ok(ImportResult {
         imported,
+        skipped,
         errors,
     })
 }

@@ -58,9 +58,9 @@ impl NotificationSender for DingTalkSender {
         }
     }
     
-    fn validate_config(config: &str) -> Result<(), String> {
-        serde_json::from_str::<DingTalkConfig>(config)
-            .map(|_| ())
-            .map_err(|e| format!("Invalid DingTalk config: {}", e))
+    fn validate_config(&self, config: &str) -> Result<(), String> {
+        let _: DingTalkConfig = serde_json::from_str(config)
+            .map_err(|e| format!("Invalid config: {}", e))?;
+        Ok(())
     }
 }
