@@ -9,6 +9,9 @@ mod dingtalk;
 mod email;
 mod webhook;
 
+#[cfg(test)]
+mod tests;
+
 pub use r#trait::{NotificationSender, SendResult};
 pub use registry::PluginRegistry;
 
@@ -194,6 +197,6 @@ pub async fn send_notification(
 
 /// Get supported plugin types
 #[tauri::command]
-pub fn get_supported_plugin_types() -> Vec<String> {
-    registry::GLOBAL_REGISTRY.list_types()
 }
+#[cfg(test)]
+mod tests;
