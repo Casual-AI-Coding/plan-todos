@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.5.10] - 2026-03-06
 
 ### Changed
 
 **Architecture - OCP Refactoring**:
+
 - Refactored notification_plugins module using Trait + Registry pattern
 - Resolved OCP violation: adding new notification plugins now only requires implementing NotificationSender trait
 - Added PluginRegistry for centralized plugin management
@@ -20,6 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NotificationSender trait with async support
 - PluginRegistry for plugin lifecycle management
 - Unit tests for notification plugins module
+
+### Fixed
+
+**P1 - 数据安全**:
+
+- Fixed database initialization error: added "tags" and "entity_tags" to VALID_TABLES whitelist
+- Prevented "Invalid table name: tags" panic during startup
+
+**P2 - 图标更新**:
+
+- Regenerated all platform icons with new logo design
+- Added automated icon generation script (`scripts/generate-icons.js`)
 
 ---
 

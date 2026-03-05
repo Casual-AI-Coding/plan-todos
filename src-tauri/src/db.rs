@@ -379,6 +379,7 @@ fn add_column_if_not_exists(
     const VALID_TABLES: &[&str] = &[
         "todos", "plans", "tasks", "targets", "milestones", "steps",
         "circulations", "circulation_logs", "todos_tags", "notification_plugins",
+        "tags", "entity_tags", "daily_summary_settings",
     ];
     
     if !VALID_TABLES.contains(&table) {
