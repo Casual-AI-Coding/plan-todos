@@ -94,6 +94,14 @@ mod registry_tests {
         assert!(types.contains(&"email".to_string()));
         assert!(types.contains(&"webhook".to_string()));
     }
+
+    #[tokio::test]
+    async fn test_registry_send_unknown_type() {
+        // Test that sending with unknown type returns error
+        let result = GLOBAL_REGISTRY.send("unknown_type", "Test Title", "Test Content").await;
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Unknown sender type"));
+    }
 }
 
 /// Test FeishuSender configuration validation
