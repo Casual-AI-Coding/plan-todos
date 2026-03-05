@@ -1,4 +1,15 @@
 //! Feishu/Lark Notification Sender
+//!
+//! Implementation for Feishu (飞书) webhook notifications.
+//!
+//! ## Configuration Format
+//!
+//! ```json
+//! {
+//!   "webhook_url": "https://open.feishu.cn/open-apis/bot/v2/hook/xxx"
+//! }
+//! ```
+//!
 //! 
 //! Implementation for Feishu (飞书) webhook notifications.
 

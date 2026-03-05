@@ -1,6 +1,25 @@
 //! Notification Sender Trait
 //!
 //! Defines the interface for all notification plugins.
+//!
+//! ## Usage
+//!
+//! Implement this trait to add new notification channels. Each implementation must:
+//! - Provide a unique `sender_type()` identifier
+//! - Implement async `send()` for notification delivery
+//! - Implement `validate_config()` for configuration validation
+//!
+//! ## Adding New Plugins (OCP Principle)
+//!
+//! To add a new notification type:
+//! 1. Create a new module (e.g., `slack.rs`)
+//! 2. Implement `NotificationSender` trait
+//! 3. Register in `registry.rs`'s `GLOBAL_REGISTRY`
+//!
+//! No existing code needs modification to add new plugins.
+//!
+//!
+//! Defines the interface for all notification plugins.
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};

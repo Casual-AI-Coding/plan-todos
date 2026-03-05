@@ -1,4 +1,19 @@
 //! Plugin Registry
+//!
+//! Central registry for managing notification plugins using OCP pattern.
+//!
+//! ## Architecture
+//!
+//! The registry uses a HashMap to store sender instances, allowing dynamic
+//! lookup by sender type. All senders are wrapped in `Arc<dyn NotificationSender>`
+//! for shared ownership and thread-safe access.
+//!
+//! ## Thread Safety
+//!
+//! - `RwLock` allows concurrent reads while exclusive writes
+//! - `Arc` enables safe sharing across threads
+//! - `Send + Sync` bounds ensure the trait object is safe for concurrency
+//!
 //! 
 //! Central registry for managing notification plugins using OCP pattern.
 

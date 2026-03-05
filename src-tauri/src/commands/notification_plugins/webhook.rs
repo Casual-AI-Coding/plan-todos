@@ -1,4 +1,16 @@
 //! Webhook Notification Sender
+//!
+//! Implementation for generic webhook notifications.
+//!
+//! ## Configuration Format
+//!
+//! ```json
+//! {
+//!   "url": "https://example.com/webhook",
+//!   "method": "POST"
+//! }
+//! ```
+//!
 //! 
 //! Implementation for generic webhook notifications.
 

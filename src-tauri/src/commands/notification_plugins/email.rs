@@ -1,4 +1,17 @@
 //! Email Notification Sender
+//!
+//! Implementation for email notifications via SMTP.
+//!
+//! ## Configuration Format
+//!
+//! ```json
+//! {
+//!   "smtp_host": "smtp.example.com",
+//!   "smtp_port": 587,
+//!   "to": ["recipient@example.com"]
+//! }
+//! ```
+//!
 //! 
 //! Implementation for email notifications via SMTP.
 

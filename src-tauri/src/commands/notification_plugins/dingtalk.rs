@@ -1,4 +1,15 @@
 //! DingTalk Notification Sender
+//!
+//! Implementation for DingTalk (钉钉) webhook notifications.
+//!
+//! ## Configuration Format
+//!
+//! ```json
+//! {
+//!   "webhook_url": "https://oapi.dingtalk.com/robot/send?access_token=xxx"
+//! }
+//! ```
+//!
 //! 
 //! Implementation for DingTalk (钉钉) webhook notifications.
 
