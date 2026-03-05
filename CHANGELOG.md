@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+**Architecture - OCP Refactoring**:
+- Refactored notification_plugins module using Trait + Registry pattern
+- Resolved OCP violation: adding new notification plugins now only requires implementing NotificationSender trait
+- Added PluginRegistry for centralized plugin management
+- Improved thread safety with proper Send + Sync bounds
+
+### Added
+
+- NotificationSender trait with async support
+- PluginRegistry for plugin lifecycle management
+- Unit tests for notification plugins module
+
+---
+
+## [0.5.9] - 2026-03-04
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [0.5.9] - 2026-03-04
 
 ### Fixed
