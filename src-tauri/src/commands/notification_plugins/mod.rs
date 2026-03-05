@@ -197,3 +197,5 @@ pub async fn send_notification(
 pub fn get_supported_plugin_types() -> Vec<String> {
     registry::GLOBAL_REGISTRY.list_types()
 }
+#[cfg(test)]
+mod tests;
