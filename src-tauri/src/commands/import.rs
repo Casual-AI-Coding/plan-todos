@@ -414,14 +414,8 @@ fn import_replace(
         ) {
             warn!("Failed to import daily_summary_settings: {}", e);
         }
-    if let Some(ref settings) = data.settings.daily_summary_settings {
-        if let Err(e) = tx.execute(
-            "INSERT INTO daily_summary_settings (id, enabled, time, include_pending, include_overdue, include_completed, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            rusqlite::params![settings.id, settings.enabled, settings.time, settings.include_pending, settings.include_overdue, settings.include_completed, settings.created_at, settings.updated_at],
-        ) {
-            warn!("Failed to import daily_summary_settings: {}", e);
-        }
     }
+
 
     for plugin in &data.settings.notification_plugins {
         match tx.execute(
@@ -566,7 +560,6 @@ fn import_update(
     }
 
     for plugin in &data.settings.notification_plugins {
-    for plugin in &data.settings.notification_plugins {
         match tx.execute(
             "INSERT OR REPLACE INTO notification_plugins (id, name, plugin_type, enabled, config, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
             rusqlite::params![plugin.id, plugin.name, plugin.plugin_type, plugin.enabled, plugin.config, plugin.created_at, plugin.updated_at],
@@ -577,16 +570,14 @@ fn import_update(
     }
 
     // Rollback if there are errors, otherwise commit
-
-    // Rollback if there are errors, otherwise commit
     if errors.is_empty() {
         tx.commit().map_err(|e| e.to_string())?;
     } else {
         tx.rollback().map_err(|e| e.to_string())?;
     }
+
     Ok(ImportResult {
         imported,
-        skipped,
         errors,
     })
 }
