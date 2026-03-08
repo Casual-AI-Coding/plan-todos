@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, useEffect } from "react";
+import { logger } from "@/lib/utils/logger";
 import {
   ThemeId,
   themes,
@@ -97,7 +98,7 @@ export function useTheme() {
       systemTheme,
     ];
     if (!validThemes.includes(newTheme)) {
-      console.warn(`Invalid theme: ${newTheme}, falling back to light`);
+      logger.warn(`Invalid theme: ${newTheme}, falling back to light`);
       newTheme = defaultTheme;
     }
 

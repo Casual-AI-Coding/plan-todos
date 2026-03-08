@@ -5,6 +5,7 @@
  */
 
 import { isTauri as checkTauri, invoke as tauriInvoke } from "./client";
+import { logger } from "@/lib/utils/logger";
 
 // Re-export isTauri for convenience
 export const isTauri = checkTauri;
@@ -78,7 +79,7 @@ export async function withTauriFallback<T>(
   if (!isTauri()) {
     const message =
       fallbackMessage ?? "Running outside Tauri - data not available";
-    console.warn(message);
+    logger.warn(message);
     return defaultValue;
   }
   try {

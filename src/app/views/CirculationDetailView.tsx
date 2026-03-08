@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { logger } from "@/lib/utils/logger";
 import { Card, Button, Modal, ProgressRing } from "@/components/ui";
 import {
   useCirculation,
@@ -46,7 +47,7 @@ export function CirculationDetailView({
       await checkin.mutateAsync({ id: circulation.id, note, count });
       setCheckinTarget(null);
     } catch (e) {
-      console.error(e);
+      logger.error("Checkin failed", e);
       alert(e instanceof Error ? e.message : "打卡失败");
     }
   }
@@ -56,7 +57,7 @@ export function CirculationDetailView({
     try {
       await undoCheckin.mutateAsync(circulation.id);
     } catch (e) {
-      console.error(e);
+      logger.error("Undo checkin failed", e);
     }
   }
 
