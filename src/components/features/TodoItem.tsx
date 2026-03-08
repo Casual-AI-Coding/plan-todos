@@ -17,12 +17,20 @@ export interface TodoItemProps {
  * Only re-render if todo data changes
  */
 function areEqual(prevProps: TodoItemProps, nextProps: TodoItemProps): boolean {
+  // Shallow compare tags - check length and IDs
+  const prevTags = prevProps.todo.tags || [];
+  const nextTags = nextProps.todo.tags || [];
+  const tagsEqual =
+    prevTags.length === nextTags.length &&
+    prevTags.every((tag, index) => tag.id === nextTags[index]?.id);
+
   return (
     prevProps.todo.id === nextProps.todo.id &&
     prevProps.todo.title === nextProps.todo.title &&
     prevProps.todo.status === nextProps.todo.status &&
     prevProps.todo.priority === nextProps.todo.priority &&
-    JSON.stringify(prevProps.todo.tags) === JSON.stringify(nextProps.todo.tags)
+    prevProps.todo.due_date === nextProps.todo.due_date &&
+    tagsEqual
   );
 }
 
