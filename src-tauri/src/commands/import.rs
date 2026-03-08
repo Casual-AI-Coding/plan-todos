@@ -26,6 +26,21 @@ pub struct ImportResult {
 }
 
 // ============================================================================
+// Table Name Whitelist Validation (Security)
+// ============================================================================
+
+const VALID_TABLES: &[&str] = &[
+    "entity_tags", "milestones", "steps", "tasks", "todos",
+    "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"
+];
+
+fn validate_table_name(table: &str) -> Result<&'static str, String> {
+    VALID_TABLES.iter()
+        .find(|&&t| t == table)
+        .copied()
+        .ok_or_else(|| format!("Invalid table name: {}", table))
+}
+// ============================================================================
 // Import Command
 // ============================================================================
 
@@ -310,8 +325,15 @@ fn import_replace(
         "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"
     ];
     for table in &tables {
-        if let Err(e) = tx.execute(&format!("DELETE FROM {}", table), []) {
-            warn!("Failed to clear table {}: {}", table, e);
+        match validate_table_name(table) {
+            Ok(validated) => {
+                if let Err(e) = tx.execute(&format!("DELETE FROM {}", validated), []) {
+                    warn!("Failed to clear table {}: {}", validated, e);
+                }
+            }
+            Err(e) => {
+                warn!("Invalid table name skipped: {}", e);
+            }
         }
     }
 
