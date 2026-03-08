@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { logger } from "@/lib/utils/logger";
+import { useToast } from "@/components/ui/Toast";
 import { Card, Button, Modal, ProgressRing } from "@/components/ui";
 import {
   useCirculation,
@@ -26,6 +27,7 @@ export function CirculationDetailView({
     null,
   );
 
+  const toast = useToast();
   const isModal = !!onClose;
 
   const { data: circulation, isLoading, error } = useCirculation(id);
@@ -48,7 +50,7 @@ export function CirculationDetailView({
       setCheckinTarget(null);
     } catch (e) {
       logger.error("Checkin failed", e);
-      alert(e instanceof Error ? e.message : "打卡失败");
+      toast.error(e instanceof Error ? e.message : "打卡失败");
     }
   }
 
