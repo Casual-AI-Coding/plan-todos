@@ -24,8 +24,8 @@ export function useGlassSettings() {
   const [glassOpacity, setGlassOpacityState] =
     useState<number>(getInitialOpacity);
 
-  // Set CSS variables on mount
-
+  // Set initial CSS variables on mount only
+  // Subsequent updates are handled by setGlassBlur/setGlassOpacity setters
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--glass-blur",
@@ -35,7 +35,7 @@ export function useGlassSettings() {
       "--glass-opacity",
       `${glassOpacity / 100}`,
     );
-  }, []); // Only run once on mount
+  }, []); // Intentionally empty - only run once on mount
 
   const setGlassBlur = useCallback((blur: number) => {
     setGlassBlurState(blur);
