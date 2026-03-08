@@ -1,18 +1,6 @@
-// src/lib/services/planService.ts
+import type { Plan, Step } from "@/lib/types";
 
-export interface Plan {
-  id: string;
-  title: string;
-  deadline?: string;
-  steps?: Step[];
-  status?: string;
-}
-
-export interface Step {
-  id: string;
-  status: "pending" | "in_progress" | "completed";
-}
-
+// Service-specific computed type for progress tracking
 export interface PlanProgress {
   completed: number;
   total: number;
@@ -31,21 +19,24 @@ export function calculatePlanProgress(steps: Step[]): PlanProgress {
 
 export function sortPlansByDeadline(plans: Plan[]): Plan[] {
   return [...plans].sort((a, b) => {
-    if (!a.deadline && !b.deadline) return 0;
-    if (!a.deadline) return 1;
-    if (!b.deadline) return -1;
-    return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+    if (!a.end_date && !b.end_date) return 0;
+    if (!a.end_date) return 1;
+    if (!b.end_date) return -1;
+    return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
   });
 }
 
-export function filterPlansByStatus(plans: Plan[], status: string): Plan[] {
+export function filterPlansByStatus(
+  plans: Plan[],
+  status: Plan["status"],
+): Plan[] {
   return plans.filter((p) => p.status === status);
 }
 
 export function getOverduePlans(plans: Plan[]): Plan[] {
   const now = new Date();
   return plans.filter((p) => {
-    if (!p.deadline) return false;
-    return new Date(p.deadline) < now;
+    if (!p.end_date) return false;
+    return new Date(p.end_date) < now;
   });
 }
