@@ -1,12 +1,4 @@
-// src/lib/services/todoService.ts
-export interface Todo {
-  id: string;
-  title: string;
-  priority?: string;
-  status?: string;
-  tags?: string[];
-  dueDate?: string;
-}
+import type { Todo } from "@/lib/types";
 
 export function filterTodosByPriority(todos: Todo[], priority: string): Todo[] {
   return todos.filter((t) => t.priority === priority);
@@ -25,15 +17,15 @@ export function groupTodosByStatus(todos: Todo[]): Record<string, Todo[]> {
 }
 
 export function filterTodosByTag(todos: Todo[], tag: string): Todo[] {
-  return todos.filter((t) => t.tags?.includes(tag));
+  return todos.filter((t) => t.tags?.some((t) => t.name === tag));
 }
 
 export function getTodosDueSoon(todos: Todo[], days: number = 3): Todo[] {
   const now = new Date();
   const future = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   return todos.filter((t) => {
-    if (!t.dueDate) return false;
-    const dueDate = new Date(t.dueDate);
+    if (!t.due_date) return false;
+    const dueDate = new Date(t.due_date);
     return dueDate >= now && dueDate <= future;
   });
 }

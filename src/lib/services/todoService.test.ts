@@ -1,5 +1,6 @@
 // src/lib/services/todoService.test.ts
 import { describe, it, expect } from "vitest";
+import type { Todo, Tag } from "@/lib/types";
 import {
   filterTodosByPriority,
   groupTodosByStatus,
@@ -8,20 +9,43 @@ import {
   sortTodosByPriority,
 } from "./todoService";
 
+const createMockTag = (name: string): Tag => ({
+  id: Math.random().toString(36).substring(7),
+  name,
+  color: "#ffffff",
+  description: null,
+  created_at: "2024-01-01T00:00:00Z",
+});
+
+const createMockTodo = (overrides: Partial<Todo> = {}): Todo => ({
+  id: "1",
+  title: "Test Todo",
+  content: null,
+  due_date: null,
+  status: "pending",
+  priority: "P2",
+  created_at: "2024-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
+  tags: [],
+  ...overrides,
+});
+
 describe("todoService", () => {
   describe("filterTodosByPriority", () => {
     it("should filter todos by priority", () => {
       const todos = [
-        { id: "1", title: "Todo 1", priority: "P1" },
-        { id: "2", title: "Todo 2", priority: "P2" },
-        { id: "3", title: "Todo 3", priority: "P1" },
+        createMockTodo({ id: "1", title: "Todo 1", priority: "P1" }),
+        createMockTodo({ id: "2", title: "Todo 2", priority: "P2" }),
+        createMockTodo({ id: "3", title: "Todo 3", priority: "P1" }),
       ];
       const result = filterTodosByPriority(todos, "P1");
       expect(result.length).toBe(2);
     });
 
     it("should return empty array when no match", () => {
-      const todos = [{ id: "1", title: "Todo 1", priority: "P2" }];
+      const todos = [
+        createMockTodo({ id: "1", title: "Todo 1", priority: "P2" }),
+      ];
       const result = filterTodosByPriority(todos, "P1");
       expect(result).toEqual([]);
     });
@@ -30,17 +54,19 @@ describe("todoService", () => {
   describe("groupTodosByStatus", () => {
     it("should group todos by status", () => {
       const todos = [
-        { id: "1", title: "Todo 1", status: "pending" },
-        { id: "2", title: "Todo 2", status: "completed" },
-        { id: "3", title: "Todo 3", status: "pending" },
+        createMockTodo({ id: "1", title: "Todo 1", status: "pending" }),
+        createMockTodo({ id: "2", title: "Todo 2", status: "done" }),
+        createMockTodo({ id: "3", title: "Todo 3", status: "pending" }),
       ];
       const result = groupTodosByStatus(todos);
       expect(result.pending?.length).toBe(2);
-      expect(result.completed?.length).toBe(1);
+      expect(result.done?.length).toBe(1);
     });
 
     it("should default to pending for undefined status", () => {
-      const todos = [{ id: "1", title: "Todo 1" }];
+      const todos = [
+        createMockTodo({ id: "1", title: "Todo 1", status: "pending" }),
+      ];
       const result = groupTodosByStatus(todos);
       expect(result.pending?.length).toBe(1);
     });
@@ -49,16 +75,34 @@ describe("todoService", () => {
   describe("filterTodosByTag", () => {
     it("should filter todos by tag", () => {
       const todos = [
-        { id: "1", title: "Todo 1", tags: ["work", "urgent"] },
-        { id: "2", title: "Todo 2", tags: ["personal"] },
-        { id: "3", title: "Todo 3", tags: ["work"] },
+        createMockTodo({
+          id: "1",
+          title: "Todo 1",
+          tags: [createMockTag("work"), createMockTag("urgent")],
+        }),
+        createMockTodo({
+          id: "2",
+          title: "Todo 2",
+          tags: [createMockTag("personal")],
+        }),
+        createMockTodo({
+          id: "3",
+          title: "Todo 3",
+          tags: [createMockTag("work")],
+        }),
       ];
       const result = filterTodosByTag(todos, "work");
       expect(result.length).toBe(2);
     });
 
     it("should return empty array when no tags match", () => {
-      const todos = [{ id: "1", title: "Todo 1", tags: ["personal"] }];
+      const todos = [
+        createMockTodo({
+          id: "1",
+          title: "Todo 1",
+          tags: [createMockTag("personal")],
+        }),
+      ];
       const result = filterTodosByTag(todos, "work");
       expect(result).toEqual([]);
     });
@@ -70,9 +114,13 @@ describe("todoService", () => {
       tomorrow.setDate(tomorrow.getDate() + 1);
 
       const todos = [
-        { id: "1", title: "Todo 1", dueDate: tomorrow.toISOString() },
-        { id: "2", title: "Todo 2", dueDate: "2099-12-31" },
-        { id: "3", title: "Todo 3" },
+        createMockTodo({
+          id: "1",
+          title: "Todo 1",
+          due_date: tomorrow.toISOString(),
+        }),
+        createMockTodo({ id: "2", title: "Todo 2", due_date: "2099-12-31" }),
+        createMockTodo({ id: "3", title: "Todo 3", due_date: null }),
       ];
       const result = getTodosDueSoon(todos, 3);
       expect(result.length).toBe(1);
@@ -84,7 +132,11 @@ describe("todoService", () => {
       twoDays.setDate(twoDays.getDate() + 2);
 
       const todos = [
-        { id: "1", title: "Todo 1", dueDate: twoDays.toISOString() },
+        createMockTodo({
+          id: "1",
+          title: "Todo 1",
+          due_date: twoDays.toISOString(),
+        }),
       ];
       const result = getTodosDueSoon(todos);
       expect(result.length).toBe(1);
@@ -94,9 +146,9 @@ describe("todoService", () => {
   describe("sortTodosByPriority", () => {
     it("should sort todos by priority ascending", () => {
       const todos = [
-        { id: "1", title: "Todo 1", priority: "P3" },
-        { id: "2", title: "Todo 2", priority: "P0" },
-        { id: "3", title: "Todo 3", priority: "P1" },
+        createMockTodo({ id: "1", title: "Todo 1", priority: "P3" }),
+        createMockTodo({ id: "2", title: "Todo 2", priority: "P0" }),
+        createMockTodo({ id: "3", title: "Todo 3", priority: "P1" }),
       ];
       const result = sortTodosByPriority(todos);
       expect(result[0].id).toBe("2");
@@ -106,8 +158,8 @@ describe("todoService", () => {
 
     it("should default to P3 for undefined priority", () => {
       const todos = [
-        { id: "1", title: "Todo 1", priority: "P0" },
-        { id: "2", title: "Todo 2" },
+        createMockTodo({ id: "1", title: "Todo 1", priority: "P0" }),
+        createMockTodo({ id: "2", title: "Todo 2", priority: "P2" }),
       ];
       const result = sortTodosByPriority(todos);
       expect(result[0].id).toBe("1");
