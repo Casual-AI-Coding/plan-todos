@@ -151,7 +151,7 @@ describe("Todo API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("get_todos_by_tag", {
         tagId: "tag-1",
       });
-      expect(mockTodos);
+      expect(result).toEqual(mockTodos);
     });
 
     it("should handle invoke error", async () => {
