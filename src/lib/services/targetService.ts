@@ -1,10 +1,19 @@
 // src/lib/services/targetService.ts
-export interface Target {
-  id: string;
-  title: string;
+import type { Target as TargetEntity } from "@/lib/types";
+
+/**
+ * Target for service layer calculations
+ * Extends the entity Target but uses current/target instead of calculated progress
+ */
+export type Target = Omit<TargetEntity, "progress" | "description" | "due_date" | "status" | "created_at" | "updated_at"> & {
   current: number;
   target: number;
-}
+  description?: string | null;
+  due_date?: string | null;
+  status?: "active" | "completed" | "archived";
+  created_at?: string;
+  updated_at?: string;
+};
 
 export interface TargetProgress {
   id: string;
