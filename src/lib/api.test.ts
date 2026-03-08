@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@/lib/utils/logger";
 import {
   isTauri,
   getPlans,
@@ -118,43 +119,43 @@ describe("API Functions - Read operations (non-Tauri)", () => {
   });
 
   it("getTasks returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const result = await getTasks();
     expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(loggerSpy).toHaveBeenCalledWith(
       "Running outside Tauri - data not available",
     );
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 
   it("getTasksByPlan returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const result = await getTasksByPlan("plan-1");
     expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(loggerSpy).toHaveBeenCalledWith(
       "Running outside Tauri - data not available",
     );
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 
   it("getTargets returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const result = await getTargets();
     expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(loggerSpy).toHaveBeenCalledWith(
       "Running outside Tauri - data not available",
     );
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 
   it("getSteps returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const result = await getSteps("target-1");
     expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(loggerSpy).toHaveBeenCalledWith(
       "Running outside Tauri - data not available",
     );
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 
   it("getTodos throws error when not in Tauri", async () => {
@@ -164,13 +165,13 @@ describe("API Functions - Read operations (non-Tauri)", () => {
   });
 
   it("getMilestones returns empty array when not in Tauri", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
     const result = await getMilestones();
     expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(loggerSpy).toHaveBeenCalledWith(
       "Running outside Tauri - data not available",
     );
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 });
 

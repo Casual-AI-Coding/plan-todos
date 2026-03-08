@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@/lib/utils/logger";
 import type { Statistics } from "@/lib/types";
 import { getStatistics } from "./statistics";
 
@@ -34,7 +35,7 @@ describe("getStatistics", () => {
   // ==========================================================================
   describe("Non-Tauri environment", () => {
     it("returns mock data when not in Tauri environment", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
       const result = await getStatistics();
 
       // Verify counts structure
@@ -104,19 +105,19 @@ describe("getStatistics", () => {
       expect(result.efficiency.productivity_score).toBe(0);
 
       // Verify warning was logged
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         "Running outside Tauri - returning mock data",
       );
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it("logs warning when not in Tauri environment", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
       await getStatistics();
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         "Running outside Tauri - returning mock data",
       );
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 

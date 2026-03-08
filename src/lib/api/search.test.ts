@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { logger } from "@/lib/utils/logger";
 import { searchAll } from "./search";
 import type { SearchResult } from "@/lib/types";
 
@@ -53,36 +54,36 @@ describe("searchAll", () => {
   // ========================================================================
   describe("non-Tauri environment", () => {
     it("should return empty array when not in Tauri environment", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
 
       const result = await searchAll("test query");
 
       expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         "Running outside Tauri - search not available",
       );
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it("should not call invoke when not in Tauri environment", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
 
       await searchAll("test query");
 
       expect(invoke).not.toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it("should return empty array with empty query when not in Tauri", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
 
       const result = await searchAll("");
 
       expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         "Running outside Tauri - search not available",
       );
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
   });
 
