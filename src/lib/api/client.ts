@@ -65,10 +65,14 @@ export async function tryInvoke<T>(
 ): Promise<T | null> {
   try {
     return await invoke<T>(command, args);
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.debug(`[API] tryInvoke failed: ${command}`, error);
+    }
     return null;
   }
 }
+
 
 /**
  * API Client type for dependency injection and testing
