@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.11] - 2026-03-10
+
+### Security
+
+- **SQL 注入修复**: `import.rs` 添加 `VALID_TABLES` 白名单和 `validate_table_name()` 函数，防止恶意表名注入
+
+### Changed
+
+**类型系统重构**:
+- 删除服务层重复类型定义 (`Todo`, `Plan`, `Step`, `Target`)
+- 统一从 `@/lib/types` 导入类型定义
+- 字段命名统一: `deadline` → `end_date`, `dueDate` → `due_date`
+- `targetService.ts` 使用更清晰的 `ServiceTarget` 接口
+
+**日志系统**:
+- 新建 `src/lib/utils/logger.ts` 统一日志工具
+- 支持动态环境检查，开发环境输出日志，生产环境静默
+- 替换 4 个文件中的 `console.*` 调用
+
+**错误处理**:
+- `tryInvoke` 添加开发环境调试日志
+- `ErrorBoundary` 使用统一 logger
+
+**用户体验**:
+- `CirculationDetailView` 中 `alert()` 替换为 `toast.error()`，改善交互体验
+
+**性能优化**:
+- `TodoItem.areEqual` 移除 `JSON.stringify`，改用浅比较
+
+### Added
+
+**测试覆盖**:
+- 新增 `src/lib/api/utils.test.ts` - 20 个测试用例
+- 新增 `src/lib/api/client.test.ts` - 21 个测试用例
+
+**文档**:
+- `useGlassSettings.ts` 添加 useEffect 设计意图注释
+
+### Fixed
+
+- 修复 `todos.test.ts` 中 `getTodosByTag` 断言不完整问题
+- 修复多个测试文件适配 logger 更改
+
+---
+
+
 ## [0.5.10] - 2026-03-06
 
 ### Changed

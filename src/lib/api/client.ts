@@ -73,7 +73,6 @@ export async function tryInvoke<T>(
   }
 }
 
-
 /**
  * API Client type for dependency injection and testing
  */

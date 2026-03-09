@@ -163,7 +163,7 @@ describe("tryInvoke", () => {
     await tryInvoke<string>("test_command");
     expect(consoleSpy).toHaveBeenCalledWith(
       "[API] tryInvoke failed: test_command",
-      expect.any(Error)
+      expect.any(Error),
     );
 
     consoleSpy.mockRestore();
