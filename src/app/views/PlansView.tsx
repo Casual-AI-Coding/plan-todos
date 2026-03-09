@@ -114,7 +114,8 @@ export function PlansView() {
           } else {
             setEditingReminderTimes([]);
           }
-        } catch {
+        } catch (error) {
+          console.warn("Failed to fetch reminder settings:", error);
           setEditingReminderTimes([]);
         }
       } else {

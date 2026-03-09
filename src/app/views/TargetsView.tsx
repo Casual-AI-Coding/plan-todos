@@ -49,6 +49,7 @@ interface TargetCardProps {
 
 function TargetCard({
   target,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   index: _index,
   expandedTargets,
   toggleTarget,
@@ -77,7 +78,8 @@ function TargetCard({
       } else {
         setEditingReminderTimes([]);
       }
-    } catch {
+    } catch (error) {
+      console.warn("Failed to fetch reminder settings:", error);
       setEditingReminderTimes([]);
     }
     setShowForm(true);

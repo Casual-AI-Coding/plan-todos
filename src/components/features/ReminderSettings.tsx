@@ -12,6 +12,10 @@ const PRESET_TIMES = [
   { label: "1天", value: 1440 },
 ] as const;
 
+/** Maximum allowed custom reminder time (365 days in minutes) */
+const MAX_CUSTOM_TIME = 525600;
+
+
 export interface ReminderSettingsProps {
   value: number[];
   onChange: (times: number[]) => void;
@@ -62,7 +66,7 @@ export function ReminderSettings({
 
   const handleAddCustomTime = () => {
     const minutes = parseInt(customTime, 10);
-    if (isNaN(minutes) || minutes <= 0) return;
+    if (isNaN(minutes) || minutes <= 0 || minutes > MAX_CUSTOM_TIME) return;
 
     if (!value.includes(minutes)) {
       onChange([...value, minutes].sort((a, b) => a - b));
@@ -219,10 +223,11 @@ export function ReminderSettings({
           <Input
             type="number"
             label="提前时间"
-            placeholder="输入分钟数"
+            placeholder="输入分钟数 (最大365天)"
             value={customTime}
             onChange={(e) => setCustomTime(e.target.value)}
             min={1}
+            max={MAX_CUSTOM_TIME}
           />
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             例如：输入 10 表示提前 10 分钟提醒，输入 120 表示提前 2 小时提醒

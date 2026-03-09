@@ -6,6 +6,18 @@ import { Card, Checkbox } from "@/components/ui";
 import { ReminderQuickButton } from "./ReminderQuickButton";
 import type { Todo } from "@/lib/types";
 
+/**
+ * Shallow compare two arrays of primitive values (numbers, strings)
+ * More efficient than JSON.stringify for small arrays
+ */
+function arraysEqual(a: unknown[], b: unknown[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
 export interface TodoItemProps {
   todo: Todo;
   reminderTimes?: number[];
@@ -34,8 +46,7 @@ function areEqual(prevProps: TodoItemProps, nextProps: TodoItemProps): boolean {
     prevProps.todo.priority === nextProps.todo.priority &&
     prevProps.todo.due_date === nextProps.todo.due_date &&
     tagsEqual &&
-    JSON.stringify(prevProps.reminderTimes || []) ===
-      JSON.stringify(nextProps.reminderTimes || [])
+    arraysEqual(prevProps.reminderTimes || [], nextProps.reminderTimes || [])
   );
 }
 

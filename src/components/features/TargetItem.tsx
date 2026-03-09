@@ -5,6 +5,18 @@ import { Card, ProgressBar, Checkbox } from "@/components/ui";
 import { ReminderQuickButton } from "./ReminderQuickButton";
 import type { Target, Tag, Step } from "@/lib/types";
 
+/**
+ * Shallow compare two arrays of primitive values (numbers, strings)
+ * More efficient than JSON.stringify for small arrays
+ */
+function arraysEqual(a: unknown[], b: unknown[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
 export interface TargetItemProps {
   target: Target;
   tags?: Tag[];
@@ -54,8 +66,7 @@ function areEqual(
     tagsEqual &&
     stepsEqual &&
     prevProps.expanded === nextProps.expanded &&
-    JSON.stringify(prevProps.reminderTimes || []) ===
-      JSON.stringify(nextProps.reminderTimes || [])
+    arraysEqual(prevProps.reminderTimes || [], nextProps.reminderTimes || [])
   );
 }
 

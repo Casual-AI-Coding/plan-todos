@@ -5,6 +5,18 @@ import { Card } from "@/components/ui";
 import { ReminderQuickButton } from "./ReminderQuickButton";
 import type { Plan, Tag } from "@/lib/types";
 
+/**
+ * Shallow compare two arrays of primitive values (numbers, strings)
+ * More efficient than JSON.stringify for small arrays
+ */
+function arraysEqual(a: unknown[], b: unknown[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
 export interface PlanItemProps {
   plan: Plan;
   tags?: Tag[];
@@ -33,8 +45,7 @@ function areEqual(prevProps: PlanItemProps, nextProps: PlanItemProps): boolean {
     prevProps.plan.start_date === nextProps.plan.start_date &&
     prevProps.plan.end_date === nextProps.plan.end_date &&
     tagsEqual &&
-    JSON.stringify(prevProps.reminderTimes || []) ===
-      JSON.stringify(nextProps.reminderTimes || [])
+    arraysEqual(prevProps.reminderTimes || [], nextProps.reminderTimes || [])
   );
 }
 
