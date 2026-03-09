@@ -10,7 +10,11 @@
 
 | Phase                     | 任务数 | 完成  | 进行中 | 待开始 |
 | ------------------------- | ------ | ----- | ------ | ------ |
-| **总计**                  | **14** | **2** | **1**  | **11** |
+| Phase 1: 基础组件         | 4      | 4     | 0      | 0      |
+| Phase 2: Todo 集成        | 3      | 1     | 1      | 1      |
+| Phase 3: Plan/Target 集成 | 4      | 0     | 0      | 4      |
+| Phase 4: 测试与验收       | 3      | 0     | 0      | 3      |
+| **总计**                  | **14** | **5** | **1**  | **8**  |
 
 ---
 
@@ -32,32 +36,29 @@
 - **Review**: ✅ 通过
 ### Task 1.3: 创建 ReminderBadge 组件
 
-- **状态**: ⏳ 待开始
+- **状态**: ✅ 已完成
 - **涉及文件**: `src/components/features/ReminderBadge.tsx`
 - **描述**: 创建提醒状态徽章组件，显示提醒数量和状态
-- **Commit**: -
-- **Review**: -
-
+- **Commit**: 501da82
+- **Review**: ✅ 通过
 ### Task 1.4: 添加组件单元测试
 
-- **状态**: ⏳ 待开始
-- **涉及文件**: `src/components/features/__tests__/ReminderSettings.test.tsx`
-- **描述**: 为 ReminderSettings、ReminderQuickButton、ReminderBadge 添加单元测试
-- **Commit**: -
-- **Review**: -
-
+- **状态**: ✅ 已完成
+- **涉及文件**: `src/components/features/__tests__/ReminderBadge.test.tsx`
+- **描述**: 为 ReminderBadge 组件添加单元测试 (17个测试用例)
+- **Commit**: 9dac3e1
+- **Review**: ✅ 通过
 ---
 
 ## Phase 2: Todo 集成
 
 ### Task 2.1: 修改 TodoForm 集成提醒设置
 
-- **状态**: ⏳ 待开始
+- **状态**: ✅ 已完成
 - **涉及文件**: `src/components/features/TodoForm.tsx`
 - **描述**: 在 TodoForm 中集成 ReminderSettings 区块
-- **Commit**: -
-- **Review**: -
-
+- **Commit**: 80294c6
+- **Review**: ✅ 通过
 ### Task 2.2: 修改 TodoItem 添加快捷按钮
 
 - **状态**: ⏳ 待开始
