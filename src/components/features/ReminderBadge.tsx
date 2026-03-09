@@ -34,7 +34,7 @@ export function ReminderBadge({
       className="relative inline-flex items-center justify-center"
       style={{ opacity: sent ? 0.6 : 1 }}
     >
-      <Bell className={sizeClasses.icon} />
+      <Bell data-testid="bell-icon" className={sizeClasses.icon} />
       <span
         className={`absolute -top-1 -right-1 flex items-center justify-center font-medium rounded-full ${sizeClasses.badge}`}
         style={{
