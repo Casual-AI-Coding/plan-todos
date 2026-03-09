@@ -3,13 +3,16 @@
 import React from "react";
 
 import { Card, Checkbox } from "@/components/ui";
+import { ReminderQuickButton } from "./ReminderQuickButton";
 import type { Todo } from "@/lib/types";
 
 export interface TodoItemProps {
   todo: Todo;
+  reminderTimes?: number[];
   onToggle: (todo: Todo) => void;
   onDelete: (id: string) => void;
   onClick: (todo: Todo) => void;
+  onReminderUpdate?: (todoId: string, times: number[]) => void;
 }
 
 /**
@@ -30,15 +33,19 @@ function areEqual(prevProps: TodoItemProps, nextProps: TodoItemProps): boolean {
     prevProps.todo.status === nextProps.todo.status &&
     prevProps.todo.priority === nextProps.todo.priority &&
     prevProps.todo.due_date === nextProps.todo.due_date &&
-    tagsEqual
+    tagsEqual &&
+    JSON.stringify(prevProps.reminderTimes || []) ===
+      JSON.stringify(nextProps.reminderTimes || [])
   );
 }
 
 export const TodoItem = React.memo(function TodoItem({
   todo,
+  reminderTimes,
   onToggle,
   onDelete,
   onClick,
+  onReminderUpdate,
 }: TodoItemProps) {
   const priorityColors: Record<string, string> = {
     P0: "bg-red-100 text-red-700",
@@ -75,6 +82,13 @@ export const TodoItem = React.memo(function TodoItem({
           >
             {todo.title}
           </div>
+          {/* Reminder button */}
+          <ReminderQuickButton
+            entityType="todo"
+            entityId={todo.id}
+            reminderTimes={reminderTimes || []}
+            onUpdate={(times) => onReminderUpdate?.(todo.id, times)}
+          />
           {/* Tags display */}
           {todo.tags && todo.tags.length > 0 && (
             <div className="flex gap-1 mt-1 flex-wrap">
