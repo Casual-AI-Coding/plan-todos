@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Modal, Button, Input } from "@/components/ui";
+import { ReminderSettings } from "./ReminderSettings";
 import type { Todo, Priority, Tag } from "@/lib/types";
 
 export interface TodoFormData {
@@ -9,6 +10,7 @@ export interface TodoFormData {
   content?: string;
   due_date?: string;
   priority: Priority;
+  reminder_times?: number[];
 }
 
 export interface TodoFormProps {
@@ -16,6 +18,7 @@ export interface TodoFormProps {
   editingTodo?: Todo | null;
   allTags: Tag[];
   selectedTags: string[];
+  editingReminderTimes?: number[];
   onClose: () => void;
   onSave: (data: TodoFormData, selectedTags: string[]) => void;
 }
@@ -25,6 +28,7 @@ export function TodoForm({
   editingTodo,
   allTags,
   selectedTags,
+  editingReminderTimes,
   onClose,
   onSave,
 }: TodoFormProps) {
@@ -33,6 +37,7 @@ export function TodoForm({
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState<Priority>("P2");
   const [tags, setTags] = useState<string[]>([]);
+  const [reminderTimes, setReminderTimes] = useState<number[]>([]);
   const isInitialized = useRef(false);
 
   useEffect(() => {
@@ -44,15 +49,17 @@ export function TodoForm({
       setDueDate("");
       setPriority("P2");
       setTags([]);
+      setReminderTimes([]);
     } else if (editingTodo) {
       setTitle(editingTodo.title);
       setContent(editingTodo.content || "");
       setDueDate(editingTodo.due_date || "");
       setPriority(editingTodo.priority);
       setTags(editingTodo.tags?.map((t) => t.id) || []);
+      setReminderTimes(editingReminderTimes || []);
     }
     isInitialized.current = true;
-  }, [open, editingTodo]);
+  }, [open, editingTodo, editingReminderTimes]);
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -62,6 +69,7 @@ export function TodoForm({
         content: content || undefined,
         due_date: dueDate || undefined,
         priority,
+        reminder_times: reminderTimes.length > 0 ? reminderTimes : undefined,
       },
       tags,
     );
@@ -73,6 +81,7 @@ export function TodoForm({
     setDueDate("");
     setPriority("P2");
     setTags([]);
+    setReminderTimes([]);
     onClose();
   };
 
@@ -183,6 +192,12 @@ export function TodoForm({
             )}
           </div>
         </div>
+        <ReminderSettings
+          entityType="todo"
+          entityId={editingTodo?.id || ""}
+          value={reminderTimes}
+          onChange={setReminderTimes}
+        />
       </div>
     </Modal>
   );
