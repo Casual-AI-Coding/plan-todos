@@ -2,10 +2,12 @@
 import type { Target as TargetEntity } from "@/lib/types";
 
 /**
- * Target for service layer calculations
- * Extends the entity Target but uses current/target instead of calculated progress
+ * Service-specific Target type for calculations
+ * Uses current/target values instead of pre-calculated progress
  */
-export type Target = Omit<TargetEntity, "progress" | "description" | "due_date" | "status" | "created_at" | "updated_at"> & {
+export interface ServiceTarget {
+  id: string;
+  title: string;
   current: number;
   target: number;
   description?: string | null;
@@ -13,7 +15,10 @@ export type Target = Omit<TargetEntity, "progress" | "description" | "due_date" 
   status?: "active" | "completed" | "archived";
   created_at?: string;
   updated_at?: string;
-};
+}
+
+/** @deprecated Use ServiceTarget instead */
+export type Target = ServiceTarget;
 
 export interface TargetProgress {
   id: string;
