@@ -153,8 +153,7 @@ describe("tryInvoke", () => {
 
   it("logs debug message in development mode", async () => {
     const consoleSpy = vi.spyOn(console, "debug").mockImplementation(() => {});
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
+    vi.stubEnv("NODE_ENV", "development");
 
     Object.defineProperty(global, "window", {
       value: undefined,
@@ -164,11 +163,11 @@ describe("tryInvoke", () => {
     await tryInvoke<string>("test_command");
     expect(consoleSpy).toHaveBeenCalledWith(
       "[API] tryInvoke failed: test_command",
-      expect.any(Error),
+      expect.any(Error)
     );
 
-    process.env.NODE_ENV = originalEnv;
     consoleSpy.mockRestore();
+    vi.unstubAllEnvs();
   });
 });
 
