@@ -14,4 +14,6 @@ export { StatCard } from "./StatCard";
 export { ThemeSelector } from "./ThemeSelector";
 export { TodoFilters } from "./TodoFilters";
 export { TodoForm } from "./TodoForm";
+export { TargetForm } from "./TargetForm";
 export { TodoItem } from "./TodoItem";
+export { PlanForm } from "./PlanForm";

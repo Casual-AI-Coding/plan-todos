@@ -174,8 +174,6 @@ export function PlanForm({
           </div>
         </div>
         <ReminderSettings
-          entityType="plan"
-          entityId={editingPlan?.id || ""}
           value={reminderTimes}
           onChange={setReminderTimes}
         />

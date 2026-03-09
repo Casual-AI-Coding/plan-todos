@@ -17,7 +17,6 @@ export interface TodoFormProps {
   open: boolean;
   editingTodo?: Todo | null;
   allTags: Tag[];
-  selectedTags: string[];
   editingReminderTimes?: number[];
   onClose: () => void;
   onSave: (data: TodoFormData, selectedTags: string[]) => void;
@@ -27,7 +26,6 @@ export function TodoForm({
   open,
   editingTodo,
   allTags,
-  selectedTags,
   editingReminderTimes,
   onClose,
   onSave,
@@ -193,8 +191,6 @@ export function TodoForm({
           </div>
         </div>
         <ReminderSettings
-          entityType="todo"
-          entityId={editingTodo?.id || ""}
           value={reminderTimes}
           onChange={setReminderTimes}
         />

@@ -70,8 +70,6 @@ export function ReminderQuickButton({
         footer={<Button onClick={handleSave}>保存</Button>}
       >
         <ReminderSettings
-          entityType={entityType}
-          entityId={entityId}
           value={reminderTimes}
           onChange={onUpdate}
           compact

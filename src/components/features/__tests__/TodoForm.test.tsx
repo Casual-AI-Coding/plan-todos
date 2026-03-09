@@ -90,7 +90,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -106,7 +106,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -123,7 +123,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -143,7 +143,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -160,7 +160,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -195,7 +195,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -225,7 +225,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -257,7 +257,7 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-          selectedTags={["tag-1"]}
+         
           editingReminderTimes={existingReminderTimes}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -280,7 +280,7 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-          selectedTags={["tag-1"]}
+         
           editingReminderTimes={existingReminderTimes}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -304,7 +304,7 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-          selectedTags={["tag-1"]}
+         
           editingReminderTimes={existingReminderTimes}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -337,7 +337,7 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-          selectedTags={["tag-1"]}
+         
           editingReminderTimes={[]}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -356,7 +356,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -377,7 +377,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -396,7 +396,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -417,7 +417,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -436,7 +436,7 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-          selectedTags={[]}
+         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,

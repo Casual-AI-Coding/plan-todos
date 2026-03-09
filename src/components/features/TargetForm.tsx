@@ -162,8 +162,6 @@ export function TargetForm({
           </div>
         </div>
         <ReminderSettings
-          entityType="target"
-          entityId={editingTarget?.id || ""}
           value={reminderTimes}
           onChange={setReminderTimes}
         />

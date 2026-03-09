@@ -256,7 +256,6 @@ export function TodosView() {
         open={showForm}
         editingTodo={editingTodo}
         allTags={allTags}
-        selectedTags={selectedTags}
         onClose={handleCloseForm}
         onSave={handleSave}
       />

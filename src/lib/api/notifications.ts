@@ -30,14 +30,14 @@ export async function getNotificationSettings(
 export async function setNotificationSettings(
   entityType: string,
   entityId: string,
-  reminderMinutes: number,
+  reminderTimes: number[],
 ): Promise<NotificationSettings> {
   return withTauriError("set notification settings", async () => {
     const { invoke } = await import("@tauri-apps/api/core");
     return invoke<NotificationSettings>("set_notification_settings", {
       entityType,
       entityId,
-      reminderMinutes,
+      reminderTimes,
     });
   });
 }

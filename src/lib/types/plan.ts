@@ -18,6 +18,7 @@ export interface Plan {
   status: "active" | "completed" | "archived";
   created_at: string;
   updated_at: string;
+  reminder_times?: number[]; // 提醒时间（分钟数数组）
 }
 
 /**

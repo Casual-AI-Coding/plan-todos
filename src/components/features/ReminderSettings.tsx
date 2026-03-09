@@ -13,8 +13,6 @@ const PRESET_TIMES = [
 ] as const;
 
 export interface ReminderSettingsProps {
-  entityType: "todo" | "plan" | "target";
-  entityId: string;
   value: number[];
   onChange: (times: number[]) => void;
   compact?: boolean;
@@ -37,8 +35,6 @@ function isPresetTime(value: number): boolean {
 }
 
 export function ReminderSettings({
-  entityType,
-  entityId,
   value,
   onChange,
   compact = false,

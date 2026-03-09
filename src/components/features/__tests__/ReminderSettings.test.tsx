@@ -58,12 +58,7 @@ describe("ReminderSettings", () => {
   describe("渲染测试", () => {
     it("组件正确渲染", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       expect(screen.getByText("提醒设置")).toBeInTheDocument();
@@ -72,12 +67,7 @@ describe("ReminderSettings", () => {
 
     it("显示所有预设时间选项", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       expect(screen.getByText("5分钟")).toBeInTheDocument();
@@ -92,12 +82,7 @@ describe("ReminderSettings", () => {
   describe("预设时间选择", () => {
     it("点击 checkbox 切换选中状态", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 点击 "5分钟" 选项
@@ -110,12 +95,7 @@ describe("ReminderSettings", () => {
 
     it("再次点击取消选中", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[5]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[5]} onChange={mockOnChange} />,
       );
 
       // 点击已选中的 "5分钟" 选项
@@ -128,12 +108,7 @@ describe("ReminderSettings", () => {
 
     it("支持多选", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[5]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[5]} onChange={mockOnChange} />,
       );
 
       // 点击 "15分钟" 选项
@@ -148,12 +123,7 @@ describe("ReminderSettings", () => {
   describe("自定义时间", () => {
     it("打开自定义时间弹窗", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 点击自定义按钮
@@ -169,12 +139,7 @@ describe("ReminderSettings", () => {
 
     it("输入自定义时间并保存", async () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 打开自定义弹窗
@@ -197,12 +162,7 @@ describe("ReminderSettings", () => {
 
     it("输入无效时间不保存", async () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 打开自定义弹窗
@@ -225,12 +185,7 @@ describe("ReminderSettings", () => {
 
     it("取消按钮关闭弹窗", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 打开自定义弹窗
@@ -249,12 +204,7 @@ describe("ReminderSettings", () => {
   describe("onChange 回调", () => {
     it("选择时间后触发 onChange", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 选择多个时间
@@ -269,13 +219,7 @@ describe("ReminderSettings", () => {
   describe("compact 模式", () => {
     it("紧凑模式渲染正确", () => {
       const { container } = render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[5]}
-          onChange={mockOnChange}
-          compact
-        />,
+        <ReminderSettings value={[5]} onChange={mockOnChange} compact />,
       );
 
       // 验证组件渲染
@@ -289,12 +233,7 @@ describe("ReminderSettings", () => {
   describe("选中数量显示", () => {
     it("显示已选中的数量", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[5, 15]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[5, 15]} onChange={mockOnChange} />,
       );
 
       // 应该显示选中数量徽章
@@ -303,12 +242,7 @@ describe("ReminderSettings", () => {
 
     it("未选中时不显示数量", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[]} onChange={mockOnChange} />,
       );
 
       // 不应该显示数量徽章（只有选中时才会渲染）
@@ -321,8 +255,8 @@ describe("ReminderSettings", () => {
     it("显示已添加的自定义时间", () => {
       render(
         <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
+         
+         
           value={[5, 45]} // 45 不是预设时间
           onChange={mockOnChange}
         />,
@@ -335,12 +269,7 @@ describe("ReminderSettings", () => {
 
     it("点击删除自定义时间", () => {
       render(
-        <ReminderSettings
-          entityType="todo"
-          entityId="test-id"
-          value={[5, 45]}
-          onChange={mockOnChange}
-        />,
+        <ReminderSettings value={[5, 45]} onChange={mockOnChange} />,
       );
 
       // 点击删除按钮

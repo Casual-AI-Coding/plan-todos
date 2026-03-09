@@ -13,7 +13,7 @@ export interface NotificationSettings {
   id: string;
   entity_type: string;
   entity_id: string;
-  reminder_minutes: number;
+  reminder_times: number[];
   reminder_sent: boolean;
   created_at: string;
   updated_at: string;

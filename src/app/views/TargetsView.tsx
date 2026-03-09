@@ -72,8 +72,8 @@ function TargetCard({
     // Fetch reminder times for this target
     try {
       const settings = await getNotificationSettings("target", target.id);
-      if (settings && settings.reminder_minutes) {
-        setEditingReminderTimes([settings.reminder_minutes]);
+      if (settings && settings.reminder_times) {
+        setEditingReminderTimes(settings.reminder_times);
       } else {
         setEditingReminderTimes([]);
       }

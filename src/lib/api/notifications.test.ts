@@ -58,7 +58,7 @@ describe("Notification API", () => {
         id: "ns-1",
         entity_type: "todo",
         entity_id: "entity-1",
-        reminder_minutes: 30,
+        reminder_times: [30],
         reminder_sent: false,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
@@ -86,18 +86,18 @@ describe("Notification API", () => {
     it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
       await expect(
-        setNotificationSettings("todo", "entity-1", 30),
+        setNotificationSettings("todo", "entity-1", [30]),
       ).rejects.toThrow("This app must run in Tauri");
     });
 
     it("should call invoke with set_notification_settings command", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
       mockInvoke.mockResolvedValue({});
-      await setNotificationSettings("todo", "entity-1", 30);
+      await setNotificationSettings("todo", "entity-1", [30]);
       expect(mockInvoke).toHaveBeenCalledWith("set_notification_settings", {
         entityType: "todo",
         entityId: "entity-1",
-        reminderMinutes: 30,
+        reminderTimes: [30],
       });
     });
   });

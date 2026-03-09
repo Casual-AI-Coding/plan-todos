@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   Button,
@@ -23,6 +23,9 @@ import {
 import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useTags } from "@/hooks/useTags";
 import type { Plan, Task } from "@/lib/api";
+import { setEntityTags } from "@/lib/api";
+import { getNotificationSettings } from "@/lib/api/notifications";
+import { PlanForm, type PlanFormData } from "@/components/features/PlanForm";
 
 export function PlansView() {
   const toast = useToast();
@@ -98,6 +101,28 @@ export function PlansView() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>([]);
+
+  // Fetch reminder times when editing plan
+  useEffect(() => {
+    async function fetchReminderTimes() {
+      if (editingPlan?.id) {
+        try {
+          const settings = await getNotificationSettings("plan", editingPlan.id);
+          if (settings && settings.reminder_times) {
+            setEditingReminderTimes(settings.reminder_times);
+          } else {
+            setEditingReminderTimes([]);
+          }
+        } catch {
+          setEditingReminderTimes([]);
+        }
+      } else {
+        setEditingReminderTimes([]);
+      }
+    }
+    fetchReminderTimes();
+  }, [editingPlan]);
 
   function closeForm() {
     setShowForm(false);
@@ -107,6 +132,7 @@ export function PlansView() {
     setStartDate("");
     setEndDate("");
     setSelectedTags([]);
+    setEditingReminderTimes([]);
   }
 
   function closeTaskForm() {
@@ -126,22 +152,25 @@ export function PlansView() {
     });
   }
 
-  function handleSubmitPlan() {
-    if (!title.trim()) return;
-
+  async function handleSavePlan(data: PlanFormData, tags: string[]) {
     const planData = {
-      title,
-      description: description || undefined,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
-      tagIds: selectedTags,
+      title: data.title,
+      description: data.description,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      tagIds: tags,
     };
 
     if (editingPlan) {
-      updatePlanMutation.mutate({ id: editingPlan.id, ...planData });
+      await updatePlanMutation.mutateAsync({ id: editingPlan.id, ...planData });
+      // Handle tags
+      if (tags.length > 0) {
+        await setEntityTags("plan", editingPlan.id, tags);
+      }
     } else {
-      createPlanMutation.mutate(planData);
+      await createPlanMutation.mutateAsync(planData);
     }
+    closeForm();
   }
 
   function handleSubmitTask() {
@@ -272,101 +301,15 @@ export function PlansView() {
         />
       )}
 
-      <Modal
+      <PlanForm
         open={showForm}
-        title={editingPlan ? "编辑 Plan" : "新建 Plan"}
+        editingPlan={editingPlan}
+        allTags={tags}
+        selectedTags={selectedTags}
+        editingReminderTimes={editingReminderTimes}
         onClose={closeForm}
-        footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setShowForm(false);
-                setEditingPlan(null);
-                setSelectedTags([]);
-              }}
-            >
-              取消
-            </Button>
-            <Button onClick={handleSubmitPlan}>
-              {editingPlan ? "保存" : "创建"}
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <Input
-            label="标题"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="计划标题..."
-            autoFocus
-          />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              描述
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-              rows={3}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="开始日期"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <Input
-              label="结束日期"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-          {/* Tag selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              标签
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {tags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedTags((prev) =>
-                      prev.includes(tag.id)
-                        ? prev.filter((id) => id !== tag.id)
-                        : [...prev, tag.id],
-                    );
-                  }}
-                  className={`px-3 py-1 rounded text-sm transition-colors ${
-                    selectedTags.includes(tag.id) ? "text-white" : ""
-                  }`}
-                  style={{
-                    backgroundColor: selectedTags.includes(tag.id)
-                      ? tag.color
-                      : `${tag.color}20`,
-                    color: selectedTags.includes(tag.id) ? "white" : tag.color,
-                    border: `1px solid ${tag.color}`,
-                  }}
-                >
-                  {tag.name}
-                </button>
-              ))}
-              {tags.length === 0 && (
-                <span className="text-sm text-gray-400">
-                  暂无标签，请在设置中创建
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </Modal>
+        onSave={handleSavePlan}
+      />
 
       <Modal
         open={showTaskForm}
