@@ -10,7 +10,7 @@ import {
   Checkbox,
 } from "@/components/ui";
 import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
-import { EmptyStateCard } from "@/components/features";
+import { EmptyStateCard, TargetForm } from "@/components/features";
 import { useToast } from "@/components/ui/Toast";
 import {
   useTargets,
@@ -24,6 +24,12 @@ import {
 } from "@/hooks/useTargets";
 import { useTags } from "@/hooks/useTags";
 import type { Target, Step } from "@/lib/api";
+import type { TargetFormData } from "@/components/features/TargetForm";
+import {
+  setEntityTags,
+  updateTarget as updateTargetApi,
+  getNotificationSettings,
+} from "@/lib/api";
 
 interface TargetCardProps {
   target: Target;
@@ -33,6 +39,9 @@ interface TargetCardProps {
   selectedTargetId: string;
   setSelectedTargetId: (id: string) => void;
   setShowStepForm: (show: boolean) => void;
+  setEditingTarget: (target: Target | null) => void;
+  setEditingReminderTimes: (times: number[]) => void;
+  setShowForm: (show: boolean) => void;
   handleDeleteTarget: (id: string) => void;
   handleToggleStep: (step: Step) => void;
   handleDeleteStep: (id: string) => void;
@@ -40,11 +49,14 @@ interface TargetCardProps {
 
 function TargetCard({
   target,
-  index,
+  index: _index,
   expandedTargets,
   toggleTarget,
   setSelectedTargetId,
   setShowStepForm,
+  setEditingTarget,
+  setEditingReminderTimes,
+  setShowForm,
   handleDeleteTarget,
   handleToggleStep,
   handleDeleteStep,
@@ -53,6 +65,23 @@ function TargetCard({
   const { data: targetSteps = [] } = useTargetSteps(target.id);
 
   const totalWeight = targetSteps.reduce((sum, s) => sum + s.weight, 0);
+
+  const handleEditClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingTarget(target);
+    // Fetch reminder times for this target
+    try {
+      const settings = await getNotificationSettings("target", target.id);
+      if (settings && settings.reminder_minutes) {
+        setEditingReminderTimes([settings.reminder_minutes]);
+      } else {
+        setEditingReminderTimes([]);
+      }
+    } catch {
+      setEditingReminderTimes([]);
+    }
+    setShowForm(true);
+  };
 
   return (
     <Card>
@@ -82,6 +111,12 @@ function TargetCard({
               className="text-orange-500 hover:bg-orange-50 px-2 py-1 rounded text-sm"
             >
               + Step
+            </button>
+            <button
+              onClick={handleEditClick}
+              className="text-gray-400 hover:text-blue-500 px-2"
+            >
+              ✏️
             </button>
             <button
               onClick={(e) => {
@@ -223,17 +258,18 @@ export function TargetsView() {
   const [showForm, setShowForm] = useState(false);
   const [showStepForm, setShowStepForm] = useState(false);
   const [selectedTargetId, setSelectedTargetId] = useState<string>("");
+  const [editingTarget, setEditingTarget] = useState<Target | null>(null);
+  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>(
+    [],
+  );
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState("");
   const [weight, setWeight] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   function closeForm() {
     setShowForm(false);
-    setTitle("");
-    setDescription("");
-    setDueDate("");
+    setEditingTarget(null);
+    setEditingReminderTimes([]);
     setSelectedTags([]);
   }
 
@@ -253,17 +289,27 @@ export function TargetsView() {
     });
   }
 
-  function handleSubmitTarget() {
-    if (!title.trim()) return;
-
-    const targetData = {
-      title,
-      description: description || undefined,
-      due_date: dueDate || undefined,
-      tagIds: selectedTags,
-    };
-
-    createTargetMutation.mutate(targetData);
+  async function handleSaveTarget(data: TargetFormData, tagIds: string[]) {
+    if (editingTarget) {
+      // Update existing target
+      await updateTargetApi(editingTarget.id, {
+        title: data.title,
+        description: data.description,
+        due_date: data.due_date,
+      });
+      await setEntityTags("target", editingTarget.id, tagIds);
+      toast.success("目标更新成功");
+    } else {
+      // Create new target
+      const targetData = {
+        title: data.title,
+        description: data.description,
+        due_date: data.due_date,
+        tagIds,
+      };
+      createTargetMutation.mutate(targetData);
+    }
+    closeForm();
   }
 
   function handleSubmitStep() {
@@ -325,7 +371,8 @@ export function TargetsView() {
         </h2>
         <Button
           onClick={() => {
-            setSelectedTargetId("");
+            setEditingTarget(null);
+            setEditingReminderTimes([]);
             setShowForm(true);
           }}
         >
@@ -383,6 +430,9 @@ export function TargetsView() {
                 selectedTargetId={selectedTargetId}
                 setSelectedTargetId={setSelectedTargetId}
                 setShowStepForm={setShowStepForm}
+                setEditingTarget={setEditingTarget}
+                setEditingReminderTimes={setEditingReminderTimes}
+                setShowForm={setShowForm}
                 handleDeleteTarget={handleDeleteTarget}
                 handleToggleStep={handleToggleStep}
                 handleDeleteStep={handleDeleteStep}
@@ -395,94 +445,29 @@ export function TargetsView() {
           icon="🎯"
           title="暂无目标"
           description="创建你的第一个目标来开始使用"
-          action={<Button onClick={() => setShowForm(true)}>+ 创建目标</Button>}
+          action={
+            <Button
+              onClick={() => {
+                setEditingTarget(null);
+                setEditingReminderTimes([]);
+                setShowForm(true);
+              }}
+            >
+              + 创建目标
+            </Button>
+          }
         />
       )}
 
-      <Modal
+      <TargetForm
         open={showForm}
-        title="新建 Target"
+        editingTarget={editingTarget}
+        allTags={tags}
+        selectedTags={selectedTags}
+        editingReminderTimes={editingReminderTimes}
         onClose={closeForm}
-        footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setShowForm(false);
-                setSelectedTags([]);
-              }}
-            >
-              取消
-            </Button>
-            <Button onClick={handleSubmitTarget}>创建</Button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <Input
-            label="标题"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="目标标题..."
-            autoFocus
-          />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              描述
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-              rows={3}
-            />
-          </div>
-          <Input
-            label="截止日期"
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
-          {/* Tag selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              标签
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {tags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedTags((prev) =>
-                      prev.includes(tag.id)
-                        ? prev.filter((id) => id !== tag.id)
-                        : [...prev, tag.id],
-                    );
-                  }}
-                  className={`px-3 py-1 rounded text-sm transition-colors ${
-                    selectedTags.includes(tag.id) ? "text-white" : ""
-                  }`}
-                  style={{
-                    backgroundColor: selectedTags.includes(tag.id)
-                      ? tag.color
-                      : `${tag.color}20`,
-                    color: selectedTags.includes(tag.id) ? "white" : tag.color,
-                    border: `1px solid ${tag.color}`,
-                  }}
-                >
-                  {tag.name}
-                </button>
-              ))}
-              {tags.length === 0 && (
-                <span className="text-sm text-gray-400">
-                  暂无标签，请在设置中创建
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </Modal>
+        onSave={handleSaveTarget}
+      />
 
       <Modal
         open={showStepForm}
