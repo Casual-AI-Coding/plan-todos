@@ -27,7 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ${className}
           `}
           style={{
-            backgroundColor: error ? "var(--color-error)" : "var(--color-bg)",
+            backgroundColor: "var(--color-bg)",
             borderColor: error ? "var(--color-error)" : "var(--color-border)",
             color: "var(--color-text)",
           }}
