@@ -55,11 +55,12 @@ export function TodoFilters({
             <button
               key={f.id}
               onClick={() => onFilterChange(f.id)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-11 ${
                 filter === f.id
                   ? "bg-teal-100 text-teal-700"
                   : "text-gray-500 hover:bg-gray-100"
-              }`}
+              }`
+            }
             >
               {f.label}
             </button>
@@ -68,7 +69,7 @@ export function TodoFilters({
         <div className="flex gap-1">
           <button
             onClick={() => onViewModeChange("list")}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-11 ${
               viewMode === "list"
                 ? "bg-teal-500 text-white"
                 : "bg-gray-100 text-gray-600"
@@ -78,7 +79,7 @@ export function TodoFilters({
           </button>
           <button
             onClick={() => onViewModeChange("calendar")}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-11 ${
               viewMode === "calendar"
                 ? "bg-teal-500 text-white"
                 : "bg-gray-100 text-gray-600"
@@ -95,7 +96,7 @@ export function TodoFilters({
         <div className="relative">
           <button
             onClick={onPriorityDropdownToggle}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 min-h-11 ${
               priorityFilter !== "all"
                 ? "border-teal-500 bg-teal-50 text-teal-700"
                 : "border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -110,11 +111,12 @@ export function TodoFilters({
                 <button
                   key={p}
                   onClick={() => onPriorityFilterChange(p)}
-                  className={`w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 ${
+                  className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 min-h-11 ${
                     priorityFilter === p
                       ? "text-teal-600 font-medium"
                       : "text-gray-600"
-                  }`}
+                  }`
+                }
                 >
                   {p === "all"
                     ? "全部"
@@ -135,7 +137,7 @@ export function TodoFilters({
         <div className="relative">
           <button
             onClick={onTagDropdownToggle}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 min-h-11 ${
               tagFilters.length > 0
                 ? "border-teal-500 bg-teal-50 text-teal-700"
                 : "border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -159,7 +161,7 @@ export function TodoFilters({
                           : [...tagFilters, tag.id],
                       )
                     }
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                    className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-2 min-h-11"
                   >
                     <span
                       className={`w-4 h-4 rounded border flex items-center justify-center ${
@@ -203,7 +205,7 @@ export function TodoFilters({
           {searchQuery && (
             <button
               onClick={() => onSearchChange("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2 min-h-8 min-w-8"
               aria-label="清除搜索"
             >
               ✕

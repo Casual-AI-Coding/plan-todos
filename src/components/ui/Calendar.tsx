@@ -53,7 +53,7 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-          className="px-3 py-1 rounded hover:bg-gray-100"
+          className="px-4 py-2.5 rounded hover:bg-gray-100 min-h-11 min-w-11"
           aria-label="上一月"
         >
           ←
@@ -63,7 +63,7 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
         </h3>
         <button
           onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-          className="px-3 py-1 rounded hover:bg-gray-100"
+          className="px-4 py-2.5 rounded hover:bg-gray-100 min-h-11 min-w-11"
           aria-label="下一月"
         >
           →
