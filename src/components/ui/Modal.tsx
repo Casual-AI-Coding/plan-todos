@@ -61,7 +61,7 @@ export function Modal({
             }}
             onClick={onClose}
             style={{
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backgroundColor: "var(--color-backdrop)",
               backdropFilter: "blur(var(--glass-blur, 10px))",
               WebkitBackdropFilter: "blur(var(--glass-blur, 10px))",
             }}

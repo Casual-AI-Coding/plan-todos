@@ -21,6 +21,9 @@
   --transition-slow: 300ms;
   --animation-duration-normal: 250ms;
   --animation-duration-slow: 400ms;
+
+  /* Overlay & Backdrop */
+  --color-backdrop: rgba(0, 0, 0, 0.5);
 }
 
 /* Light Theme (default) - with transparency */
