@@ -96,6 +96,10 @@ export const TargetItem = React.memo(function TargetItem({
                 e.stopPropagation();
                 onToggleExpand?.(target.id);
               }}
+              onKeyDown={(e) => e.key === "Enter" && onToggleExpand?.(target.id)}
+              role="button"
+              tabIndex={0}
+              aria-label={expanded ? "折叠步骤" : "展开步骤"}
             >
               {expanded ? "▼" : "▶"}
             </span>
@@ -124,6 +128,7 @@ export const TargetItem = React.memo(function TargetItem({
                   onDelete(target.id);
                 }}
                 className="text-gray-400 hover:text-red-500 px-2"
+                aria-label="删除目标"
               >
                 🗑️
               </button>
@@ -182,6 +187,7 @@ export const TargetItem = React.memo(function TargetItem({
                       onDeleteStep(step.id);
                     }}
                     className="text-gray-400 hover:text-red-500"
+                    aria-label="删除步骤"
                   >
                     🗑️
                   </button>

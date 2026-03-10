@@ -197,12 +197,14 @@ export function TodoFilters({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="搜索..."
+            aria-label="搜索待办事项"
             className="w-full px-3 py-1.5 pr-8 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
           {searchQuery && (
             <button
               onClick={() => onSearchChange("")}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              aria-label="清除搜索"
             >
               ✕
             </button>

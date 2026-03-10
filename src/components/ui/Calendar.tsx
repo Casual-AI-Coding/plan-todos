@@ -54,6 +54,7 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
         <button
           onClick={() => setCurrentDate(subMonths(currentDate, 1))}
           className="px-3 py-1 rounded hover:bg-gray-100"
+          aria-label="上一月"
         >
           ←
         </button>
@@ -63,6 +64,7 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
         <button
           onClick={() => setCurrentDate(addMonths(currentDate, 1))}
           className="px-3 py-1 rounded hover:bg-gray-100"
+          aria-label="下一月"
         >
           →
         </button>
@@ -103,6 +105,9 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
                 <div
                   key={e.id}
                   onClick={() => onEventClick?.(e)}
+                  onKeyDown={(event) => event.key === "Enter" && onEventClick?.(e)}
+                  role="button"
+                  tabIndex={0}
                   className={`text-xs p-1 mb-1 rounded truncate cursor-pointer ${eventColors[e.type]} text-white`}
                 >
                   {e.title}

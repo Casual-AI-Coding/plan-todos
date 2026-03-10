@@ -10,10 +10,11 @@ export interface LanguageSelectorProps {
 export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label htmlFor="language-select" className="block text-sm font-medium text-gray-700 mb-2">
         语言
       </label>
       <select
+        id="language-select"
         value={value}
         onChange={(e) => onChange(e.target.value as Language)}
         className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"

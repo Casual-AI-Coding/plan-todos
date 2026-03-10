@@ -107,10 +107,12 @@ function GlassSettingsModal({
           </div>
           <input
             type="range"
+            id="blur-slider"
             min="5"
             max="30"
             value={tempBlurValue}
             onChange={(e) => handleBlurChange(parseInt(e.target.value, 10))}
+            aria-label="模糊程度"
             className="w-full h-2 rounded-lg appearance-none cursor-pointer"
             style={{
               background: "var(--color-border)",
@@ -141,10 +143,12 @@ function GlassSettingsModal({
           </div>
           <input
             type="range"
+            id="opacity-slider"
             min="5"
             max="100"
             value={tempOpacityValue}
             onChange={(e) => handleOpacityChange(parseInt(e.target.value, 10))}
+            aria-label="不透明度"
             className="w-full h-2 rounded-lg appearance-none cursor-pointer"
             style={{
               background: "var(--color-border)",

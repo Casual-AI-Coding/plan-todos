@@ -33,6 +33,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="搜索..."
+        aria-label="搜索"
         className="w-full sm:max-w-xs md:max-w-sm px-4 py-2 bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-700 placeholder-gray-400"
       />
       {isOpen && results.length > 0 && (
@@ -40,7 +41,18 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
           {results.map((r) => (
             <div
               key={`${r.entity_type}-${r.id}`}
-              onClick={() => onResultClick(r.entity_type, r.id)}
+              onClick={() => {
+                onResultClick(r.entity_type, r.id);
+                setIsOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onResultClick(r.entity_type, r.id);
+                  setIsOpen(false);
+                }
+              }}
+              role="button"
+              tabIndex={0}
               className="p-3 hover:bg-teal-50 cursor-pointer border-b border-teal-50 last:border-b-0 transition-colors"
             >
               <div className="font-medium text-gray-800">{r.title}</div>

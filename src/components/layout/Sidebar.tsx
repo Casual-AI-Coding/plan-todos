@@ -282,11 +282,12 @@ export function Sidebar({
                   : "var(--color-text)",
                 transition: "transform 0.2s",
               }}
+              aria-hidden="true"
             >
               ▶
             </span>
           )}
-          <span className="text-base">{menu.icon}</span>
+          <span className="text-base" aria-hidden="true">{menu.icon}</span>
           {!isCollapsed && (
             <span className="font-medium truncate">{menu.label}</span>
           )}
@@ -335,6 +336,7 @@ export function Sidebar({
             className="p-1 rounded hover:opacity-80 transition-opacity cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
             title={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
+            aria-label={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
           >
             {isCollapsed ? "→" : "←"}
           </button>

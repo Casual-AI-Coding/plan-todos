@@ -118,6 +118,7 @@ export const PlanItem = React.memo(function PlanItem({
               onDelete(plan.id);
             }}
             className="text-gray-400 hover:text-red-500 px-2"
+            aria-label="删除计划"
           >
             🗑️
           </button>

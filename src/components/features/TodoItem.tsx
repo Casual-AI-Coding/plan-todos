@@ -129,6 +129,7 @@ export const TodoItem = React.memo(function TodoItem({
             onDelete(todo.id);
           }}
           className="text-gray-400 hover:text-red-500 px-2"
+          aria-label="删除待办事项"
         >
           🗑️
         </button>

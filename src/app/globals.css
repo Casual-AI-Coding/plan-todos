@@ -1337,4 +1337,51 @@ body {
   .interactive-focus:focus {
     @apply outline-none ring-2 ring-primary;
   }
+
+/* ============================================
+Reduced Motion Support (WCAG 2.3.3)
+Respects user preference for reduced motion
+============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep essential transitions for usability */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+Reduced Motion Support (WCAG 2.3.3)
+Respects user preference for reduced motion
+============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep essential transitions for usability */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    transition-duration: 0.01ms !important;
+  }
 }
