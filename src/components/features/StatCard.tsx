@@ -19,15 +19,18 @@ export function StatCard({
     size === "lg" ? "text-3xl font-bold" : "text-lg font-semibold";
 
   return (
-    <Card className="text-center">
-      <div className={`${valueClass}`} style={{ color }}>
-        {value}
-      </div>
+    <Card className="py-4 px-5">
       <div
-        className="text-sm mt-1"
+        className="text-xs font-medium uppercase tracking-wide mb-1"
         style={{ color: "var(--color-text-muted)" }}
       >
         {label}
+      </div>
+      <div
+        className={`${valueClass} tabular-nums`}
+        style={{ color }}
+      >
+        {value}
       </div>
     </Card>
   );
