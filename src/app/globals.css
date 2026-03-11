@@ -1340,7 +1340,7 @@ body {
   .interactive-focus:focus {
     @apply outline-none ring-2 ring-primary;
   }
-
+}
 /* ============================================
 Reduced Motion Support (WCAG 2.3.3)
 Respects user preference for reduced motion
