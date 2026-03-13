@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { getDueReminders, markReminderSent } from "@/lib/api";
 import type { DueReminder } from "@/lib/types";
 
@@ -62,6 +62,3 @@ export function useMarkReminderSent() {
     }) => markReminderSent(entityType, entityId),
   });
 }
-
-// Need to import useMutation
-import { useMutation } from "@tanstack/react-query";
