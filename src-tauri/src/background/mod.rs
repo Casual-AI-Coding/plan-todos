@@ -28,8 +28,6 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
     let (shutdown_tx, mut shutdown_rx) = tokio::sync::mpsc::channel::<()>(1);
 
     tauri::async_runtime::spawn(async move {
-        let mut tick_count: u64 = 0;
-
         loop {
             tokio::select! {
                 // Check for shutdown signal
@@ -39,8 +37,6 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
                 }
                 // Wait for the polling interval
                 _ = tokio::time::sleep(tokio::time::Duration::from_secs(interval_secs)) => {
-                    tick_count += 1;
-
                     // Get database connection from app state
                     let state_result = app_handle.try_state::<AppState>();
 
@@ -52,20 +48,19 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
                             match get_pending_notifications(&conn) {
                                 Ok(pending) => {
                                     for notification in pending {
-                                        // Send the notification
-                                        let result = send_notification(&notification).await;
-
                                         // Update status based on result
-                                        let update_result = if result.is_ok() {
-                                            update_notification_status(&conn, &notification.id, "sent", None)
-                                        } else {
-                                            let error_msg = result.unwrap_err();
-                                            update_notification_status(
-                                                &conn,
-                                                &notification.id,
-                                                "failed",
-                                                Some(error_msg),
-                                            )
+                                        let update_result = match send_notification(&notification).await {
+                                            Ok(_) => {
+                                                update_notification_status(&conn, &notification.id, "sent", None)
+                                            }
+                                            Err(error_msg) => {
+                                                update_notification_status(
+                                                    &conn,
+                                                    &notification.id,
+                                                    "failed",
+                                                    Some(error_msg),
+                                                )
+                                            }
                                         };
 
                                         if let Err(e) = update_result {
