@@ -127,8 +127,7 @@ pub fn set_notification_settings(
     let id = format!("notif-{}-{}", entity_type, entity_id);
 
     // Serialize reminder_times to JSON string for storage
-    let reminder_times_json = serde_json::to_string(&reminder_times)
-        .map_err(|e| e.to_string())?;
+    let reminder_times_json = serde_json::to_string(&reminder_times).map_err(|e| e.to_string())?;
 
     conn.execute(
         "INSERT INTO notification_settings (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at)
@@ -191,14 +190,16 @@ pub fn delete_entity_notifications(
     conn.execute(
         "DELETE FROM notification_settings WHERE entity_type = ? AND entity_id = ?",
         rusqlite::params![entity_type, entity_id],
-    ).map_err(|e| e.to_string())?;
+    )
+    .map_err(|e| e.to_string())?;
 
     // 2. Delete pending status notification_history (keep sent/failed for record keeping)
     conn.execute(
         "DELETE FROM notification_history 
          WHERE entity_type = ? AND entity_id = ? AND status = 'pending'",
         rusqlite::params![entity_type, entity_id],
-    ).map_err(|e| e.to_string())?;
+    )
+    .map_err(|e| e.to_string())?;
 
     Ok(())
 }
@@ -333,7 +334,8 @@ pub fn get_due_reminders(state: tauri::State<AppState>) -> Result<Vec<DueReminde
             let entity_id: String = row.get(1)?;
             let due_date: String = row.get(2)?;
             let title: String = row.get(3)?;
-            let reminder_times_json: String = row.get::<_, Option<String>>(4)?
+            let reminder_times_json: String = row
+                .get::<_, Option<String>>(4)?
                 .unwrap_or_else(|| "[]".to_string());
 
             Ok((entity_type, entity_id, due_date, title, reminder_times_json))
@@ -366,8 +368,7 @@ pub fn get_due_reminders(state: tauri::State<AppState>) -> Result<Vec<DueReminde
         }
 
         // Find which reminder times match current time
-        let matched_times =
-            should_trigger_reminder(&due_date, &reminder_times, tolerance_minutes);
+        let matched_times = should_trigger_reminder(&due_date, &reminder_times, tolerance_minutes);
 
         // Only include if at least one reminder time matches
         if !matched_times.is_empty() {
@@ -457,15 +458,166 @@ fn parse_date(date_str: &str) -> Option<chrono::DateTime<chrono::Utc>> {
             log::debug!("Failed to parse date '{}' as RFC3339: {}", date_str, e);
         }
     }
-    
+
     // Fallback to YYYY-MM-DD format
     match chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
         Ok(d) => d.and_hms_opt(0, 0, 0).map(|dt| dt.and_utc()),
         Err(e) => {
-            log::warn!("Failed to parse date '{}': neither RFC3339 nor YYYY-MM-DD format. Error: {}", date_str, e);
+            log::warn!(
+                "Failed to parse date '{}': neither RFC3339 nor YYYY-MM-DD format. Error: {}",
+                date_str,
+                e
+            );
             None
         }
     }
+}
+
+// Notification History APIs
+
+/// Filters for querying notification history
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NotificationHistoryFilters {
+    pub status: Option<String>,
+    pub entity_type: Option<String>,
+    pub start_date: Option<String>,
+    pub end_date: Option<String>,
+}
+
+/// Pagination parameters
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PaginationParams {
+    pub page: i32,
+    pub limit: i32,
+}
+
+/// Paginated result wrapper
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PaginatedResult<T> {
+    pub items: Vec<T>,
+    pub total: i32,
+    pub page: i32,
+    pub limit: i32,
+}
+
+/// Get notification history with optional filters and pagination
+#[tauri::command]
+pub fn get_notification_history(
+    state: tauri::State<AppState>,
+    filters: Option<NotificationHistoryFilters>,
+    pagination: Option<PaginationParams>,
+) -> Result<PaginatedResult<NotificationHistory>, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    // Build base query
+    let mut query = String::from(
+        "SELECT id, entity_type, entity_id, title, message, reminder_time,
+                scheduled_at, sent_at, channel, status, error_message, created_at
+         FROM notification_history WHERE 1=1",
+    );
+
+    // Apply filters
+    if let Some(ref f) = filters {
+        if let Some(ref status) = f.status {
+            query.push_str(&format!(" AND status = '{}'", status));
+        }
+        if let Some(ref entity_type) = f.entity_type {
+            query.push_str(&format!(" AND entity_type = '{}'", entity_type));
+        }
+        if let Some(ref start_date) = f.start_date {
+            query.push_str(&format!(" AND created_at >= '{}'", start_date));
+        }
+        if let Some(ref end_date) = f.end_date {
+            query.push_str(&format!(" AND created_at <= '{}'", end_date));
+        }
+    }
+
+    // Get total count
+    let count_query = query.replace("SELECT id, entity_type, entity_id, title, message, reminder_time,\n                scheduled_at, sent_at, channel, status, error_message, created_at", "SELECT COUNT(*)");
+    let total: i32 = conn
+        .query_row(&count_query, [], |row| row.get(0))
+        .map_err(|e| e.to_string())?;
+
+    // Add ordering and pagination
+    query.push_str(" ORDER BY created_at DESC");
+
+    let page = pagination.as_ref().map(|p| p.page).unwrap_or(1);
+    let limit = pagination.as_ref().map(|p| p.limit).unwrap_or(20);
+    let offset = (page - 1) * limit;
+
+    query.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
+
+    let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
+    let items = stmt
+        .query_map([], |row| {
+            Ok(NotificationHistory {
+                id: row.get(0)?,
+                entity_type: row.get(1)?,
+                entity_id: row.get(2)?,
+                title: row.get(3)?,
+                message: row.get(4)?,
+                reminder_time: row.get(5)?,
+                scheduled_at: row.get(6)?,
+                sent_at: row.get(7)?,
+                channel: row.get(8)?,
+                status: row.get(9)?,
+                error_message: row.get(10)?,
+                created_at: row.get(11)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    let items = items
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())?;
+
+    Ok(PaginatedResult {
+        items,
+        total,
+        page,
+        limit,
+    })
+}
+
+/// Get pending notifications that are due to be sent
+#[tauri::command]
+pub fn get_pending_notifications(
+    state: tauri::State<AppState>,
+) -> Result<Vec<NotificationHistory>, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    let mut stmt = conn
+        .prepare(
+            "SELECT id, entity_type, entity_id, title, message, reminder_time,
+                    scheduled_at, sent_at, channel, status, error_message, created_at
+             FROM notification_history
+             WHERE status = 'pending' AND scheduled_at <= datetime('now')
+             ORDER BY scheduled_at ASC",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let notifications = stmt
+        .query_map([], |row| {
+            Ok(NotificationHistory {
+                id: row.get(0)?,
+                entity_type: row.get(1)?,
+                entity_id: row.get(2)?,
+                title: row.get(3)?,
+                message: row.get(4)?,
+                reminder_time: row.get(5)?,
+                scheduled_at: row.get(6)?,
+                sent_at: row.get(7)?,
+                channel: row.get(8)?,
+                status: row.get(9)?,
+                error_message: row.get(10)?,
+                created_at: row.get(11)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    notifications
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 #[cfg(test)]
@@ -489,7 +641,8 @@ mod tests {
                 UNIQUE(entity_type, entity_id)
             )",
             [],
-        ).unwrap();
+        )
+        .unwrap();
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS notification_history (
@@ -507,7 +660,8 @@ mod tests {
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )",
             [],
-        ).unwrap();
+        )
+        .unwrap();
 
         conn
     }
@@ -518,7 +672,7 @@ mod tests {
         let now = Utc::now().to_rfc3339();
         let reminder_times = vec![5, 15, 30, 60, 1440];
         let reminder_times_json = serde_json::to_string(&reminder_times).unwrap();
-        
+
         conn.execute(
             "INSERT INTO notification_settings (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at) VALUES (?, ?, ?, ?, 0, ?, ?)",
             rusqlite::params!["notif-todo-1", "todo", "todo-1", &reminder_times_json, &now, &now],
@@ -541,7 +695,7 @@ mod tests {
         let due_date = now + Duration::minutes(5);
         let result = should_trigger_reminder(&due_date.to_rfc3339(), &[5], 1);
         assert!(!result.is_empty());
-        
+
         let due_date = now + Duration::minutes(10);
         let result = should_trigger_reminder(&due_date.to_rfc3339(), &[5], 1);
         assert!(result.is_empty());
@@ -575,13 +729,29 @@ mod tests {
 
         delete_entity_notifications(&conn, "todo", "todo-1").unwrap();
 
-        let settings_cnt: i32 = conn.query_row("SELECT COUNT(*) FROM notification_settings", [], |row| row.get(0)).unwrap();
+        let settings_cnt: i32 = conn
+            .query_row("SELECT COUNT(*) FROM notification_settings", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
         assert_eq!(settings_cnt, 0);
 
-        let pending_cnt: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history WHERE status = 'pending'", [], |row| row.get(0)).unwrap();
+        let pending_cnt: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notification_history WHERE status = 'pending'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
         assert_eq!(pending_cnt, 0);
 
-        let sent_cnt: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history WHERE status = 'sent'", [], |row| row.get(0)).unwrap();
+        let sent_cnt: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notification_history WHERE status = 'sent'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
         assert_eq!(sent_cnt, 1);
     }
 
@@ -597,10 +767,20 @@ mod tests {
             ).unwrap();
         }
 
-        let total: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history", [], |row| row.get(0)).unwrap();
+        let total: i32 = conn
+            .query_row("SELECT COUNT(*) FROM notification_history", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
         assert_eq!(total, 3);
 
-        let pending: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history WHERE status = 'pending'", [], |row| row.get(0)).unwrap();
+        let pending: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notification_history WHERE status = 'pending'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
         assert_eq!(pending, 3);
     }
 }

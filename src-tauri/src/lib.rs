@@ -145,6 +145,8 @@ pub fn run() {
             commands::notifications::get_due_reminders,
             commands::notifications::mark_reminder_sent,
             commands::notifications::get_daily_summary,
+            commands::notifications::get_notification_history,
+            commands::notifications::get_pending_notifications,
             commands::batch::bulk_update_todo_status,
             commands::batch::bulk_update_task_status,
             commands::batch::bulk_update_step_status,
