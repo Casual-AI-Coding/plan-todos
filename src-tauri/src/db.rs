@@ -618,9 +618,10 @@ fn create_indexes(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
     conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_notification_due ON notification_settings(reminder_sent, reminder_minutes)",
+        "CREATE INDEX IF NOT EXISTS idx_notification_due ON notification_settings(reminder_sent)",
         [],
     )?;
+
 
     Ok(())
 }

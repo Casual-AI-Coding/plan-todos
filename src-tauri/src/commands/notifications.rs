@@ -449,14 +449,23 @@ pub fn get_daily_summary(state: tauri::State<AppState>) -> Result<DailySummary, 
 }
 
 fn parse_date(date_str: &str) -> Option<chrono::DateTime<chrono::Utc>> {
-    chrono::DateTime::parse_from_rfc3339(date_str)
-        .map(|dt| dt.with_timezone(&chrono::Utc))
-        .ok()
-        .or_else(|| {
-            chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d")
-                .ok()
-                .map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc())
-        })
+    // Try RFC3339 format first
+    match chrono::DateTime::parse_from_rfc3339(date_str) {
+        Ok(dt) => return Some(dt.with_timezone(&chrono::Utc)),
+        Err(e) => {
+            // Log parse error for debugging
+            log::debug!("Failed to parse date '{}' as RFC3339: {}", date_str, e);
+        }
+    }
+    
+    // Fallback to YYYY-MM-DD format
+    match chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
+        Ok(d) => d.and_hms_opt(0, 0, 0).map(|dt| dt.and_utc()),
+        Err(e) => {
+            log::warn!("Failed to parse date '{}': neither RFC3339 nor YYYY-MM-DD format. Error: {}", date_str, e);
+            None
+        }
+    }
 }
 
 #[cfg(test)]

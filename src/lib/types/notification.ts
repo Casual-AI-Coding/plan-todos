@@ -14,7 +14,8 @@ export interface NotificationSettings {
   entity_type: "todo" | "plan" | "target";
   entity_id: string;
   reminder_times: number[];
-  reminder_minutes?: number; // Legacy field
+  /** @deprecated Use reminder_times instead. This field is kept for backward compatibility. */
+  reminder_minutes?: number;
   reminder_sent: boolean;
   created_at: string;
   updated_at: string;

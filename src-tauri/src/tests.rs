@@ -251,7 +251,7 @@ mod tests {
         init_db(&conn).unwrap();
         let now = chrono::Utc::now().to_rfc3339();
 
-        conn.execute("INSERT INTO notification_settings (id, entity_type, entity_id, reminder_minutes, reminder_sent, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-ns-1", "todo", "t1", 30, 0, &now, &now]).unwrap();
+        conn.execute("INSERT INTO notification_settings (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)", rusqlite::params!["test-ns-1", "todo", "t1", "[30]", 0, &now, &now]).unwrap();
 
         let cnt: i32 = conn
             .query_row("SELECT COUNT(*) FROM notification_settings", [], |row| {

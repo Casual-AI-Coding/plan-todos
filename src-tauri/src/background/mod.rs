@@ -11,72 +11,84 @@ use rusqlite::Connection;
 use std::time::Duration;
 use tauri::{AppHandle, Manager};
 
-/// Start the notification checker background task
+/// Start the notification checker background task with graceful shutdown
 ///
 /// This function spawns an async task that periodically checks for pending
 /// notifications and sends them using the configured notification plugins.
+/// The task can be gracefully shut down using the returned shutdown handle.
 ///
 /// # Arguments
 /// * `app` - The Tauri application handle
 /// * `interval_secs` - The polling interval in seconds
-pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) {
+///
+/// # Returns
+/// A shutdown sender that can be used to gracefully stop the background task
+pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio::sync::mpsc::Sender<()> {
     let app_handle = app.clone();
+    let (shutdown_tx, mut shutdown_rx) = tokio::sync::mpsc::channel::<()>(1);
 
     tauri::async_runtime::spawn(async move {
-        // Create a simple timer using a loop with sleep
         let mut tick_count: u64 = 0;
 
         loop {
-            tick_count += 1;
+            tokio::select! {
+                // Check for shutdown signal
+                _ = shutdown_rx.recv() => {
+                    log::info!("Notification checker shutting down gracefully");
+                    break;
+                }
+                // Wait for the polling interval
+                _ = tokio::time::sleep(tokio::time::Duration::from_secs(interval_secs)) => {
+                    tick_count += 1;
 
-            // Get database connection from app state
-            let state_result = app_handle.try_state::<AppState>();
+                    // Get database connection from app state
+                    let state_result = app_handle.try_state::<AppState>();
 
-            if let Some(state) = state_result {
-                let conn_result = state.db.lock();
+                    if let Some(state) = state_result {
+                        let conn_result = state.db.lock();
 
-                if let Ok(conn) = conn_result {
-                    // Check for pending notifications
-                    match get_pending_notifications(&conn) {
-                        Ok(pending) => {
-                            for notification in pending {
-                                // Send the notification
-                                let result = send_notification(&notification).await;
+                        if let Ok(conn) = conn_result {
+                            // Check for pending notifications
+                            match get_pending_notifications(&conn) {
+                                Ok(pending) => {
+                                    for notification in pending {
+                                        // Send the notification
+                                        let result = send_notification(&notification).await;
 
-                                // Update status based on result
-                                let update_result = if result.is_ok() {
-                                    update_notification_status(&conn, &notification.id, "sent", None)
-                                } else {
-                                    let error_msg = result.unwrap_err();
-                                    update_notification_status(
-                                        &conn,
-                                        &notification.id,
-                                        "failed",
-                                        Some(error_msg),
-                                    )
-                                };
+                                        // Update status based on result
+                                        let update_result = if result.is_ok() {
+                                            update_notification_status(&conn, &notification.id, "sent", None)
+                                        } else {
+                                            let error_msg = result.unwrap_err();
+                                            update_notification_status(
+                                                &conn,
+                                                &notification.id,
+                                                "failed",
+                                                Some(error_msg),
+                                            )
+                                        };
 
-                                if let Err(e) = update_result {
-                                    log::error!("Failed to update notification status: {}", e);
+                                        if let Err(e) = update_result {
+                                            log::error!("Failed to update notification status: {}", e);
+                                        }
+                                    }
+                                }
+                                Err(e) => {
+                                    log::error!("Failed to get pending notifications: {}", e);
                                 }
                             }
+                        } else {
+                            log::error!("Failed to acquire database lock");
                         }
-                        Err(e) => {
-                            log::error!("Failed to get pending notifications: {}", e);
-                        }
+                    } else {
+                        log::error!("Failed to get AppState");
                     }
-                } else {
-                    log::error!("Failed to acquire database lock");
                 }
-            } else {
-                log::error!("Failed to get AppState");
             }
-
-            // Sleep for the specified interval
-            // Using a simple busy wait with tokio sleep
-            tokio::time::sleep(Duration::from_secs(interval_secs)).await;
         }
     });
+
+    shutdown_tx
 }
 
 /// Get all pending notifications that are due to be sent

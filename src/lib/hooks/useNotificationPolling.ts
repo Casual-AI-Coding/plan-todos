@@ -4,12 +4,16 @@
  * Provides polling for due reminders with automatic refresh.
  */
 
-import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getDueReminders, markReminderSent } from "@/lib/api";
-import type { DueReminder } from "@/lib/types";
+import { getDueReminders, markReminderSent } from "@/lib/api/notifications";
+import type { DueReminder } from "@/lib/types/notification";
 
-const POLLING_INTERVAL = 30000; // 30 seconds
+const DEFAULT_POLLING_INTERVAL = 30000; // 30 seconds
+
+export interface UseNotificationPollingOptions {
+  /** Polling interval in milliseconds (default: 30000) */
+  pollingInterval?: number;
+}
 
 export interface UseNotificationPollingResult {
   dueReminders: DueReminder[];
@@ -19,8 +23,10 @@ export interface UseNotificationPollingResult {
   refetch: () => Promise<unknown>;
 }
 
-export function useNotificationPolling(): UseNotificationPollingResult {
-  const [localPendingCount, setLocalPendingCount] = useState(0);
+export function useNotificationPolling(
+  options: UseNotificationPollingOptions = {},
+): UseNotificationPollingResult {
+  const { pollingInterval = DEFAULT_POLLING_INTERVAL } = options;
 
   const {
     data: dueReminders = [],
@@ -30,18 +36,16 @@ export function useNotificationPolling(): UseNotificationPollingResult {
   } = useQuery<DueReminder[]>({
     queryKey: ["dueReminders"],
     queryFn: getDueReminders,
-    refetchInterval: POLLING_INTERVAL,
-    staleTime: POLLING_INTERVAL,
+    refetchInterval: pollingInterval,
+    staleTime: pollingInterval,
   });
 
-  // Update local pending count when due reminders change
-  useEffect(() => {
-    setLocalPendingCount(dueReminders.length);
-  }, [dueReminders]);
+  // Derive pending count directly from dueReminders (removed redundant local state)
+  const pendingCount = dueReminders.length;
 
   return {
     dueReminders,
-    pendingCount: localPendingCount,
+    pendingCount,
     isLoading,
     isError,
     refetch,
