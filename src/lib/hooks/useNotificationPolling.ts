@@ -16,7 +16,7 @@ export interface UseNotificationPollingResult {
   pendingCount: number;
   isLoading: boolean;
   isError: boolean;
-  refetch: () => Promise<void>;
+  refetch: () => Promise<unknown>;
 }
 
 export function useNotificationPolling(): UseNotificationPollingResult {

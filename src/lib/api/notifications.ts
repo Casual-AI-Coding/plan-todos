@@ -162,7 +162,7 @@ export async function deleteNotificationPlugin(id: string): Promise<void> {
   });
 }
 
-export async function sendPluginNotification(
+export async function sendNotification(
   pluginId: string,
   title: string,
   content: string,
@@ -173,19 +173,6 @@ export async function sendPluginNotification(
       pluginId,
       title,
       content,
-    });
-  });
-}
-
-export async function sendNotification(
-  entityType: string,
-  entityId: string,
-): Promise<void> {
-  return withTauriError("send notification", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<void>("send_notification", {
-      entityType,
-      entityId,
     });
   });
 }
