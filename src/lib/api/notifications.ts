@@ -6,6 +6,15 @@
 
 import type {
   NotificationSettings,
+  NotificationHistory,
+  NotificationHistoryFilters,
+  DailySummarySettings,
+  DueReminder,
+  DailySummary,
+  NotificationPlugin,
+  SendNotificationResult,
+} from "@/lib/types";
+  NotificationSettings,
   DailySummarySettings,
   DueReminder,
   DailySummary,
@@ -160,7 +169,7 @@ export async function deleteNotificationPlugin(id: string): Promise<void> {
   });
 }
 
-export async function sendNotification(
+export async function sendPluginNotification(
   pluginId: string,
   title: string,
   content: string,
@@ -172,5 +181,51 @@ export async function sendNotification(
       title,
       content,
     });
+  });
+}
+
+export async function sendNotification(
+  entityType: string,
+  entityId: string,
+): Promise<void> {
+  return withTauriError("send notification", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<void>("send_notification", {
+      entityType,
+      entityId,
+    });
+  });
+}
+  pluginId: string,
+  title: string,
+  content: string,
+): Promise<SendNotificationResult> {
+  return withTauriError("send notification", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<SendNotificationResult>("send_notification", {
+      pluginId,
+      title,
+      content,
+    });
+  });
+}
+
+// Notification History APIs
+
+export async function getNotificationHistory(
+  filters?: NotificationHistoryFilters,
+): Promise<NotificationHistory[]> {
+  return withTauriError("get notification history", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<NotificationHistory[]>("get_notification_history", {
+      filters,
+    });
+  });
+}
+
+export async function getPendingNotifications(): Promise<NotificationHistory[]> {
+  return withTauriError("get pending notifications", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<NotificationHistory[]>("get_pending_notifications", {});
   });
 }

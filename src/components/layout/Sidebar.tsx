@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { SearchBar } from "@/components/features";
-
+import { Bell, LucideIcon } from "lucide-react";
+import { ComponentType } from "react";
 interface MenuItem {
   id: string;
-  icon: string;
+  icon: string | LucideIcon;
   label: string;
   children?: MenuItem[];
+  href?: string;
 }
 
 interface SidebarProps {
@@ -38,7 +40,8 @@ const menus: MenuItem[] = [
         id: "settings-notifications",
         icon: "🔔",
         label: "通知",
-        children: [
+      children: [
+          { id: "notifications", icon: Bell, label: "通知中心", href: "/notifications" },
           { id: "settings-channels", icon: "📢", label: "通知渠道" },
           { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
         ],
