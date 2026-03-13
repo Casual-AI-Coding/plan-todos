@@ -50,7 +50,8 @@ vi.mock("../ReminderQuickButton", () => ({
 const mockTarget: Target = {
   id: "target-1",
   title: "测试目标",
-  status: "in_progress",
+  description: null,
+  status: "active",
   progress: 50,
   due_date: "2024-12-31",
   created_at: "2024-01-01",
@@ -73,6 +74,7 @@ const mockSteps: Step[] = [
     title: "步骤1",
     status: "pending",
     weight: 30,
+    priority: "P2",
     target_id: "target-1",
     created_at: "2024-01-01",
     updated_at: "2024-01-01",
@@ -82,6 +84,7 @@ const mockSteps: Step[] = [
     title: "步骤2",
     status: "completed",
     weight: 40,
+    priority: "P2",
     target_id: "target-1",
     created_at: "2024-01-01",
     updated_at: "2024-01-01",
@@ -134,7 +137,7 @@ describe("TargetItem", () => {
         />,
       );
 
-      expect(screen.getByText(/2024\/12\/31/)).toBeInTheDocument();
+      expect(screen.getByText(/2024-12-31/)).toBeInTheDocument();
     });
 
     it("显示权重总和", () => {
@@ -151,7 +154,7 @@ describe("TargetItem", () => {
     });
 
     it("无截止日期时不显示日期", () => {
-      const targetWithoutDueDate = { ...mockTarget, due_date: undefined };
+      const targetWithoutDueDate: Target = { ...mockTarget, due_date: null };
 
       render(
         <TargetItem
@@ -362,8 +365,9 @@ describe("TargetItem", () => {
         />,
       );
 
-      const deleteButtons = screen.getAllByText("🗑️");
-      fireEvent.click(deleteButtons[1]); // 第二个删除按钮是步骤的
+      // 使用 aria-label 来精确选择步骤删除按钮
+      const stepDeleteButton = screen.getAllByLabelText("删除步骤");
+      fireEvent.click(stepDeleteButton[0]);
 
       expect(mockOnDeleteStep).toHaveBeenCalledWith("step-1");
     });
@@ -492,6 +496,7 @@ describe("TargetItem", () => {
           title: "新步骤",
           status: "pending",
           weight: 50,
+          priority: "P2",
           target_id: "target-1",
           created_at: "2024-01-01",
           updated_at: "2024-01-01",

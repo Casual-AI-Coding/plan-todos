@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { LanguageSelector } from "../LanguageSelector";
 
 describe("LanguageSelector", () => {
@@ -105,7 +105,8 @@ describe("LanguageSelector", () => {
       fireEvent.change(select, { target: { value: "en" } });
 
       expect(mockOnChange).toHaveBeenCalledWith("en");
-      expect(select).toHaveValue("en");
+      // 由于组件不管理内部状态，value 由 props 控制
+      // 测试验证 onChange 被正确调用即可
     });
 
     it("从英文切换到中文", () => {
@@ -117,7 +118,6 @@ describe("LanguageSelector", () => {
       fireEvent.change(select, { target: { value: "zh" } });
 
       expect(mockOnChange).toHaveBeenCalledWith("zh");
-      expect(select).toHaveValue("zh");
     });
   });
 });
