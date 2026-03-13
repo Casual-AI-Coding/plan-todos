@@ -122,7 +122,6 @@ describe("Button", () => {
     vi.useRealTimers();
   });
 
-
   it("should handle click without onClick handler", () => {
     // Test click when onClick is undefined (line 76: onClick?.(e))
     render(<Button>No Handler</Button>);
@@ -137,7 +136,7 @@ describe("Button", () => {
       <Button>
         <span>Icon</span>
         <span>Text</span>
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole("button");
     // When children is not a string and no label, aria-label should be undefined
@@ -149,7 +148,7 @@ describe("Button", () => {
     render(
       <Button label="Custom Label">
         <span>Icon</span>
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("aria-label", "Custom Label");

@@ -15,12 +15,12 @@ describe("logger", () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    (process.env as { NODE_ENV: string }).NODE_ENV = originalEnv;
   });
 
   describe("in development environment", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "development";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "development";
     });
 
     it("should call console.warn with formatted message", () => {
@@ -83,7 +83,7 @@ describe("logger", () => {
 
   describe("in production environment", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "production";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "production";
     });
 
     it("should NOT call console.warn", () => {
@@ -109,7 +109,7 @@ describe("logger", () => {
 
   describe("in test environment", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "test";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "test";
     });
 
     it("should NOT call console methods in test environment", () => {

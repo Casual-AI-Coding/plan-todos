@@ -10,7 +10,15 @@
  * Note: These tests require Tauri backend to be running or mock appropriately.
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  vi,
+} from "vitest";
 import {
   setNotificationSettings,
   getNotificationSettings,
@@ -35,7 +43,6 @@ vi.mock("@/lib/api/client", () => ({
   isTauri: vi.fn(() => true),
   invoke: mockInvoke,
 }));
-
 
 describe("Notification API Integration", () => {
   // Unique test identifiers to avoid conflicts

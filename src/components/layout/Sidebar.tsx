@@ -40,8 +40,13 @@ const menus: MenuItem[] = [
         id: "settings-notifications",
         icon: "🔔",
         label: "通知",
-      children: [
-          { id: "notifications", icon: Bell, label: "通知中心", href: "/notifications" },
+        children: [
+          {
+            id: "notifications",
+            icon: Bell,
+            label: "通知中心",
+            href: "/notifications",
+          },
           { id: "settings-channels", icon: "📢", label: "通知渠道" },
           { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
         ],

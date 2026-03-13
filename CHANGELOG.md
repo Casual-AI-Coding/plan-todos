@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2026-03-14
+
+### Added
+
+**通知中心功能 (Notification Center)**:
+
+- 新增 `NotificationCenterView` 页面 - 查看所有待处理和已发送的通知
+- 新增 `NotificationBell` 组件 - 侧边栏通知铃铛，显示未读通知数量
+- 新增 `NotificationModal` 组件 - 通知详情弹窗
+- 新增 `notification_history` 数据表 - 存储通知历史记录
+- 新增后台通知轮询服务 (`background/mod.rs`) - 自动检测到期提醒
+- 新增通知相关 API:
+  - `get_notification_history` - 获取通知历史
+  - `send_and_record_notification` - 发送并记录通知
+  - `get_due_reminders` - 获取到期提醒 (支持多时间点)
+  - `set_notification_settings` / `get_notification_settings` - 通知设置管理
+  - `mark_notification_sent` - 标记通知已发送
+- 新增通知去重机制和实体清理逻辑
+- 新增 `useNotificationPolling` Hook - 前端通知轮询
+
+**测试覆盖增强**:
+
+- 新增 49 个测试文件，约 1000+ 个测试用例
+- **Views 测试** (16 个文件): TodosView, PlansView, TargetsView, Dashboard, StatisticsView, CirculationsView, MilestonesView, Settings 各页面等
+- **Hooks 测试** (14 个文件): useTodos, usePlans, useTargets, useTasks, useTheme, useStatistics 等
+- **Features 组件测试** (19 个文件): TargetForm, PlanForm, CirculationForm, TargetItem, PlanItem, StatCard, EmptyStateCard, SortableList 等
+
+**UI 组件**:
+
+- 新增 `Badge` 组件
+- 新增 `Card` 组件
+- 新增 `ScrollArea` 组件
+- 新增 `Tabs` 组件
+- 新增通知相关图标
+
+### Fixed
+
+- **代码审查修复**: 修复 `unwrap_err()` 使用、移除未使用变量等 P2 问题
+- **数据库迁移**: 修复嵌套迁移代码问题，正确创建 `notification_history` 表
+- **API 修复**: 通知历史 API 改为直接返回数组而非分页结果
+- **前端集成**: 修复 TodosView/PlansView 中 reminder 设置未保存的问题
+- **ESLint 修复**: 修复测试文件中的 TypeScript 类型错误
+
+### Changed
+
+- NotificationCenterView 重新设计，符合项目设计系统
+- 使用 CSS 变量 (`--color-text`, `--color-primary` 等) 统一主题
+- 使用 `StaggeredList` 组件实现动画效果
+- 使用 `EmptyStateCard` 组件处理空状态
+
+---
+
 ## [0.6.0] - 2026-03-13
 
 ### Added
@@ -48,7 +100,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 测试覆盖率提升至 92%+
 
 ---
-
 
 ## [0.5.11] - 2026-03-10
 

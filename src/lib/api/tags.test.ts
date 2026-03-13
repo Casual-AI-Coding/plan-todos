@@ -140,7 +140,6 @@ describe("Tag API", () => {
       });
     });
 
-
     it("should handle partial updates with null values", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
       mockInvoke.mockResolvedValue({});

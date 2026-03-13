@@ -395,7 +395,6 @@ describe("TodoItem", () => {
     });
   });
 
-
   describe("键盘交互", () => {
     it("按 Enter 键触发 onClick", () => {
       render(
@@ -513,7 +512,15 @@ describe("TodoItem", () => {
 
       const todoWithTags = {
         ...mockTodo,
-        tags: [{ id: "tag-1", name: "新标签", color: "#FF0000", description: null, created_at: "2024-01-01" }],
+        tags: [
+          {
+            id: "tag-1",
+            name: "新标签",
+            color: "#FF0000",
+            description: null,
+            created_at: "2024-01-01",
+          },
+        ],
       };
       rerender(
         <TodoItem
@@ -530,7 +537,15 @@ describe("TodoItem", () => {
     it("tags 长度不同时重新渲染", () => {
       const todoWithOneTag = {
         ...mockTodo,
-        tags: [{ id: "tag-1", name: "标签1", color: "#FF0000", description: null, created_at: "2024-01-01" }],
+        tags: [
+          {
+            id: "tag-1",
+            name: "标签1",
+            color: "#FF0000",
+            description: null,
+            created_at: "2024-01-01",
+          },
+        ],
       };
 
       const { rerender } = render(
@@ -545,8 +560,20 @@ describe("TodoItem", () => {
       const todoWithTwoTags = {
         ...mockTodo,
         tags: [
-          { id: "tag-1", name: "标签1", color: "#FF0000", description: null, created_at: "2024-01-01" },
-          { id: "tag-2", name: "标签2", color: "#00FF00", description: null, created_at: "2024-01-01" },
+          {
+            id: "tag-1",
+            name: "标签1",
+            color: "#FF0000",
+            description: null,
+            created_at: "2024-01-01",
+          },
+          {
+            id: "tag-2",
+            name: "标签2",
+            color: "#00FF00",
+            description: null,
+            created_at: "2024-01-01",
+          },
         ],
       };
       rerender(
@@ -564,7 +591,15 @@ describe("TodoItem", () => {
     it("tags ID 不同时重新渲染", () => {
       const todoWithTags = {
         ...mockTodo,
-        tags: [{ id: "tag-1", name: "旧标签", color: "#FF0000", description: null, created_at: "2024-01-01" }],
+        tags: [
+          {
+            id: "tag-1",
+            name: "旧标签",
+            color: "#FF0000",
+            description: null,
+            created_at: "2024-01-01",
+          },
+        ],
       };
 
       const { rerender } = render(
@@ -578,7 +613,15 @@ describe("TodoItem", () => {
 
       const todoWithDifferentTag = {
         ...mockTodo,
-        tags: [{ id: "tag-2", name: "新标签", color: "#00FF00", description: null, created_at: "2024-01-01" }],
+        tags: [
+          {
+            id: "tag-2",
+            name: "新标签",
+            color: "#00FF00",
+            description: null,
+            created_at: "2024-01-01",
+          },
+        ],
       };
       rerender(
         <TodoItem

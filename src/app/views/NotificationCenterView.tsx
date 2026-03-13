@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Card, Button, Badge } from "@/components/ui";
+import { useState, useEffect, useMemo, useTransition } from "react";
+import { Card, Badge } from "@/components/ui";
 import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { EmptyStateCard } from "@/components/features";
 import { ScrollArea } from "@/components/ui/ScrollArea";
@@ -269,19 +269,32 @@ export function NotificationCenterView() {
     useNotificationPolling();
   const [history, setHistory] = useState<NotificationHistory[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (activeTab === "history") {
-      setIsHistoryLoading(true);
+      startTransition(() => {
+        setIsHistoryLoading(true);
+      });
       getNotificationHistory()
-        .then(setHistory)
+        .then((data) => {
+          startTransition(() => {
+            setHistory(data);
+          });
+        })
         .catch((error) => {
           console.error("Failed to fetch notification history:", error);
-          setHistory([]);
+          startTransition(() => {
+            setHistory([]);
+          });
         })
-        .finally(() => setIsHistoryLoading(false));
+        .finally(() => {
+          startTransition(() => {
+            setIsHistoryLoading(false);
+          });
+        });
     }
-  }, [activeTab]);
+  }, [activeTab, startTransition]);
 
   // Group history by time
   const groupedHistory = useMemo(() => {
