@@ -20,6 +20,7 @@ import {
   SettingsTagsView,
   CirculationsView,
   CirculationDetailView,
+  NotificationCenterView,
 } from "./views";
 
 // Main App
@@ -97,6 +98,12 @@ export default function Home() {
         view = <CirculationsView mode="settings" />;
         break;
       case "statistics":
+        view = <StatisticsView />;
+        break;
+      case "notifications":
+        view = <NotificationCenterView />;
+        break;
+      case "settings":
         view = <StatisticsView />;
         break;
       case "settings":

@@ -458,3 +458,140 @@ fn parse_date(date_str: &str) -> Option<chrono::DateTime<chrono::Utc>> {
                 .map(|d| d.and_hms_opt(0, 0, 0).unwrap().and_utc())
         })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{Duration, Utc};
+    use rusqlite::Connection;
+
+    fn create_test_db() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS notification_settings (
+                id TEXT PRIMARY KEY,
+                entity_type TEXT NOT NULL,
+                entity_id TEXT NOT NULL,
+                reminder_times TEXT,
+                reminder_sent INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(entity_type, entity_id)
+            )",
+            [],
+        ).unwrap();
+
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS notification_history (
+                id TEXT PRIMARY KEY,
+                entity_type TEXT NOT NULL,
+                entity_id TEXT NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT,
+                reminder_time INTEGER,
+                scheduled_at TEXT NOT NULL,
+                sent_at TEXT,
+                channel TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                error_message TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )",
+            [],
+        ).unwrap();
+
+        conn
+    }
+
+    #[test]
+    fn test_set_notification_settings() {
+        let conn = create_test_db();
+        let now = Utc::now().to_rfc3339();
+        let reminder_times = vec![5, 15, 30, 60, 1440];
+        let reminder_times_json = serde_json::to_string(&reminder_times).unwrap();
+        
+        conn.execute(
+            "INSERT INTO notification_settings (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at) VALUES (?, ?, ?, ?, 0, ?, ?)",
+            rusqlite::params!["notif-todo-1", "todo", "todo-1", &reminder_times_json, &now, &now],
+        ).unwrap();
+
+        let settings = conn.query_row(
+            "SELECT reminder_times FROM notification_settings WHERE entity_type = 'todo' AND entity_id = 'todo-1'",
+            [], |row| {
+                let rt: String = row.get(0)?;
+                Ok(rt)
+            },
+        ).unwrap();
+        let parsed: Vec<i32> = serde_json::from_str(&settings).unwrap();
+        assert_eq!(parsed, vec![5, 15, 30, 60, 1440]);
+    }
+
+    #[test]
+    fn test_should_trigger_reminder() {
+        let now = Utc::now();
+        let due_date = now + Duration::minutes(5);
+        let result = should_trigger_reminder(&due_date.to_rfc3339(), &[5], 1);
+        assert!(!result.is_empty());
+        
+        let due_date = now + Duration::minutes(10);
+        let result = should_trigger_reminder(&due_date.to_rfc3339(), &[5], 1);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_should_trigger_reminder_invalid_date() {
+        let result = should_trigger_reminder("invalid", &[5], 1);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_delete_entity_notifications() {
+        let conn = create_test_db();
+        let now = Utc::now().to_rfc3339();
+
+        conn.execute(
+            "INSERT INTO notification_settings (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at) VALUES (?, ?, ?, ?, 0, ?, ?)",
+            rusqlite::params!["notif-todo-1", "todo", "todo-1", "[5]", &now, &now],
+        ).unwrap();
+
+        conn.execute(
+            "INSERT INTO notification_history (id, entity_type, entity_id, title, message, reminder_time, scheduled_at, sent_at, channel, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["hist-pending", "todo", "todo-1", "Test", None::<String>, 30, &now, None::<String>, "test", "pending", None::<String>, &now],
+        ).unwrap();
+
+        conn.execute(
+            "INSERT INTO notification_history (id, entity_type, entity_id, title, message, reminder_time, scheduled_at, sent_at, channel, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["hist-sent", "todo", "todo-1", "Test", None::<String>, 30, &now, &now, "test", "sent", None::<String>, &now],
+        ).unwrap();
+
+        delete_entity_notifications(&conn, "todo", "todo-1").unwrap();
+
+        let settings_cnt: i32 = conn.query_row("SELECT COUNT(*) FROM notification_settings", [], |row| row.get(0)).unwrap();
+        assert_eq!(settings_cnt, 0);
+
+        let pending_cnt: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history WHERE status = 'pending'", [], |row| row.get(0)).unwrap();
+        assert_eq!(pending_cnt, 0);
+
+        let sent_cnt: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history WHERE status = 'sent'", [], |row| row.get(0)).unwrap();
+        assert_eq!(sent_cnt, 1);
+    }
+
+    #[test]
+    fn test_notification_history_filters() {
+        let conn = create_test_db();
+        let now = Utc::now().to_rfc3339();
+
+        for i in 1..=3 {
+            conn.execute(
+                "INSERT INTO notification_history (id, entity_type, entity_id, title, message, reminder_time, scheduled_at, sent_at, channel, status, error_message, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                rusqlite::params![format!("hist-{}", i), "todo", format!("todo-{}", i), "Test", None::<String>, 30, &now, None::<String>, "test", "pending", None::<String>, &now],
+            ).unwrap();
+        }
+
+        let total: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history", [], |row| row.get(0)).unwrap();
+        assert_eq!(total, 3);
+
+        let pending: i32 = conn.query_row("SELECT COUNT(*) FROM notification_history WHERE status = 'pending'", [], |row| row.get(0)).unwrap();
+        assert_eq!(pending, 3);
+    }
+}

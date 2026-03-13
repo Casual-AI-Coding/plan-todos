@@ -23,6 +23,8 @@ import {
   AlertTriangle,
   ArrowUp,
   ArrowDown,
+  Bell,
+  AlertCircle,
 } from "lucide-react";
 
 export const Icons = {
@@ -50,4 +52,6 @@ export const Icons = {
   AlertTriangle,
   ArrowUp,
   ArrowDown,
+  Bell,
+  AlertCircle,
 };

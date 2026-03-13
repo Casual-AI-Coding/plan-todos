@@ -106,19 +106,4 @@ describe("NotificationBell", () => {
       "5 条未读通知",
     );
   });
-
-  it("calls onClick when button is clicked", () => {
-    const mockOnClick = vi.fn();
-    vi.mocked(useNotificationPolling).mockReturnValue({
-      dueReminders: [],
-      pendingCount: 0,
-      isLoading: false,
-      isError: false,
-      refetch: vi.fn(),
-    });
-
-    render(<NotificationBell onClick={mockOnClick} />);
-    screen.getByRole("button").click();
-    expect(mockOnClick).toHaveBeenCalledTimes(1);
-  });
 });

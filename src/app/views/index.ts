@@ -12,3 +12,4 @@ export { SettingsAboutView } from "./SettingsAboutView";
 export { SettingsTagsView } from "./SettingsTagsView";
 export { CirculationsView } from "./CirculationsView";
 export { CirculationDetailView } from "./CirculationDetailView";
+export { NotificationCenterView } from "./NotificationCenterView";
