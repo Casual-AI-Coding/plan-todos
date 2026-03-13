@@ -274,137 +274,111 @@ pub fn update_daily_summary_settings(
     ).map_err(|e| e.to_string())
 }
 
-// Get due reminders - finds entities with upcoming due dates
+/// Check if any reminder time matches the current time within tolerance
+fn should_trigger_reminder(
+    due_date: &str,
+    reminder_times: &[i32],
+    tolerance_minutes: i32,
+) -> Vec<i32> {
+    let now = Utc::now();
+    let due = match DateTime::parse_from_rfc3339(due_date) {
+        Ok(d) => d.with_timezone(&Utc),
+        Err(_) => return vec![],
+    };
 
+    let minutes_until_due = (due - now).num_minutes();
+
+    reminder_times
+        .iter()
+        .filter(|&&rt| {
+            let expected = rt as i64;
+            let actual = minutes_until_due;
+            (actual - expected).abs() <= tolerance_minutes as i64
+        })
+        .copied()
+        .collect()
+}
+
+// Get due reminders - finds entities with upcoming due dates
 #[tauri::command]
 pub fn get_due_reminders(state: tauri::State<AppState>) -> Result<Vec<DueReminder>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let now = chrono::Utc::now();
+    let now = Utc::now();
+    let tolerance_minutes = 1;
 
     let mut reminders: Vec<DueReminder> = Vec::new();
 
-    // Check todos
-    let mut stmt = conn
-        .prepare(
-            "SELECT id, title, due_date FROM todos WHERE status != 'done' AND due_date IS NOT NULL",
-        )
-        .map_err(|e| e.to_string())?;
+    // Query notification settings joined with todos/plans/targets
+    let query = r#"
+        SELECT ns.entity_type, ns.entity_id, 
+               COALESCE(t.due_date, p.due_date, tg.due_date) as due_date,
+               COALESCE(t.title, p.title, tg.title) as title,
+               ns.reminder_times
+        FROM notification_settings ns
+        LEFT JOIN todos t ON ns.entity_type = 'todo' AND ns.entity_id = t.id
+        LEFT JOIN plans p ON ns.entity_type = 'plan' AND ns.entity_id = p.id  
+        LEFT JOIN targets tg ON ns.entity_type = 'target' AND ns.entity_id = tg.id
+        WHERE ns.reminder_sent = 0
+          AND ns.reminder_times IS NOT NULL
+          AND ns.reminder_times != '[]'
+          AND ns.reminder_times != ''
+          AND COALESCE(t.due_date, p.due_date, tg.due_date) IS NOT NULL
+          AND COALESCE(t.due_date, p.due_date, tg.due_date) != ''
+    "#;
 
-    let todo_iter = stmt
+    let mut stmt = conn.prepare(query).map_err(|e| e.to_string())?;
+    let rows = stmt
         .query_map([], |row| {
-            Ok((
-                row.get::<_, String>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?,
-            ))
+            let entity_type: String = row.get(0)?;
+            let entity_id: String = row.get(1)?;
+            let due_date: String = row.get(2)?;
+            let title: String = row.get(3)?;
+            let reminder_times_json: String = row.get::<_, Option<String>>(4)?
+                .unwrap_or_else(|| "[]".to_string());
+
+            Ok((entity_type, entity_id, due_date, title, reminder_times_json))
         })
         .map_err(|e| e.to_string())?;
 
-    for todo in todo_iter {
-        let (id, title, due_date) = todo.map_err(|e| e.to_string())?;
-        if let Some(due) = parse_date(&due_date) {
-            let duration = due.signed_duration_since(now);
-            let minutes = duration.num_minutes();
+    for row in rows {
+        let (entity_type, entity_id, due_date, title, reminder_times_json) =
+            row.map_err(|e| e.to_string())?;
 
-            // Get reminder minutes for this entity
-            let reminder_minutes: i32 = conn.query_row(
-                "SELECT reminder_minutes FROM notification_settings WHERE entity_type = 'todo' AND entity_id = ? AND reminder_sent = 0",
-                [&id],
-                |row| row.get(0),
-            ).unwrap_or(30); // Default 30 minutes
+        // Parse reminder_times from JSON
+        let reminder_times: Vec<i32> =
+            serde_json::from_str(&reminder_times_json).unwrap_or_default();
 
-            if minutes > 0 && minutes <= reminder_minutes as i64 {
-                reminders.push(DueReminder {
-                    entity_type: "todo".to_string(),
-                    entity_id: id,
-                    title,
-                    due_date,
-                    minutes_until_due: minutes,
-                    reminder_times: vec![reminder_minutes], // Matched reminder times
-                });
-            }
+        if reminder_times.is_empty() {
+            continue;
         }
-    }
 
-    // Check tasks
-    let mut stmt = conn
-        .prepare(
-            "SELECT id, title, end_date FROM tasks WHERE status != 'done' AND end_date IS NOT NULL",
-        )
-        .map_err(|e| e.to_string())?;
+        // Parse due date and calculate minutes until due
+        let due = match DateTime::parse_from_rfc3339(&due_date) {
+            Ok(d) => d.with_timezone(&Utc),
+            Err(_) => continue,
+        };
 
-    let task_iter = stmt
-        .query_map([], |row| {
-            Ok((
-                row.get::<_, String>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?,
-            ))
-        })
-        .map_err(|e| e.to_string())?;
+        let minutes_until_due = (due - now).num_minutes();
 
-    for task in task_iter {
-        let (id, title, end_date) = task.map_err(|e| e.to_string())?;
-        if let Some(due) = parse_date(&end_date) {
-            let duration = due.signed_duration_since(now);
-            let minutes = duration.num_minutes();
-
-            let reminder_minutes: i32 = conn.query_row(
-                "SELECT reminder_minutes FROM notification_settings WHERE entity_type = 'task' AND entity_id = ? AND reminder_sent = 0",
-                [&id],
-                |row| row.get(0),
-            ).unwrap_or(30);
-
-            if minutes > 0 && minutes <= reminder_minutes as i64 {
-                reminders.push(DueReminder {
-                    entity_type: "task".to_string(),
-                    entity_id: id,
-                    title,
-                    due_date: end_date,
-                    minutes_until_due: minutes,
-                    reminder_times: vec![reminder_minutes],
-                });
-            }
+        // Skip if overdue or too far in the future
+        if minutes_until_due <= 0 {
+            continue;
         }
-    }
 
-    // Check milestones
-    let mut stmt = conn.prepare(
-        "SELECT id, title, target_date FROM milestones WHERE status != 'completed' AND target_date IS NOT NULL"
-    ).map_err(|e| e.to_string())?;
+        // Find which reminder times match current time
+        let matched_times =
+            should_trigger_reminder(&due_date, &reminder_times, tolerance_minutes);
 
-    let milestone_iter = stmt
-        .query_map([], |row| {
-            Ok((
-                row.get::<_, String>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?,
-            ))
-        })
-        .map_err(|e| e.to_string())?;
-
-    for milestone in milestone_iter {
-        let (id, title, target_date) = milestone.map_err(|e| e.to_string())?;
-        if let Some(due) = parse_date(&target_date) {
-            let duration = due.signed_duration_since(now);
-            let minutes = duration.num_minutes();
-
-            let reminder_minutes: i32 = conn.query_row(
-                "SELECT reminder_minutes FROM notification_settings WHERE entity_type = 'milestone' AND entity_id = ? AND reminder_sent = 0",
-                [&id],
-                |row| row.get(0),
-            ).unwrap_or(30);
-
-            if minutes > 0 && minutes <= reminder_minutes as i64 {
-                reminders.push(DueReminder {
-                    entity_type: "milestone".to_string(),
-                    entity_id: id,
-                    title,
-                    due_date: target_date,
-                    minutes_until_due: minutes,
-                    reminder_times: vec![reminder_minutes],
-                });
-            }
+        // Only include if at least one reminder time matches
+        if !matched_times.is_empty() {
+            reminders.push(DueReminder {
+                entity_type,
+                entity_id,
+                title,
+                due_date,
+                minutes_until_due,
+                reminder_times: matched_times,
+            });
         }
     }
 
