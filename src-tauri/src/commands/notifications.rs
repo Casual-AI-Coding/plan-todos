@@ -1,7 +1,10 @@
 // Notification system module
 
 use crate::AppState;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_json;
+use std::collections::HashSet;
 use std::time::Instant;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -117,31 +120,39 @@ pub fn set_notification_settings(
     state: tauri::State<AppState>,
     entity_type: String,
     entity_id: String,
-    reminder_minutes: i32,
+    reminder_times: Vec<i32>,
 ) -> Result<NotificationSettings, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let now = chrono::Utc::now().to_rfc3339();
+    let now = Utc::now().to_rfc3339();
     let id = format!("notif-{}-{}", entity_type, entity_id);
 
+    // Serialize reminder_times to JSON string for storage
+    let reminder_times_json = serde_json::to_string(&reminder_times)
+        .map_err(|e| e.to_string())?;
+
     conn.execute(
-        "INSERT INTO notification_settings (id, entity_type, entity_id, reminder_minutes, reminder_sent, created_at, updated_at)
+        "INSERT INTO notification_settings (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at)
          VALUES (?, ?, ?, ?, 0, ?, ?)
-         ON CONFLICT(entity_type, entity_id) DO UPDATE SET reminder_minutes = ?, updated_at = ?",
-        rusqlite::params![&id, &entity_type, &entity_id, reminder_minutes, &now, &now, reminder_minutes, &now],
+         ON CONFLICT(entity_type, entity_id) DO UPDATE SET reminder_times = ?, reminder_sent = 0, updated_at = ?",
+        rusqlite::params![&id, &entity_type, &entity_id, &reminder_times_json, &now, &now, &reminder_times_json, &now],
     ).map_err(|e| e.to_string())?;
 
     // Retrieve the settings directly
     let result = conn.query_row(
-        "SELECT id, entity_type, entity_id, reminder_minutes, reminder_sent, created_at, updated_at 
+        "SELECT id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at 
          FROM notification_settings WHERE entity_type = ? AND entity_id = ?",
         rusqlite::params![&entity_type, &entity_id],
         |row| {
+            // Parse reminder_times from JSON string
+            let reminder_times_str: String = row.get(3)?;
+            let reminder_times_vec: Vec<i32> = serde_json::from_str(&reminder_times_str).unwrap_or_default();
+            
             Ok(NotificationSettings {
                 id: row.get(0)?,
                 entity_type: row.get(1)?,
                 entity_id: row.get(2)?,
-                reminder_times: vec![row.get::<_, i32>(3)?],
-                reminder_minutes: row.get(3)?,
+                reminder_times: reminder_times_vec.clone(),
+                reminder_minutes: reminder_times_vec.first().copied().unwrap_or(0),
                 reminder_sent: row.get::<_, i32>(4)? != 0,
                 created_at: row.get(5)?,
                 updated_at: row.get(6)?,
