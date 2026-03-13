@@ -349,6 +349,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         ) {
             warn!("Migration warning: {}", e);
         }
+    }
 
     // Migration: Add reminder_times column and create notification_history table for v0.6.1
     let migration_id_v061 = "notification_v061_migration";
@@ -389,7 +390,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             [],
         ) {
             warn!("Dropping reminder_minutes column, recreating table: {}", e);
-            
+
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS notification_settings_new (
                     id TEXT PRIMARY KEY,
@@ -411,7 +412,10 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             )?;
 
             conn.execute("DROP TABLE notification_settings", [])?;
-            conn.execute("ALTER TABLE notification_settings_new RENAME TO notification_settings", [])?;
+            conn.execute(
+                "ALTER TABLE notification_settings_new RENAME TO notification_settings",
+                [],
+            )?;
         }
 
         // Step 4: Create notification_history table
@@ -464,7 +468,6 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         }
         info!("v0.6.1 notification migration completed");
     }
-    }
 
     // Migration: Add priority columns
 
@@ -496,19 +499,29 @@ fn add_column_if_not_exists(
 ) -> Result<(), rusqlite::Error> {
     // Whitelist of valid table names to prevent SQL injection
     const VALID_TABLES: &[&str] = &[
-        "todos", "plans", "tasks", "targets", "milestones", "steps",
-        "circulations", "circulation_logs", "todos_tags", "notification_plugins",
-        "tags", "entity_tags", "daily_summary_settings",
+        "todos",
+        "plans",
+        "tasks",
+        "targets",
+        "milestones",
+        "steps",
+        "circulations",
+        "circulation_logs",
+        "todos_tags",
+        "notification_plugins",
+        "tags",
+        "entity_tags",
+        "daily_summary_settings",
         "notification_settings",
     ];
-    
+
     if !VALID_TABLES.contains(&table) {
         return Err(rusqlite::Error::InvalidParameterName(format!(
             "Invalid table name: {}",
             table
         )));
     }
-    
+
     // Validate column name (alphanumeric and underscore only)
     if !column.chars().all(|c| c.is_alphanumeric() || c == '_') {
         return Err(rusqlite::Error::InvalidParameterName(format!(
@@ -516,7 +529,7 @@ fn add_column_if_not_exists(
             column
         )));
     }
-    
+
     // Check if column exists using PRAGMA table_info
     // Safe: table name is validated against whitelist
     let mut stmt = conn.prepare(&format!("PRAGMA table_info({})", table))?;
@@ -621,7 +634,6 @@ fn create_indexes(conn: &Connection) -> Result<(), rusqlite::Error> {
         "CREATE INDEX IF NOT EXISTS idx_notification_due ON notification_settings(reminder_sent)",
         [],
     )?;
-
 
     Ok(())
 }
