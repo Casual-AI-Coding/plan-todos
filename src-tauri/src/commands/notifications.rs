@@ -181,6 +181,28 @@ pub fn delete_notification_settings(
     Ok(rows > 0)
 }
 
+// Delete entity notifications - cleanup notification data when entities are deleted
+pub fn delete_entity_notifications(
+    conn: &rusqlite::Connection,
+    entity_type: &str,
+    entity_id: &str,
+) -> Result<(), String> {
+    // 1. Delete notification_settings
+    conn.execute(
+        "DELETE FROM notification_settings WHERE entity_type = ? AND entity_id = ?",
+        rusqlite::params![entity_type, entity_id],
+    ).map_err(|e| e.to_string())?;
+
+    // 2. Delete pending status notification_history (keep sent/failed for record keeping)
+    conn.execute(
+        "DELETE FROM notification_history 
+         WHERE entity_type = ? AND entity_id = ? AND status = 'pending'",
+        rusqlite::params![entity_type, entity_id],
+    ).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
 // Daily summary settings
 
 #[tauri::command]
