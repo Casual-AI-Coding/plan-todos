@@ -484,29 +484,12 @@ pub struct NotificationHistoryFilters {
     pub end_date: Option<String>,
 }
 
-/// Pagination parameters
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PaginationParams {
-    pub page: i32,
-    pub limit: i32,
-}
-
-/// Paginated result wrapper
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PaginatedResult<T> {
-    pub items: Vec<T>,
-    pub total: i32,
-    pub page: i32,
-    pub limit: i32,
-}
-
-/// Get notification history with optional filters and pagination
+/// Get notification history with optional filters
 #[tauri::command]
 pub fn get_notification_history(
     state: tauri::State<AppState>,
     filters: Option<NotificationHistoryFilters>,
-    pagination: Option<PaginationParams>,
-) -> Result<PaginatedResult<NotificationHistory>, String> {
+) -> Result<Vec<NotificationHistory>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 
     // Build base query
@@ -532,20 +515,8 @@ pub fn get_notification_history(
         }
     }
 
-    // Get total count
-    let count_query = query.replace("SELECT id, entity_type, entity_id, title, message, reminder_time,\n                scheduled_at, sent_at, channel, status, error_message, created_at", "SELECT COUNT(*)");
-    let total: i32 = conn
-        .query_row(&count_query, [], |row| row.get(0))
-        .map_err(|e| e.to_string())?;
-
-    // Add ordering and pagination
+    // Add ordering
     query.push_str(" ORDER BY created_at DESC");
-
-    let page = pagination.as_ref().map(|p| p.page).unwrap_or(1);
-    let limit = pagination.as_ref().map(|p| p.limit).unwrap_or(20);
-    let offset = (page - 1) * limit;
-
-    query.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
 
     let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
     let items = stmt
@@ -567,16 +538,9 @@ pub fn get_notification_history(
         })
         .map_err(|e| e.to_string())?;
 
-    let items = items
+    items
         .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.to_string())?;
-
-    Ok(PaginatedResult {
-        items,
-        total,
-        page,
-        limit,
-    })
+        .map_err(|e| e.to_string())
 }
 
 /// Get pending notifications that are due to be sent
