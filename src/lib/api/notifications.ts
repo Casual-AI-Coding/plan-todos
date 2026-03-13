@@ -14,13 +14,6 @@ import type {
   NotificationPlugin,
   SendNotificationResult,
 } from "@/lib/types";
-  NotificationSettings,
-  DailySummarySettings,
-  DueReminder,
-  DailySummary,
-  NotificationPlugin,
-  SendNotificationResult,
-} from "@/lib/types";
 import { withTauriError, withTauriFallback } from "./utils";
 
 export async function getNotificationSettings(
@@ -196,19 +189,6 @@ export async function sendNotification(
     });
   });
 }
-  pluginId: string,
-  title: string,
-  content: string,
-): Promise<SendNotificationResult> {
-  return withTauriError("send notification", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<SendNotificationResult>("send_notification", {
-      pluginId,
-      title,
-      content,
-    });
-  });
-}
 
 // Notification History APIs
 
@@ -223,7 +203,9 @@ export async function getNotificationHistory(
   });
 }
 
-export async function getPendingNotifications(): Promise<NotificationHistory[]> {
+export async function getPendingNotifications(): Promise<
+  NotificationHistory[]
+> {
   return withTauriError("get pending notifications", async () => {
     const { invoke } = await import("@tauri-apps/api/core");
     return invoke<NotificationHistory[]>("get_pending_notifications", {});

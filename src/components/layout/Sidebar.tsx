@@ -169,6 +169,15 @@ export function Sidebar({
     return false;
   };
 
+  // Render icon - supports both emoji strings and LucideIcon components
+  const renderIcon = (icon: string | LucideIcon, className?: string) => {
+    if (typeof icon === "string") {
+      return <span className={className}>{icon}</span>;
+    }
+    const IconComponent = icon;
+    return <IconComponent className={className || "w-5 h-5"} />;
+  };
+
   // Render popup children for collapsed mode
   const renderPopupChildren = (children: MenuItem[]): React.ReactNode => {
     return children.map((child) => {
@@ -192,7 +201,7 @@ export function Sidebar({
                   : "var(--color-text)",
             }}
           >
-            <span>{child.icon}</span>
+            {renderIcon(child.icon, "text-base")}
             <span className="font-medium truncate">{child.label}</span>
           </button>
           {/* Render grandchildren */}
@@ -291,7 +300,7 @@ export function Sidebar({
             </span>
           )}
           <span className="text-base" aria-hidden="true">
-            {menu.icon}
+            {renderIcon(menu.icon)}
           </span>
           {!isCollapsed && (
             <span className="font-medium truncate">{menu.label}</span>

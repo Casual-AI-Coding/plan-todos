@@ -17,3 +17,5 @@ export { TodoForm } from "./TodoForm";
 export { TargetForm } from "./TargetForm";
 export { TodoItem } from "./TodoItem";
 export { PlanForm } from "./PlanForm";
+
+export { NotificationBell } from "./NotificationBell";
