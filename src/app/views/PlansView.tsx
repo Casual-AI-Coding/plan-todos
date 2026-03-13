@@ -23,7 +23,7 @@ import {
 import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useTags } from "@/hooks/useTags";
 import type { Plan, Task } from "@/lib/api";
-import { setEntityTags } from "@/lib/api";
+import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { getNotificationSettings } from "@/lib/api/notifications";
 import { PlanForm, type PlanFormData } from "@/components/features/PlanForm";
 
@@ -167,15 +167,25 @@ export function PlansView() {
       tagIds: tags,
     };
 
+    let planId: string;
+
     if (editingPlan) {
       await updatePlanMutation.mutateAsync({ id: editingPlan.id, ...planData });
+      planId = editingPlan.id;
       // Handle tags
       if (tags.length > 0) {
-        await setEntityTags("plan", editingPlan.id, tags);
+        await setEntityTags("plan", planId, tags);
       }
     } else {
-      await createPlanMutation.mutateAsync(planData);
+      const newPlan = await createPlanMutation.mutateAsync(planData);
+      planId = newPlan.id;
     }
+
+    // Save reminder settings
+    if (data.reminder_times && data.reminder_times.length > 0) {
+      await setNotificationSettings("plan", planId, data.reminder_times);
+    }
+
     closeForm();
   }
 

@@ -14,7 +14,7 @@ import {
 } from "@/hooks/useTodos";
 import { useTags } from "@/hooks/useTags";
 import type { Todo, Priority } from "@/lib/types";
-import { setEntityTags } from "@/lib/api";
+import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { TodoItem } from "@/components/features/TodoItem";
 import { TodoForm, type TodoFormData } from "@/components/features/TodoForm";
 import { TodoFilters } from "@/components/features/TodoFilters";
@@ -148,6 +148,15 @@ export function TodosView() {
     }
   }
 
+  async function handleReminderUpdate(todoId: string, times: number[]) {
+    try {
+      await setNotificationSettings("todo", todoId, times);
+    } catch (e) {
+      console.error("Failed to update reminder settings:", e);
+      toast.error("提醒设置更新失败");
+    }
+  }
+
   function handleEditClick(todo: Todo) {
     setEditingTodo(todo);
     setShowForm(true);
@@ -227,6 +236,7 @@ export function TodosView() {
                   onToggle={handleToggle}
                   onDelete={handleDelete}
                   onClick={handleEditClick}
+                  onReminderUpdate={handleReminderUpdate}
                 />
               </StaggeredListItem>
             ))}
