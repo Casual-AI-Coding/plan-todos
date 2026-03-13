@@ -9,7 +9,10 @@ pub struct NotificationSettings {
     pub id: String,
     pub entity_type: String,
     pub entity_id: String,
-    pub reminder_minutes: i32,
+    #[serde(default)]
+    pub reminder_times: Vec<i32>, // Multi-reminder times
+    #[serde(default)]
+    pub reminder_minutes: i32, // Keep for compatibility
     pub reminder_sent: bool,
     pub created_at: String,
     pub updated_at: String,
@@ -27,13 +30,14 @@ pub struct DailySummarySettings {
     pub updated_at: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DueReminder {
     pub entity_type: String,
     pub entity_id: String,
     pub title: String,
     pub due_date: String,
-    pub minutes_until_due: i32,
+    pub minutes_until_due: i64,
+    pub reminder_times: Vec<i32>, // Which reminder times matched
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -43,6 +47,23 @@ pub struct DailySummary {
     pub overdue_count: i32,
     pub completed_count: i32,
     pub upcoming_count: i32,
+}
+
+// NotificationHistory - notification send history record
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct NotificationHistory {
+    pub id: String,
+    pub entity_type: String,
+    pub entity_id: String,
+    pub title: String,
+    pub message: Option<String>,
+    pub reminder_time: Option<i32>,
+    pub scheduled_at: String,
+    pub sent_at: Option<String>,
+    pub channel: String,
+    pub status: String, // "pending" | "sent" | "failed"
+    pub error_message: Option<String>,
+    pub created_at: String,
 }
 
 // CRUD for notification settings
@@ -65,6 +86,7 @@ pub fn get_notification_settings(
                 id: row.get(0)?,
                 entity_type: row.get(1)?,
                 entity_id: row.get(2)?,
+                reminder_times: vec![row.get::<_, i32>(3)?], // Convert single value to vec for compatibility
                 reminder_minutes: row.get(3)?,
                 reminder_sent: row.get::<_, i32>(4)? != 0,
                 created_at: row.get(5)?,
@@ -118,6 +140,7 @@ pub fn set_notification_settings(
                 id: row.get(0)?,
                 entity_type: row.get(1)?,
                 entity_id: row.get(2)?,
+                reminder_times: vec![row.get::<_, i32>(3)?],
                 reminder_minutes: row.get(3)?,
                 reminder_sent: row.get::<_, i32>(4)? != 0,
                 created_at: row.get(5)?,
@@ -263,7 +286,8 @@ pub fn get_due_reminders(state: tauri::State<AppState>) -> Result<Vec<DueReminde
                     entity_id: id,
                     title,
                     due_date,
-                    minutes_until_due: minutes as i32,
+                    minutes_until_due: minutes,
+                    reminder_times: vec![reminder_minutes], // Matched reminder times
                 });
             }
         }
@@ -304,7 +328,8 @@ pub fn get_due_reminders(state: tauri::State<AppState>) -> Result<Vec<DueReminde
                     entity_id: id,
                     title,
                     due_date: end_date,
-                    minutes_until_due: minutes as i32,
+                    minutes_until_due: minutes,
+                    reminder_times: vec![reminder_minutes],
                 });
             }
         }
@@ -343,7 +368,8 @@ pub fn get_due_reminders(state: tauri::State<AppState>) -> Result<Vec<DueReminde
                     entity_id: id,
                     title,
                     due_date: target_date,
-                    minutes_until_due: minutes as i32,
+                    minutes_until_due: minutes,
+                    reminder_times: vec![reminder_minutes],
                 });
             }
         }

@@ -349,7 +349,126 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         ) {
             warn!("Migration warning: {}", e);
         }
+
+    // Migration: Add reminder_times column and create notification_history table for v0.6.1
+    let migration_id_v061 = "notification_v061_migration";
+    let migration_done_v061: bool = conn
+        .query_row(
+            "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE id = ?)",
+            [migration_id_v061],
+            |row| row.get(0),
+        )
+        .unwrap_or(false);
+
+    if !migration_done_v061 {
+        // Step 1: Add reminder_times column (TEXT, JSON array) to notification_settings
+        add_column_if_not_exists(conn, "notification_settings", "reminder_times", "TEXT")?;
+
+        // Step 2: Migrate existing reminder_minutes data to reminder_times JSON array
+        let has_legacy_reminder: bool = conn
+            .query_row(
+                "SELECT EXISTS(SELECT 1 FROM notification_settings WHERE reminder_minutes IS NOT NULL AND reminder_minutes > 0)",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(false);
+
+        if has_legacy_reminder {
+            if let Err(e) = conn.execute(
+                "UPDATE notification_settings SET reminder_times = '[' || reminder_minutes || ']'",
+                [],
+            ) {
+                warn!("Migration warning: {}", e);
+            }
+            info!("Migrated reminder_minutes to reminder_times JSON array");
+        }
+
+        // Step 3: Remove reminder_minutes column (fallback to recreate table if DROP COLUMN not supported)
+        if let Err(e) = conn.execute(
+            "ALTER TABLE notification_settings DROP COLUMN reminder_minutes",
+            [],
+        ) {
+            warn!("Dropping reminder_minutes column, recreating table: {}", e);
+            
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS notification_settings_new (
+                    id TEXT PRIMARY KEY,
+                    entity_type TEXT NOT NULL,
+                    entity_id TEXT NOT NULL,
+                    reminder_times TEXT,
+                    reminder_sent INTEGER NOT NULL DEFAULT 0,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE(entity_type, entity_id)
+                )",
+                [],
+            )?;
+
+            conn.execute(
+                "INSERT INTO notification_settings_new (id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at)
+                 SELECT id, entity_type, entity_id, reminder_times, reminder_sent, created_at, updated_at FROM notification_settings",
+                [],
+            )?;
+
+            conn.execute("DROP TABLE notification_settings", [])?;
+            conn.execute("ALTER TABLE notification_settings_new RENAME TO notification_settings", [])?;
+        }
+
+        // Step 4: Create notification_history table
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS notification_history (
+                id TEXT PRIMARY KEY,
+                entity_type TEXT NOT NULL,
+                entity_id TEXT NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT,
+                reminder_time INTEGER,
+                scheduled_at TEXT NOT NULL,
+                sent_at TEXT,
+                channel TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                error_message TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )",
+            [],
+        )?;
+
+        // Step 5: Create indexes for notification_history
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notification_history_entity ON notification_history(entity_type, entity_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notification_history_status ON notification_history(status)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notification_history_scheduled ON notification_history(scheduled_at)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_notification_dedup ON notification_history(entity_type, entity_id, reminder_time, scheduled_at)",
+            [],
+        )?;
+
+        // Step 6: Drop old index that references reminder_minutes
+        conn.execute("DROP INDEX IF EXISTS idx_notification_due", [])?;
+
+        // Record migration as done
+        let now = chrono::Utc::now().to_rfc3339();
+        if let Err(e) = conn.execute(
+            "INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?)",
+            [migration_id_v061, &now],
+        ) {
+            warn!("Migration warning: {}", e);
+        }
+        info!("v0.6.1 notification migration completed");
     }
+    }
+
+    // Migration: Add priority columns
+
+    // Migration: Add priority columns
 
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
     // Check if column exists first, then add if not
@@ -380,6 +499,7 @@ fn add_column_if_not_exists(
         "todos", "plans", "tasks", "targets", "milestones", "steps",
         "circulations", "circulation_logs", "todos_tags", "notification_plugins",
         "tags", "entity_tags", "daily_summary_settings",
+        "notification_settings",
     ];
     
     if !VALID_TABLES.contains(&table) {
