@@ -70,6 +70,22 @@ describe("todoService", () => {
       const result = groupTodosByStatus(todos);
       expect(result.pending?.length).toBe(1);
     });
+
+    it("should handle todo with no status (undefined)", () => {
+      const todoWithoutStatus = {
+        id: "1",
+        title: "Todo without status",
+        content: null,
+        due_date: null,
+        status: undefined,
+        priority: "P2",
+        created_at: "2024-01-01T00:00:00Z",
+        updated_at: "2024-01-01T00:00:00Z",
+        tags: [],
+      } as Todo;
+      const result = groupTodosByStatus([todoWithoutStatus]);
+      expect(result.pending?.length).toBe(1);
+    });
   });
 
   describe("filterTodosByTag", () => {
@@ -163,6 +179,17 @@ describe("todoService", () => {
       ];
       const result = sortTodosByPriority(todos);
       expect(result[0].id).toBe("1");
+    });
+
+    it("should handle invalid priority values", () => {
+      const todos = [
+        createMockTodo({ id: "1", title: "Todo 1", priority: "P5" }),
+        createMockTodo({ id: "2", title: "Todo 2", priority: undefined }),
+        createMockTodo({ id: "3", title: "Todo 3", priority: "P0" }),
+      ] as Todo[];
+      const result = sortTodosByPriority(todos);
+      // P0 should be first, P5 and undefined should be treated as P3 (priority 3)
+      expect(result[0].id).toBe("3");
     });
   });
 });

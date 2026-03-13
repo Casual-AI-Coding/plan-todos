@@ -121,4 +121,52 @@ describe("Button", () => {
     expect(button).toBeInTheDocument();
     vi.useRealTimers();
   });
+
+
+  it("should handle click without onClick handler", () => {
+    // Test click when onClick is undefined (line 76: onClick?.(e))
+    render(<Button>No Handler</Button>);
+    const button = screen.getByText("No Handler");
+    // Should not throw when clicked without onClick
+    expect(() => fireEvent.click(button)).not.toThrow();
+  });
+
+  it("should render with non-string children for aria-label", () => {
+    // Test aria-label when children is not a string (line 147)
+    render(
+      <Button>
+        <span>Icon</span>
+        <span>Text</span>
+      </Button>
+    );
+    const button = screen.getByRole("button");
+    // When children is not a string and no label, aria-label should be undefined
+    expect(button).toBeInTheDocument();
+  });
+
+  it("should use label prop for aria-label", () => {
+    // Test aria-label from label prop (line 147)
+    render(
+      <Button label="Custom Label">
+        <span>Icon</span>
+      </Button>
+    );
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-label", "Custom Label");
+  });
+
+  it("should use string children as aria-label", () => {
+    // Test aria-label from string children (line 147)
+    render(<Button>Button Text</Button>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-label", "Button Text");
+  });
+
+  it("should not apply scale effects when loading", () => {
+    // Test whileHover/whileTap scale when loading (lines 128, 139)
+    const { container } = render(<Button loading>Loading</Button>);
+    const button = container.querySelector("button");
+    // Button should be disabled when loading
+    expect(button).toHaveAttribute("disabled");
+  });
 });

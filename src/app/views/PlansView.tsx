@@ -101,14 +101,19 @@ export function PlansView() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>([]);
+  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>(
+    [],
+  );
 
   // Fetch reminder times when editing plan
   useEffect(() => {
     async function fetchReminderTimes() {
       if (editingPlan?.id) {
         try {
-          const settings = await getNotificationSettings("plan", editingPlan.id);
+          const settings = await getNotificationSettings(
+            "plan",
+            editingPlan.id,
+          );
           if (settings && settings.reminder_times) {
             setEditingReminderTimes(settings.reminder_times);
           } else {

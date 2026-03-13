@@ -7,8 +7,10 @@ import {
   bulkUpdateStepStatus,
   bulkDeleteTodos,
   bulkDeleteTasks,
+  bulkDeleteSteps,
+  bulkUpdateTodoPriority,
+  bulkUpdateTaskPriority,
 } from "@/lib/api/bulk";
-
 // Use vi.hoisted to create mock reference before vi.mock
 const { mockInvoke } = vi.hoisted(() => ({
   mockInvoke: vi.fn(),
@@ -421,4 +423,105 @@ describe("Bulk API Functions", () => {
       expect(result.updated).toBe(3);
     });
   });
+
+
+  // ===========================================================================
+  // bulkDeleteSteps Tests
+  // ===========================================================================
+  describe("bulkDeleteSteps", () => {
+    it("should call invoke with correct parameters", async () => {
+      const mockResult: BatchUpdateResult = {
+        updated: 2,
+        failed: [],
+      };
+      mockInvoke.mockResolvedValue(mockResult);
+
+      const result = await bulkDeleteSteps(["step-1", "step-2"]);
+
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_delete_steps", {
+        ids: ["step-1", "step-2"],
+      });
+      expect(result).toEqual(mockResult);
+    });
+
+    it("should throw error when not in Tauri environment", async () => {
+      Object.defineProperty(global, "window", {
+        value: {},
+        writable: true,
+      });
+
+      await expect(bulkDeleteSteps(["step-1"])).rejects.toThrow(
+        "This app must run in Tauri",
+      );
+    });
+  });
+
+  // ===========================================================================
+  // bulkUpdateTodoPriority Tests
+  // ===========================================================================
+  describe("bulkUpdateTodoPriority", () => {
+    it("should call invoke with correct parameters", async () => {
+      const mockResult: BatchUpdateResult = {
+        updated: 3,
+        failed: [],
+      };
+      mockInvoke.mockResolvedValue(mockResult);
+
+      const result = await bulkUpdateTodoPriority(
+        ["todo-1", "todo-2", "todo-3"],
+        "P1",
+      );
+
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_update_todo_priority", {
+        ids: ["todo-1", "todo-2", "todo-3"],
+        priority: "P1",
+      });
+      expect(result).toEqual(mockResult);
+    });
+
+    it("should throw error when not in Tauri environment", async () => {
+      Object.defineProperty(global, "window", {
+        value: {},
+        writable: true,
+      });
+
+      await expect(bulkUpdateTodoPriority(["todo-1"], "P2")).rejects.toThrow(
+        "This app must run in Tauri",
+      );
+    });
+  });
+
+  // ===========================================================================
+  // bulkUpdateTaskPriority Tests
+  // ===========================================================================
+  describe("bulkUpdateTaskPriority", () => {
+    it("should call invoke with correct parameters", async () => {
+      const mockResult: BatchUpdateResult = {
+        updated: 2,
+        failed: [],
+      };
+      mockInvoke.mockResolvedValue(mockResult);
+
+      const result = await bulkUpdateTaskPriority(["task-1", "task-2"], "P0");
+
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_update_task_priority", {
+        ids: ["task-1", "task-2"],
+        priority: "P0",
+      });
+      expect(result).toEqual(mockResult);
+    });
+
+    it("should throw error when not in Tauri environment", async () => {
+      Object.defineProperty(global, "window", {
+        value: {},
+        writable: true,
+      });
+
+      await expect(bulkUpdateTaskPriority(["task-1"], "P3")).rejects.toThrow(
+        "This app must run in Tauri",
+      );
+    });
+  });
 });
+
+

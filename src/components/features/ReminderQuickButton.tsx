@@ -69,11 +69,7 @@ export function ReminderQuickButton({
         onClose={() => setIsOpen(false)}
         footer={<Button onClick={handleSave}>保存</Button>}
       >
-        <ReminderSettings
-          value={reminderTimes}
-          onChange={onUpdate}
-          compact
-        />
+        <ReminderSettings value={reminderTimes} onChange={onUpdate} compact />
       </Modal>
     </>
   );

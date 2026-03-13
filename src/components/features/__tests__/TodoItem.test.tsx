@@ -394,4 +394,202 @@ describe("TodoItem", () => {
       expect(card).toBeInTheDocument();
     });
   });
+
+
+  describe("键盘交互", () => {
+    it("按 Enter 键触发 onClick", () => {
+      render(
+        <TodoItem
+          todo={mockTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const card = screen.getByTestId("card");
+      fireEvent.keyDown(card, { key: "Enter" });
+
+      expect(mockOnClick).toHaveBeenCalledWith(mockTodo);
+    });
+
+    it("按其他键不触发 onClick", () => {
+      render(
+        <TodoItem
+          todo={mockTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const card = screen.getByTestId("card");
+      fireEvent.keyDown(card, { key: "Escape" });
+
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("React.memo 优化", () => {
+    it("相同 props 不会重新渲染", () => {
+      const { rerender } = render(
+        <TodoItem
+          todo={mockTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      rerender(
+        <TodoItem
+          todo={mockTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      expect(screen.getByTestId("card")).toBeInTheDocument();
+    });
+
+    it("todo 属性变化时重新渲染", () => {
+      const { rerender } = render(
+        <TodoItem
+          todo={mockTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const updatedTodo = { ...mockTodo, title: "更新的任务" };
+      rerender(
+        <TodoItem
+          todo={updatedTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      expect(screen.getByText("更新的任务")).toBeInTheDocument();
+    });
+
+    it("reminderTimes 变化时重新渲染", () => {
+      const { rerender } = render(
+        <TodoItem
+          todo={mockTodo}
+          reminderTimes={[]}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      rerender(
+        <TodoItem
+          todo={mockTodo}
+          reminderTimes={[5, 15]}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const reminderTimesDisplay = screen.getByTestId("reminder-times");
+      expect(reminderTimesDisplay).toHaveTextContent("[5,15]");
+    });
+
+    it("tags 变化时重新渲染", () => {
+      const { rerender } = render(
+        <TodoItem
+          todo={mockTodo}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const todoWithTags = {
+        ...mockTodo,
+        tags: [{ id: "tag-1", name: "新标签", color: "#FF0000", description: null, created_at: "2024-01-01" }],
+      };
+      rerender(
+        <TodoItem
+          todo={todoWithTags}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      expect(screen.getByText("新标签")).toBeInTheDocument();
+    });
+
+    it("tags 长度不同时重新渲染", () => {
+      const todoWithOneTag = {
+        ...mockTodo,
+        tags: [{ id: "tag-1", name: "标签1", color: "#FF0000", description: null, created_at: "2024-01-01" }],
+      };
+
+      const { rerender } = render(
+        <TodoItem
+          todo={todoWithOneTag}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const todoWithTwoTags = {
+        ...mockTodo,
+        tags: [
+          { id: "tag-1", name: "标签1", color: "#FF0000", description: null, created_at: "2024-01-01" },
+          { id: "tag-2", name: "标签2", color: "#00FF00", description: null, created_at: "2024-01-01" },
+        ],
+      };
+      rerender(
+        <TodoItem
+          todo={todoWithTwoTags}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      expect(screen.getByText("标签2")).toBeInTheDocument();
+    });
+
+    it("tags ID 不同时重新渲染", () => {
+      const todoWithTags = {
+        ...mockTodo,
+        tags: [{ id: "tag-1", name: "旧标签", color: "#FF0000", description: null, created_at: "2024-01-01" }],
+      };
+
+      const { rerender } = render(
+        <TodoItem
+          todo={todoWithTags}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      const todoWithDifferentTag = {
+        ...mockTodo,
+        tags: [{ id: "tag-2", name: "新标签", color: "#00FF00", description: null, created_at: "2024-01-01" }],
+      };
+      rerender(
+        <TodoItem
+          todo={todoWithDifferentTag}
+          onToggle={mockOnToggle}
+          onDelete={mockOnDelete}
+          onClick={mockOnClick}
+        />,
+      );
+
+      expect(screen.getByText("新标签")).toBeInTheDocument();
+    });
+  });
 });

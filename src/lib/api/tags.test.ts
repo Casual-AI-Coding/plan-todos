@@ -139,6 +139,22 @@ describe("Tag API", () => {
         description: "new",
       });
     });
+
+
+    it("should handle partial updates with null values", async () => {
+      vi.mocked(isTauri).mockReturnValue(true);
+      mockInvoke.mockResolvedValue({});
+
+      // Test with only name provided - color and description should be null
+      await updateTag("tag-1", { name: "Updated" });
+
+      expect(mockInvoke).toHaveBeenCalledWith("update_tag", {
+        id: "tag-1",
+        name: "Updated",
+        color: null,
+        description: null,
+      });
+    });
   });
 
   describe("deleteTag", () => {

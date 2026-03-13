@@ -15,7 +15,6 @@ const PRESET_TIMES = [
 /** Maximum allowed custom reminder time (365 days in minutes) */
 const MAX_CUSTOM_TIME = 525600;
 
-
 export interface ReminderSettingsProps {
   value: number[];
   onChange: (times: number[]) => void;

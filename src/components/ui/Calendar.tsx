@@ -105,7 +105,9 @@ export function Calendar({ events, onEventClick }: CalendarProps) {
                 <div
                   key={e.id}
                   onClick={() => onEventClick?.(e)}
-                  onKeyDown={(event) => event.key === "Enter" && onEventClick?.(e)}
+                  onKeyDown={(event) =>
+                    event.key === "Enter" && onEventClick?.(e)
+                  }
                   role="button"
                   tabIndex={0}
                   className={`text-xs p-1 mb-1 rounded truncate cursor-pointer ${eventColors[e.type]} text-white`}

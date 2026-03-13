@@ -20,6 +20,7 @@ export default defineConfig({
         "src/app/page.tsx", // Main page component - requires full app context
         "src/app/layout.tsx",
         "src/components/layout/**",
+        "src/components/ui/index.ts", // Barrel exports - no logic to test
       ],
       // 90% threshold as per AGENTS.md (excluding Tauri-specific files)
       thresholds: {

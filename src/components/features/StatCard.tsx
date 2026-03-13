@@ -26,10 +26,7 @@ export function StatCard({
       >
         {label}
       </div>
-      <div
-        className={`${valueClass} tabular-nums`}
-        style={{ color }}
-      >
+      <div className={`${valueClass} tabular-nums`} style={{ color }}>
         {value}
       </div>
     </Card>

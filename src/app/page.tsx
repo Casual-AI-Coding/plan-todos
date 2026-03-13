@@ -170,7 +170,13 @@ export default function Home() {
             style={{ color: "var(--color-text)" }}
             aria-label="打开菜单"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <rect x="2" y="4" width="16" height="1.5" />
               <rect x="2" y="9" width="16" height="1.5" />
               <rect x="2" y="14" width="16" height="1.5" />

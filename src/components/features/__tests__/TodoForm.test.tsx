@@ -60,8 +60,20 @@ vi.mock("../ReminderSettings", () => ({
 }));
 
 const mockTags: Tag[] = [
-  { id: "tag-1", name: "工作", color: "#FF6B6B", description: null, created_at: "2024-01-01" },
-  { id: "tag-2", name: "个人", color: "#4ECDC4", description: null, created_at: "2024-01-01" },
+  {
+    id: "tag-1",
+    name: "工作",
+    color: "#FF6B6B",
+    description: null,
+    created_at: "2024-01-01",
+  },
+  {
+    id: "tag-2",
+    name: "个人",
+    color: "#4ECDC4",
+    description: null,
+    created_at: "2024-01-01",
+  },
 ];
 
 const mockTodo: Todo = {
@@ -90,7 +102,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -106,7 +117,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -123,7 +133,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -143,7 +152,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -160,7 +168,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -195,7 +202,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -225,7 +231,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -257,7 +262,6 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-         
           editingReminderTimes={existingReminderTimes}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -280,7 +284,6 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-         
           editingReminderTimes={existingReminderTimes}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -304,7 +307,6 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-         
           editingReminderTimes={existingReminderTimes}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -337,7 +339,6 @@ describe("TodoForm", () => {
           open={true}
           editingTodo={mockTodo}
           allTags={mockTags}
-         
           editingReminderTimes={[]}
           onClose={mockOnClose}
           onSave={mockOnSave}
@@ -356,7 +357,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -377,7 +377,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -396,7 +395,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -417,7 +415,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,
@@ -436,7 +433,6 @@ describe("TodoForm", () => {
         <TodoForm
           open={true}
           allTags={mockTags}
-         
           onClose={mockOnClose}
           onSave={mockOnSave}
         />,

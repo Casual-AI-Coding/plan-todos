@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-03-13
+
+### Added
+
+**Reminder UI 功能**:
+
+- 新增 `ReminderSettings` 组件 - 多时间点提醒设置，支持预设选项和自定义输入
+- 新增 `ReminderQuickButton` 组件 - 快捷提醒按钮，一键设置提醒时间
+- 新增 `ReminderBadge` 组件 - 提醒状态徽章显示
+- 为 `Todo`、`Plan`、`Target` 类型添加 `reminder_times?: number[]` 字段
+- 集成到 `TodoForm`/`TodoItem`、`PlanForm`/`PlanItem`、`TargetForm`/`TargetItem`
+
+**测试覆盖增强**:
+
+- 新增 `logger.test.ts` - 日志工具测试 (100% 覆盖)
+- 新增 `ScaleIn.test.tsx`、`Skeleton.test.tsx`、`ProgressRing.test.tsx` - UI 组件测试
+- 补充 `bulk.test.ts` - 批量操作 API 测试
+- 补充 `tags.test.ts` - 标签 API 边界测试
+- 补充 `Button.test.tsx` - 按钮组件边界测试
+- 补充 `TodoItem.test.tsx` - React.memo 优化测试
+
+### Changed
+
+**WCAG 无障碍改进**:
+
+- 触摸目标最小尺寸 44×44px (WCAG 2.5.5)
+- 添加 `aria-label`、`role`、`keyboard` 支持到交互组件
+- 添加 `prefers-reduced-motion` 媒体查询支持 (WCAG 2.3.3)
+- 改进表单标签和输入关联
+
+**CSS/UI 优化**:
+
+- 添加 `--color-backdrop` CSS 变量
+- StatCard 组件简化
+- Input 错误状态修复
+- CSS layer 修复
+
+### Fixed
+
+- 代码审查 P0/P1 问题修复
+- 测试覆盖率提升至 92%+
+
+---
+
+
 ## [0.5.11] - 2026-03-10
 
 ### Security
@@ -14,33 +59,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 **类型系统重构**:
+
 - 删除服务层重复类型定义 (`Todo`, `Plan`, `Step`, `Target`)
 - 统一从 `@/lib/types` 导入类型定义
 - 字段命名统一: `deadline` → `end_date`, `dueDate` → `due_date`
 - `targetService.ts` 使用更清晰的 `ServiceTarget` 接口
 
 **日志系统**:
+
 - 新建 `src/lib/utils/logger.ts` 统一日志工具
 - 支持动态环境检查，开发环境输出日志，生产环境静默
 - 替换 4 个文件中的 `console.*` 调用
 
 **错误处理**:
+
 - `tryInvoke` 添加开发环境调试日志
 - `ErrorBoundary` 使用统一 logger
 
 **用户体验**:
+
 - `CirculationDetailView` 中 `alert()` 替换为 `toast.error()`，改善交互体验
 
 **性能优化**:
+
 - `TodoItem.areEqual` 移除 `JSON.stringify`，改用浅比较
 
 ### Added
 
 **测试覆盖**:
+
 - 新增 `src/lib/api/utils.test.ts` - 20 个测试用例
 - 新增 `src/lib/api/client.test.ts` - 21 个测试用例
 
 **文档**:
+
 - `useGlassSettings.ts` 添加 useEffect 设计意图注释
 
 ### Fixed
@@ -49,7 +101,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 修复多个测试文件适配 logger 更改
 
 ---
-
 
 ## [0.5.10] - 2026-03-06
 

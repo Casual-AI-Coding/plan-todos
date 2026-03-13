@@ -59,8 +59,7 @@ export function TodoFilters({
                 filter === f.id
                   ? "bg-teal-100 text-teal-700"
                   : "text-gray-500 hover:bg-gray-100"
-              }`
-            }
+              }`}
             >
               {f.label}
             </button>
@@ -115,8 +114,7 @@ export function TodoFilters({
                     priorityFilter === p
                       ? "text-teal-600 font-medium"
                       : "text-gray-600"
-                  }`
-                }
+                  }`}
                 >
                   {p === "all"
                     ? "全部"

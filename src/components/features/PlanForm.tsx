@@ -173,10 +173,7 @@ export function PlanForm({
             )}
           </div>
         </div>
-        <ReminderSettings
-          value={reminderTimes}
-          onChange={setReminderTimes}
-        />
+        <ReminderSettings value={reminderTimes} onChange={setReminderTimes} />
       </div>
     </Modal>
   );

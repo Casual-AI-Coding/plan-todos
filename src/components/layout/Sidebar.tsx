@@ -287,7 +287,9 @@ export function Sidebar({
               ▶
             </span>
           )}
-          <span className="text-base" aria-hidden="true">{menu.icon}</span>
+          <span className="text-base" aria-hidden="true">
+            {menu.icon}
+          </span>
           {!isCollapsed && (
             <span className="font-medium truncate">{menu.label}</span>
           )}

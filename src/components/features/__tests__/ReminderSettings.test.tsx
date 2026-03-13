@@ -57,18 +57,14 @@ describe("ReminderSettings", () => {
 
   describe("渲染测试", () => {
     it("组件正确渲染", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       expect(screen.getByText("提醒设置")).toBeInTheDocument();
       expect(screen.getByText("提前提醒时间")).toBeInTheDocument();
     });
 
     it("显示所有预设时间选项", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       expect(screen.getByText("5分钟")).toBeInTheDocument();
       expect(screen.getByText("15分钟")).toBeInTheDocument();
@@ -81,9 +77,7 @@ describe("ReminderSettings", () => {
 
   describe("预设时间选择", () => {
     it("点击 checkbox 切换选中状态", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 点击 "5分钟" 选项
       const fiveMinButton = screen.getByText("5分钟").closest("button");
@@ -94,9 +88,7 @@ describe("ReminderSettings", () => {
     });
 
     it("再次点击取消选中", () => {
-      render(
-        <ReminderSettings value={[5]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[5]} onChange={mockOnChange} />);
 
       // 点击已选中的 "5分钟" 选项
       const fiveMinButton = screen.getByText("5分钟").closest("button");
@@ -107,9 +99,7 @@ describe("ReminderSettings", () => {
     });
 
     it("支持多选", () => {
-      render(
-        <ReminderSettings value={[5]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[5]} onChange={mockOnChange} />);
 
       // 点击 "15分钟" 选项
       const fifteenMinButton = screen.getByText("15分钟").closest("button");
@@ -122,9 +112,7 @@ describe("ReminderSettings", () => {
 
   describe("自定义时间", () => {
     it("打开自定义时间弹窗", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 点击自定义按钮
       const customButton = screen.getByText("自定义");
@@ -138,9 +126,7 @@ describe("ReminderSettings", () => {
     });
 
     it("输入自定义时间并保存", async () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 打开自定义弹窗
       const customButton = screen.getByText("自定义");
@@ -161,9 +147,7 @@ describe("ReminderSettings", () => {
     });
 
     it("输入无效时间不保存", async () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 打开自定义弹窗
       const customButton = screen.getByText("自定义");
@@ -184,9 +168,7 @@ describe("ReminderSettings", () => {
     });
 
     it("取消按钮关闭弹窗", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 打开自定义弹窗
       const customButton = screen.getByText("自定义");
@@ -203,9 +185,7 @@ describe("ReminderSettings", () => {
 
   describe("onChange 回调", () => {
     it("选择时间后触发 onChange", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 选择多个时间
       fireEvent.click(screen.getByText("5分钟").closest("button")!);
@@ -232,18 +212,14 @@ describe("ReminderSettings", () => {
 
   describe("选中数量显示", () => {
     it("显示已选中的数量", () => {
-      render(
-        <ReminderSettings value={[5, 15]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[5, 15]} onChange={mockOnChange} />);
 
       // 应该显示选中数量徽章
       expect(screen.getByText("2")).toBeInTheDocument();
     });
 
     it("未选中时不显示数量", () => {
-      render(
-        <ReminderSettings value={[]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[]} onChange={mockOnChange} />);
 
       // 不应该显示数量徽章（只有选中时才会渲染）
       const badges = screen.queryAllByText(/^\d+$/);
@@ -255,8 +231,6 @@ describe("ReminderSettings", () => {
     it("显示已添加的自定义时间", () => {
       render(
         <ReminderSettings
-         
-         
           value={[5, 45]} // 45 不是预设时间
           onChange={mockOnChange}
         />,
@@ -268,9 +242,7 @@ describe("ReminderSettings", () => {
     });
 
     it("点击删除自定义时间", () => {
-      render(
-        <ReminderSettings value={[5, 45]} onChange={mockOnChange} />,
-      );
+      render(<ReminderSettings value={[5, 45]} onChange={mockOnChange} />);
 
       // 点击删除按钮
       const deleteButton = screen.getByText("提前45分钟").closest("button");

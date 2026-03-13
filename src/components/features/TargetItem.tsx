@@ -96,7 +96,9 @@ export const TargetItem = React.memo(function TargetItem({
                 e.stopPropagation();
                 onToggleExpand?.(target.id);
               }}
-              onKeyDown={(e) => e.key === "Enter" && onToggleExpand?.(target.id)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && onToggleExpand?.(target.id)
+              }
               role="button"
               tabIndex={0}
               aria-label={expanded ? "折叠步骤" : "展开步骤"}

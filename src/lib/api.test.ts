@@ -402,9 +402,9 @@ describe("API Functions - Notifications (non-Tauri)", () => {
 
   it("setNotificationSettings throws error when not in Tauri", async () => {
     const { setNotificationSettings } = await import("@/lib/api");
-    await expect(setNotificationSettings("todo", "test-1", [30])).rejects.toThrow(
-      "This app must run in Tauri",
-    );
+    await expect(
+      setNotificationSettings("todo", "test-1", [30]),
+    ).rejects.toThrow("This app must run in Tauri");
   });
 
   it("deleteNotificationSettings throws error when not in Tauri", async () => {
