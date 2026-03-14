@@ -180,6 +180,46 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         )?;
     }
 
+    // Global notification settings
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS global_notification_settings (
+            id TEXT PRIMARY KEY,
+            master_enabled INTEGER NOT NULL DEFAULT 1,
+            desktop_enabled INTEGER NOT NULL DEFAULT 1,
+            sound_enabled INTEGER NOT NULL DEFAULT 1,
+            default_reminder_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+            todo_default_enabled INTEGER NOT NULL DEFAULT 1,
+            todo_default_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+            plan_default_enabled INTEGER NOT NULL DEFAULT 1,
+            plan_default_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+            target_default_enabled INTEGER NOT NULL DEFAULT 1,
+            target_default_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+            dnd_enabled INTEGER NOT NULL DEFAULT 0,
+            dnd_start_time TEXT,
+            dnd_end_time TEXT,
+            dnd_days TEXT NOT NULL DEFAULT '[0, 1, 2, 3, 4, 5, 6]',
+            channel_priority TEXT NOT NULL DEFAULT '[\"desktop\", \"email\", \"webhook\"]',
+            retention_days INTEGER NOT NULL DEFAULT 30,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // Seed default global notification settings
+    let global_count: i32 = conn.query_row(
+        "SELECT COUNT(*) FROM global_notification_settings",
+        [],
+        |row| row.get(0),
+    )?;
+    if global_count == 0 {
+        let now = chrono::Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO global_notification_settings (id, master_enabled, desktop_enabled, sound_enabled, default_reminder_times, todo_default_enabled, todo_default_times, plan_default_enabled, plan_default_times, target_default_enabled, target_default_times, dnd_enabled, dnd_start_time, dnd_end_time, dnd_days, channel_priority, retention_days, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["default", 1, 1, 1, "[5, 15, 30]", 1, "[5, 15, 30]", 1, "[5, 15, 30]", 1, "[5, 15, 30]", 0, "22:00", "08:00", "[0, 1, 2, 3, 4, 5, 6]", "[\"desktop\", \"email\", \"webhook\"]", 30, &now, &now],
+        )?;
+    }
+
     // Notification plugins table
     conn.execute(
         "CREATE TABLE IF NOT EXISTS notification_plugins (
@@ -513,6 +553,7 @@ fn add_column_if_not_exists(
         "entity_tags",
         "daily_summary_settings",
         "notification_settings",
+        "global_notification_settings",
     ];
 
     if !VALID_TABLES.contains(&table) {

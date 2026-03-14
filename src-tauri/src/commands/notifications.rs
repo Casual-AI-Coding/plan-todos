@@ -69,6 +69,30 @@ pub struct NotificationHistory {
     pub created_at: String,
 }
 
+// GlobalNotificationSettings - global notification settings
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GlobalNotificationSettings {
+    pub id: String,
+    pub master_enabled: bool,
+    pub desktop_enabled: bool,
+    pub sound_enabled: bool,
+    pub default_reminder_times: Vec<i32>,
+    pub todo_default_enabled: bool,
+    pub todo_default_times: Vec<i32>,
+    pub plan_default_enabled: bool,
+    pub plan_default_times: Vec<i32>,
+    pub target_default_enabled: bool,
+    pub target_default_times: Vec<i32>,
+    pub dnd_enabled: bool,
+    pub dnd_start_time: Option<String>,
+    pub dnd_end_time: Option<String>,
+    pub dnd_days: Vec<i32>,
+    pub channel_priority: Vec<String>,
+    pub retention_days: i32,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
 // CRUD for notification settings
 
 #[tauri::command]
@@ -584,6 +608,136 @@ pub fn get_pending_notifications(
         .map_err(|e| e.to_string())
 }
 
+// Global Notification Settings APIs
+
+#[tauri::command]
+pub fn get_global_notification_settings(
+    state: tauri::State<AppState>,
+) -> Result<GlobalNotificationSettings, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+    conn.query_row(
+        "SELECT id, master_enabled, desktop_enabled, sound_enabled, default_reminder_times,
+                todo_default_enabled, todo_default_times, plan_default_enabled, plan_default_times,
+                target_default_enabled, target_default_times, dnd_enabled, dnd_start_time, dnd_end_time,
+                dnd_days, channel_priority, retention_days, created_at, updated_at
+         FROM global_notification_settings LIMIT 1",
+        [],
+        |row| {
+            let default_reminder_times_str: String = row.get(3)?;
+            let default_reminder_times: Vec<i32> = serde_json::from_str(&default_reminder_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
+            
+            let todo_default_times_str: String = row.get(5)?;
+            let todo_default_times: Vec<i32> = serde_json::from_str(&todo_default_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
+            
+            let plan_default_times_str: String = row.get(7)?;
+            let plan_default_times: Vec<i32> = serde_json::from_str(&plan_default_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
+            
+            let target_default_times_str: String = row.get(9)?;
+            let target_default_times: Vec<i32> = serde_json::from_str(&target_default_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
+            
+            let dnd_days_str: String = row.get(14)?;
+            let dnd_days: Vec<i32> = serde_json::from_str(&dnd_days_str).unwrap_or_else(|_| vec![0, 1, 2, 3, 4, 5, 6]);
+            
+            let channel_priority_str: String = row.get(15)?;
+            let channel_priority: Vec<String> = serde_json::from_str(&channel_priority_str).unwrap_or_else(|_| vec!["desktop".to_string(), "email".to_string(), "webhook".to_string()]);
+            
+            Ok(GlobalNotificationSettings {
+                id: row.get(0)?,
+                master_enabled: row.get::<_, i32>(1)? != 0,
+                desktop_enabled: row.get::<_, i32>(2)? != 0,
+                sound_enabled: row.get::<_, i32>(3)? != 0,
+                default_reminder_times,
+                todo_default_enabled: row.get::<_, i32>(4)? != 0,
+                todo_default_times,
+                plan_default_enabled: row.get::<_, i32>(6)? != 0,
+                plan_default_times,
+                target_default_enabled: row.get::<_, i32>(8)? != 0,
+                target_default_times,
+                dnd_enabled: row.get::<_, i32>(10)? != 0,
+                dnd_start_time: row.get(11)?,
+                dnd_end_time: row.get(12)?,
+                dnd_days,
+                channel_priority,
+                retention_days: row.get(16)?,
+                created_at: row.get(17)?,
+                updated_at: row.get(18)?,
+            })
+        },
+    ).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn update_global_notification_settings(
+    state: tauri::State<AppState>,
+    settings: GlobalNotificationSettings,
+) -> Result<GlobalNotificationSettings, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    let now = chrono::Utc::now().to_rfc3339();
+
+    let default_reminder_times_json =
+        serde_json::to_string(&settings.default_reminder_times).map_err(|e| e.to_string())?;
+    let todo_default_times_json =
+        serde_json::to_string(&settings.todo_default_times).map_err(|e| e.to_string())?;
+    let plan_default_times_json =
+        serde_json::to_string(&settings.plan_default_times).map_err(|e| e.to_string())?;
+    let target_default_times_json =
+        serde_json::to_string(&settings.target_default_times).map_err(|e| e.to_string())?;
+    let dnd_days_json = serde_json::to_string(&settings.dnd_days).map_err(|e| e.to_string())?;
+    let channel_priority_json =
+        serde_json::to_string(&settings.channel_priority).map_err(|e| e.to_string())?;
+
+    conn.execute(
+        "UPDATE global_notification_settings SET
+            master_enabled = ?, desktop_enabled = ?, sound_enabled = ?, default_reminder_times = ?,
+            todo_default_enabled = ?, todo_default_times = ?, plan_default_enabled = ?, plan_default_times = ?,
+            target_default_enabled = ?, target_default_times = ?, dnd_enabled = ?, dnd_start_time = ?,
+            dnd_end_time = ?, dnd_days = ?, channel_priority = ?, retention_days = ?, updated_at = ?
+         WHERE id = 'default'",
+        rusqlite::params![
+            settings.master_enabled as i32,
+            settings.desktop_enabled as i32,
+            settings.sound_enabled as i32,
+            default_reminder_times_json,
+            settings.todo_default_enabled as i32,
+            todo_default_times_json,
+            settings.plan_default_enabled as i32,
+            plan_default_times_json,
+            settings.target_default_enabled as i32,
+            target_default_times_json,
+            settings.dnd_enabled as i32,
+            settings.dnd_start_time,
+            settings.dnd_end_time,
+            dnd_days_json,
+            channel_priority_json,
+            settings.retention_days,
+            &now
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    get_global_notification_settings(state)
+}
+
+#[tauri::command]
+pub fn reset_global_notification_settings(
+    state: tauri::State<AppState>,
+) -> Result<GlobalNotificationSettings, String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    let now = chrono::Utc::now().to_rfc3339();
+
+    conn.execute(
+        "UPDATE global_notification_settings SET
+            master_enabled = 1, desktop_enabled = 1, sound_enabled = 1, default_reminder_times = '[5, 15, 30]',
+            todo_default_enabled = 1, todo_default_times = '[5, 15, 30]', plan_default_enabled = 1, plan_default_times = '[5, 15, 30]',
+            target_default_enabled = 1, target_default_times = '[5, 15, 30]', dnd_enabled = 0, dnd_start_time = '22:00',
+            dnd_end_time = '08:00', dnd_days = '[0, 1, 2, 3, 4, 5, 6]', channel_priority = '[\"desktop\", \"email\", \"webhook\"]', retention_days = 30, updated_at = ?
+         WHERE id = 'default'",
+        rusqlite::params![&now],
+    ).map_err(|e| e.to_string())?;
+
+    get_global_notification_settings(state)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -746,5 +900,111 @@ mod tests {
             )
             .unwrap();
         assert_eq!(pending, 3);
+    }
+
+    // Global Notification Settings Tests
+
+    fn create_test_db_with_global_settings() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS global_notification_settings (
+                id TEXT PRIMARY KEY,
+                master_enabled INTEGER NOT NULL DEFAULT 1,
+                desktop_enabled INTEGER NOT NULL DEFAULT 1,
+                sound_enabled INTEGER NOT NULL DEFAULT 1,
+                default_reminder_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+                todo_default_enabled INTEGER NOT NULL DEFAULT 1,
+                todo_default_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+                plan_default_enabled INTEGER NOT NULL DEFAULT 1,
+                plan_default_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+                target_default_enabled INTEGER NOT NULL DEFAULT 1,
+                target_default_times TEXT NOT NULL DEFAULT '[5, 15, 30]',
+                dnd_enabled INTEGER NOT NULL DEFAULT 0,
+                dnd_start_time TEXT,
+                dnd_end_time TEXT,
+                dnd_days TEXT NOT NULL DEFAULT '[0, 1, 2, 3, 4, 5, 6]',
+                channel_priority TEXT NOT NULL DEFAULT '[\"desktop\", \"email\", \"webhook\"]',
+                retention_days INTEGER NOT NULL DEFAULT 30,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )",
+            [],
+        )
+        .unwrap();
+
+        let now = Utc::now().to_rfc3339();
+        conn.execute(
+            "INSERT INTO global_notification_settings (id, master_enabled, desktop_enabled, sound_enabled, default_reminder_times, todo_default_enabled, todo_default_times, plan_default_enabled, plan_default_times, target_default_enabled, target_default_times, dnd_enabled, dnd_start_time, dnd_end_time, dnd_days, channel_priority, retention_days, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rusqlite::params!["default", 1, 1, 1, "[5, 15, 30]", 1, "[5, 15, 30]", 1, "[5, 15, 30]", 1, "[5, 15, 30]", 0, "22:00", "08:00", "[0, 1, 2, 3, 4, 5, 6]", "[\"desktop\", \"email\", \"webhook\"]", 30, &now, &now],
+        ).unwrap();
+
+        conn
+    }
+
+    #[test]
+    fn test_global_notification_settings_default_values() {
+        let conn = create_test_db_with_global_settings();
+
+        let settings = conn.query_row(
+            "SELECT master_enabled, desktop_enabled, sound_enabled, retention_days FROM global_notification_settings WHERE id = 'default'",
+            [],
+            |row| {
+                Ok((
+                    row.get::<_, i32>(0)? != 0,
+                    row.get::<_, i32>(1)? != 0,
+                    row.get::<_, i32>(2)? != 0,
+                    row.get::<_, i32>(3)?,
+                ))
+            },
+        ).unwrap();
+
+        assert!(settings.0); // master_enabled
+        assert!(settings.1); // desktop_enabled
+        assert!(settings.2); // sound_enabled
+        assert_eq!(settings.3, 30); // retention_days
+    }
+
+    #[test]
+    fn test_global_notification_settings_json_fields() {
+        let conn = create_test_db_with_global_settings();
+
+        let (default_times, dnd_days, channel_priority): (String, String, String) = conn.query_row(
+            "SELECT default_reminder_times, dnd_days, channel_priority FROM global_notification_settings WHERE id = 'default'",
+            [],
+            |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+            },
+        ).unwrap();
+
+        let times: Vec<i32> = serde_json::from_str(&default_times).unwrap();
+        let days: Vec<i32> = serde_json::from_str(&dnd_days).unwrap();
+        let channels: Vec<String> = serde_json::from_str(&channel_priority).unwrap();
+
+        assert_eq!(times, vec![5, 15, 30]);
+        assert_eq!(days, vec![0, 1, 2, 3, 4, 5, 6]);
+        assert_eq!(channels, vec!["desktop", "email", "webhook"]);
+    }
+
+    #[test]
+    fn test_global_notification_settings_update() {
+        let conn = create_test_db_with_global_settings();
+        let now = Utc::now().to_rfc3339();
+
+        conn.execute(
+            "UPDATE global_notification_settings SET master_enabled = 0, retention_days = 90, updated_at = ? WHERE id = 'default'",
+            rusqlite::params![&now],
+        ).unwrap();
+
+        let (master_enabled, retention_days): (bool, i32) = conn.query_row(
+            "SELECT master_enabled, retention_days FROM global_notification_settings WHERE id = 'default'",
+            [],
+            |row| {
+                Ok((row.get::<_, i32>(0)? != 0, row.get(1)?))
+            },
+        ).unwrap();
+
+        assert!(!master_enabled);
+        assert_eq!(retention_days, 90);
     }
 }
