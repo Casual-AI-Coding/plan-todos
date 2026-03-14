@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CirculationDetailView } from "@/app/views/CirculationDetailView";
+import { useCirculation, useCirculationLogs } from "@/hooks/useCirculations";
 
 vi.mock("@/hooks/useCirculations", () => ({
   useCirculation: vi.fn(),
@@ -49,11 +50,15 @@ describe("CirculationDetailView", () => {
   };
 
   it("renders loading state", () => {
-    const { useCirculation } = require("@/hooks/useCirculations");
     vi.mocked(useCirculation).mockReturnValue({
       data: undefined,
       isLoading: true,
       error: null,
+    } as any);
+
+    vi.mocked(useCirculationLogs).mockReturnValue({
+      data: [],
+      isLoading: false,
     } as any);
 
     render(<CirculationDetailView id="circ-1" />);
@@ -61,14 +66,12 @@ describe("CirculationDetailView", () => {
   });
 
   it("renders circulation detail with data", () => {
-    const { useCirculation } = require("@/hooks/useCirculations");
     vi.mocked(useCirculation).mockReturnValue({
       data: mockCirculation,
       isLoading: false,
       error: null,
     } as any);
 
-    const { useCirculationLogs } = require("@/hooks/useCirculations");
     vi.mocked(useCirculationLogs).mockReturnValue({
       data: [],
       isLoading: false,
@@ -79,14 +82,12 @@ describe("CirculationDetailView", () => {
   });
 
   it("displays streak count", () => {
-    const { useCirculation } = require("@/hooks/useCirculations");
     vi.mocked(useCirculation).mockReturnValue({
       data: mockCirculation,
       isLoading: false,
       error: null,
     } as any);
 
-    const { useCirculationLogs } = require("@/hooks/useCirculations");
     vi.mocked(useCirculationLogs).mockReturnValue({
       data: [],
       isLoading: false,
@@ -97,14 +98,12 @@ describe("CirculationDetailView", () => {
   });
 
   it("displays best streak", () => {
-    const { useCirculation } = require("@/hooks/useCirculations");
     vi.mocked(useCirculation).mockReturnValue({
       data: mockCirculation,
       isLoading: false,
       error: null,
     } as any);
 
-    const { useCirculationLogs } = require("@/hooks/useCirculations");
     vi.mocked(useCirculationLogs).mockReturnValue({
       data: [],
       isLoading: false,
@@ -115,14 +114,12 @@ describe("CirculationDetailView", () => {
   });
 
   it("displays logs section", () => {
-    const { useCirculation } = require("@/hooks/useCirculations");
     vi.mocked(useCirculation).mockReturnValue({
       data: mockCirculation,
       isLoading: false,
       error: null,
     } as any);
 
-    const { useCirculationLogs } = require("@/hooks/useCirculations");
     vi.mocked(useCirculationLogs).mockReturnValue({
       data: [
         {

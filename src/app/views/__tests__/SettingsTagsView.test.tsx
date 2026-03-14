@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SettingsTagsView } from "@/app/views/SettingsTagsView";
+import { useTags } from "@/hooks/useTags";
 
 vi.mock("@/hooks/useTags", () => ({
   useTags: vi.fn(),
@@ -44,7 +45,6 @@ describe("SettingsTagsView", () => {
   ];
 
   it("renders settings tags view with title", () => {
-    const { useTags } = require("@/hooks/useTags");
     vi.mocked(useTags).mockReturnValue({
       data: mockTags,
       isLoading: false,
@@ -52,11 +52,10 @@ describe("SettingsTagsView", () => {
     } as any);
 
     render(<SettingsTagsView />);
-    expect(screen.getByText("设置 > 标签")).toBeInTheDocument();
+    expect(screen.getByText("设置 > 标签管理")).toBeInTheDocument();
   });
 
   it("renders loading state", () => {
-    const { useTags } = require("@/hooks/useTags");
     vi.mocked(useTags).mockReturnValue({
       data: [],
       isLoading: true,
@@ -68,7 +67,6 @@ describe("SettingsTagsView", () => {
   });
 
   it("renders tags list", () => {
-    const { useTags } = require("@/hooks/useTags");
     vi.mocked(useTags).mockReturnValue({
       data: mockTags,
       isLoading: false,
@@ -81,7 +79,6 @@ describe("SettingsTagsView", () => {
   });
 
   it("shows add button", () => {
-    const { useTags } = require("@/hooks/useTags");
     vi.mocked(useTags).mockReturnValue({
       data: mockTags,
       isLoading: false,
@@ -93,7 +90,6 @@ describe("SettingsTagsView", () => {
   });
 
   it("shows empty state when no tags", () => {
-    const { useTags } = require("@/hooks/useTags");
     vi.mocked(useTags).mockReturnValue({
       data: [],
       isLoading: false,

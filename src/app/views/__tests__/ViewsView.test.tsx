@@ -1,7 +1,12 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ViewsView } from "@/app/views/ViewsView";
+import { useTodos } from "@/hooks/useTodos";
+import { usePlans } from "@/hooks/usePlans";
+import { useTargets } from "@/hooks/useTargets";
+import { useMilestones } from "@/hooks/useMilestones";
+import { useTasks } from "@/hooks/useTasks";
 
 vi.mock("@/hooks/useTodos", () => ({
   useTodos: vi.fn(),
@@ -49,31 +54,26 @@ describe("ViewsView", () => {
   ];
 
   it("renders views view", () => {
-    const { useTodos } = require("@/hooks/useTodos");
     vi.mocked(useTodos).mockReturnValue({
       data: mockTodos,
       isLoading: false,
     } as any);
 
-    const { usePlans } = require("@/hooks/usePlans");
     vi.mocked(usePlans).mockReturnValue({
       data: [],
       isLoading: false,
     } as any);
 
-    const { useTargets } = require("@/hooks/useTargets");
     vi.mocked(useTargets).mockReturnValue({
       data: [],
       isLoading: false,
     } as any);
 
-    const { useMilestones } = require("@/hooks/useMilestones");
     vi.mocked(useMilestones).mockReturnValue({
       data: [],
       isLoading: false,
     } as any);
 
-    const { useTasks } = require("@/hooks/useTasks");
     vi.mocked(useTasks).mockReturnValue({
       data: [],
       isLoading: false,
@@ -81,6 +81,6 @@ describe("ViewsView", () => {
 
     render(<ViewsView />);
     // The ViewsView may render different views based on state
-    expect(screen.getByText("视图")).toBeInTheDocument();
+    expect(screen.getByText("视图查看")).toBeInTheDocument();
   });
 });

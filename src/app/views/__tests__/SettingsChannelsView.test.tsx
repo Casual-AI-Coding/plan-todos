@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SettingsChannelsView } from "@/app/views/SettingsChannelsView";
+import { useNotificationPlugins } from "@/hooks/useNotificationPlugins";
 
 vi.mock("@/hooks/useNotificationPlugins", () => ({
   useNotificationPlugins: vi.fn(),
@@ -41,22 +42,16 @@ describe("SettingsChannelsView", () => {
   ];
 
   it("renders settings channels view with title", () => {
-    const {
-      useNotificationPlugins,
-    } = require("@/hooks/useNotificationPlugins");
     vi.mocked(useNotificationPlugins).mockReturnValue({
       data: mockPlugins,
       isLoading: false,
     } as any);
 
     render(<SettingsChannelsView />);
-    expect(screen.getByText("设置 > 通知渠道")).toBeInTheDocument();
+    expect(screen.getByText("设置 > 通知 > 通知渠道")).toBeInTheDocument();
   });
 
   it("renders loading state", () => {
-    const {
-      useNotificationPlugins,
-    } = require("@/hooks/useNotificationPlugins");
     vi.mocked(useNotificationPlugins).mockReturnValue({
       data: [],
       isLoading: true,
@@ -67,9 +62,6 @@ describe("SettingsChannelsView", () => {
   });
 
   it("renders plugins list", () => {
-    const {
-      useNotificationPlugins,
-    } = require("@/hooks/useNotificationPlugins");
     vi.mocked(useNotificationPlugins).mockReturnValue({
       data: mockPlugins,
       isLoading: false,
@@ -80,28 +72,22 @@ describe("SettingsChannelsView", () => {
   });
 
   it("shows add button", () => {
-    const {
-      useNotificationPlugins,
-    } = require("@/hooks/useNotificationPlugins");
     vi.mocked(useNotificationPlugins).mockReturnValue({
       data: mockPlugins,
       isLoading: false,
     } as any);
 
     render(<SettingsChannelsView />);
-    expect(screen.getByText("+ 添加渠道")).toBeInTheDocument();
+    expect(screen.getByText("+ 添加通知渠道")).toBeInTheDocument();
   });
 
   it("shows empty state when no plugins", () => {
-    const {
-      useNotificationPlugins,
-    } = require("@/hooks/useNotificationPlugins");
     vi.mocked(useNotificationPlugins).mockReturnValue({
       data: [],
       isLoading: false,
     } as any);
 
     render(<SettingsChannelsView />);
-    expect(screen.getByText("暂无通知渠道")).toBeInTheDocument();
+    expect(screen.getByText(/暂无通知渠道/)).toBeInTheDocument();
   });
 });

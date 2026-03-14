@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ImportExportView } from "@/app/views/ImportExportView";
+import { exportData, importData } from "@/lib/api";
 
 vi.mock("@/lib/api", () => ({
   exportData: vi.fn(),
@@ -15,8 +16,8 @@ describe("ImportExportView", () => {
 
   it("renders import/export view", () => {
     render(<ImportExportView />);
+    expect(screen.getAllByText("导出数据").length).toBeGreaterThan(0);
     expect(screen.getByText("导入数据")).toBeInTheDocument();
-    expect(screen.getByText("导出数据")).toBeInTheDocument();
   });
 
   it("renders import mode options", () => {
@@ -28,11 +29,11 @@ describe("ImportExportView", () => {
 
   it("renders export button", () => {
     render(<ImportExportView />);
-    expect(screen.getByText("导出")).toBeInTheDocument();
+    expect(screen.getAllByText("导出数据").length).toBeGreaterThan(0);
   });
 
   it("renders import button", () => {
     render(<ImportExportView />);
-    expect(screen.getByText("导入")).toBeInTheDocument();
+    expect(screen.getByText("选择文件导入")).toBeInTheDocument();
   });
 });

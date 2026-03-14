@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MilestonesView } from "@/app/views/MilestonesView";
+import { useMilestones } from "@/hooks/useMilestones";
 
 vi.mock("@/hooks/useMilestones", () => ({
   useMilestones: vi.fn(),
@@ -60,18 +61,16 @@ describe("MilestonesView", () => {
   ];
 
   it("renders loading state", () => {
-    const { useMilestones } = require("@/hooks/useMilestones");
     vi.mocked(useMilestones).mockReturnValue({
       data: undefined,
       isLoading: true,
     } as any);
 
     render(<MilestonesView />);
-    expect(screen.getByText("里程碑")).toBeInTheDocument();
+    expect(screen.getByText("MILESTONES")).toBeInTheDocument();
   });
 
   it("renders milestones with data", () => {
-    const { useMilestones } = require("@/hooks/useMilestones");
     vi.mocked(useMilestones).mockReturnValue({
       data: mockMilestones,
       isLoading: false,
@@ -83,7 +82,6 @@ describe("MilestonesView", () => {
   });
 
   it("shows empty state when no milestones", () => {
-    const { useMilestones } = require("@/hooks/useMilestones");
     vi.mocked(useMilestones).mockReturnValue({
       data: [],
       isLoading: false,
@@ -94,7 +92,6 @@ describe("MilestonesView", () => {
   });
 
   it("shows create button", () => {
-    const { useMilestones } = require("@/hooks/useMilestones");
     vi.mocked(useMilestones).mockReturnValue({
       data: mockMilestones,
       isLoading: false,

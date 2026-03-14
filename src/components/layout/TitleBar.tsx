@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "@/hooks/useTheme";
+import { NotificationBell } from "@/components/features/NotificationBell";
 import {
   minimizeWindow,
   toggleMaximize,
@@ -142,88 +143,100 @@ export function TitleBar({
         </span>
       </div>
 
-      {/* Right section: Window controls */}
+      {/* Right section: Notification bell + Window controls */}
       {showControls && (
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "2px",
+            gap: "4px",
           }}
         >
-          {/* Minimize button */}
-          <WindowControlButton
-            onClick={handleMinimize}
-            title="Minimize"
-            icon={
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="currentColor"
-              >
-                <rect x="0" y="4" width="10" height="1" />
-              </svg>
-            }
-          />
-          {/* Maximize/Restore button */}
-          <WindowControlButton
-            onClick={handleMaximize}
-            title={maximized ? "Restore" : "Maximize"}
-            icon={
-              maximized ? (
+          {/* Notification Bell */}
+          <NotificationBell />
+
+          {/* Window controls */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "2px",
+            }}
+          >
+            {/* Minimize button */}
+            <WindowControlButton
+              onClick={handleMinimize}
+              title="Minimize"
+              icon={
                 <svg
                   width="10"
                   height="10"
                   viewBox="0 0 10 10"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
+                  fill="currentColor"
                 >
-                  <rect x="2" y="0" width="8" height="8" />
-                  <rect
-                    x="0"
-                    y="2"
-                    width="8"
-                    height="8"
-                    fill="var(--color-bg)"
+                  <rect x="0" y="4" width="10" height="1" />
+                </svg>
+              }
+            />
+            {/* Maximize/Restore button */}
+            <WindowControlButton
+              onClick={handleMaximize}
+              title={maximized ? "Restore" : "Maximize"}
+              icon={
+                maximized ? (
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  >
+                    <rect x="2" y="0" width="8" height="8" />
+                    <rect
+                      x="0"
+                      y="2"
+                      width="8"
+                      height="8"
+                      fill="var(--color-bg)"
+                    />
+                    <rect x="0" y="2" width="8" height="8" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  >
+                    <rect x="0" y="0" width="10" height="10" />
+                  </svg>
+                )
+              }
+            />
+            {/* Close button */}
+            <WindowControlButton
+              onClick={handleClose}
+              title="Close"
+              icon={
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M1 1L9 9M9 1L1 9"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
                   />
-                  <rect x="0" y="2" width="8" height="8" />
                 </svg>
-              ) : (
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 10 10"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                >
-                  <rect x="0" y="0" width="10" height="10" />
-                </svg>
-              )
-            }
-          />
-          {/* Close button */}
-          <WindowControlButton
-            onClick={handleClose}
-            title="Close"
-            icon={
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="currentColor"
-              >
-                <path
-                  d="M1 1L9 9M9 1L1 9"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                />
-              </svg>
-            }
-            isClose
-          />
+              }
+              isClose
+            />
+          </div>
         </div>
       )}
     </div>
