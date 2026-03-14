@@ -192,3 +192,85 @@ export const CHANNEL_TYPES = [
   { value: "dingtalk", label: "钉钉", icon: "💬" },
   { value: "feishu", label: "飞书", icon: "🔔" },
 ] as const;
+
+// ========== Circulation Notification Settings Types ==========
+
+/**
+ * CirculationNotificationSettings - 打卡通知设置
+ */
+export interface CirculationNotificationSettings {
+  id: string;
+  circulation_id: string;
+  enabled: boolean;
+  reminder_type: "fixed" | "before" | "achievement";
+  fixed_time?: string;
+  before_minutes?: number;
+  achievement_type?: "streak" | "count" | "best_streak";
+  achievement_threshold?: number;
+  channels: string;
+  message_template?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * CirculationNotificationSettingsInput - 打卡通知设置输入
+ */
+export type CirculationNotificationSettingsInput = Partial<{
+  enabled: boolean;
+  reminder_type: "fixed" | "before" | "achievement";
+  fixed_time: string;
+  before_minutes: number;
+  achievement_type: "streak" | "count" | "best_streak";
+  achievement_threshold: number;
+  channels: string;
+  message_template: string;
+}>;
+
+/**
+ * GlobalCirculationNotificationSettings - 全局打卡通知设置
+ */
+export interface GlobalCirculationNotificationSettings {
+  id: string;
+  master_enabled: boolean;
+  default_reminder_type: string;
+  default_fixed_time: string;
+  default_before_minutes: number;
+  achievement_notifications: boolean;
+  streak_milestones: string;
+  count_milestones: string;
+  default_channels: string;
+  dnd_enabled: boolean;
+  dnd_start_time: string;
+  dnd_end_time: string;
+  updated_at: string;
+}
+
+/**
+ * GlobalCirculationNotificationSettingsInput - 全局打卡通知设置输入
+ */
+export type GlobalCirculationNotificationSettingsInput = Partial<{
+  master_enabled: boolean;
+  default_reminder_type: string;
+  default_fixed_time: string;
+  default_before_minutes: number;
+  achievement_notifications: boolean;
+  streak_milestones: string;
+  count_milestones: string;
+  default_channels: string;
+  dnd_enabled: boolean;
+  dnd_start_time: string;
+  dnd_end_time: string;
+}>;
+
+/**
+ * CirculationWithNotificationSettings - 打卡项及其通知设置
+ */
+export interface CirculationWithNotificationSettings {
+  id: string;
+  title: string;
+  circulation_type: string;
+  frequency?: string;
+  status: string;
+  notification_settings?: CirculationNotificationSettings;
+}

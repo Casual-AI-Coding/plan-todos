@@ -49,6 +49,11 @@ const menus: MenuItem[] = [
           },
           { id: "settings-channels", icon: "📢", label: "通知渠道" },
           { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
+          {
+            id: "settings-circulation-notifications",
+            icon: "🔄",
+            label: "打卡通知",
+          },
         ],
       },
     ],

@@ -2,6 +2,7 @@
 
 pub mod batch;
 pub mod circulations;
+pub mod circulation_notifications;
 pub mod command_log;
 pub mod dashboard;
 pub mod export;

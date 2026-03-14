@@ -525,6 +525,56 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     // Seed initial data
     seed_data(conn).ok();
 
+    // Step 7: Create circulation notification settings tables
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS circulation_notification_settings (
+            id TEXT PRIMARY KEY,
+            circulation_id TEXT NOT NULL REFERENCES circulations(id) ON DELETE CASCADE,
+            enabled INTEGER DEFAULT 1,
+            reminder_type TEXT NOT NULL DEFAULT 'fixed',
+            fixed_time TEXT,
+            before_minutes INTEGER DEFAULT 15,
+            achievement_type TEXT,
+            achievement_threshold INTEGER,
+            channels TEXT DEFAULT '[\"desktop\"]',
+            message_template TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(circulation_id)
+        )",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS global_circulation_notification_settings (
+            id TEXT PRIMARY KEY DEFAULT 'global',
+            master_enabled INTEGER DEFAULT 1,
+            default_reminder_type TEXT DEFAULT 'fixed',
+            default_fixed_time TEXT DEFAULT '09:00',
+            default_before_minutes INTEGER DEFAULT 15,
+            achievement_notifications INTEGER DEFAULT 1,
+            streak_milestones TEXT DEFAULT '[7, 14, 30, 60, 100, 365]',
+            count_milestones TEXT DEFAULT '[10, 50, 100, 500, 1000]',
+            default_channels TEXT DEFAULT '[\"desktop\"]',
+            dnd_enabled INTEGER DEFAULT 0,
+            dnd_start_time TEXT DEFAULT '22:00',
+            dnd_end_time TEXT DEFAULT '08:00',
+            updated_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // Insert default global circulation notification settings if not exists
+    conn.execute(
+        "INSERT OR IGNORE INTO global_circulation_notification_settings 
+         (id, master_enabled, default_reminder_type, default_fixed_time, default_before_minutes,
+          achievement_notifications, streak_milestones, count_milestones, default_channels,
+          dnd_enabled, dnd_start_time, dnd_end_time, updated_at)
+         VALUES ('global', 1, 'fixed', '09:00', 15, 1, '[7, 14, 30, 60, 100, 365]', 
+                 '[10, 50, 100, 500, 1000]', '[\"desktop\"]', 0, '22:00', '08:00', datetime('now'))",
+        [],
+    )?;
+
     info!("Database initialized successfully");
     Ok(())
 }

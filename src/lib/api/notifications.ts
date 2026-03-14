@@ -15,6 +15,11 @@ import type {
   SendNotificationResult,
   GlobalNotificationSettings,
   GlobalNotificationSettingsUpdate,
+  CirculationNotificationSettings,
+  CirculationNotificationSettingsInput,
+  GlobalCirculationNotificationSettings,
+  GlobalCirculationNotificationSettingsInput,
+  CirculationWithNotificationSettings,
 } from "@/lib/types";
 import { withTauriError, withTauriFallback } from "./utils";
 
@@ -229,4 +234,89 @@ export async function sendNotification(
       message,
     });
   });
+}
+
+// ========== Circulation Notification Settings APIs ==========
+
+export async function getCirculationNotificationSettings(
+  circulationId: string,
+): Promise<CirculationNotificationSettings | null> {
+  return withTauriError("get circulation notification settings", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<CirculationNotificationSettings | null>(
+      "get_circulation_notification_settings",
+      { circulationId },
+    );
+  });
+}
+
+export async function updateCirculationNotificationSettings(
+  circulationId: string,
+  input: CirculationNotificationSettingsInput,
+): Promise<CirculationNotificationSettings> {
+  return withTauriError(
+    "update circulation notification settings",
+    async () => {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return invoke<CirculationNotificationSettings>(
+        "update_circulation_notification_settings",
+        { circulationId, input },
+      );
+    },
+  );
+}
+
+export async function deleteCirculationNotificationSettings(
+  circulationId: string,
+): Promise<boolean> {
+  return withTauriError(
+    "delete circulation notification settings",
+    async () => {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return invoke<boolean>("delete_circulation_notification_settings", {
+        circulationId,
+      });
+    },
+  );
+}
+
+export async function getGlobalCirculationNotificationSettings(): Promise<GlobalCirculationNotificationSettings> {
+  return withTauriError(
+    "get global circulation notification settings",
+    async () => {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return invoke<GlobalCirculationNotificationSettings>(
+        "get_global_circulation_notification_settings",
+      );
+    },
+  );
+}
+
+export async function updateGlobalCirculationNotificationSettings(
+  input: GlobalCirculationNotificationSettingsInput,
+): Promise<GlobalCirculationNotificationSettings> {
+  return withTauriError(
+    "update global circulation notification settings",
+    async () => {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return invoke<GlobalCirculationNotificationSettings>(
+        "update_global_circulation_notification_settings",
+        { input },
+      );
+    },
+  );
+}
+
+export async function getCirculationsWithNotificationSettings(): Promise<
+  CirculationWithNotificationSettings[]
+> {
+  return withTauriError(
+    "get circulations with notification settings",
+    async () => {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return invoke<CirculationWithNotificationSettings[]>(
+        "get_circulations_with_notification_settings",
+      );
+    },
+  );
 }
