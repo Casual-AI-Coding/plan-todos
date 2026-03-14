@@ -48,6 +48,9 @@ describe("Export API", () => {
           settings: {
             daily_summary_settings: null,
             notification_plugins: [],
+            global_notification_settings: null,
+            global_circulation_notification_settings: null,
+            circulation_notification_settings: [],
           },
         },
       };
@@ -82,6 +85,9 @@ describe("Export API", () => {
         settings: {
           daily_summary_settings: null,
           notification_plugins: [],
+          global_notification_settings: null,
+          global_circulation_notification_settings: null,
+          circulation_notification_settings: [],
         },
       },
     });

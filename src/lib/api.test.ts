@@ -687,6 +687,9 @@ describe("API Functions - Export/Import (non-Tauri)", () => {
         settings: {
           daily_summary_settings: null,
           notification_plugins: [],
+          global_notification_settings: null,
+          global_circulation_notification_settings: null,
+          circulation_notification_settings: [],
         },
       },
     };
@@ -757,6 +760,9 @@ describe("Export Data Structure", () => {
         settings: {
           daily_summary_settings: null,
           notification_plugins: [],
+          global_notification_settings: null,
+          global_circulation_notification_settings: null,
+          circulation_notification_settings: [],
         },
       },
     };

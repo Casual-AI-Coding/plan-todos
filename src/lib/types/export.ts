@@ -12,7 +12,13 @@ import type { Target } from "./target";
 import type { Step } from "./step";
 import type { Milestone } from "./milestone";
 import type { Tag } from "./tag";
-import type { DailySummarySettings, NotificationPlugin } from "./notification";
+import type {
+  DailySummarySettings,
+  NotificationPlugin,
+  GlobalNotificationSettings,
+  GlobalCirculationNotificationSettings,
+  CirculationNotificationSettings,
+} from "./notification";
 
 /**
  * ExportData - 导出数据
@@ -37,6 +43,9 @@ export interface ExportData {
     settings: {
       daily_summary_settings: DailySummarySettings | null;
       notification_plugins: NotificationPlugin[];
+      global_notification_settings: GlobalNotificationSettings | null;
+      global_circulation_notification_settings: GlobalCirculationNotificationSettings | null;
+      circulation_notification_settings: CirculationNotificationSettings[];
     };
   };
 }
