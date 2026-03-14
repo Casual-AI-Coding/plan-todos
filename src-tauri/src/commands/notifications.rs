@@ -715,6 +715,9 @@ pub fn update_global_notification_settings(
         ],
     ).map_err(|e| e.to_string())?;
 
+    // Explicitly drop the connection to release the lock before re-using state
+    drop(conn);
+
     get_global_notification_settings(state)
 }
 
@@ -734,6 +737,9 @@ pub fn reset_global_notification_settings(
          WHERE id = 'default'",
         rusqlite::params![&now],
     ).map_err(|e| e.to_string())?;
+
+    // Explicitly drop the connection to release the lock before re-using state
+    drop(conn);
 
     get_global_notification_settings(state)
 }
