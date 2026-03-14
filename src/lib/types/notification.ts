@@ -116,21 +116,70 @@ export interface NotificationHistoryFilters {
 }
 
 /**
- * PaginationParams - 分页参数
- * Parameters for paginated queries.
+ * GlobalNotificationSettings - 全局通知设置
+ * Global notification configuration and defaults.
  */
-export interface PaginationParams {
-  page: number;
-  limit: number;
+export interface GlobalNotificationSettings {
+  id: string;
+  master_enabled: boolean;
+  desktop_enabled: boolean;
+  sound_enabled: boolean;
+  default_reminder_times: number[];
+  todo_default_enabled: boolean;
+  todo_default_times: number[];
+  plan_default_enabled: boolean;
+  plan_default_times: number[];
+  target_default_enabled: boolean;
+  target_default_times: number[];
+  dnd_enabled: boolean;
+  dnd_start_time?: string;
+  dnd_end_time?: string;
+  dnd_days: number[];
+  channel_priority: string[];
+  retention_days: number;
+  created_at: string;
+  updated_at: string;
 }
 
 /**
- * PaginatedResult<T> - 分页结果
- * Generic paginated result wrapper.
+ * ReminderTimeOption - 提醒时间选项
+ * Standard reminder time options in minutes.
  */
-export interface PaginatedResult<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
+export const REMINDER_TIME_OPTIONS = [
+  { value: 5, label: "5分钟前" },
+  { value: 15, label: "15分钟前" },
+  { value: 30, label: "30分钟前" },
+  { value: 60, label: "1小时前" },
+  { value: 180, label: "3小时前" },
+  { value: 360, label: "6小时前" },
+  { value: 720, label: "12小时前" },
+  { value: 1440, label: "1天前" },
+  { value: 2880, label: "2天前" },
+  { value: 10080, label: "1周前" },
+] as const;
+
+/**
+ * WeekDay - 星期选项
+ * Days of the week for Do Not Disturb scheduling.
+ */
+export const WEEK_DAYS = [
+  { value: 0, label: "周日" },
+  { value: 1, label: "周一" },
+  { value: 2, label: "周二" },
+  { value: 3, label: "周三" },
+  { value: 4, label: "周四" },
+  { value: 5, label: "周五" },
+  { value: 6, label: "周六" },
+] as const;
+
+/**
+ * ChannelType - 通知渠道类型
+ * Available notification channel types.
+ */
+export const CHANNEL_TYPES = [
+  { value: "desktop", label: "桌面通知", icon: "🖥️" },
+  { value: "email", label: "邮件", icon: "📧" },
+  { value: "webhook", label: "Webhook", icon: "🔗" },
+  { value: "dingtalk", label: "钉钉", icon: "💬" },
+  { value: "feishu", label: "飞书", icon: "🔔" },
+] as const;
