@@ -210,7 +210,7 @@ describe("useNotificationPlugins", () => {
 
   describe("useDeleteNotificationPlugin", () => {
     it("应该删除插件并刷新查询", async () => {
-      vi.mocked(deleteNotificationPlugin).mockResolvedValue(undefined);
+      vi.mocked(deleteNotificationPlugin).mockResolvedValue(true);
 
       const { result } = renderHook(() => useDeleteNotificationPlugin(), {
         wrapper: createWrapper(),

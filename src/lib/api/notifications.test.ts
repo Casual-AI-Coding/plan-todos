@@ -226,7 +226,9 @@ describe("Notification API", () => {
       };
       mockInvoke.mockResolvedValue(mockSummary);
       const result = await getDailySummary();
-      expect(mockInvoke).toHaveBeenCalledWith("get_daily_summary");
+      expect(mockInvoke).toHaveBeenCalledWith("get_daily_summary", {
+        date: undefined,
+      });
       expect(result).toEqual(mockSummary);
     });
   });
@@ -335,7 +337,7 @@ describe("Notification API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("send_notification", {
         pluginId: "plugin-1",
         title: "Title",
-        content: "Content",
+        message: "Content",
       });
       expect(result).toEqual(mockResult);
     });

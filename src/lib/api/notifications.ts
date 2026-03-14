@@ -14,6 +14,7 @@ import type {
   NotificationPlugin,
   SendNotificationResult,
   GlobalNotificationSettings,
+  GlobalNotificationSettingsUpdate,
 } from "@/lib/types";
 import { withTauriError, withTauriFallback } from "./utils";
 
@@ -104,10 +105,62 @@ export async function markReminderSent(
   });
 }
 
-export async function getDailySummary(): Promise<DailySummary> {
+export async function getDailySummary(date?: string): Promise<DailySummary> {
   return withTauriError("get daily summary", async () => {
     const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<DailySummary>("get_daily_summary");
+    return invoke<DailySummary>("get_daily_summary", { date });
+  });
+}
+
+export async function getNotificationHistory(
+  filters?: NotificationHistoryFilters,
+): Promise<NotificationHistory[]> {
+  return withTauriError("get notification history", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<NotificationHistory[]>("get_notification_history", {
+      filters,
+    });
+  });
+}
+
+export async function getPendingNotifications(): Promise<
+  NotificationHistory[]
+> {
+  return withTauriError("get pending notifications", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<NotificationHistory[]>("get_pending_notifications", {});
+  });
+}
+
+// Global Notification Settings APIs
+
+export async function getGlobalNotificationSettings(): Promise<GlobalNotificationSettings> {
+  return withTauriError("get global notification settings", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<GlobalNotificationSettings>(
+      "get_global_notification_settings",
+    );
+  });
+}
+
+export async function updateGlobalNotificationSettings(
+  settings: GlobalNotificationSettingsUpdate,
+): Promise<GlobalNotificationSettings> {
+  return withTauriError("update global notification settings", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<GlobalNotificationSettings>(
+      "update_global_notification_settings",
+      { settings },
+    );
+  });
+}
+
+export async function resetGlobalNotificationSettings(): Promise<GlobalNotificationSettings> {
+  return withTauriError("reset global notification settings", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<GlobalNotificationSettings>(
+      "reset_global_notification_settings",
+    );
   });
 }
 
@@ -115,7 +168,7 @@ export async function getDailySummary(): Promise<DailySummary> {
 
 export async function getNotificationPlugins(): Promise<NotificationPlugin[]> {
   return withTauriFallback(
-    "notification plugins",
+    "get notification plugins",
     async () => {
       const { invoke } = await import("@tauri-apps/api/core");
       return invoke<NotificationPlugin[]>("get_notification_plugins");
@@ -156,78 +209,24 @@ export async function updateNotificationPlugin(
   });
 }
 
-export async function deleteNotificationPlugin(id: string): Promise<void> {
+export async function deleteNotificationPlugin(id: string): Promise<boolean> {
   return withTauriError("delete notification plugin", async () => {
     const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<void>("delete_notification_plugin", { id });
+    return invoke<boolean>("delete_notification_plugin", { id });
   });
 }
 
 export async function sendNotification(
   pluginId: string,
   title: string,
-  content: string,
+  message: string,
 ): Promise<SendNotificationResult> {
   return withTauriError("send notification", async () => {
     const { invoke } = await import("@tauri-apps/api/core");
     return invoke<SendNotificationResult>("send_notification", {
       pluginId,
       title,
-      content,
+      message,
     });
-  });
-}
-
-// Notification History APIs
-
-export async function getNotificationHistory(
-  filters?: NotificationHistoryFilters,
-): Promise<NotificationHistory[]> {
-  return withTauriError("get notification history", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<NotificationHistory[]>("get_notification_history", {
-      filters,
-    });
-  });
-}
-
-export async function getPendingNotifications(): Promise<
-  NotificationHistory[]
-> {
-  return withTauriError("get pending notifications", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<NotificationHistory[]>("get_pending_notifications", {});
-  });
-}
-
-// Global Notification Settings APIs
-
-export async function getGlobalNotificationSettings(): Promise<GlobalNotificationSettings> {
-  return withTauriError("get global notification settings", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<GlobalNotificationSettings>(
-      "get_global_notification_settings",
-    );
-  });
-}
-
-export async function updateGlobalNotificationSettings(
-  settings: GlobalNotificationSettings,
-): Promise<GlobalNotificationSettings> {
-  return withTauriError("update global notification settings", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<GlobalNotificationSettings>(
-      "update_global_notification_settings",
-      { settings },
-    );
-  });
-}
-
-export async function resetGlobalNotificationSettings(): Promise<GlobalNotificationSettings> {
-  return withTauriError("reset global notification settings", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
-    return invoke<GlobalNotificationSettings>(
-      "reset_global_notification_settings",
-    );
   });
 }

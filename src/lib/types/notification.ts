@@ -142,6 +142,15 @@ export interface GlobalNotificationSettings {
 }
 
 /**
+ * GlobalNotificationSettingsUpdate - 全局通知设置更新
+ * Partial type for updating global notification settings.
+ */
+export type GlobalNotificationSettingsUpdate = Omit<
+  GlobalNotificationSettings,
+  "id" | "created_at" | "updated_at"
+>;
+
+/**
  * ReminderTimeOption - 提醒时间选项
  * Standard reminder time options in minutes.
  */

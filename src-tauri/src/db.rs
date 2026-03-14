@@ -180,7 +180,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         )?;
     }
 
-    // Global notification settings
+    // Global notification settings table
     conn.execute(
         "CREATE TABLE IF NOT EXISTS global_notification_settings (
             id TEXT PRIMARY KEY,

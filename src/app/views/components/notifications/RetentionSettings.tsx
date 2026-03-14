@@ -1,10 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Card } from "@/components/ui";
 
 interface RetentionSettingsProps {
-  retentionDays: number;
+  days: number;
   onChange: (days: number) => void;
   disabled?: boolean;
 }
@@ -18,70 +17,66 @@ const RETENTION_OPTIONS = [
 ];
 
 export function RetentionSettings({
-  retentionDays,
+  days,
   onChange,
-  disabled = false,
+  disabled,
 }: RetentionSettingsProps) {
-  const handleCustomChange = (value: string) => {
-    const days = parseInt(value, 10);
-    if (!isNaN(days) && days > 0) {
-      onChange(days);
-    }
-  };
-
-  const isCustomValue = !RETENTION_OPTIONS.some(
-    (opt) => opt.value === retentionDays,
-  );
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>通知历史保留</CardTitle>
-        <p className="text-sm text-gray-500">
-          自动清理超过保留期限的通知历史记录
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {RETENTION_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => onChange(option.value)}
-              disabled={disabled}
-              className={`
-                px-4 py-2 rounded-lg text-sm font-medium transition-all
-                ${
-                  retentionDays === option.value
-                    ? "bg-teal-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }
-                ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-              `}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+    <Card className="mb-6">
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-xl">🗑️</span>
+        <h3 className="font-medium" style={{ color: "var(--color-text)" }}>
+          历史记录保留
+        </h3>
+      </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600">自定义：</span>
-          <Input
-            type="number"
-            min={1}
-            max={3650}
-            value={isCustomValue ? retentionDays : ""}
-            onChange={(e) => handleCustomChange(e.target.value)}
+      <p className="text-sm mb-4" style={{ color: "var(--color-text-muted)" }}>
+        自动清理超过保留时间的通知历史记录
+      </p>
+
+      <div className="grid grid-cols-5 gap-2">
+        {RETENTION_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
             disabled={disabled}
-            placeholder="天数"
-            className="w-24"
-          />
-          <span className="text-sm text-gray-500">天</span>
-        </div>
+            className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
+              days === option.value ? "text-white" : "hover:bg-gray-50"
+            }`}
+            style={{
+              backgroundColor:
+                days === option.value
+                  ? "var(--color-primary)"
+                  : "var(--color-bg)",
+              borderColor:
+                days === option.value
+                  ? "var(--color-primary)"
+                  : "var(--color-border)",
+              color: days === option.value ? "white" : "var(--color-text)",
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
 
-        <p className="text-sm text-gray-500">
-          当前设置：保留最近 <strong>{retentionDays} 天</strong> 的通知历史
-        </p>
-      </CardContent>
+      <div
+        className="mt-4 p-3 rounded-lg text-sm"
+        style={{
+          backgroundColor: "rgba(245, 158, 11, 0.1)",
+          color: "#B45309",
+        }}
+      >
+        <div className="flex items-start gap-2">
+          <span className="text-lg">⚠️</span>
+          <div>
+            <div className="font-medium mb-1">注意</div>
+            <div>
+              超过保留时间的历史记录将被永久删除，无法恢复。建议保留至少30天以便查阅。
+            </div>
+          </div>
+        </div>
+      </div>
     </Card>
   );
 }
