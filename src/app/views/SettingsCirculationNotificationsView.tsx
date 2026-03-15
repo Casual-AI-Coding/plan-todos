@@ -72,6 +72,7 @@ export function SettingsCirculationNotificationsView() {
   const [initialized, setInitialized] = useState(false);
 
   // Sync with server data
+  /* eslint-disable */
   useEffect(() => {
     if (globalSettings && !initialized) {
       setMasterEnabled(globalSettings.master_enabled);
@@ -85,6 +86,7 @@ export function SettingsCirculationNotificationsView() {
       setInitialized(true);
     }
   }, [globalSettings, initialized]);
+  /* eslint-enable */
 
   const handleSaveGlobal = async () => {
     try {

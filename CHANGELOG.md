@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 2026-03-15
+
+### Added
+
+**全局通知设置功能 (Global Notification Settings)**:
+
+- 新增 `SettingsNotificationsView` 页面 - 全局通知设置入口
+- 新增 `SettingsCirculationNotificationsView` 页面 - 打卡通知配置
+- 新增 `global_notification_settings` 数据表 - 存储全局通知设置
+- 新增 `circulation_notification_settings` 数据表 - 存储打卡项通知设置
+- 新增 `notification_channels` 数据表 - 存储通知渠道配置
+- 新增全局通知设置 API:
+  - `get_global_notification_settings` - 获取全局通知设置
+  - `update_global_notification_settings` - 更新全局通知设置
+- 新增打卡通知设置 API:
+  - `get_global_circulation_notification_settings` - 获取打卡全局通知设置
+  - `update_global_circulation_notification_settings` - 更新打卡全局通知设置
+  - `get_circulations_with_notification_settings` - 获取打卡项及其通知设置
+  - `update_circulation_notification_settings` - 更新单个打卡项通知设置
+
+**UI 组件**:
+
+- 新增 `MasterToggle` 组件 - 主开关组件
+- 新增 `DefaultReminderSettings` 组件 - 默认提醒设置
+- 新增 `DoNotDisturbSettings` 组件 - 免打扰设置
+- 新增 `ChannelPrioritySettings` 组件 - 渠道优先级设置
+- 新增 `NotificationChannelsSection` 组件 - 通知渠道区块
+- 新增 `RetentionSettings` 组件 - 通知保留设置
+
+**Hooks**:
+
+- 新增 `useGlobalNotificationSettings` Hook - 全局通知设置状态管理
+- 新增 `useCirculationNotifications` Hook - 打卡通知设置状态管理
+
+### Changed
+
+- 设置页面增加"通知设置"入口
+- 侧边栏增加"打卡通知"设置入口
+
+---
+
 ## [0.6.1] - 2026-03-14
 
 ### Added
