@@ -14,6 +14,7 @@ pub mod plans;
 pub mod search;
 pub mod statistics;
 pub mod steps;
+pub mod sync;
 pub mod tags;
 pub mod targets;
 pub mod tasks;

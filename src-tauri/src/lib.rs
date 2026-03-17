@@ -4,6 +4,7 @@ pub use crate::models::AppState;
 mod commands;
 mod db;
 mod models;
+mod sync;
 #[cfg(test)]
 mod tests;
 
@@ -167,6 +168,24 @@ pub fn run() {
             commands::window::toggle_maximize,
             commands::window::close_window,
             commands::window::is_maximized,
+            // Sync commands (Phase 6)
+            commands::sync::get_sync_config,
+            commands::sync::update_sync_config,
+            commands::sync::test_sync_connection,
+            commands::sync::save_sync_credentials,
+            commands::sync::get_sync_username,
+            commands::sync::delete_sync_credentials,
+            commands::sync::has_sync_credentials,
+            commands::sync::get_sync_status,
+            commands::sync::trigger_sync,
+            commands::sync::get_pending_changes_count,
+            commands::sync::get_sync_logs,
+            commands::sync::get_device_info,
+            commands::sync::update_device_name,
+            commands::sync::get_synced_devices,
+            commands::sync::get_pending_conflicts,
+            commands::sync::resolve_conflict,
+            commands::sync::resolve_all_conflicts,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

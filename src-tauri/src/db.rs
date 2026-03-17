@@ -575,6 +575,100 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
         [],
     )?;
 
+    // ==================== Sync Tables (Phase 6) ====================
+
+    // sync_metadata - tracks sync state for each entity
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS sync_metadata (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            local_modified_at TEXT NOT NULL,
+            remote_modified_at TEXT,
+            sync_status TEXT NOT NULL DEFAULT 'pending',
+            remote_version TEXT,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
+            device_id TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            UNIQUE(entity_type, entity_id)
+        )",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sync_metadata_entity ON sync_metadata(entity_type, entity_id)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sync_metadata_status ON sync_metadata(sync_status)",
+        [],
+    )?;
+
+    // sync_config - global sync configuration
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS sync_config (
+            id TEXT PRIMARY KEY DEFAULT 'default',
+            enabled INTEGER NOT NULL DEFAULT 0,
+            provider_type TEXT NOT NULL DEFAULT 'webdav',
+            server_url TEXT,
+            username TEXT,
+            password_encrypted TEXT,
+            remote_path TEXT DEFAULT '/plan-todos-sync',
+            sync_interval_minutes INTEGER DEFAULT 30,
+            conflict_strategy TEXT DEFAULT 'timestamp',
+            last_sync_at TEXT,
+            last_sync_status TEXT,
+            last_sync_error TEXT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )",
+        [],
+    )?;
+
+    // Seed default sync config if not exists
+    conn.execute(
+        "INSERT OR IGNORE INTO sync_config (id, enabled, provider_type) VALUES ('default', 0, 'webdav')",
+        [],
+    )?;
+
+    // device_info - device identification for multi-device sync
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS device_info (
+            device_id TEXT PRIMARY KEY,
+            device_name TEXT NOT NULL,
+            is_current_device INTEGER NOT NULL DEFAULT 1,
+            last_seen_at TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )",
+        [],
+    )?;
+
+    // sync_log - history of sync operations
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS sync_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            started_at TEXT NOT NULL,
+            completed_at TEXT,
+            status TEXT NOT NULL,
+            entities_uploaded INTEGER DEFAULT 0,
+            entities_downloaded INTEGER DEFAULT 0,
+            conflicts_count INTEGER DEFAULT 0,
+            error_message TEXT,
+            duration_ms INTEGER
+        )",
+        [],
+    )?;
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sync_log_started ON sync_log(started_at)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_sync_log_status ON sync_log(status)",
+        [],
+    )?;
+
     info!("Database initialized successfully");
     Ok(())
 }

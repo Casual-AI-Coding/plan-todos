@@ -113,3 +113,108 @@ pub struct CirculationLog {
     pub period: Option<String>, // periodic: "2024-W05" / "2024-02"
     pub count: Option<i32>,     // count for count-type circulation
 }
+
+// ==================== Sync Models (Phase 6) ====================
+
+/// Sync metadata tracks the sync state for each entity
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct SyncMetadata {
+    pub id: i64,
+    pub entity_type: String,
+    pub entity_id: String,
+    pub local_modified_at: String,
+    pub remote_modified_at: Option<String>,
+    pub sync_status: String, // 'pending' | 'synced' | 'conflict' | 'error'
+    pub remote_version: Option<String>,
+    pub is_deleted: bool,
+    pub device_id: String,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+/// Sync configuration
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct SyncConfig {
+    pub id: String,
+    pub enabled: bool,
+    pub provider_type: String, // 'webdav'
+    pub server_url: Option<String>,
+    pub username: Option<String>,
+    pub password_encrypted: Option<String>,
+    pub remote_path: String,
+    pub sync_interval_minutes: i32,
+    pub conflict_strategy: String, // 'local-wins' | 'remote-wins' | 'timestamp' | 'manual-merge'
+    pub last_sync_at: Option<String>,
+    pub last_sync_status: Option<String>,
+    pub last_sync_error: Option<String>,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+impl Default for SyncConfig {
+    fn default() -> Self {
+        Self {
+            id: "default".to_string(),
+            enabled: false,
+            provider_type: "webdav".to_string(),
+            server_url: None,
+            username: None,
+            password_encrypted: None,
+            remote_path: "/plan-todos-sync".to_string(),
+            sync_interval_minutes: 30,
+            conflict_strategy: "timestamp".to_string(),
+            last_sync_at: None,
+            last_sync_status: None,
+            last_sync_error: None,
+            created_at: chrono::Utc::now().to_rfc3339(),
+            updated_at: chrono::Utc::now().to_rfc3339(),
+        }
+    }
+}
+
+/// Device information for multi-device sync
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct DeviceInfo {
+    pub device_id: String,
+    pub device_name: String,
+    pub is_current_device: bool,
+    pub last_seen_at: String,
+    pub created_at: String,
+}
+
+/// Sync operation log
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct SyncLog {
+    pub id: i64,
+    pub started_at: String,
+    pub completed_at: Option<String>,
+    pub status: String, // 'started' | 'completed' | 'failed'
+    pub entities_uploaded: i32,
+    pub entities_downloaded: i32,
+    pub conflicts_count: i32,
+    pub error_message: Option<String>,
+    pub duration_ms: Option<i64>,
+}
+
+/// Sync status response
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SyncStatus {
+    pub enabled: bool,
+    pub is_syncing: bool,
+    pub last_sync_at: Option<String>,
+    pub last_sync_status: Option<String>,
+    pub pending_changes: i64,
+    pub conflicts_count: i64,
+}
+
+/// Conflict for manual resolution
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SyncConflict {
+    pub id: i64,
+    pub entity_type: String,
+    pub entity_id: String,
+    pub local_version: serde_json::Value,
+    pub remote_version: serde_json::Value,
+    pub local_modified_at: String,
+    pub remote_modified_at: Option<String>,
+}
