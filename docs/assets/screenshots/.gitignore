@@ -1,8 +1,0 @@
-# Screenshots for documentation
-*.png
-*.jpg
-*.jpeg
-*.gif
-
-# Keep only specific documentation images
-!docs/assets/screenshots/*.png

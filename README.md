@@ -125,9 +125,9 @@ plan-todos/
 - **Phase 1**: 数据可用 ✅
 - **Phase 2**: 增强功能 (Priority + Tags + Import/Export) ✅
 - **Phase 3**: Circulation 打卡 ✅
-- **Phase 4**: 通知系统 (后端完成，UI 待开发)
-- **Phase 5**: 移动端适配 (部分完成)
-- **Phase 6**: 数据同步与备份 (规划中)
+- **Phase 4**: 通知系统 ✅
+- **Phase 5**: 移动端适配 ✅ (Android), iOS 已跳过
+- **Phase 6**: 数据同步与备份 🔄 (本地导出/导入已完成，云同步待规划)
 
 ## 测试
 
