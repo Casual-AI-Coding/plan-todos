@@ -23,13 +23,13 @@ Implement WebDAV-based cloud sync with incremental synchronization, conflict res
 
 ## Phase 6 Status
 
-| Feature         | Status                    |
-| --------------- | ------------------------- |
-| 6.1 本地导出    | ✅ 已完成                 |
-| 6.2 本地导入    | ✅ 已完成                 |
-| 6.3 云同步      | 🔄 进行中 (Wave 1-3 完成) |
-| 6.4 冲突解决    | 📋 已规划                 |
-| 6.5 WebDAV 支持 | 🔄 进行中 (Wave 1-3 完成) |
+| Feature         | Status    |
+| --------------- | --------- |
+| 6.1 本地导出    | ✅ 已完成 |
+| 6.2 本地导入    | ✅ 已完成 |
+| 6.3 云同步      | ✅ 已完成 |
+| 6.4 冲突解决    | ✅ 已完成 |
+| 6.5 WebDAV 支持 | ✅ 已完成 |
 
 ---
 
@@ -262,12 +262,14 @@ src/
 | 1    | Foundation (Database & Models)    | 1-2d   | None         | ✅ 已完成 |
 | 2    | Configuration & Credentials       | 2-3d   | Wave 1       | ✅ 已完成 |
 | 3    | WebDAV Client                     | 2-3d   | Wave 2       | ✅ 已完成 |
-| 4    | Change Tracking & Delta           | 2-3d   | Wave 1       | ⏳ 待开始 |
-| 5    | Sync Engine & Conflict Resolution | 3-4d   | Wave 3, 4    | ⏳ 待开始 |
-| 6    | Frontend UI                       | 2-3d   | Wave 2, 5    | ⏳ 待开始 |
-| 7    | Background Sync & Polish          | 2-3d   | Wave 6       | ⏳ 待开始 |
+| 4    | Change Tracking & Delta           | 2-3d   | Wave 1       | ✅ 已完成 |
+| 5    | Sync Engine & Conflict Resolution | 3-4d   | Wave 3, 4    | ✅ 已完成 |
+| 6    | Frontend UI                       | 2-3d   | Wave 2, 5    | ✅ 已完成 |
+| 7    | Background Sync & Polish          | 2-3d   | Wave 6       | ✅ 已完成 |
 
 **Total Estimated Effort:** 14-21 days
+
+**Completed:** 2026-03-18 (all waves implemented)
 
 ---
 
