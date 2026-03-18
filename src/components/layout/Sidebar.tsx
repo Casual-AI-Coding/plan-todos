@@ -36,6 +36,7 @@ const menus: MenuItem[] = [
     children: [
       { id: "settings-general", icon: "🎨", label: "通用" },
       { id: "settings-tags", icon: "🏷️", label: "标签管理" },
+      { id: "settings-sync", icon: "☁️", label: "云同步" },
       {
         id: "settings-notifications",
         icon: "🔔",

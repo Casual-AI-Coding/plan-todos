@@ -1,6 +1,7 @@
 // Library crate for Tauri Android builds
 pub use crate::models::AppState;
 
+mod background;
 mod commands;
 mod db;
 mod models;
@@ -11,7 +12,7 @@ mod tests;
 use log::info;
 use rusqlite::Connection;
 use std::io::Write;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -73,11 +74,19 @@ pub fn run() {
 
             // Create AppState and manage it
             let state = AppState {
-                db: Mutex::new(conn),
+                db: Arc::new(Mutex::new(conn)),
             };
             app.manage(state);
 
+            // Initialize and manage scheduler state
+            let scheduler_state = background::SchedulerState::new();
+            app.manage(scheduler_state);
+
+            // Start the background sync scheduler
+            background::start_sync_scheduler(app.handle());
+
             info!("Database initialized successfully");
+            info!("Background sync scheduler started");
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -186,6 +195,13 @@ pub fn run() {
             commands::sync::get_pending_conflicts,
             commands::sync::resolve_conflict,
             commands::sync::resolve_all_conflicts,
+            // Scheduler commands (Phase 6 - Wave 7)
+            commands::sync::get_scheduler_status,
+            commands::sync::start_scheduler,
+            commands::sync::stop_scheduler,
+            commands::sync::set_sync_interval,
+            commands::sync::trigger_background_sync,
+            commands::sync::reset_circuit_breaker,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

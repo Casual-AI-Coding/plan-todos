@@ -1,10 +1,15 @@
-// Background notification polling module
-//
-// This module implements the background task that polls for pending notifications
-// and sends them using configured notification plugins.
+// Background task modules
+// 
+// This module contains background tasks that run independently of user interaction:
+// - Notification checker: Polls for pending notifications and sends them
+// - Sync scheduler: Performs periodic cloud synchronization
+
+mod sync_scheduler;
+
+pub use sync_scheduler::{SchedulerState, start_sync_scheduler};
 
 use crate::commands::notifications::NotificationHistory;
-use crate::commands::notification_plugins::registry::GLOBAL_REGISTRY;
+use crate::commands::notification_plugins::GLOBAL_REGISTRY;
 use crate::AppState;
 
 use rusqlite::Connection;
@@ -37,46 +42,53 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
                 }
                 // Wait for the polling interval
                 _ = tokio::time::sleep(tokio::time::Duration::from_secs(interval_secs)) => {
-                    // Get database connection from app state
-                    let state_result = app_handle.try_state::<AppState>();
-
-                    if let Some(state) = state_result {
-                        let conn_result = state.db.lock();
-
-                        if let Ok(conn) = conn_result {
-                            // Check for pending notifications
-                            match get_pending_notifications(&conn) {
-                                Ok(pending) => {
-                                    for notification in pending {
-                                        // Update status based on result
-                                        let update_result = match send_notification(&notification).await {
-                                            Ok(_) => {
-                                                update_notification_status(&conn, &notification.id, "sent", None)
-                                            }
-                                            Err(error_msg) => {
-                                                update_notification_status(
-                                                    &conn,
-                                                    &notification.id,
-                                                    "failed",
-                                                    Some(error_msg),
-                                                )
-                                            }
-                                        };
-
-                                        if let Err(e) = update_result {
-                                            log::error!("Failed to update notification status: {}", e);
-                                        }
-                                    }
-                                }
-                                Err(e) => {
-                                    log::error!("Failed to get pending notifications: {}", e);
-                                }
+                    // Get pending notifications in a separate scope to drop the lock before await
+                    let pending = {
+                        let state_result = app_handle.try_state::<AppState>();
+                        
+                        if let Some(state) = state_result {
+                            let conn_result = state.db.lock();
+                            
+                            if let Ok(conn) = conn_result {
+                                get_pending_notifications(&conn).unwrap_or_default()
+                            } else {
+                                log::error!("Failed to acquire database lock");
+                                Vec::new()
                             }
                         } else {
-                            log::error!("Failed to acquire database lock");
+                            log::error!("Failed to get AppState");
+                            Vec::new()
                         }
-                    } else {
-                        log::error!("Failed to get AppState");
+                    };
+
+                    // Process notifications without holding the lock
+                    for notification in pending {
+                        // Send notification (async)
+                        let result = send_notification(&notification).await;
+                        
+                        // Update status (acquire new lock)
+                        let state_result = app_handle.try_state::<AppState>();
+                        if let Some(state) = state_result {
+                            if let Ok(conn) = state.db.lock() {
+                                let update_result = match result {
+                                    Ok(_) => {
+                                        update_notification_status(&conn, &notification.id, "sent", None)
+                                    }
+                                    Err(error_msg) => {
+                                        update_notification_status(
+                                            &conn,
+                                            &notification.id,
+                                            "failed",
+                                            Some(error_msg),
+                                        )
+                                    }
+                                };
+
+                                if let Err(e) = update_result {
+                                    log::error!("Failed to update notification status: {}", e);
+                                }
+                            }
+                        }
                     }
                 }
             }

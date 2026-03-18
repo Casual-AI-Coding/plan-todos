@@ -1,11 +1,11 @@
 // Data Models
 
 use rusqlite::Connection;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 // Database state
 pub struct AppState {
-    pub db: Mutex<Connection>,
+    pub db: Arc<Mutex<Connection>>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]

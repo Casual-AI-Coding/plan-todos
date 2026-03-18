@@ -5,9 +5,11 @@ pub mod config;
 pub mod conflicts;
 pub mod devices;
 pub mod operations;
+pub mod scheduler;
 
 // Re-export commands for registration
 pub use config::*;
 pub use conflicts::*;
 pub use devices::*;
 pub use operations::*;
+pub use scheduler::*;

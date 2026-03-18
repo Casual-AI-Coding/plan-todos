@@ -2,15 +2,15 @@
 // Phase 6: Incremental sync support
 
 use rusqlite::Connection;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 /// Tracks changes to entities for incremental sync
 pub struct ChangeTracker {
-    db: Mutex<Connection>,
+    db: Arc<Mutex<Connection>>,
 }
 
 impl ChangeTracker {
-    pub fn new(db: Mutex<Connection>) -> Self {
+    pub fn new(db: Arc<Mutex<Connection>>) -> Self {
         Self { db }
     }
 
