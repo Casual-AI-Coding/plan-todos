@@ -14,6 +14,7 @@ use rusqlite::Connection;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
+use crate::sync::SyncState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -82,6 +83,10 @@ pub fn run() {
             // Initialize and manage scheduler state
             let scheduler_state = background::SchedulerState::new();
             app.manage(scheduler_state);
+
+            // Initialize and manage sync state for real-time progress tracking
+            let sync_state = SyncState::new();
+            app.manage(sync_state);
 
             // Start the background sync scheduler
             background::start_sync_scheduler(app.handle());
@@ -212,6 +217,8 @@ pub fn run() {
             commands::sync::set_sync_interval,
             commands::sync::trigger_background_sync,
             commands::sync::reset_circuit_breaker,
+            // Sync progress command (Phase 6 - v0.7.1)
+            commands::sync::get_sync_progress,
             // Google Drive commands
             commands::google_drive::get_google_drive_auth_url,
             commands::google_drive::exchange_google_drive_code,
