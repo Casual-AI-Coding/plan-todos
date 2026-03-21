@@ -2,13 +2,16 @@
 // Phase 6: Conflict management
 
 use crate::models::{AppState, SyncConflict};
+use crate::sync::{ConflictResolution, ConflictResolver};
 use tauri::State;
 
 /// Get pending conflicts
 #[tauri::command]
 pub fn get_pending_conflicts(state: State<AppState>) -> Result<Vec<SyncConflict>, String> {
-    // TODO: Implement conflict retrieval in Wave 5
-    Ok(vec![])
+    let db = state.db.clone();
+    let resolver = ConflictResolver::new(db, ConflictResolution::ManualMerge);
+
+    resolver.detect_conflicts()
 }
 
 /// Resolve a single conflict
@@ -18,8 +21,17 @@ pub fn resolve_conflict(
     conflict_id: i64,
     resolution: String, // 'local' | 'remote'
 ) -> Result<(), String> {
-    // TODO: Implement conflict resolution in Wave 5
-    Err("Conflict resolution not yet implemented".to_string())
+    let db = state.db.clone();
+
+    // Parse resolution strategy
+    let strategy = match resolution.as_str() {
+        "local" => ConflictResolution::LocalWins,
+        "remote" => ConflictResolution::RemoteWins,
+        _ => return Err(format!("Invalid resolution strategy: {}", resolution)),
+    };
+
+    let resolver = ConflictResolver::new(db, strategy);
+    resolver.resolve_conflict(conflict_id, strategy)
 }
 
 /// Resolve all conflicts with a single strategy
@@ -28,6 +40,11 @@ pub fn resolve_all_conflicts(
     state: State<AppState>,
     strategy: String, // 'local-wins' | 'remote-wins' | 'timestamp'
 ) -> Result<i64, String> {
-    // TODO: Implement bulk conflict resolution in Wave 5
-    Err("Bulk conflict resolution not yet implemented".to_string())
+    let db = state.db.clone();
+
+    // Parse strategy
+    let resolution = ConflictResolution::from(strategy.as_str());
+
+    let resolver = ConflictResolver::new(db, resolution);
+    resolver.resolve_all()
 }

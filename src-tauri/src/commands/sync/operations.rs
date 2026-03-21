@@ -3,6 +3,7 @@
 
 use crate::models::{AppState, SyncLog, SyncStatus};
 use crate::sync::{SyncEngine, SyncState};
+use std::sync::Arc;
 use tauri::{AppHandle, Manager, State};
 
 /// Get current sync status
