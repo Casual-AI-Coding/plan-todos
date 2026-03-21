@@ -85,7 +85,7 @@ pub fn run() {
             app.manage(scheduler_state);
 
             // Initialize and manage sync state for real-time progress tracking
-            let sync_state = SyncState::new();
+            let sync_state = Arc::new(SyncState::new());
             app.manage(sync_state);
 
             // Start the background sync scheduler

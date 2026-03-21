@@ -2,7 +2,8 @@
 // Phase 6: Sync execution and status
 
 use crate::models::{AppState, SyncLog, SyncStatus};
-use tauri::State;
+use crate::sync::{SyncEngine, SyncState};
+use tauri::{AppHandle, Manager, State};
 
 /// Get current sync status
 #[tauri::command]
@@ -48,9 +49,34 @@ pub fn get_sync_status(state: State<AppState>) -> Result<SyncStatus, String> {
 
 /// Trigger a manual sync
 #[tauri::command]
-pub async fn trigger_sync(state: State<'_, AppState>) -> Result<(), String> {
-    // TODO: Implement sync trigger in Wave 5
-    Err("Manual sync not yet implemented".to_string())
+pub async fn trigger_sync(app: AppHandle) -> Result<crate::sync::engine::SyncResult, String> {
+    // Get database
+    let db = app
+        .try_state::<AppState>()
+        .ok_or("AppState not found")?
+        .db
+        .clone();
+
+    // Get sync state for progress tracking
+    let sync_state = app
+        .try_state::<Arc<SyncState>>()
+        .ok_or("SyncState not found")?
+        .inner()
+        .clone();
+
+    // Create engine with sync state for progress tracking
+    let engine = SyncEngine::with_sync_state(db, sync_state);
+    
+    let result = engine.trigger_sync().await?;
+    
+    log::info!(
+        "Sync completed: uploaded={}, downloaded={}, conflicts={}",
+        result.uploaded,
+        result.downloaded,
+        result.conflicts
+    );
+    
+    Ok(result)
 }
 
 /// Get count of pending changes

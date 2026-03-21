@@ -2,11 +2,12 @@
 // Phase 6: Atomic sync state tracking
 
 use crate::sync::{SyncState, SyncStatus};
+use std::sync::Arc;
 use tauri::State;
 
 /// Get real-time sync progress status
 /// Returns atomic state: Idle, Syncing { progress }, or Error { message }
 #[tauri::command]
-pub fn get_sync_progress(state: State<'_, SyncState>) -> SyncStatus {
+pub fn get_sync_progress(state: State<'_, Arc<SyncState>>) -> SyncStatus {
     state.get_status()
 }
