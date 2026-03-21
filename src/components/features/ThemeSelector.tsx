@@ -243,35 +243,47 @@ function ColorPicker({
   label,
   value,
   onChange,
+  description,
 }: {
   label: string;
   value: string;
   onChange: (color: string) => void;
+  description?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span
-        className="text-sm font-medium"
-        style={{ color: "var(--color-text)" }}
-      >
-        {label}
-      </span>
+    <div
+      className="flex items-center justify-between gap-3 p-3 rounded-lg"
+      style={{ background: "var(--color-bg-hover)" }}
+    >
+      <div className="flex-1">
+        <div
+          className="font-medium text-sm mb-0.5"
+          style={{ color: "var(--color-text)" }}
+        >
+          {label}
+        </div>
+        {description && (
+          <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            {description}
+          </div>
+        )}
+      </div>
       <div className="flex items-center gap-2">
         <input
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-10 h-10 rounded cursor-pointer border-2"
+          className="w-10 h-10 rounded-lg cursor-pointer border-2"
           style={{
-            borderColor: "var(--color-border)",
+            borderColor: value,
             background: value,
           }}
         />
         <input
           type="text"
-          value={value}
+          value={value.toUpperCase()}
           onChange={(e) => onChange(e.target.value)}
-          className="w-24 px-2 py-1 text-xs rounded border"
+          className="w-20 px-2 py-1.5 text-xs font-mono rounded-lg border text-center"
           style={{
             background: "var(--color-bg)",
             color: "var(--color-text)",
@@ -489,87 +501,193 @@ export function ThemeSelector() {
 
       {/* Theme Grid or Custom Editor */}
       {activeTab === "customized" ? (
-        <div className="space-y-4">
-          {/* Preview Card */}
+        <div className="space-y-5">
+          {/* Header */}
+          <div className="text-center">
+            <h3
+              className="text-lg font-semibold mb-1"
+              style={{ color: "var(--color-text)" }}
+            >
+              🎨 自定义主题
+            </h3>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              调整颜色打造属于你的独特风格
+            </p>
+          </div>
+
+          {/* Live Preview Card */}
           <div
-            className="p-4 rounded-lg border"
+            className="rounded-2xl border-2 overflow-hidden"
             style={{
-              background: customColors.bgCard,
-              borderColor: "var(--color-border)",
+              background: customColors.bg,
+              borderColor: customColors.primary,
             }}
           >
+            {/* Preview Header */}
             <div
-              className="font-semibold mb-1"
-              style={{ color: customColors.text }}
+              className="px-5 py-4 border-b"
+              style={{
+                background: customColors.bgCard,
+                borderColor: customColors.primary + "40",
+              }}
             >
-              Preview Card
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                    style={{
+                      background: customColors.primary,
+                      color: "#fff",
+                    }}
+                  >
+                    ✨
+                  </div>
+                  <div>
+                    <div
+                      className="font-semibold"
+                      style={{ color: customColors.text }}
+                    >
+                      自定义主题
+                    </div>
+                    <div
+                      className="text-xs"
+                      style={{ color: customColors.textMuted }}
+                    >
+                      实时预览效果
+                    </div>
+                  </div>
+                </div>
+                <span
+                  className="px-3 py-1 rounded-full text-xs font-medium"
+                  style={{
+                    background: customColors.primary + "20",
+                    color: customColors.primary,
+                  }}
+                >
+                  预览
+                </span>
+              </div>
             </div>
-            <div
-              className="text-sm mb-2"
-              style={{ color: customColors.textMuted }}
-            >
-              This is how your custom theme will look
-            </div>
-            <div className="flex gap-2">
-              <span
-                className="px-3 py-1 rounded text-sm text-white"
-                style={{ background: customColors.primary }}
+
+            {/* Preview Content */}
+            <div className="p-5 space-y-4">
+              {/* Sample Text */}
+              <p style={{ color: customColors.text }}>
+                这是一段示例文字，展示你的主题配色效果。
+              </p>
+
+              {/* Sample Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <span
+                  className="px-4 py-2 rounded-lg text-sm font-medium"
+                  style={{
+                    background: customColors.primary,
+                    color: "#fff",
+                  }}
+                >
+                  主按钮
+                </span>
+                <span
+                  className="px-4 py-2 rounded-lg text-sm font-medium"
+                  style={{
+                    background: customColors.secondary,
+                    color: "#fff",
+                  }}
+                >
+                  次按钮
+                </span>
+                <span
+                  className="px-4 py-2 rounded-lg text-sm border"
+                  style={{
+                    background: customColors.bgCard,
+                    color: customColors.text,
+                    borderColor: customColors.primary + "40",
+                  }}
+                >
+                  边框按钮
+                </span>
+              </div>
+
+              {/* Sample Card */}
+              <div
+                className="p-4 rounded-xl"
+                style={{
+                  background: customColors.bgCard,
+                  border: `1px solid ${customColors.primary}30`,
+                }}
               >
-                Primary
-              </span>
-              <span
-                className="px-3 py-1 rounded text-sm text-white"
-                style={{ background: customColors.secondary }}
-              >
-                Secondary
-              </span>
+                <div
+                  className="font-medium mb-1"
+                  style={{ color: customColors.text }}
+                >
+                  卡片标题
+                </div>
+                <div
+                  className="text-sm"
+                  style={{ color: customColors.textMuted }}
+                >
+                  卡片内容的次要文字颜色效果展示
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Color Pickers */}
           <div
-            className="p-4 rounded-lg border space-y-4"
+            className="p-5 rounded-2xl border space-y-3"
             style={{
               background: "var(--color-bg-card)",
               borderColor: "var(--color-border)",
             }}
           >
-            <h3
-              className="text-sm font-semibold mb-3"
-              style={{ color: "var(--color-text)" }}
-            >
-              Theme Colors
-            </h3>
-            <ColorPicker
-              label="Primary"
-              value={customColors.primary}
-              onChange={(v) => handleCustomColorChange("primary", v)}
-            />
-            <ColorPicker
-              label="Secondary"
-              value={customColors.secondary}
-              onChange={(v) => handleCustomColorChange("secondary", v)}
-            />
-            <ColorPicker
-              label="Background"
-              value={customColors.bg}
-              onChange={(v) => handleCustomColorChange("bg", v)}
-            />
-            <ColorPicker
-              label="Card Background"
-              value={customColors.bgCard}
-              onChange={(v) => handleCustomColorChange("bgCard", v)}
-            />
-            <ColorPicker
-              label="Text"
-              value={customColors.text}
-              onChange={(v) => handleCustomColorChange("text", v)}
-            />
-            <ColorPicker
-              label="Muted Text"
-              value={customColors.textMuted}
-              onChange={(v) => handleCustomColorChange("textMuted", v)}
-            />
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg">🎯</span>
+              <h4
+                className="font-semibold"
+                style={{ color: "var(--color-text)" }}
+              >
+                颜色配置
+              </h4>
+            </div>
+
+            <div className="grid gap-2">
+              <ColorPicker
+                label="主色调"
+                description="按钮、链接、强调色"
+                value={customColors.primary}
+                onChange={(v) => handleCustomColorChange("primary", v)}
+              />
+              <ColorPicker
+                label="次色调"
+                description="辅助按钮、标签"
+                value={customColors.secondary}
+                onChange={(v) => handleCustomColorChange("secondary", v)}
+              />
+              <ColorPicker
+                label="背景色"
+                description="页面背景"
+                value={customColors.bg}
+                onChange={(v) => handleCustomColorChange("bg", v)}
+              />
+              <ColorPicker
+                label="卡片背景"
+                description="卡片、浮层背景"
+                value={customColors.bgCard}
+                onChange={(v) => handleCustomColorChange("bgCard", v)}
+              />
+              <ColorPicker
+                label="文字颜色"
+                description="主要文字"
+                value={customColors.text}
+                onChange={(v) => handleCustomColorChange("text", v)}
+              />
+              <ColorPicker
+                label="次要文字"
+                description="提示、禁用状态"
+                value={customColors.textMuted}
+                onChange={(v) => handleCustomColorChange("textMuted", v)}
+              />
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -577,25 +695,35 @@ export function ThemeSelector() {
             <Button
               variant="secondary"
               onClick={handleResetCustomTheme}
-              className="flex-1"
+              className="flex-1 py-3"
             >
-              Reset
+              <span className="mr-2">↺</span>
+              重置
             </Button>
-            <Button onClick={handleSaveCustomTheme} className="flex-1">
-              {theme === "custom" ? "Update Theme" : "Apply Custom Theme"}
+            <Button
+              onClick={handleSaveCustomTheme}
+              className="flex-1 py-3"
+              style={{
+                background:
+                  theme === "custom" ? "var(--color-primary)" : undefined,
+              }}
+            >
+              <span className="mr-2">{theme === "custom" ? "✓" : "✨"}</span>
+              {theme === "custom" ? "已应用" : "应用主题"}
             </Button>
           </div>
 
           {/* Current Status */}
           {theme === "custom" && (
             <div
-              className="p-3 rounded-lg text-sm"
+              className="p-4 rounded-xl text-sm text-center flex items-center justify-center gap-2"
               style={{
-                background: "var(--color-bg-elevated)",
-                color: "var(--color-text-muted)",
+                background: "var(--color-primary) + 10",
+                color: "var(--color-primary)",
               }}
             >
-              ✓ Custom theme is currently active
+              <span>✓</span>
+              <span>自定义主题已启用</span>
             </div>
           )}
         </div>

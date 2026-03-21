@@ -1520,11 +1520,7 @@ export const systemThemeDisplay: Theme = {
 // Extended theme list including system for display
 export const themeListWithSystem = [...themeList, systemThemeDisplay];
 
-// Theme type filters
-export const lightThemes = themeList.filter((t) => t.type === "light");
-export const darkThemes = themeList.filter((t) => t.type === "dark");
-
-// Style themes (aesthetic themes)
+// Style themes (aesthetic themes) - must be defined before filters
 export const styleThemeIds: ThemeId[] = [
   "blackMyth",
   "cyberpunk",
@@ -1537,6 +1533,14 @@ export const styleThemeIds: ThemeId[] = [
   "kawaii",
   "retro90s",
 ];
+
+// Theme type filters (exclude style themes)
+export const lightThemes = themeList.filter(
+  (t) => t.type === "light" && !styleThemeIds.includes(t.id),
+);
+export const darkThemes = themeList.filter(
+  (t) => t.type === "dark" && !styleThemeIds.includes(t.id),
+);
 
 export const styleThemes = themeList.filter((t) =>
   styleThemeIds.includes(t.id),
