@@ -13,6 +13,9 @@ import {
   useDeleteTodo,
 } from "@/hooks/useTodos";
 import { useTags } from "@/hooks/useTags";
+import { useBatchSelect } from "@/hooks/useBatchSelect";
+import { BatchActionBar } from "@/components/features/BatchActionBar";
+import { SelectableItem } from "@/components/features/SelectableItem";
 import type { Todo, Priority } from "@/lib/types";
 import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { TodoItem } from "@/components/features/TodoItem";
@@ -41,6 +44,10 @@ export function TodosView() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const toast = useToast();
+
+  // Batch mode state
+  const batchMode = useBatchSelect((s) => s.mode);
+  const toggleBatchMode = useBatchSelect((s) => s.toggleMode);
 
   // Use React Query hooks
   const { data: todosData, isLoading, error } = useTodos();
@@ -105,6 +112,7 @@ export function TodosView() {
           content: data.content,
           due_date: data.due_date,
           priority: data.priority,
+          recurrence: data.recurrence,
         });
         todoId = editingTodo.id;
         toast.success("待办已更新");
@@ -114,6 +122,7 @@ export function TodosView() {
           content: data.content,
           due_date: data.due_date,
           priority: data.priority,
+          recurrence: data.recurrence,
         });
         todoId = newTodo.id;
         toast.success("待办已创建");
@@ -184,7 +193,16 @@ export function TodosView() {
         >
           TODOS
         </h2>
-        <Button onClick={() => setShowForm(true)}>+ 新建</Button>
+        <div className="flex gap-2">
+          <Button
+            variant={batchMode ? "primary" : "secondary"}
+            size="sm"
+            onClick={toggleBatchMode}
+          >
+            {batchMode ? "退出多选" : "多选"}
+          </Button>
+          <Button onClick={() => setShowForm(true)}>+ 新建</Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -227,30 +245,41 @@ export function TodosView() {
       {isLoading ? (
         <div className="text-gray-500">加载中...</div>
       ) : viewMode === "list" ? (
-        filteredTodos.length > 0 ? (
-          <StaggeredList className="space-y-2" staggerDelay={50}>
-            {filteredTodos.map((todo) => (
-              <StaggeredListItem key={todo.id}>
-                <TodoItem
-                  todo={todo}
-                  onToggle={handleToggle}
-                  onDelete={handleDelete}
-                  onClick={handleEditClick}
-                  onReminderUpdate={handleReminderUpdate}
-                />
-              </StaggeredListItem>
-            ))}
-          </StaggeredList>
-        ) : (
-          <EmptyStateCard
-            icon="📋"
-            title="暂无待办事项"
-            description="创建你的第一个待办事项来开始使用"
-            action={
-              <Button onClick={() => setShowForm(true)}>+ 创建待办</Button>
-            }
-          />
-        )
+        <>
+          {/* Batch Action Bar */}
+          {batchMode && (
+            <BatchActionBar
+              entityType="todo"
+              allIds={filteredTodos.map((todo) => todo.id)}
+            />
+          )}
+          {filteredTodos.length > 0 ? (
+            <StaggeredList className="space-y-2" staggerDelay={50}>
+              {filteredTodos.map((todo) => (
+                <StaggeredListItem key={todo.id}>
+                  <SelectableItem id={todo.id}>
+                    <TodoItem
+                      todo={todo}
+                      onToggle={handleToggle}
+                      onDelete={handleDelete}
+                      onClick={handleEditClick}
+                      onReminderUpdate={handleReminderUpdate}
+                    />
+                  </SelectableItem>
+                </StaggeredListItem>
+              ))}
+            </StaggeredList>
+          ) : (
+            <EmptyStateCard
+              icon="📋"
+              title="暂无待办事项"
+              description="创建你的第一个待办事项来开始使用"
+              action={
+                <Button onClick={() => setShowForm(true)}>+ 创建待办</Button>
+              }
+            />
+          )}
+        </>
       ) : (
         /* Calendar */
         <Card>

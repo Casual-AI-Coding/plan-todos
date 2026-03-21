@@ -32,6 +32,7 @@ export async function createTodo(data: CreateTodoParams): Promise<Todo> {
       content: data.content || null,
       dueDate: data.due_date || null,
       priority: data.priority || null,
+      recurrence: data.recurrence ? JSON.stringify(data.recurrence) : null,
     });
   });
 }
@@ -48,6 +49,7 @@ export async function updateTodo(
       dueDate: data.due_date,
       status: data.status,
       priority: data.priority,
+      recurrence: data.recurrence ? JSON.stringify(data.recurrence) : null,
     });
   });
 }

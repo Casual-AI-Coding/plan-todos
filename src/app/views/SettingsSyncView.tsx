@@ -24,7 +24,16 @@ import {
   useSetSyncInterval,
   useResetCircuitBreaker,
 } from "@/hooks/useSync";
+import {
+  useGoogleDriveStatus,
+  useGoogleDriveAuthUrl,
+  useGoogleDriveDisconnect,
+  useGoogleDriveSync,
+  useGoogleDriveBackups,
+  useGoogleDriveRestore,
+} from "@/hooks/useGoogleDrive";
 import type { SyncConflict, DeviceInfo } from "@/lib/api/sync";
+import type { DriveFile } from "@/lib/api/googleDrive";
 
 export function SettingsSyncView() {
   // Data hooks
@@ -51,6 +60,14 @@ export function SettingsSyncView() {
   const triggerSync = useTriggerSync();
   const resolveConflict = useResolveConflict();
   const unregisterDevice = useUnregisterDevice();
+
+  // Google Drive hooks
+  const { data: driveStatus } = useGoogleDriveStatus();
+  const { data: backups } = useGoogleDriveBackups();
+  const getAuthUrl = useGoogleDriveAuthUrl();
+  const disconnectDrive = useGoogleDriveDisconnect();
+  const syncToDrive = useGoogleDriveSync();
+  const restoreFromDrive = useGoogleDriveRestore();
 
   // Form state
   const [serverUrl, setServerUrl] = useState("");
@@ -414,6 +431,150 @@ export function SettingsSyncView() {
                     解决冲突 ({status.conflicts_count})
                   </Button>
                 )}
+              </div>
+            </>
+          )}
+        </div>
+      </Card>
+
+      {/* Google Drive Sync */}
+      <Card className="mb-6">
+        <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+          Google Drive 同步
+        </h3>
+
+        <div className="space-y-3">
+          {driveStatus?.connected ? (
+            <>
+              {/* Connected status */}
+              <div
+                className="p-3 rounded-lg"
+                style={{ backgroundColor: "var(--color-bg-hover)" }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div
+                      className="font-medium"
+                      style={{ color: "var(--color-text)" }}
+                    >
+                      已连接到 Google Drive
+                    </div>
+                    {driveStatus.email && (
+                      <div
+                        className="text-sm"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
+                        {driveStatus.email}
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className="px-2 py-1 rounded text-xs font-medium"
+                    style={{
+                      backgroundColor: "#D1FAE5",
+                      color: "#065F46",
+                    }}
+                  >
+                    已连接
+                  </span>
+                </div>
+              </div>
+
+              {/* Sync actions */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => syncToDrive.mutate()}
+                  disabled={syncToDrive.isPending}
+                  variant="primary"
+                >
+                  {syncToDrive.isPending ? "同步中..." : "立即同步"}
+                </Button>
+                <Button
+                  onClick={() => disconnectDrive.mutate()}
+                  disabled={disconnectDrive.isPending}
+                  variant="danger"
+                >
+                  断开连接
+                </Button>
+              </div>
+
+              {/* Backup files list */}
+              {backups && backups.length > 0 && (
+                <div className="mt-4">
+                  <h4
+                    className="text-sm font-medium mb-2"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    备份文件 ({backups.length})
+                  </h4>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {backups.map((file: DriveFile) => (
+                      <div
+                        key={file.id}
+                        className="flex items-center justify-between p-2 rounded"
+                        style={{ backgroundColor: "var(--color-bg-hover)" }}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div
+                            className="text-sm font-medium truncate"
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            {file.name}
+                          </div>
+                          <div
+                            className="text-xs"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            {new Date(file.modified_at).toLocaleString("zh-CN")}
+                            {file.size &&
+                              ` · ${(file.size / 1024).toFixed(1)} KB`}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => restoreFromDrive.mutate(file.id)}
+                          disabled={restoreFromDrive.isPending}
+                        >
+                          恢复
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Not connected */}
+              <div
+                className="p-3 rounded-lg text-center"
+                style={{ backgroundColor: "var(--color-bg-hover)" }}
+              >
+                <div
+                  className="mb-3"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  连接到 Google Drive 以备份和同步您的数据
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      const url = await getAuthUrl.mutateAsync();
+                      // Open URL in browser
+                      window.open(url, "_blank");
+                    } catch (error) {
+                      setMessage({
+                        type: "error",
+                        text: "获取授权 URL 失败",
+                      });
+                    }
+                  }}
+                  disabled={getAuthUrl.isPending}
+                  variant="primary"
+                >
+                  {getAuthUrl.isPending ? "获取中..." : "连接 Google Drive"}
+                </Button>
               </div>
             </>
           )}

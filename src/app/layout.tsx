@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { QueryProvider } from "@/components/ui/QueryProvider";
 import { ToastProvider, ToastContainer } from "@/components/ui/Toast";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { HotkeyProvider } from "@/lib/HotkeyProvider";
 import "./globals.css";
 
 const firaCode = Fira_Code({
@@ -76,7 +77,9 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>
             <ToastProvider>
-              <ErrorBoundary>{children}</ErrorBoundary>
+              <ErrorBoundary>
+                <HotkeyProvider>{children}</HotkeyProvider>
+              </ErrorBoundary>
               <ToastContainer />
             </ToastProvider>
           </QueryProvider>

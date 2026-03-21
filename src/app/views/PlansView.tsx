@@ -22,6 +22,9 @@ import {
 } from "@/hooks/usePlans";
 import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useTags } from "@/hooks/useTags";
+import { useBatchSelect } from "@/hooks/useBatchSelect";
+import { BatchActionBar } from "@/components/features/BatchActionBar";
+import { SelectableItem } from "@/components/features/SelectableItem";
 import type { Plan, Task } from "@/lib/api";
 import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { getNotificationSettings } from "@/lib/api/notifications";
@@ -29,6 +32,10 @@ import { PlanForm, type PlanFormData } from "@/components/features/PlanForm";
 
 export function PlansView() {
   const toast = useToast();
+
+  // Batch mode state
+  const batchMode = useBatchSelect((s) => s.mode);
+  const toggleBatchMode = useBatchSelect((s) => s.toggleMode);
 
   // Data fetching with React Query
   const { data: plans = [], isLoading: plansLoading } = usePlans();
@@ -249,7 +256,16 @@ export function PlansView() {
         >
           PLANS
         </h2>
-        <Button onClick={() => setShowForm(true)}>+ 新建 Plan</Button>
+        <div className="flex gap-2">
+          <Button
+            variant={batchMode ? "primary" : "secondary"}
+            size="sm"
+            onClick={toggleBatchMode}
+          >
+            {batchMode ? "退出多选" : "多选"}
+          </Button>
+          <Button onClick={() => setShowForm(true)}>+ 新建 Plan</Button>
+        </div>
       </div>
 
       {/* Tag filter */}
@@ -290,21 +306,31 @@ export function PlansView() {
         ))}
       </div>
 
+      {/* Batch Action Bar */}
+      {batchMode && (
+        <BatchActionBar
+          entityType="plan"
+          allIds={filteredPlans.map((plan) => plan.id)}
+        />
+      )}
+
       {filteredPlans.length > 0 ? (
         <StaggeredList className="space-y-4" staggerDelay={80}>
           {filteredPlans.map((plan, index) => (
             <StaggeredListItem key={plan.id}>
-              <PlanCard
-                plan={plan}
-                index={index}
-                expandedPlans={expandedPlans}
-                togglePlan={togglePlan}
-                setSelectedPlanId={setSelectedPlanId}
-                setShowTaskForm={setShowTaskForm}
-                handleDeletePlan={handleDeletePlan}
-                handleToggleTask={handleToggleTask}
-                handleDeleteTask={handleDeleteTask}
-              />
+              <SelectableItem id={plan.id}>
+                <PlanCard
+                  plan={plan}
+                  index={index}
+                  expandedPlans={expandedPlans}
+                  togglePlan={togglePlan}
+                  setSelectedPlanId={setSelectedPlanId}
+                  setShowTaskForm={setShowTaskForm}
+                  handleDeletePlan={handleDeletePlan}
+                  handleToggleTask={handleToggleTask}
+                  handleDeleteTask={handleDeleteTask}
+                />
+              </SelectableItem>
             </StaggeredListItem>
           ))}
         </StaggeredList>

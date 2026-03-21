@@ -37,6 +37,7 @@ pub fn run() {
     // Run Tauri application with setup hook to initialize database
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_deep_link::init())
         .setup(|app| {
             // Get app data directory using Tauri v2 path API
             let app_data_dir = match app.path().app_data_dir() {
@@ -171,12 +172,21 @@ pub fn run() {
             commands::batch::bulk_update_step_status,
             commands::batch::bulk_delete_todos,
             commands::batch::bulk_delete_tasks,
+            commands::batch::bulk_update_todos,
+            commands::batch::bulk_archive_todos,
+            commands::batch::bulk_update_plans,
+            commands::batch::bulk_delete_plans,
+            commands::batch::bulk_update_targets,
+            commands::batch::bulk_delete_targets,
             commands::data::seed::seed_test_data,
             commands::data::reset::reset_data,
             commands::window::minimize_window,
             commands::window::toggle_maximize,
             commands::window::close_window,
             commands::window::is_maximized,
+            // Update commands
+            commands::update::check_for_updates,
+            commands::update::skip_version,
             // Sync commands (Phase 6)
             commands::sync::get_sync_config,
             commands::sync::update_sync_config,
@@ -202,6 +212,16 @@ pub fn run() {
             commands::sync::set_sync_interval,
             commands::sync::trigger_background_sync,
             commands::sync::reset_circuit_breaker,
+            // Google Drive commands
+            commands::google_drive::get_google_drive_auth_url,
+            commands::google_drive::exchange_google_drive_code,
+            commands::google_drive::get_google_drive_status,
+            commands::google_drive::google_drive_upload,
+            commands::google_drive::google_drive_download,
+            commands::google_drive::google_drive_list_files,
+            commands::google_drive::google_drive_disconnect,
+            commands::google_drive::google_drive_sync,
+            commands::google_drive::google_drive_restore,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

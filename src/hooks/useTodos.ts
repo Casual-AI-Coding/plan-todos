@@ -5,7 +5,7 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
-import type { Todo, Priority } from "@/lib/types";
+import type { Todo, Priority, Recurrence } from "@/lib/types";
 import {
   getTodo,
   getTodos,
@@ -20,6 +20,7 @@ export type CreateTodoInput = {
   content?: string;
   due_date?: string;
   priority?: Priority;
+  recurrence?: Recurrence;
 };
 
 export type UpdateTodoInput = {
@@ -29,6 +30,7 @@ export type UpdateTodoInput = {
   due_date?: string;
   status?: "pending" | "in-progress" | "done";
   priority?: Priority;
+  recurrence?: Recurrence;
 };
 
 // Query Keys

@@ -44,5 +44,12 @@
         "type": "downloadBootstrapper"
       }
     }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["plan-todos"]
+      }
+    }
   }
 }

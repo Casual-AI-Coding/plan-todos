@@ -179,7 +179,7 @@ pub fn export_data(state: tauri::State<AppState>) -> Result<ExportData, String> 
 
 fn export_todos(conn: &rusqlite::Connection) -> Result<Vec<Todo>, String> {
     let mut stmt = conn
-        .prepare("SELECT id, title, content, due_date, status, priority, created_at, updated_at FROM todos")
+        .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, created_at, updated_at FROM todos")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
@@ -191,8 +191,11 @@ fn export_todos(conn: &rusqlite::Connection) -> Result<Vec<Todo>, String> {
                 due_date: row.get(3)?,
                 status: row.get(4)?,
                 priority: row.get(5)?,
-                created_at: row.get(6)?,
-                updated_at: row.get(7)?,
+                recurrence: row.get(6)?,
+                recurrence_from: row.get(7)?,
+                recurrence_index: row.get(8)?,
+                created_at: row.get(9)?,
+                updated_at: row.get(10)?,
             })
         })
         .map_err(|e| e.to_string())?;

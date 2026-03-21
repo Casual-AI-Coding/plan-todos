@@ -64,8 +64,11 @@ pub struct Todo {
     pub title: String,
     pub content: Option<String>,
     pub due_date: Option<String>,
-    pub status: String,   // pending | in-progress | done
-    pub priority: String, // P0 | P1 | P2 | P3 (default P2)
+    pub status: String,                  // pending | in-progress | done
+    pub priority: String,                // P0 | P1 | P2 | P3 (default P2)
+    pub recurrence: Option<String>,      // JSON string of Recurrence config
+    pub recurrence_from: Option<String>, // Original todo ID for tracking chain
+    pub recurrence_index: Option<i32>,   // Current occurrence number
     pub created_at: String,
     pub updated_at: String,
 }

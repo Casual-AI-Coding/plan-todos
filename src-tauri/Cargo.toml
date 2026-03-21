@@ -28,11 +28,15 @@ once_cell = "1.19"
 tokio = { version = "1", features = ["full"] }
 # Sync dependencies (Phase 6)
 hostname = "0.4"
-reqwest = { version = "0.12", features = ["rustls-tls"], default-features = false }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+semver = "1.0"
 keyring = "3"
 base64 = "0.22"
 quick-xml = "0.37"
 fastrand = "2"
+sha2 = "0.10"
+urlencoding = "2.1"
+tauri-plugin-deep-link = "2"
 
 [profile.release]
 panic = "abort"

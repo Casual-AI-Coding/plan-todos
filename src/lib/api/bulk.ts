@@ -1,97 +1,69 @@
-/**
- * Bulk Operation APIs
- *
- * API functions for batch operations.
- */
+// src/lib/api/bulk.ts
+import { invoke } from "@tauri-apps/api/core";
 
-import type { BatchUpdateResult } from "@/lib/types";
-import { invoke, withTauriError } from "./utils";
-
-// Status types for bulk operations
-export type BulkTodoStatus = "pending" | "in-progress" | "done";
-export type BulkTaskStatus = "pending" | "in-progress" | "done";
-export type BulkStepStatus = "pending" | "completed";
-
-export async function bulkUpdateTodoStatus(
-  ids: string[],
-  status: BulkTodoStatus,
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk update todo status", async () => {
-    return invoke<BatchUpdateResult>("bulk_update_todo_status", {
-      ids,
-      status,
-    });
-  });
+export interface BulkTodoUpdates {
+  status?: string;
+  priority?: string;
+  due_date?: string;
+  archived?: boolean;
 }
 
-export async function bulkUpdateTaskStatus(
-  ids: string[],
-  status: BulkTaskStatus,
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk update task status", async () => {
-    return invoke<BatchUpdateResult>("bulk_update_task_status", {
-      ids,
-      status,
-    });
-  });
+export interface BulkUpdateResult {
+  updated: number;
+  failed: Array<{ id: string; error: string }>;
 }
 
-export async function bulkUpdateStepStatus(
+export async function bulkUpdateTodos(
   ids: string[],
-  status: BulkStepStatus,
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk update step status", async () => {
-    return invoke<BatchUpdateResult>("bulk_update_step_status", {
-      ids,
-      status,
-    });
-  });
+  updates: BulkTodoUpdates,
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_update_todos", { ids, updates });
 }
 
 export async function bulkDeleteTodos(
   ids: string[],
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk delete todos", async () => {
-    return invoke<BatchUpdateResult>("bulk_delete_todos", { ids });
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_delete_todos", { ids });
+}
+
+export async function bulkArchiveTodos(
+  ids: string[],
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_archive_todos", { ids });
+}
+
+export async function bulkUpdatePlans(
+  ids: string[],
+  status?: string,
+  archived?: boolean,
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_update_plans", {
+    ids,
+    status,
+    archived,
   });
 }
 
-export async function bulkDeleteTasks(
+export async function bulkDeletePlans(
   ids: string[],
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk delete tasks", async () => {
-    return invoke<BatchUpdateResult>("bulk_delete_tasks", { ids });
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_delete_plans", { ids });
+}
+
+export async function bulkUpdateTargets(
+  ids: string[],
+  status?: string,
+  archived?: boolean,
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_update_targets", {
+    ids,
+    status,
+    archived,
   });
 }
 
-export async function bulkDeleteSteps(
+export async function bulkDeleteTargets(
   ids: string[],
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk delete steps", async () => {
-    return invoke<BatchUpdateResult>("bulk_delete_steps", { ids });
-  });
-}
-
-export async function bulkUpdateTodoPriority(
-  ids: string[],
-  priority: string,
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk update todo priority", async () => {
-    return invoke<BatchUpdateResult>("bulk_update_todo_priority", {
-      ids,
-      priority,
-    });
-  });
-}
-
-export async function bulkUpdateTaskPriority(
-  ids: string[],
-  priority: string,
-): Promise<BatchUpdateResult> {
-  return withTauriError("bulk update task priority", async () => {
-    return invoke<BatchUpdateResult>("bulk_update_task_priority", {
-      ids,
-      priority,
-    });
-  });
+): Promise<BulkUpdateResult> {
+  return await invoke<BulkUpdateResult>("bulk_delete_targets", { ids });
 }

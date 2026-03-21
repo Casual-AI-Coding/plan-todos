@@ -80,6 +80,9 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
             due_date TEXT,
             status TEXT NOT NULL DEFAULT 'pending',
             priority TEXT NOT NULL DEFAULT 'P2',
+            recurrence TEXT,
+            recurrence_from TEXT,
+            recurrence_index INTEGER DEFAULT 0,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )",
@@ -516,6 +519,11 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
     // Check if column exists first, then add if not
     add_column_if_not_exists(conn, "todos", "priority", "TEXT DEFAULT 'P2'")?;
+
+    // Migration: Add recurrence columns for recurring todos feature
+    add_column_if_not_exists(conn, "todos", "recurrence", "TEXT")?;
+    add_column_if_not_exists(conn, "todos", "recurrence_from", "TEXT")?;
+    add_column_if_not_exists(conn, "todos", "recurrence_index", "INTEGER DEFAULT 0")?;
     add_column_if_not_exists(conn, "tasks", "priority", "TEXT DEFAULT 'P2'")?;
     add_column_if_not_exists(conn, "steps", "priority", "TEXT DEFAULT 'P2'")?;
 

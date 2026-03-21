@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Modal, Button, Input } from "@/components/ui";
 import { ReminderSettings } from "./ReminderSettings";
-import type { Todo, Priority, Tag } from "@/lib/types";
+import { RecurrenceForm } from "./RecurrenceForm";
+import type { Todo, Priority, Tag, Recurrence } from "@/lib/types";
 
 export interface TodoFormData {
   title: string;
@@ -11,6 +12,7 @@ export interface TodoFormData {
   due_date?: string;
   priority: Priority;
   reminder_times?: number[];
+  recurrence?: Recurrence;
 }
 
 export interface TodoFormProps {
@@ -18,6 +20,7 @@ export interface TodoFormProps {
   editingTodo?: Todo | null;
   allTags: Tag[];
   editingReminderTimes?: number[];
+  editingRecurrence?: Recurrence | null;
   onClose: () => void;
   onSave: (data: TodoFormData, selectedTags: string[]) => void;
 }
@@ -27,6 +30,7 @@ export function TodoForm({
   editingTodo,
   allTags,
   editingReminderTimes,
+  editingRecurrence,
   onClose,
   onSave,
 }: TodoFormProps) {
@@ -36,6 +40,7 @@ export function TodoForm({
   const [priority, setPriority] = useState<Priority>("P2");
   const [tags, setTags] = useState<string[]>([]);
   const [reminderTimes, setReminderTimes] = useState<number[]>([]);
+  const [recurrence, setRecurrence] = useState<Recurrence | null>(null);
   const isInitialized = useRef(false);
 
   useEffect(() => {
@@ -48,6 +53,7 @@ export function TodoForm({
       setPriority("P2");
       setTags([]);
       setReminderTimes([]);
+      setRecurrence(null);
     } else if (editingTodo) {
       setTitle(editingTodo.title);
       setContent(editingTodo.content || "");
@@ -55,9 +61,10 @@ export function TodoForm({
       setPriority(editingTodo.priority);
       setTags(editingTodo.tags?.map((t) => t.id) || []);
       setReminderTimes(editingReminderTimes || []);
+      setRecurrence(editingRecurrence || null);
     }
     isInitialized.current = true;
-  }, [open, editingTodo, editingReminderTimes]);
+  }, [open, editingTodo, editingReminderTimes, editingRecurrence]);
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -68,6 +75,7 @@ export function TodoForm({
         due_date: dueDate || undefined,
         priority,
         reminder_times: reminderTimes.length > 0 ? reminderTimes : undefined,
+        recurrence: recurrence || undefined,
       },
       tags,
     );
@@ -80,6 +88,7 @@ export function TodoForm({
     setPriority("P2");
     setTags([]);
     setReminderTimes([]);
+    setRecurrence(null);
     onClose();
   };
 
@@ -94,6 +103,7 @@ export function TodoForm({
       open={open}
       title={editingTodo ? "编辑 Todo" : "新建 Todo"}
       onClose={handleClose}
+      width="sm"
       footer={
         <>
           <Button variant="secondary" onClick={handleClose}>
@@ -103,7 +113,7 @@ export function TodoForm({
         </>
       }
     >
-      <div className="space-y-4">
+      <div className="space-y-3">
         <Input
           label="标题"
           value={title}
@@ -112,15 +122,15 @@ export function TodoForm({
           autoFocus
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-0.5">
             内容
           </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="输入任务内容..."
-            className="w-full px-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            rows={3}
+            className="w-full px-3 py-1.5 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+            rows={2}
           />
         </div>
         <Input
@@ -130,46 +140,44 @@ export function TodoForm({
           onChange={(e) => setDueDate(e.target.value)}
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-0.5">
             优先级
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             {(["P0", "P1", "P2", "P3"] as Priority[]).map((p) => (
               <button
                 key={p}
                 type="button"
                 onClick={() => setPriority(p)}
-                className={`flex-1 py-2 rounded-lg border-2 transition-colors ${
+                className={`flex-1 py-1.5 text-sm rounded-lg border-2 transition-colors ${
                   priority === p
                     ? "border-teal-500 bg-teal-50 text-teal-700"
                     : "border-gray-200 text-gray-600"
                 }`}
               >
                 {p === "P0"
-                  ? "P0 紧急"
+                  ? "紧急"
                   : p === "P1"
-                    ? "P1 重要"
+                    ? "重要"
                     : p === "P2"
-                      ? "P2 普通"
-                      : "P3 低"}
+                      ? "普通"
+                      : "低"}
               </button>
             ))}
           </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            标签
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {allTags.length === 0 ? (
-              <span className="text-sm text-gray-400">暂无标签</span>
-            ) : (
-              allTags.map((tag) => (
+        {allTags.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-0.5">
+              标签
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {allTags.map((tag) => (
                 <button
                   key={tag.id}
                   type="button"
                   onClick={() => toggleTag(tag.id)}
-                  className={`px-3 py-1 rounded-full text-sm border transition-colors ${
+                  className={`px-2 py-0.5 rounded-full text-xs border transition-colors ${
                     tags.includes(tag.id)
                       ? "border-teal-500 bg-teal-50 text-teal-700"
                       : "border-gray-200 text-gray-600 hover:border-teal-300"
@@ -186,11 +194,16 @@ export function TodoForm({
                 >
                   {tag.name}
                 </button>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <ReminderSettings value={reminderTimes} onChange={setReminderTimes} />
+        <RecurrenceForm
+          value={recurrence}
+          onChange={(data) => setRecurrence(data.recurrence)}
+          onClear={() => setRecurrence(null)}
+        />
       </div>
     </Modal>
   );

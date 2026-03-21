@@ -23,6 +23,9 @@ import {
   useDeleteStep,
 } from "@/hooks/useTargets";
 import { useTags } from "@/hooks/useTags";
+import { useBatchSelect } from "@/hooks/useBatchSelect";
+import { BatchActionBar } from "@/components/features/BatchActionBar";
+import { SelectableItem } from "@/components/features/SelectableItem";
 import type { Target, Step } from "@/lib/api";
 import type { TargetFormData } from "@/components/features/TargetForm";
 import {
@@ -201,6 +204,10 @@ function TargetCard({
 export function TargetsView() {
   const toast = useToast();
 
+  // Batch mode state
+  const batchMode = useBatchSelect((s) => s.mode);
+  const toggleBatchMode = useBatchSelect((s) => s.toggleMode);
+
   // Data fetching with React Query
   const { data: targets = [], isLoading: targetsLoading } = useTargets();
   const { data: tags = [] } = useTags();
@@ -371,15 +378,24 @@ export function TargetsView() {
         >
           GOALS
         </h2>
-        <Button
-          onClick={() => {
-            setEditingTarget(null);
-            setEditingReminderTimes([]);
-            setShowForm(true);
-          }}
-        >
-          + 新建 Target
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant={batchMode ? "primary" : "secondary"}
+            size="sm"
+            onClick={toggleBatchMode}
+          >
+            {batchMode ? "退出多选" : "多选"}
+          </Button>
+          <Button
+            onClick={() => {
+              setEditingTarget(null);
+              setEditingReminderTimes([]);
+              setShowForm(true);
+            }}
+          >
+            + 新建 Target
+          </Button>
+        </div>
       </div>
 
       {/* Tag filter */}
@@ -420,25 +436,35 @@ export function TargetsView() {
         ))}
       </div>
 
+      {/* Batch Action Bar */}
+      {batchMode && (
+        <BatchActionBar
+          entityType="target"
+          allIds={filteredTargets.map((target) => target.id)}
+        />
+      )}
+
       {filteredTargets.length > 0 ? (
         <StaggeredList className="space-y-4" staggerDelay={80}>
           {filteredTargets.map((target, index) => (
             <StaggeredListItem key={target.id}>
-              <TargetCard
-                target={target}
-                index={index}
-                expandedTargets={expandedTargets}
-                toggleTarget={toggleTarget}
-                selectedTargetId={selectedTargetId}
-                setSelectedTargetId={setSelectedTargetId}
-                setShowStepForm={setShowStepForm}
-                setEditingTarget={setEditingTarget}
-                setEditingReminderTimes={setEditingReminderTimes}
-                setShowForm={setShowForm}
-                handleDeleteTarget={handleDeleteTarget}
-                handleToggleStep={handleToggleStep}
-                handleDeleteStep={handleDeleteStep}
-              />
+              <SelectableItem id={target.id}>
+                <TargetCard
+                  target={target}
+                  index={index}
+                  expandedTargets={expandedTargets}
+                  toggleTarget={toggleTarget}
+                  selectedTargetId={selectedTargetId}
+                  setSelectedTargetId={setSelectedTargetId}
+                  setShowStepForm={setShowStepForm}
+                  setEditingTarget={setEditingTarget}
+                  setEditingReminderTimes={setEditingReminderTimes}
+                  setShowForm={setShowForm}
+                  handleDeleteTarget={handleDeleteTarget}
+                  handleToggleStep={handleToggleStep}
+                  handleDeleteStep={handleDeleteStep}
+                />
+              </SelectableItem>
             </StaggeredListItem>
           ))}
         </StaggeredList>
