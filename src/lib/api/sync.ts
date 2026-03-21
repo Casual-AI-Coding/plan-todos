@@ -36,6 +36,25 @@ export interface SyncStatus {
   conflicts_count: number;
 }
 
+/**
+ * Real-time atomic sync progress status
+ * Updated during sync operations
+ */
+export type SyncProgress =
+  | { type: "idle" }
+  | { type: "syncing"; progress: number }
+  | { type: "error"; message: string };
+
+/**
+ * Sync result returned after trigger_sync
+ */
+export interface SyncResult {
+  uploaded: number;
+  downloaded: number;
+  conflicts: number;
+  duration_ms: number;
+}
+
 export interface SyncLog {
   id: number;
   started_at: string;
@@ -158,9 +177,19 @@ export async function getSyncStatus(): Promise<SyncStatus> {
   });
 }
 
-export async function triggerSync(): Promise<void> {
+/**
+ * Get real-time sync progress (atomic state)
+ * Returns current sync state: idle, syncing with progress, or error
+ */
+export async function getSyncProgress(): Promise<SyncProgress> {
+  return withTauriError("获取同步进度", async () => {
+    return invoke<SyncProgress>("get_sync_progress");
+  });
+}
+
+export async function triggerSync(): Promise<SyncResult> {
   return withTauriError("触发同步", async () => {
-    return invoke<void>("trigger_sync");
+    return invoke<SyncResult>("trigger_sync");
   });
 }
 

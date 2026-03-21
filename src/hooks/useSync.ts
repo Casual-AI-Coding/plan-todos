@@ -8,6 +8,8 @@ import {
 import type {
   SyncConfig,
   SyncStatus,
+  SyncProgress,
+  SyncResult,
   SyncLog,
   SyncConflict,
   DeviceInfo,
@@ -18,6 +20,7 @@ import {
   getSyncConfig,
   updateSyncConfig,
   getSyncStatus,
+  getSyncProgress,
   triggerSync,
   getSyncLogs,
   getPendingChangesCount,
@@ -42,6 +45,7 @@ import {
 export const syncQueryKeys = {
   config: ["sync", "config"] as const,
   status: ["sync", "status"] as const,
+  progress: ["sync", "progress"] as const,
   logs: ["sync", "logs"] as const,
   username: ["sync", "username"] as const,
   hasCredentials: ["sync", "hasCredentials"] as const,
@@ -106,6 +110,22 @@ export function useSyncStatus(
 }
 
 /**
+ * Get real-time sync progress (atomic state)
+ * Updates every second during sync operations
+ */
+export function useSyncProgress(
+  options?: Omit<UseQueryOptions<SyncProgress, Error>, "queryKey" | "queryFn">,
+) {
+  return useQuery<SyncProgress, Error>({
+    queryKey: syncQueryKeys.progress,
+    queryFn: getSyncProgress,
+    refetchInterval: 1000, // Refetch every second for real-time updates
+    staleTime: 500, // Consider stale after 500ms
+    ...options,
+  });
+}
+
+/**
  * Get pending changes count
  */
 export function usePendingChangesCount(
@@ -122,11 +142,11 @@ export function usePendingChangesCount(
  * Trigger manual sync
  */
 export function useTriggerSync(
-  options?: Omit<UseMutationOptions<void, Error, void>, "mutationFn">,
+  options?: Omit<UseMutationOptions<SyncResult, Error, void>, "mutationFn">,
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, void>({
+  return useMutation<SyncResult, Error, void>({
     mutationFn: triggerSync,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: syncQueryKeys.status });

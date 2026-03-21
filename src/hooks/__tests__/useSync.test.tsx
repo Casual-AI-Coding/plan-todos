@@ -265,7 +265,12 @@ describe("useSync hooks", () => {
 
   describe("useTriggerSync", () => {
     it("should trigger sync and invalidate queries", async () => {
-      vi.mocked(triggerSync).mockResolvedValue(undefined);
+      vi.mocked(triggerSync).mockResolvedValue({
+        uploaded: 0,
+        downloaded: 0,
+        conflicts: 0,
+        duration_ms: 0,
+      });
 
       const { result } = renderHook(() => useTriggerSync(), {
         wrapper: createWrapper(),
