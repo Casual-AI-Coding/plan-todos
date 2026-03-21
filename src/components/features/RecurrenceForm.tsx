@@ -40,6 +40,7 @@ export function RecurrenceForm({
   const prevValueRef = useRef(value);
 
   // Sync when value prop changes (e.g., editing a different todo)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // Only sync if value reference changed (not on every render)
     if (value === prevValueRef.current) return;

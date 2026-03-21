@@ -5,6 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-03-22
+
+### Added
+
+**自动更新检查 (Auto Update Check)**:
+
+- 应用启动时自动检查更新（限制每 24 小时一次）
+- 设置 > 关于页面添加"检查更新"按钮
+- 支持"跳过此版本"功能
+- 显示更新内容摘要和下载链接
+
+**批量编辑 (Batch Edit)**:
+
+- Todos/Plans/Targets 列表视图支持多选模式
+- 全选/取消全选功能
+- 批量操作工具栏：状态、优先级、截止日期修改
+- 批量归档和删除功能
+- 后端新增批量操作 API：`bulk_update_todos`, `bulk_archive_todos`, `bulk_update_plans`, `bulk_delete_plans`, `bulk_update_targets`, `bulk_delete_targets`
+
+**快捷键系统 (Hotkey System)**:
+
+- 应用内全局快捷键支持
+- 默认快捷键：
+  - `Ctrl+N` - 新建 Todo
+  - `Ctrl+K` - 打开搜索
+  - `Ctrl+1-6` - 切换视图
+  - `Ctrl+,` - 打开设置
+  - `Escape` - 关闭弹窗/取消选择
+- 设置 > 通用 > 快捷键自定义配置
+- 冲突检测防止重复绑定
+- 输入框内不触发快捷键
+
+**重复任务 (Recurring Todos)**:
+
+- 支持重复类型：每日、每周、每月、每年
+- 高级模式：每月第 N 个周 X（如"每月第二个周二"）
+- 结束条件：日期截止、次数上限
+- 完成后自动创建下一个实例
+- 数据库新增字段：`recurrence`, `recurrence_from`, `recurrence_index`
+
+**Google Drive 同步**:
+
+- OAuth 2.0 PKCE 安全认证流程
+- 备份上传到 Google Drive（带时间戳）
+- 从云端备份恢复数据库
+- 查看云端备份文件列表
+- 断开连接功能
+- Deep Link 支持 OAuth 回调
+
+### Changed
+
+- 后端新增 `tauri-plugin-deep-link` 插件
+- `todos` 表新增 `recurrence`, `recurrence_from`, `recurrence_index` 列
+- 导出数据包含重复任务字段
+
+### Fixed
+
+- 修复 `SettingsNotificationsView.tsx` useEffect 中 setState 警告
+- 修复 `RecurrenceForm.tsx` useEffect 中 setState 警告
+
+---
+
 ## [0.6.3] - 2026-03-21
 
 ### Added
