@@ -6,6 +6,7 @@ use crate::sync::client::WebDAVClient;
 use crate::sync::conflict::{ConflictResolution, ConflictResolver};
 use crate::sync::delta::DeltaCalculator;
 use crate::sync::serializer::SyncSerializer;
+use crate::sync::state::SyncState;
 use rusqlite::Connection;
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
@@ -22,11 +23,45 @@ pub struct SyncResult {
 /// Main sync engine that orchestrates the synchronization process
 pub struct SyncEngine {
     db: Arc<Mutex<Connection>>,
+    sync_state: Option<Arc<SyncState>>,
 }
 
 impl SyncEngine {
+    /// Create a new sync engine with database only (backward compatible)
     pub fn new(db: Arc<Mutex<Connection>>) -> Self {
-        Self { db }
+        Self {
+            db,
+            sync_state: None,
+        }
+    }
+
+    /// Create a new sync engine with sync state for progress tracking
+    pub fn with_sync_state(db: Arc<Mutex<Connection>>, sync_state: Arc<SyncState>) -> Self {
+        Self {
+            db,
+            sync_state: Some(sync_state),
+        }
+    }
+
+    /// Helper to set syncing state
+    fn set_syncing(&self, progress: u32) {
+        if let Some(state) = &self.sync_state {
+            state.set_syncing(progress);
+        }
+    }
+
+    /// Helper to set idle state
+    fn set_idle(&self) {
+        if let Some(state) = &self.sync_state {
+            state.set_idle();
+        }
+    }
+
+    /// Helper to set error state
+    fn set_error(&self, message: &str) {
+        if let Some(state) = &self.sync_state {
+            state.set_error(message);
+        }
     }
 
     /// Get current sync status
@@ -37,9 +72,14 @@ impl SyncEngine {
         let pending_changes = count_pending_changes(&conn)?;
         let conflicts_count = count_conflicts(&conn)?;
 
+        // Check if currently syncing using SyncState
+        let is_syncing = self.sync_state.as_ref().map_or(false, |s| {
+            matches!(s.get_status(), crate::sync::state::SyncStatus::Syncing { .. })
+        });
+
         Ok(SyncStatus {
             enabled: config.enabled,
-            is_syncing: false, // TODO: track sync state
+            is_syncing,
             last_sync_at: config.last_sync_at,
             last_sync_status: config.last_sync_status,
             pending_changes,
@@ -57,8 +97,14 @@ impl SyncEngine {
             errors: Vec::new(),
         };
 
+        // Set syncing state at the start
+        self.set_syncing(0);
+
         // 1. Create sync log entry
-        let log_id = self.create_sync_log()?;
+        let log_id = self.create_sync_log().map_err(|e| {
+            self.set_error(&e);
+            e
+        })?;
 
         // 2. Get sync configuration
         let config = {
@@ -67,6 +113,7 @@ impl SyncEngine {
         };
 
         if !config.enabled {
+            self.set_idle();
             return Err("Sync is not enabled".to_string());
         }
 
@@ -76,6 +123,7 @@ impl SyncEngine {
         // 4. Ensure base path exists
         client.ensure_base_path().await.map_err(|e| {
             self.update_sync_log(log_id, "failed", 0, 0, 0, Some(&e));
+            self.set_error(&e);
             e
         })?;
 
@@ -83,14 +131,23 @@ impl SyncEngine {
         let delta = DeltaCalculator::new(Arc::clone(&self.db));
         let serializer = SyncSerializer::new(Arc::clone(&self.db));
 
+        // Update progress: starting upload phase
+        self.set_syncing(10);
+
         // 6. Upload pending changes
         let upload_entities = delta.get_upload_entities().map_err(|e| {
             self.update_sync_log(log_id, "failed", 0, 0, 0, Some(&e));
+            self.set_error(&e);
             e
         })?;
 
-        for entity in upload_entities {
-            match self.upload_entity(&client, &serializer, &entity).await {
+        let total_entities = upload_entities.len().max(1);
+        for (idx, entity) in upload_entities.iter().enumerate() {
+            // Update progress during upload (10-40%)
+            let progress = 10 + ((idx as u32 * 30) / total_entities as u32);
+            self.set_syncing(progress);
+
+            match self.upload_entity(&client, &serializer, entity).await {
                 Ok(()) => {
                     result.uploaded += 1;
                     // Mark as synced
@@ -108,6 +165,7 @@ impl SyncEngine {
         }
 
         // 7. Get remote manifest
+        self.set_syncing(45);
         let remote_manifest = match self.get_remote_manifest(&client).await {
             Ok(m) => m,
             Err(e) => {
@@ -119,11 +177,18 @@ impl SyncEngine {
         // 8. Calculate download delta
         let download_delta = delta.get_download_delta(&remote_manifest).map_err(|e| {
             self.update_sync_log(log_id, "failed", result.uploaded, 0, 0, Some(&e));
+            self.set_error(&e);
             e
         })?;
 
         // 9. Download and apply remote changes
-        for entry in download_delta {
+        self.set_syncing(50);
+        let download_total = download_delta.len().max(1);
+        for (idx, entry) in download_delta.iter().enumerate() {
+            // Update progress during download (50-80%)
+            let progress = 50 + ((idx as u32 * 30) / download_total as u32);
+            self.set_syncing(progress);
+
             let parts: Vec<&str> = entry.split(':').collect();
             if parts.len() < 2 {
                 continue;
@@ -150,6 +215,7 @@ impl SyncEngine {
         }
 
         // 10. Detect and resolve conflicts
+        self.set_syncing(85);
         let resolver = ConflictResolver::new(
             Arc::clone(&self.db),
             ConflictResolution::from(config.conflict_strategy.as_str()),
@@ -166,6 +232,7 @@ impl SyncEngine {
         result.conflicts = conflicts.len() as i32;
 
         // Auto-resolve non-manual conflicts
+        self.set_syncing(90);
         if config.conflict_strategy != "manual-merge" {
             if let Ok(resolved) = resolver.resolve_all() {
                 result.conflicts -= resolved as i32;
@@ -173,6 +240,7 @@ impl SyncEngine {
         }
 
         // 11. Update sync log and config
+        self.set_syncing(95);
         let duration_ms = start_time.elapsed().as_millis() as i64;
         let status = if result.errors.is_empty() { "completed" } else { "partial" };
         let error_msg = if result.errors.is_empty() { 
@@ -191,6 +259,13 @@ impl SyncEngine {
         );
 
         self.update_sync_config(status, duration_ms)?;
+
+        // Set final state based on result
+        if result.errors.is_empty() {
+            self.set_idle();
+        } else {
+            self.set_error(&result.errors.join("; "));
+        }
 
         Ok(result)
     }
