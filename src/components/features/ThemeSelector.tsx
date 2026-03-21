@@ -379,18 +379,28 @@ export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<ThemeTab>("default");
   const [showGlassModal, setShowGlassModal] = useState(false);
-  const [customColors, setCustomColors] = useState<CustomThemeColors>(() =>
+
+  // Custom theme states
+  const [savedColors, setSavedColors] = useState<CustomThemeColors>(() =>
     loadCustomColors(),
   );
+  const [draftColors, setDraftColors] = useState<CustomThemeColors>(() =>
+    loadCustomColors(),
+  );
+  const [hasChanges, setHasChanges] = useState(false);
+
   useGlassSettings();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Apply custom colors when custom theme is active
+  // Sync draft with saved when theme changes to custom
   useEffect(() => {
     if (theme === "custom") {
-      applyCustomColors(customColors);
+      const loaded = loadCustomColors();
+      setSavedColors(loaded);
+      setDraftColors(loaded);
+      setHasChanges(false);
     }
-  }, [theme, customColors]);
+  }, [theme]);
 
   const handleThemeClick = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -409,28 +419,40 @@ export function ThemeSelector() {
     key: keyof CustomThemeColors,
     value: string,
   ) => {
-    setCustomColors((prev) => {
+    setDraftColors((prev) => {
       const newColors = { ...prev, [key]: value };
-      saveCustomColors(newColors);
-      if (theme === "custom") {
-        applyCustomColors(newColors);
-      }
+      setHasChanges(JSON.stringify(newColors) !== JSON.stringify(savedColors));
       return newColors;
     });
   };
 
   const handleSaveCustomTheme = () => {
-    saveCustomColors(customColors);
+    saveCustomColors(draftColors);
+    setSavedColors(draftColors);
     setTheme("custom");
-    applyCustomColors(customColors);
+    applyCustomColors(draftColors);
+    setHasChanges(false);
   };
 
   const handleResetCustomTheme = () => {
-    setCustomColors(defaultCustomColors);
-    saveCustomColors(defaultCustomColors);
+    // Reset to default colors
+    setDraftColors(defaultCustomColors);
+    setHasChanges(
+      JSON.stringify(defaultCustomColors) !== JSON.stringify(savedColors),
+    );
+
+    // If currently on custom theme, apply immediately
     if (theme === "custom") {
+      saveCustomColors(defaultCustomColors);
+      setSavedColors(defaultCustomColors);
       applyCustomColors(defaultCustomColors);
+      setHasChanges(false);
     }
+  };
+
+  const handleDiscardChanges = () => {
+    setDraftColors(savedColors);
+    setHasChanges(false);
   };
 
   // Get themes based on active tab
@@ -540,37 +562,37 @@ export function ThemeSelector() {
                 <ColorPicker
                   label="主色调"
                   description="按钮、链接、强调色"
-                  value={customColors.primary}
+                  value={draftColors.primary}
                   onChange={(v) => handleCustomColorChange("primary", v)}
                 />
                 <ColorPicker
                   label="次色调"
                   description="辅助按钮、标签"
-                  value={customColors.secondary}
+                  value={draftColors.secondary}
                   onChange={(v) => handleCustomColorChange("secondary", v)}
                 />
                 <ColorPicker
                   label="背景色"
                   description="页面背景"
-                  value={customColors.bg}
+                  value={draftColors.bg}
                   onChange={(v) => handleCustomColorChange("bg", v)}
                 />
                 <ColorPicker
                   label="卡片背景"
                   description="卡片、浮层背景"
-                  value={customColors.bgCard}
+                  value={draftColors.bgCard}
                   onChange={(v) => handleCustomColorChange("bgCard", v)}
                 />
                 <ColorPicker
                   label="文字颜色"
                   description="主要文字"
-                  value={customColors.text}
+                  value={draftColors.text}
                   onChange={(v) => handleCustomColorChange("text", v)}
                 />
                 <ColorPicker
                   label="次要文字"
                   description="提示、禁用状态"
-                  value={customColors.textMuted}
+                  value={draftColors.textMuted}
                   onChange={(v) => handleCustomColorChange("textMuted", v)}
                 />
               </div>
@@ -580,16 +602,16 @@ export function ThemeSelector() {
             <div
               className="rounded-2xl border-2 overflow-hidden"
               style={{
-                background: customColors.bg,
-                borderColor: customColors.primary,
+                background: draftColors.bg,
+                borderColor: draftColors.primary,
               }}
             >
               {/* Preview Header */}
               <div
                 className="px-5 py-4 border-b"
                 style={{
-                  background: customColors.bgCard,
-                  borderColor: customColors.primary + "40",
+                  background: draftColors.bgCard,
+                  borderColor: draftColors.primary + "40",
                 }}
               >
                 <div className="flex items-center justify-between">
@@ -597,7 +619,7 @@ export function ThemeSelector() {
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
                       style={{
-                        background: customColors.primary,
+                        background: draftColors.primary,
                         color: "#fff",
                       }}
                     >
@@ -606,13 +628,13 @@ export function ThemeSelector() {
                     <div>
                       <div
                         className="font-semibold"
-                        style={{ color: customColors.text }}
+                        style={{ color: draftColors.text }}
                       >
                         自定义主题
                       </div>
                       <div
                         className="text-xs"
-                        style={{ color: customColors.textMuted }}
+                        style={{ color: draftColors.textMuted }}
                       >
                         实时预览效果
                       </div>
@@ -621,8 +643,8 @@ export function ThemeSelector() {
                   <span
                     className="px-3 py-1 rounded-full text-xs font-medium"
                     style={{
-                      background: customColors.primary + "20",
-                      color: customColors.primary,
+                      background: draftColors.primary + "20",
+                      color: draftColors.primary,
                     }}
                   >
                     预览
@@ -633,7 +655,7 @@ export function ThemeSelector() {
               {/* Preview Content */}
               <div className="p-5 space-y-4">
                 {/* Sample Text */}
-                <p style={{ color: customColors.text }}>
+                <p style={{ color: draftColors.text }}>
                   这是一段示例文字，展示你的主题配色效果。
                 </p>
 
@@ -642,7 +664,7 @@ export function ThemeSelector() {
                   <span
                     className="px-4 py-2 rounded-lg text-sm font-medium"
                     style={{
-                      background: customColors.primary,
+                      background: draftColors.primary,
                       color: "#fff",
                     }}
                   >
@@ -651,7 +673,7 @@ export function ThemeSelector() {
                   <span
                     className="px-4 py-2 rounded-lg text-sm font-medium"
                     style={{
-                      background: customColors.secondary,
+                      background: draftColors.secondary,
                       color: "#fff",
                     }}
                   >
@@ -660,9 +682,9 @@ export function ThemeSelector() {
                   <span
                     className="px-4 py-2 rounded-lg text-sm border"
                     style={{
-                      background: customColors.bgCard,
-                      color: customColors.text,
-                      borderColor: customColors.primary + "40",
+                      background: draftColors.bgCard,
+                      color: draftColors.text,
+                      borderColor: draftColors.primary + "40",
                     }}
                   >
                     边框按钮
@@ -673,19 +695,19 @@ export function ThemeSelector() {
                 <div
                   className="p-4 rounded-xl"
                   style={{
-                    background: customColors.bgCard,
-                    border: `1px solid ${customColors.primary}30`,
+                    background: draftColors.bgCard,
+                    border: `1px solid ${draftColors.primary}30`,
                   }}
                 >
                   <div
                     className="font-medium mb-1"
-                    style={{ color: customColors.text }}
+                    style={{ color: draftColors.text }}
                   >
                     卡片标题
                   </div>
                   <div
                     className="text-sm"
-                    style={{ color: customColors.textMuted }}
+                    style={{ color: draftColors.textMuted }}
                   >
                     卡片内容的次要文字颜色效果展示
                   </div>
@@ -695,14 +717,14 @@ export function ThemeSelector() {
                 <div
                   className="flex items-center gap-3 p-3 rounded-lg"
                   style={{
-                    background: customColors.bgCard,
+                    background: draftColors.bgCard,
                   }}
                 >
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
                     style={{
-                      background: customColors.primary + "20",
-                      color: customColors.primary,
+                      background: draftColors.primary + "20",
+                      color: draftColors.primary,
                     }}
                   >
                     ✓
@@ -710,13 +732,13 @@ export function ThemeSelector() {
                   <div className="flex-1">
                     <div
                       className="text-sm font-medium"
-                      style={{ color: customColors.text }}
+                      style={{ color: draftColors.text }}
                     >
                       列表项标题
                     </div>
                     <div
                       className="text-xs"
-                      style={{ color: customColors.textMuted }}
+                      style={{ color: draftColors.textMuted }}
                     >
                       列表项描述文字
                     </div>
@@ -724,8 +746,8 @@ export function ThemeSelector() {
                   <span
                     className="text-xs px-2 py-1 rounded"
                     style={{
-                      background: customColors.secondary + "20",
-                      color: customColors.secondary,
+                      background: draftColors.secondary + "20",
+                      color: draftColors.secondary,
                     }}
                   >
                     标签
@@ -737,24 +759,40 @@ export function ThemeSelector() {
 
           {/* Action Buttons */}
           <div className="flex gap-3">
+            {hasChanges && (
+              <Button
+                variant="secondary"
+                onClick={handleDiscardChanges}
+                className="flex-1 py-3"
+              >
+                <span className="mr-2">↩</span>
+                放弃修改
+              </Button>
+            )}
             <Button
               variant="secondary"
               onClick={handleResetCustomTheme}
               className="flex-1 py-3"
             >
               <span className="mr-2">↺</span>
-              重置
+              重置默认
             </Button>
             <Button
               onClick={handleSaveCustomTheme}
               className="flex-1 py-3"
+              disabled={!hasChanges && theme === "custom"}
               style={{
                 background:
-                  theme === "custom" ? "var(--color-primary)" : undefined,
+                  hasChanges || theme !== "custom"
+                    ? "var(--color-primary)"
+                    : undefined,
+                opacity: !hasChanges && theme === "custom" ? 0.6 : 1,
               }}
             >
-              <span className="mr-2">{theme === "custom" ? "✓" : "✨"}</span>
-              {theme === "custom" ? "已应用" : "应用主题"}
+              <span className="mr-2">
+                {theme === "custom" && !hasChanges ? "✓" : "✨"}
+              </span>
+              {theme === "custom" && !hasChanges ? "已应用" : "应用主题"}
             </Button>
           </div>
 
@@ -763,12 +801,28 @@ export function ThemeSelector() {
             <div
               className="p-4 rounded-xl text-sm text-center flex items-center justify-center gap-2"
               style={{
-                background: "var(--color-primary) + 10",
-                color: "var(--color-primary)",
+                background: hasChanges
+                  ? "var(--color-warning) + 15"
+                  : "var(--color-primary) + 10",
+                color: hasChanges
+                  ? "var(--color-warning)"
+                  : "var(--color-primary)",
               }}
             >
-              <span>✓</span>
-              <span>自定义主题已启用</span>
+              <span>{hasChanges ? "⚠" : "✓"}</span>
+              <span>{hasChanges ? `有未保存的修改` : "自定义主题已启用"}</span>
+            </div>
+          )}
+          {theme !== "custom" && hasChanges && (
+            <div
+              className="p-4 rounded-xl text-sm text-center flex items-center justify-center gap-2"
+              style={{
+                background: "var(--color-warning) + 15",
+                color: "var(--color-warning)",
+              }}
+            >
+              <span>💡</span>
+              <span>点击"应用主题"切换到自定义主题</span>
             </div>
           )}
         </div>
