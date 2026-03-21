@@ -6,7 +6,7 @@ import { AboutCard } from "../AboutCard";
 // Mock package.json
 vi.mock("../../../package.json", () => ({
   default: {
-    version: "0.6.1",
+    version: "0.6.2",
   },
 }));
 
@@ -34,7 +34,7 @@ describe("AboutCard", () => {
 
     it("显示版本号", () => {
       render(<AboutCard />);
-      expect(screen.getByText("0.6.1")).toBeInTheDocument();
+      expect(screen.getByText("0.6.2")).toBeInTheDocument();
     });
 
     it("显示构建信息", () => {
@@ -94,7 +94,7 @@ describe("AboutCard", () => {
       expect(screen.getByText("Plan Todos")).toBeInTheDocument();
 
       expect(screen.getByText("版本")).toBeInTheDocument();
-      expect(screen.getByText("0.6.1")).toBeInTheDocument();
+      expect(screen.getByText("0.6.2")).toBeInTheDocument();
 
       expect(screen.getByText("构建")).toBeInTheDocument();
       expect(screen.getByText("Tauri + Next.js")).toBeInTheDocument();
@@ -106,7 +106,7 @@ describe("AboutCard", () => {
       // 验证版本号是静态导入的
       const { container } = render(<AboutCard />);
       const versionSpan = container.querySelectorAll(".font-medium")[1];
-      expect(versionSpan).toHaveTextContent("0.6.1");
+      expect(versionSpan).toHaveTextContent("0.6.2");
     });
   });
 
@@ -121,7 +121,7 @@ describe("AboutCard", () => {
       expect(container).toHaveTextContent("应用名称");
       expect(container).toHaveTextContent("Plan Todos");
       expect(container).toHaveTextContent("版本");
-      expect(container).toHaveTextContent("0.6.1");
+      expect(container).toHaveTextContent("0.6.2");
       expect(container).toHaveTextContent("构建");
       expect(container).toHaveTextContent("Tauri + Next.js");
     });

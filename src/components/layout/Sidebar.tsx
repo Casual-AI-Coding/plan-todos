@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { SearchBar } from "@/components/features";
-import { Bell, LucideIcon } from "lucide-react";
+import { ChevronRight, LucideIcon } from "lucide-react";
 import { ComponentType } from "react";
 interface MenuItem {
   id: string;
@@ -30,33 +30,36 @@ const menus: MenuItem[] = [
   { id: "views", icon: "👁️", label: "视图查看" },
   { id: "statistics", icon: "📈", label: "数据统计" },
   {
+    id: "notifications",
+    icon: "🔔",
+    label: "通知",
+    children: [
+      { id: "notification-center", icon: "📨", label: "通知中心" },
+      { id: "settings-channels", icon: "📢", label: "通知渠道" },
+      { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
+      {
+        id: "settings-circulation-notifications",
+        icon: "⏰",
+        label: "打卡通知",
+      },
+    ],
+  },
+  {
+    id: "data-management",
+    icon: "💾",
+    label: "数据管理",
+    children: [
+      { id: "data-import-export", icon: "🔄", label: "导入/导出" },
+      { id: "settings-sync", icon: "☁️", label: "云同步" },
+    ],
+  },
+  {
     id: "settings",
     icon: "⚙️",
     label: "设置",
     children: [
       { id: "settings-general", icon: "🎨", label: "通用" },
       { id: "settings-tags", icon: "🏷️", label: "标签管理" },
-      { id: "settings-sync", icon: "☁️", label: "云同步" },
-      {
-        id: "settings-notifications",
-        icon: "🔔",
-        label: "通知",
-        children: [
-          {
-            id: "notifications",
-            icon: Bell,
-            label: "通知中心",
-            href: "/notifications",
-          },
-          { id: "settings-channels", icon: "📢", label: "通知渠道" },
-          { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
-          {
-            id: "settings-circulation-notifications",
-            icon: "🔄",
-            label: "打卡通知",
-          },
-        ],
-      },
     ],
   },
   { id: "settings-about", icon: "ℹ️", label: "关于" },
@@ -69,7 +72,7 @@ export function Sidebar({
   isMobile = false,
 }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(
-    new Set(["settings"]),
+    new Set(["notifications", "data-management", "settings"]),
   );
 
   // Use useEffect to avoid hydration mismatch - start with false on both server and client
@@ -298,16 +301,16 @@ export function Sidebar({
         >
           {hasChildren && !isCollapsed && (
             <span
-              className={`w-3 flex-shrink-0 ${isExpanded ? "rotate-90" : ""}`}
+              className={`w-4 h-4 flex-shrink-0 flex items-center justify-center ${isExpanded ? "rotate-90" : ""}`}
               style={{
                 color: isCurrentActive
                   ? "var(--color-text-inverse)"
-                  : "var(--color-text)",
-                transition: "transform 0.2s",
+                  : "var(--color-text-muted)",
+                transition: "transform 0.2s ease",
               }}
               aria-hidden="true"
             >
-              ▶
+              <ChevronRight className="w-4 h-4" />
             </span>
           )}
           <span className="text-base" aria-hidden="true">

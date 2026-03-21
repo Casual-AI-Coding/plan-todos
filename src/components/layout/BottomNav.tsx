@@ -10,7 +10,7 @@ const navItems = [
   { id: "todos", icon: "📋", label: "待办" },
   { id: "circulations", icon: "🔄", label: "打卡" },
   { id: "plans", icon: "🚀", label: "计划" },
-  { id: "settings", icon: "⚙️", label: "设置" },
+  { id: "settings", icon: "⚙️", label: "更多" },
 ];
 
 export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
@@ -26,7 +26,9 @@ export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
         {navItems.map((item) => {
           const isActive =
             activeMenu === item.id ||
-            (item.id === "settings" && activeMenu.startsWith("settings"));
+            (item.id === "settings" &&
+              (activeMenu.startsWith("settings") ||
+                activeMenu.startsWith("data-management")));
 
           return (
             <button

@@ -132,7 +132,7 @@ export function SettingsNotificationsView() {
           className="text-2xl font-semibold mb-6"
           style={{ color: "var(--color-text)" }}
         >
-          设置 &gt; 通知
+          通知 &gt; 设置
         </h2>
         <div
           className="text-center py-8"
@@ -150,7 +150,7 @@ export function SettingsNotificationsView() {
         className="text-2xl font-semibold mb-6"
         style={{ color: "var(--color-text)" }}
       >
-        设置 &gt; 通知
+        通知 &gt; 设置
       </h2>
 
       {/* Master Toggle */}

@@ -150,7 +150,7 @@ export function SettingsCirculationNotificationsView() {
         className="text-xl font-semibold"
         style={{ color: "var(--color-text)" }}
       >
-        打卡通知设置
+        通知 &gt; 打卡通知
       </h2>
 
       {/* Global Settings Card */}

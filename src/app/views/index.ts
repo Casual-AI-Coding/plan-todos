@@ -15,3 +15,5 @@ export { SettingsCirculationNotificationsView } from "./SettingsCirculationNotif
 export { CirculationsView } from "./CirculationsView";
 export { CirculationDetailView } from "./CirculationDetailView";
 export { NotificationCenterView } from "./NotificationCenterView";
+export { ImportExportView } from "./ImportExportView";
+export { DataManagementView } from "./DataManagementView";

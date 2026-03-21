@@ -69,7 +69,7 @@ export function SettingsChannelsView() {
           className="text-2xl font-semibold"
           style={{ color: "var(--color-text)" }}
         >
-          设置 &gt; 通知 &gt; 通知渠道
+          通知 &gt; 通知渠道
         </h2>
         <Button onClick={() => setShowAddModal(true)}>+ 添加通知渠道</Button>
       </div>

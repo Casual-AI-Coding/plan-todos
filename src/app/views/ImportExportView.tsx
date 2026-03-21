@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Button } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 import { Icons } from "@/components/ui/Icons";
 import {
   exportData,
@@ -18,9 +18,9 @@ interface ImportModeOption {
 }
 
 const importModes: ImportModeOption[] = [
-  { value: "merge", label: "合并", description: "跳过重复数据" },
-  { value: "replace", label: "替换", description: "清空后导入" },
-  { value: "update", label: "更新", description: "存在则更新" },
+  { value: "merge", label: "合并", description: "跳过重复数据，保留现有数据" },
+  { value: "replace", label: "替换", description: "清空现有数据后导入" },
+  { value: "update", label: "更新", description: "存在则更新，不存在则添加" },
 ];
 
 export function ImportExportView() {
@@ -103,120 +103,170 @@ export function ImportExportView() {
 
   return (
     <div className="space-y-6">
-      {/* Export Section */}
-      <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-r from-gray-50 to-white">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
-            <Icons.Download className="w-5 h-5" />
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Export Card */}
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: "rgba(20, 184, 166, 0.1)" }}
+            >
+              <Icons.Download
+                className="w-6 h-6"
+                style={{ color: "#14b8a6" }}
+              />
+            </div>
+            <div>
+              <h3
+                className="font-semibold text-lg"
+                style={{ color: "var(--color-text)" }}
+              >
+                导出数据
+              </h3>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                备份所有数据到本地
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 mb-1">导出数据</h3>
-            <p className="text-sm text-gray-500 mb-3">
-              将所有数据导出为 JSON 文件，可用于备份或迁移
-            </p>
 
-            <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
-              <Icons.Info className="w-4 h-4" />
-              <span>
-                导出包含: Todos, Tasks, Plans, Targets, Steps, Milestones, Tags,
+          <div
+            className="p-4 rounded-lg mb-4 text-sm"
+            style={{ backgroundColor: "var(--color-bg-hover)" }}
+          >
+            <div className="flex items-start gap-2">
+              <Icons.Info
+                className="w-4 h-4 flex-shrink-0 mt-0.5"
+                style={{ color: "var(--color-text-muted)" }}
+              />
+              <span style={{ color: "var(--color-text-secondary)" }}>
+                导出包含：Todos, Tasks, Plans, Targets, Steps, Milestones, Tags,
                 Settings
               </span>
             </div>
+          </div>
 
-            <Button
-              onClick={handleExport}
-              disabled={exporting}
-              variant="secondary"
-              className="gap-2"
+          <Button
+            onClick={handleExport}
+            disabled={exporting}
+            variant="primary"
+            className="w-full gap-2"
+          >
+            <Icons.Download className="w-4 h-4" />
+            {exporting ? "导出中..." : "导出数据"}
+          </Button>
+        </Card>
+
+        {/* Import Card */}
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: "rgba(59, 130, 246, 0.1)" }}
             >
-              <Icons.Download className="w-4 h-4" />
-              {exporting ? "导出中..." : "导出数据"}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Import Section */}
-      <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-r from-gray-50 to-white">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-            <Icons.Upload className="w-5 h-5" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 mb-1">导入数据</h3>
-            <p className="text-sm text-gray-500 mb-3">
-              从 JSON 备份文件恢复数据
-            </p>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept=".json"
-              onChange={(e) =>
-                e.target.files?.[0] && handleImport(e.target.files[0])
-              }
-              className="hidden"
-            />
-
-            {/* Import Mode Selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                导入模式:
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {importModes.map((m) => (
-                  <label
-                    key={m.value}
-                    className={`relative flex flex-col p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      mode === m.value
-                        ? "border-teal-500 bg-teal-50"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <input
-                        type="radio"
-                        name="importMode"
-                        checked={mode === m.value}
-                        onChange={() => setMode(m.value)}
-                        className="sr-only"
-                      />
-                      <span
-                        className={`text-sm font-medium ${mode === m.value ? "text-teal-700" : "text-gray-700"}`}
-                      >
-                        {m.label}
-                      </span>
-                      {mode === m.value && (
-                        <div className="ml-auto text-teal-500">
-                          <Icons.Check className="w-4 h-4" />
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {m.description}
-                    </span>
-                  </label>
-                ))}
-              </div>
+              <Icons.Upload className="w-6 h-6" style={{ color: "#3b82f6" }} />
             </div>
-
-            <Button
-              variant="secondary"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={importing}
-              className="gap-2"
-            >
-              <Icons.Upload className="w-4 h-4" />
-              {importing ? "导入中..." : "选择文件导入"}
-            </Button>
+            <div>
+              <h3
+                className="font-semibold text-lg"
+                style={{ color: "var(--color-text)" }}
+              >
+                导入数据
+              </h3>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                从备份文件恢复数据
+              </p>
+            </div>
           </div>
-        </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".json"
+            onChange={(e) =>
+              e.target.files?.[0] && handleImport(e.target.files[0])
+            }
+            className="hidden"
+          />
+
+          {/* Import Mode Selection */}
+          <div className="mb-4">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "var(--color-text)" }}
+            >
+              导入模式
+            </label>
+            <div className="space-y-2">
+              {importModes.map((m) => (
+                <label
+                  key={m.value}
+                  className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                    mode === m.value
+                      ? "border-teal-500"
+                      : "border-transparent hover:border-gray-200"
+                  }`}
+                  style={{
+                    backgroundColor:
+                      mode === m.value
+                        ? "rgba(20, 184, 166, 0.05)"
+                        : "var(--color-bg-hover)",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="importMode"
+                    checked={mode === m.value}
+                    onChange={() => setMode(m.value)}
+                    className="w-4 h-4 text-teal-500 focus:ring-teal-500"
+                  />
+                  <div className="flex-1">
+                    <div
+                      className={`text-sm font-medium ${mode === m.value ? "text-teal-700" : ""}`}
+                      style={{
+                        color:
+                          mode === m.value ? "#0d9488" : "var(--color-text)",
+                      }}
+                    >
+                      {m.label}
+                    </div>
+                    <div
+                      className="text-xs"
+                      style={{ color: "var(--color-text-muted)" }}
+                    >
+                      {m.description}
+                    </div>
+                  </div>
+                  {mode === m.value && (
+                    <Icons.Check className="w-5 h-5 text-teal-500" />
+                  )}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <Button
+            variant="secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="w-full gap-2"
+          >
+            <Icons.Upload className="w-4 h-4" />
+            {importing ? "导入中..." : "选择文件导入"}
+          </Button>
+        </Card>
       </div>
 
       {/* Message */}
       {message && (
         <div
-          className={`flex items-start gap-2 p-4 rounded-lg text-sm ${
+          className={`flex items-start gap-3 p-4 rounded-lg text-sm ${
             message.type === "success"
               ? "bg-green-50 text-green-800 border border-green-200"
               : "bg-red-50 text-red-800 border border-red-200"

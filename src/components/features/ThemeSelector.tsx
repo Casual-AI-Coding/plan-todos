@@ -2,32 +2,24 @@
 
 import { useState, useRef } from "react";
 import { useTheme, ThemeId } from "@/hooks/useTheme";
-import { themeListWithSystem } from "@/lib/themes/registry";
+import {
+  themeListWithSystem,
+  lightThemes,
+  darkThemes,
+  systemThemeDisplay,
+  Theme,
+} from "@/lib/themes/registry";
 import { useGlassSettings } from "@/hooks/useGlassSettings";
 import { Modal, Button } from "@/components/ui";
 
-// Custom theme order: System -> Light -> Dark -> Glass -> Dracula -> Nord -> Monokai -> Spring -> Catppuccin -> Tokyo Night -> One Dark
-const themeOrder: ThemeId[] = [
-  "system",
-  "light",
-  "dark",
-  "glass",
-  "dracula",
-  "nord",
-  "monokai",
-  "spring",
-  "catppuccin",
-  "tokyoNight",
-  "oneDark",
-];
+type ThemeTab = "default" | "light" | "dark";
 
-function reorderThemes(themes: typeof themeListWithSystem) {
-  return [...themes].sort((a, b) => {
-    const orderA = themeOrder.indexOf(a.id);
-    const orderB = themeOrder.indexOf(b.id);
-    return orderA - orderB;
-  });
-}
+// Default themes: system, light, dark
+const defaultThemes = [
+  systemThemeDisplay,
+  lightThemes[0],
+  darkThemes[0],
+].filter(Boolean);
 
 function GlassSettingsModal({
   open,
@@ -39,8 +31,6 @@ function GlassSettingsModal({
   const { glassBlur, glassOpacity, setGlassBlur, setGlassOpacity } =
     useGlassSettings();
 
-  // Initialize temp values from glass settings
-  // Using key prop on modal to reset state on re-open
   const [tempBlurValue, setTempBlurValue] = useState(glassBlur);
   const [tempOpacityValue, setTempOpacityValue] = useState(glassOpacity);
 
@@ -51,7 +41,6 @@ function GlassSettingsModal({
   };
 
   const handleCancel = () => {
-    // Reset to saved values
     document.documentElement.style.setProperty(
       "--glass-blur",
       `${glassBlur}px`,
@@ -63,7 +52,6 @@ function GlassSettingsModal({
     onClose();
   };
 
-  // Apply preview in real-time
   const handleBlurChange = (value: number) => {
     setTempBlurValue(value);
     document.documentElement.style.setProperty("--glass-blur", `${value}px`);
@@ -198,78 +186,164 @@ function GlassSettingsModal({
   );
 }
 
+// Theme Card Component
+function ThemeCard({
+  theme: t,
+  isActive,
+  onClick,
+}: {
+  theme: Theme;
+  isActive: boolean;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        p-3 rounded-lg border-2 transition-all flex flex-col items-center
+        select-none
+        ${
+          isActive
+            ? "border-[var(--color-primary)] bg-[var(--color-primary)]/15"
+            : "border-[var(--color-border)] hover:border-[var(--color-primary)]/50"
+        }
+      `}
+      style={{
+        background: isActive ? undefined : t.colors.bg,
+      }}
+    >
+      <div
+        className="w-10 h-10 rounded mb-2 flex items-center justify-center text-lg border"
+        style={{
+          background: t.colors.bg,
+          borderColor: t.colors.border,
+        }}
+      >
+        {t.icon}
+      </div>
+      <span
+        className="text-xs font-medium truncate w-full text-center"
+        style={{
+          color: isActive ? "var(--color-primary)" : "var(--color-text)",
+        }}
+      >
+        {t.name}
+      </span>
+    </button>
+  );
+}
+
+// Tab Button Component
+function TabButton({
+  active,
+  onClick,
+  children,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  icon?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+        flex items-center gap-2
+        ${
+          active
+            ? "bg-[var(--color-primary)] text-white"
+            : "bg-transparent text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
+        }
+      `}
+    >
+      {icon && <span className="text-base">{icon}</span>}
+      <span>{children}</span>
+    </button>
+  );
+}
+
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
-  const orderedThemes = reorderThemes(themeListWithSystem);
+  const [activeTab, setActiveTab] = useState<ThemeTab>("default");
   const [showGlassModal, setShowGlassModal] = useState(false);
-  // glass settings are accessed via useGlassSettings in the modal
   useGlassSettings();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Click once to switch theme
-  // If click on already active theme, only open settings modal for Glass theme
   const handleThemeClick = (
     e: React.MouseEvent<HTMLButtonElement>,
     themeId: ThemeId,
   ) => {
-    // Remove focus from clicked button immediately
     e.currentTarget.blur();
 
     if (themeId === theme) {
-      // Already on this theme, open settings modal
       setShowGlassModal(true);
     } else {
-      // Switch to new theme
       setTheme(themeId);
     }
   };
 
-  return (
-    <div data-theme-selector ref={containerRef}>
-      <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-        {orderedThemes.map((t) => {
-          const isActive = theme === t.id;
+  // Get themes based on active tab
+  const getThemes = (): Theme[] => {
+    switch (activeTab) {
+      case "default":
+        return defaultThemes;
+      case "light":
+        return lightThemes;
+      case "dark":
+        return darkThemes;
+      default:
+        return defaultThemes;
+    }
+  };
 
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={(e) => handleThemeClick(e, t.id)}
-              className={`
-                p-4 rounded-lg border-2 transition-all flex flex-col items-center
-                select-none
-                ${
-                  isActive
-                    ? "border-[var(--color-primary)] bg-[var(--color-primary)]/15"
-                    : "border-[var(--color-border)] hover:border-[var(--color-primary)]/50"
-                }
-              `}
-              style={{
-                background: isActive ? undefined : t.colors.bg,
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded mb-2 flex items-center justify-center text-xs border"
-                style={{
-                  background: t.colors.bg,
-                  borderColor: t.colors.border,
-                }}
-              >
-                {t.icon}
-              </div>
-              <span
-                className="text-xs font-medium"
-                style={{
-                  color: isActive
-                    ? "var(--color-primary)"
-                    : "var(--color-text)",
-                }}
-              >
-                {t.name}
-              </span>
-            </button>
-          );
-        })}
+  const displayedThemes = getThemes();
+
+  return (
+    <div data-theme-selector ref={containerRef} className="space-y-4">
+      {/* Tabs */}
+      <div
+        className="flex gap-2 p-2 rounded-xl mb-6 border"
+        style={{
+          backgroundColor: "var(--color-bg-card)",
+          borderColor: "var(--color-border)",
+        }}
+      >
+        <TabButton
+          active={activeTab === "default"}
+          onClick={() => setActiveTab("default")}
+          icon="✨"
+        >
+          Default
+        </TabButton>
+        <TabButton
+          active={activeTab === "light"}
+          onClick={() => setActiveTab("light")}
+          icon="☀️"
+        >
+          Light
+        </TabButton>
+        <TabButton
+          active={activeTab === "dark"}
+          onClick={() => setActiveTab("dark")}
+          icon="🌙"
+        >
+          Dark
+        </TabButton>
+      </div>
+
+      {/* Theme Grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+        {displayedThemes.map((t) => (
+          <ThemeCard
+            key={t.id}
+            theme={t}
+            isActive={theme === t.id}
+            onClick={(e) => handleThemeClick(e, t.id)}
+          />
+        ))}
       </div>
 
       {/* Glass Theme Settings Modal */}

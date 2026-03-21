@@ -7,6 +7,7 @@ import {
   themes,
   defaultTheme,
   systemTheme,
+  getTheme,
 } from "@/lib/themes/registry";
 
 const THEME_KEY = "plan-todos-theme";
@@ -14,6 +15,7 @@ const THEME_KEY = "plan-todos-theme";
 /**
  * Get the actual theme to apply based on stored theme preference
  * If theme is 'system', returns 'light' or 'dark' based on system preference
+ * Otherwise returns the theme as-is (supports all custom themes)
  */
 function getEffectiveTheme(storedTheme: ThemeId): ThemeId {
   if (storedTheme === "system") {
@@ -24,6 +26,7 @@ function getEffectiveTheme(storedTheme: ThemeId): ThemeId {
     }
     return "light";
   }
+  // Return the theme as-is for all custom themes (pastel, mint, etc.)
   return storedTheme;
 }
 
@@ -110,14 +113,19 @@ export function useTheme() {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const effectiveTheme = getEffectiveTheme(theme);
-    const newTheme = effectiveTheme === "light" ? "dark" : "light";
-    setTheme(newTheme);
+    const themeObj = getTheme(theme);
+    // Toggle between light and dark type
+    if (themeObj.type === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
   }, [theme, setTheme]);
 
   // Determine if currently in dark mode
   const effectiveTheme = getEffectiveTheme(theme);
-  const isDark = effectiveTheme === "dark";
+  const themeObj = getTheme(theme);
+  const isDark = themeObj.type === "dark";
 
   return {
     theme,

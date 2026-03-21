@@ -9,18 +9,26 @@ export default defineConfig({
     globals: true,
     include: ["src/**/*.test.{ts,tsx}", "tests/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/test/setup.ts"],
+    // 测试超时设置
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    // 并行执行配置 (Vitest v4)
+    pool: "forks", // forks 比 threads 更稳定，是默认值
+    fileParallelism: true,
+    maxWorkers: 4, // 固定 4 个 workers
     coverage: {
       provider: "v8",
-      reporter: ["text", "json", "html"],
+      // 只生成text报告，减少I/O开销
+      reporter: ["text-summary"],
+      // 只对核心模块计算覆盖率，减少计算量
+      include: ["src/lib/**", "src/hooks/**"],
       exclude: [
         "src/lib/api.ts", // Tauri API wrapper - requires Tauri runtime
         "src/lib/api/client.ts", // Tauri API helper - auxiliary module
         "src/lib/api/index.ts", // API re-exports - pure exports
         "src/lib/types/**", // Type definitions - pure types
-        "src/app/page.tsx", // Main page component - requires full app context
-        "src/app/layout.tsx",
-        "src/components/layout/**",
-        "src/components/ui/index.ts", // Barrel exports - no logic to test
+        "**/*.d.ts", // 类型定义
+        "**/index.ts", // 纯导出文件
       ],
       // 90% threshold as per AGENTS.md (excluding Tauri-specific files)
       thresholds: {

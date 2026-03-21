@@ -76,7 +76,7 @@ export function SettingsDailySummaryView() {
           className="text-2xl font-semibold mb-6"
           style={{ color: "var(--color-text)" }}
         >
-          设置 &gt; 通知 &gt; 每日汇总
+          通知 &gt; 每日汇总
         </h2>
         <div className="text-center text-gray-500 py-8">加载中...</div>
       </div>
@@ -89,7 +89,7 @@ export function SettingsDailySummaryView() {
         className="text-2xl font-semibold mb-6"
         style={{ color: "var(--color-text)" }}
       >
-        设置 &gt; 通知 &gt; 每日汇总
+        通知 &gt; 每日汇总
       </h2>
 
       <Card className="mb-6">

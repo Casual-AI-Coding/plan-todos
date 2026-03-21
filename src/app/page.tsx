@@ -23,6 +23,8 @@ import {
   CirculationsView,
   CirculationDetailView,
   NotificationCenterView,
+  ImportExportView,
+  DataManagementView,
 } from "./views";
 
 // Main App
@@ -103,10 +105,24 @@ export default function Home() {
         view = <StatisticsView />;
         break;
       case "notifications":
+      case "notification-center":
         view = <NotificationCenterView />;
         break;
-      case "settings":
-        view = <StatisticsView />;
+      case "settings-channels":
+        view = <SettingsChannelsView />;
+        break;
+      case "settings-daily-summary":
+        view = <SettingsDailySummaryView />;
+        break;
+      case "settings-circulation-notifications":
+        view = <SettingsCirculationNotificationsView />;
+        break;
+      case "data-management":
+      case "data-import-export":
+        view = <DataManagementView />;
+        break;
+      case "settings-sync":
+        view = <SettingsSyncView />;
         break;
       case "settings":
       case "settings-general":
