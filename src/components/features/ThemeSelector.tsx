@@ -396,9 +396,12 @@ export function ThemeSelector() {
   useEffect(() => {
     if (theme === "custom") {
       const loaded = loadCustomColors();
-      setSavedColors(loaded);
-      setDraftColors(loaded);
-      setHasChanges(false);
+      // Use a single state update to avoid cascading renders
+      requestAnimationFrame(() => {
+        setSavedColors(loaded);
+        setDraftColors(loaded);
+        setHasChanges(false);
+      });
     }
   }, [theme]);
 
@@ -822,7 +825,7 @@ export function ThemeSelector() {
               }}
             >
               <span>💡</span>
-              <span>点击"应用主题"切换到自定义主题</span>
+              <span>点击&quot;应用主题&quot;切换到自定义主题</span>
             </div>
           )}
         </div>

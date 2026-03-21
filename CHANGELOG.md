@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] - 2026-03-21
+
+### Added
+
+**主题系统增强 (Theme System Enhancements)**:
+
+- 新增 Style 分类 - 10 个特色主题：
+  - 黑神话 (Black Myth) - 中国神话风格，金/深红/翡翠绿配色
+  - 赛博朋克 (Cyberpunk) - 未来霓虹风格，青/洋红/黑配色
+  - 万圣节 (Halloween) - 恐怖节日氛围，橙/黑/紫配色
+  - 圣诞节 (Christmas) - 节日喜庆风格，红/绿/白/金配色
+  - 手账风 (Handwritten) - 温暖手写风格，米色/棕色配色
+  - 田园风 (Cottagecore) - 自然田园浪漫，柔粉/麦色配色
+  - 蒸汽波 (Vaporwave) - 复古未来主义，粉/紫/青配色
+  - 暗黑学院 (Dark Academia) - 学术复古文学，深棕/象牙配色
+  - 可爱风 (Kawaii) - 日系软萌可爱，粉/薄荷绿配色
+  - 复古90s (Retro 90s) - 90年代怀旧风，亮紫/青/粉配色
+- 新增自定义主题 (Customized) 功能：
+  - 支持调整 6 个 CSS 变量：主色、次色、背景、卡片背景、文字、次要文字
+  - 实时预览效果，左右并排布局
+  - 草稿/保存分离模式，避免误操作
+  - 未保存修改提示和放弃修改功能
+- 新增字体大小调整功能：
+  - 设置 > 通用 > 字体大小
+  - 范围 12px ~ 24px，支持滑块和按钮调节
+  - 实时预览，全局生效
+
+**云同步 Phase 6 (Cloud Sync)**:
+
+- 新增同步引擎核心模块 (Rust)：
+  - `sync/engine.rs` - 同步引擎主控
+  - `sync/change_tracker.rs` - 变更追踪
+  - `sync/conflict.rs` - 冲突解决策略
+  - `sync/circuit_breaker.rs` - 熔断机制
+  - `sync/retry.rs` - 重试机制
+  - `sync/delta.rs` - 增量同步
+- 新增前端同步 API 和 Hook
+- 新增同步配置页面 `SettingsSyncView`
+
+**菜单结构调整**:
+
+- 提取"数据管理"为顶级菜单（从设置中移出）
+- 提取"通知"为顶级菜单（从设置中移出）
+- 新增数据管理独立页面 `DataManagementView`
+
+### Changed
+
+- 主题选择器 UI 重构，支持 5 个分类 Tab
+- 优化自定义主题 UX，添加草稿/保存分离模式
+- 修复主题卡片文字颜色可见性问题
+
+### Fixed
+
+- 修复 Dark/Light 分类混入 Style 主题问题
+- 修复 Custom 主题出现在 Dark 分类问题
+- 修复字体大小调整未全局生效问题
+
+---
+
 ## [0.6.2] - 2026-03-15
 
 ### Added
