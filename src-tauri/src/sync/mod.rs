@@ -10,6 +10,7 @@ pub mod delta;
 pub mod engine;
 pub mod retry;
 pub mod serializer;
+pub mod state;
 
 pub use circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitState};
 pub use change_tracker::ChangeTracker;
@@ -20,3 +21,4 @@ pub use delta::DeltaCalculator;
 pub use engine::SyncEngine;
 pub use retry::{RetryConfig, RetryResult, retry_with_backoff};
 pub use serializer::SyncSerializer;
+pub use state::{SyncState, SyncStatus};
