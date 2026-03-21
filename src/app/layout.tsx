@@ -35,9 +35,10 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-// Inline script to set theme before React loads - prevents hydration mismatch
-const themeScript = `
+// Inline script to set theme and font size before React loads - prevents hydration mismatch
+const initScript = `
 (function() {
+  // Set theme
   var theme = localStorage.getItem('plan-todos-theme');
   if (!theme) {
     theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -46,6 +47,15 @@ const themeScript = `
     document.documentElement.setAttribute('data-theme', theme);
   } else {
     document.documentElement.setAttribute('data-theme', 'light');
+  }
+  
+  // Set font size
+  var fontSize = localStorage.getItem('plan-todos-font-size');
+  if (fontSize) {
+    var parsed = parseInt(fontSize, 10);
+    if (!isNaN(parsed) && parsed >= 12 && parsed <= 24) {
+      document.documentElement.style.setProperty('--font-size-base', parsed + 'px');
+    }
   }
 })();
 `;
@@ -58,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: initScript }} />
       </head>
       <body
         className={`${firaCode.variable} ${firaSans.variable} antialiased min-h-screen`}
