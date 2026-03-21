@@ -12,6 +12,7 @@
   --color-cta: #f97316;
   --glass-blur: 0px;
   --glass-opacity: 1;
+  --font-size-base: 16px;
 
   /* Animation timing */
   --animation-easing-spring: cubic-bezier(0.22, 1, 0.36, 1);
@@ -1211,9 +1212,11 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: var(--font-size-base);
   transition:
     background-color 0.3s,
-    color 0.3s;
+    color 0.3s,
+    font-size 0.3s;
 }
 
 /* ============================================
