@@ -1534,12 +1534,14 @@ export const styleThemeIds: ThemeId[] = [
   "retro90s",
 ];
 
-// Theme type filters (exclude style themes)
+// Theme type filters (exclude style themes and custom)
 export const lightThemes = themeList.filter(
-  (t) => t.type === "light" && !styleThemeIds.includes(t.id),
+  (t) =>
+    t.type === "light" && !styleThemeIds.includes(t.id) && t.id !== "custom",
 );
 export const darkThemes = themeList.filter(
-  (t) => t.type === "dark" && !styleThemeIds.includes(t.id),
+  (t) =>
+    t.type === "dark" && !styleThemeIds.includes(t.id) && t.id !== "custom",
 );
 
 export const styleThemes = themeList.filter((t) =>
