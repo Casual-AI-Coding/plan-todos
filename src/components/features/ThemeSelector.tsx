@@ -314,19 +314,20 @@ function ThemeCard({
         select-none
         ${
           isActive
-            ? "border-[var(--color-primary)] bg-[var(--color-primary)]/15"
-            : "border-[var(--color-border)] hover:border-[var(--color-primary)]/50"
+            ? "border-[var(--color-primary)]"
+            : "border-transparent hover:border-[var(--color-primary)]/50"
         }
       `}
       style={{
-        background: isActive ? undefined : t.colors.bg,
+        background: t.colors.bg,
       }}
     >
       <div
-        className="w-10 h-10 rounded mb-2 flex items-center justify-center text-lg border"
+        className="w-10 h-10 rounded mb-2 flex items-center justify-center text-lg border-2"
         style={{
-          background: t.colors.bg,
-          borderColor: t.colors.border,
+          background: t.colors.bgCard,
+          borderColor: t.colors.primary,
+          color: t.colors.text,
         }}
       >
         {t.icon}
@@ -334,7 +335,7 @@ function ThemeCard({
       <span
         className="text-xs font-medium truncate w-full text-center"
         style={{
-          color: isActive ? "var(--color-primary)" : "var(--color-text)",
+          color: isActive ? "var(--color-primary)" : t.colors.text,
         }}
       >
         {t.name}
