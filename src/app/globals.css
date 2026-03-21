@@ -782,6 +782,350 @@
   --glass-inner-shadow: inset 0 1px 2px rgba(31, 36, 48, 0.5);
 }
 
+/* ==================== Style Themes ==================== */
+
+/* Black Myth Theme - 中国神话风 */
+[data-theme="blackMyth"] {
+  --color-bg: rgba(26, 26, 46, var(--glass-opacity, 1));
+  --color-bg-card: rgba(22, 33, 62, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(31, 43, 71, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(31, 43, 71, var(--glass-opacity, 1));
+  --color-text: #e8e8e8;
+  --color-text-muted: #a0a0a0;
+  --color-text-inverse: #1a1a2e;
+  --color-border: #2a2a4a;
+  --color-border-light: #3a3a5a;
+  --color-success: #50c878;
+  --color-warning: #ffd700;
+  --color-error: #dc2626;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --color-primary: #ffd700;
+  --color-secondary: #dc2626;
+  --color-cta: #50c878;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6), 0 16px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.7), 0 24px 48px rgba(0, 0, 0, 0.6);
+  --shadow-glow:
+    0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.2);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  --color-accent: #50c878;
+}
+
+/* Cyberpunk Theme - 赛博朋克 */
+[data-theme="cyberpunk"] {
+  --color-bg: rgba(10, 10, 15, var(--glass-opacity, 1));
+  --color-bg-card: rgba(18, 18, 26, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(26, 26, 37, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(26, 26, 37, var(--glass-opacity, 1));
+  --color-text: #e0e0e0;
+  --color-text-muted: #8888aa;
+  --color-text-inverse: #0a0a0f;
+  --color-border: #2a2a3a;
+  --color-border-light: #3a3a4a;
+  --color-success: #00ff6b;
+  --color-warning: #ffd700;
+  --color-error: #ff0055;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --color-primary: #00f0ff;
+  --color-secondary: #ff00ff;
+  --color-cta: #9d00ff;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7), 0 16px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.8), 0 24px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow:
+    0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
+  --glass-border-glow: inset 0 1px 0 rgba(0, 240, 255, 0.2);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  --color-accent: #9d00ff;
+}
+
+/* Halloween Theme - 万圣节 */
+[data-theme="halloween"] {
+  --color-bg: rgba(26, 15, 10, var(--glass-opacity, 1));
+  --color-bg-card: rgba(37, 24, 16, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(48, 32, 21, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(48, 32, 21, var(--glass-opacity, 1));
+  --color-text: #f5e6d3;
+  --color-text-muted: #b8a090;
+  --color-text-inverse: #1a0f0a;
+  --color-border: #3a2520;
+  --color-border-light: #4a3530;
+  --color-success: #00ff6b;
+  --color-warning: #ff6b00;
+  --color-error: #ff0040;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --color-primary: #ff6b00;
+  --color-secondary: #6b00ff;
+  --color-cta: #00ff6b;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7), 0 16px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.8), 0 24px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow:
+    0 0 20px rgba(255, 107, 0, 0.5), 0 0 40px rgba(255, 107, 0, 0.3);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  --color-accent: #00ff6b;
+}
+
+/* Christmas Theme - 圣诞节 (Light) */
+[data-theme="christmas"] {
+  --color-bg: rgba(248, 250, 248, var(--glass-opacity, 1));
+  --color-bg-card: rgba(255, 255, 255, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(240, 245, 240, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(232, 240, 232, var(--glass-opacity, 1));
+  --color-text: #2d2d2d;
+  --color-text-muted: #666666;
+  --color-text-inverse: #ffffff;
+  --color-border: #d0e0d0;
+  --color-border-light: #e0f0e0;
+  --color-success: #228b22;
+  --color-warning: #ffd700;
+  --color-error: #c41e3a;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --color-primary: #c41e3a;
+  --color-secondary: #228b22;
+  --color-cta: #ffd700;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 16px 32px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.16), 0 24px 48px rgba(0, 0, 0, 0.08);
+  --shadow-glow:
+    0 0 20px rgba(196, 30, 58, 0.3), 0 0 40px rgba(196, 30, 58, 0.15);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  --color-accent: #ffd700;
+}
+
+/* Handwritten Theme - 手账风 (Light) */
+[data-theme="handwritten"] {
+  --color-bg: rgba(250, 240, 230, var(--glass-opacity, 1));
+  --color-bg-card: rgba(255, 250, 245, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(245, 237, 229, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(240, 232, 224, var(--glass-opacity, 1));
+  --color-text: #4a3728;
+  --color-text-muted: #8b7355;
+  --color-text-inverse: #faf0e6;
+  --color-border: #e8d8c8;
+  --color-border-light: #f0e0d0;
+  --color-success: #6b8e23;
+  --color-warning: #d2691e;
+  --color-error: #cd5c5c;
+  --shadow-card: 0 1px 3px rgba(74, 55, 40, 0.06);
+  --shadow-elevated: 0 4px 12px rgba(74, 55, 40, 0.1);
+  --color-primary: #8b4513;
+  --color-secondary: #d2691e;
+  --color-cta: #ffb6c1;
+  --shadow-sm:
+    0 1px 2px rgba(74, 55, 40, 0.06), 0 2px 4px rgba(74, 55, 40, 0.04);
+  --shadow-md:
+    0 4px 8px rgba(74, 55, 40, 0.08), 0 8px 16px rgba(74, 55, 40, 0.05);
+  --shadow-lg:
+    0 8px 16px rgba(74, 55, 40, 0.1), 0 16px 32px rgba(74, 55, 40, 0.06);
+  --shadow-xl:
+    0 12px 24px rgba(74, 55, 40, 0.12), 0 24px 48px rgba(74, 55, 40, 0.08);
+  --shadow-glow:
+    0 0 20px rgba(139, 69, 19, 0.3), 0 0 40px rgba(139, 69, 19, 0.15);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --glass-inner-shadow: inset 0 1px 2px rgba(74, 55, 40, 0.05);
+  --color-accent: #ffb6c1;
+}
+
+/* Cottagecore Theme - 田园风 (Light) */
+[data-theme="cottagecore"] {
+  --color-bg: rgba(253, 245, 230, var(--glass-opacity, 1));
+  --color-bg-card: rgba(255, 254, 248, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(248, 240, 224, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(240, 232, 216, var(--glass-opacity, 1));
+  --color-text: #3d3d3d;
+  --color-text-muted: #7a7a6a;
+  --color-text-inverse: #fdf5e6;
+  --color-border: #d8c8a8;
+  --color-border-light: #e8d8b8;
+  --color-success: #8fbc8f;
+  --color-warning: #deb887;
+  --color-error: #cd853f;
+  --shadow-card: 0 1px 3px rgba(61, 61, 61, 0.05);
+  --shadow-elevated: 0 4px 12px rgba(61, 61, 61, 0.08);
+  --color-primary: #8fbc8f;
+  --color-secondary: #f5deb3;
+  --color-cta: #ffb6c1;
+  --shadow-sm:
+    0 1px 2px rgba(61, 61, 61, 0.05), 0 2px 4px rgba(61, 61, 61, 0.03);
+  --shadow-md:
+    0 4px 8px rgba(61, 61, 61, 0.08), 0 8px 16px rgba(61, 61, 61, 0.04);
+  --shadow-lg:
+    0 8px 16px rgba(61, 61, 61, 0.1), 0 16px 32px rgba(61, 61, 61, 0.06);
+  --shadow-xl:
+    0 12px 24px rgba(61, 61, 61, 0.12), 0 24px 48px rgba(61, 61, 61, 0.08);
+  --shadow-glow:
+    0 0 20px rgba(143, 188, 143, 0.3), 0 0 40px rgba(143, 188, 143, 0.15);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --glass-inner-shadow: inset 0 1px 2px rgba(61, 61, 61, 0.05);
+  --color-accent: #ffb6c1;
+}
+
+/* Vaporwave Theme - 蒸汽波 */
+[data-theme="vaporwave"] {
+  --color-bg: rgba(26, 10, 26, var(--glass-opacity, 1));
+  --color-bg-card: rgba(37, 21, 37, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(48, 32, 48, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(48, 32, 48, var(--glass-opacity, 1));
+  --color-text: #f0e6f6;
+  --color-text-muted: #b0a0c0;
+  --color-text-inverse: #1a0a1a;
+  --color-border: #3a2540;
+  --color-border-light: #4a3550;
+  --color-success: #00f0ff;
+  --color-warning: #ff71ce;
+  --color-error: #ff0080;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --color-primary: #ff71ce;
+  --color-secondary: #b967ff;
+  --color-cta: #00f0ff;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7), 0 16px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.8), 0 24px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow:
+    0 0 20px rgba(255, 113, 206, 0.5), 0 0 40px rgba(185, 103, 255, 0.3);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 113, 206, 0.2);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  --color-accent: #00f0ff;
+}
+
+/* Dark Academia Theme - 暗黑学院 */
+[data-theme="darkAcademia"] {
+  --color-bg: rgba(44, 24, 16, var(--glass-opacity, 1));
+  --color-bg-card: rgba(58, 34, 24, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(72, 42, 30, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(72, 42, 30, var(--glass-opacity, 1));
+  --color-text: #fffff0;
+  --color-text-muted: #c8b8a0;
+  --color-text-inverse: #2c1810;
+  --color-border: #4a3020;
+  --color-border-light: #5a3828;
+  --color-success: #6b8e6b;
+  --color-warning: #c19a6b;
+  --color-error: #8b0000;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --color-primary: #c19a6b;
+  --color-secondary: #722f37;
+  --color-cta: #2f4f4f;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7), 0 16px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.8), 0 24px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow:
+    0 0 20px rgba(193, 154, 107, 0.4), 0 0 40px rgba(193, 154, 107, 0.2);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  --color-accent: #2f4f4f;
+}
+
+/* Kawaii Theme - 可爱风 (Light) */
+[data-theme="kawaii"] {
+  --color-bg: rgba(255, 240, 245, var(--glass-opacity, 1));
+  --color-bg-card: rgba(255, 255, 255, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(255, 248, 250, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(255, 232, 238, var(--glass-opacity, 1));
+  --color-text: #4a3a40;
+  --color-text-muted: #8a7a80;
+  --color-text-inverse: #fff0f5;
+  --color-border: #ffd8e8;
+  --color-border-light: #ffe8f0;
+  --color-success: #98ff98;
+  --color-warning: #ffd700;
+  --color-error: #ff6b8a;
+  --shadow-card: 0 1px 3px rgba(74, 58, 64, 0.05);
+  --shadow-elevated: 0 4px 12px rgba(74, 58, 64, 0.08);
+  --color-primary: #ffb6c1;
+  --color-secondary: #98ff98;
+  --color-cta: #87ceeb;
+  --shadow-sm:
+    0 1px 2px rgba(74, 58, 64, 0.05), 0 2px 4px rgba(74, 58, 64, 0.03);
+  --shadow-md:
+    0 4px 8px rgba(74, 58, 64, 0.08), 0 8px 16px rgba(74, 58, 64, 0.04);
+  --shadow-lg:
+    0 8px 16px rgba(74, 58, 64, 0.1), 0 16px 32px rgba(74, 58, 64, 0.06);
+  --shadow-xl:
+    0 12px 24px rgba(74, 58, 64, 0.12), 0 24px 48px rgba(74, 58, 64, 0.08);
+  --shadow-glow:
+    0 0 20px rgba(255, 182, 193, 0.4), 0 0 40px rgba(255, 182, 193, 0.2);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --glass-inner-shadow: inset 0 1px 2px rgba(74, 58, 64, 0.05);
+  --color-accent: #87ceeb;
+}
+
+/* Retro 90s Theme - 复古90s */
+[data-theme="retro90s"] {
+  --color-bg: rgba(26, 10, 46, var(--glass-opacity, 1));
+  --color-bg-card: rgba(37, 21, 64, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(48, 31, 82, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(48, 31, 82, var(--glass-opacity, 1));
+  --color-text: #f0e8f8;
+  --color-text-muted: #b0a0c0;
+  --color-text-inverse: #1a0a2e;
+  --color-border: #3a2550;
+  --color-border-light: #4a3560;
+  --color-success: #00ced1;
+  --color-warning: #ffd700;
+  --color-error: #ff1493;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --color-primary: #bf00ff;
+  --color-secondary: #00ced1;
+  --color-cta: #ff69b4;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7), 0 16px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.8), 0 24px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow:
+    0 0 20px rgba(191, 0, 255, 0.5), 0 0 40px rgba(0, 206, 209, 0.3);
+  --glass-border-glow: inset 0 1px 0 rgba(191, 0, 255, 0.2);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  --color-accent: #ff69b4;
+}
+
+/* Custom Theme - Base styles (will be overridden by JS) */
+[data-theme="custom"] {
+  --color-bg: rgba(15, 23, 42, var(--glass-opacity, 1));
+  --color-bg-card: rgba(30, 41, 59, var(--glass-opacity, 1));
+  --color-bg-elevated: rgba(51, 65, 85, var(--glass-opacity, 1));
+  --color-bg-hover: rgba(30, 41, 59, var(--glass-opacity, 1));
+  --color-text: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #0f172a;
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-primary: #14b8a6;
+  --color-secondary: #2dd4bf;
+  --color-cta: #fb923c;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 16px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6), 0 24px 48px rgba(0, 0, 0, 0.5);
+  --shadow-glow:
+    0 0 20px rgba(20, 184, 166, 0.4), 0 0 40px rgba(20, 184, 166, 0.2);
+  --glass-border-glow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-inner-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  --color-accent: #14b8a6;
+}
+
 /* All themes - Transparent background to show desktop in Tauri */
 html,
 body,

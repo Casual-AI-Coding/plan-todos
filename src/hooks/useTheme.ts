@@ -11,6 +11,27 @@ import {
 } from "@/lib/themes/registry";
 
 const THEME_KEY = "plan-todos-theme";
+const CUSTOM_THEME_KEY = "plan-todos-custom-theme-colors";
+
+// Custom theme colors interface
+interface CustomThemeColors {
+  primary: string;
+  secondary: string;
+  bg: string;
+  bgCard: string;
+  text: string;
+  textMuted: string;
+}
+
+// Default custom theme colors
+const defaultCustomColors: CustomThemeColors = {
+  primary: "#14B8A6",
+  secondary: "#2DD4BF",
+  bg: "#0F172A",
+  bgCard: "#1E293B",
+  text: "#F1F5F9",
+  textMuted: "#94A3B8",
+};
 
 /**
  * Get the actual theme to apply based on stored theme preference
@@ -62,6 +83,55 @@ function getStoredTheme(): ThemeId {
 }
 
 /**
+ * Load custom colors from localStorage
+ */
+export function loadCustomColors(): CustomThemeColors {
+  if (typeof window === "undefined") return defaultCustomColors;
+  const stored = localStorage.getItem(CUSTOM_THEME_KEY);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return defaultCustomColors;
+    }
+  }
+  return defaultCustomColors;
+}
+
+/**
+ * Save custom colors to localStorage
+ */
+export function saveCustomColors(colors: CustomThemeColors): void {
+  localStorage.setItem(CUSTOM_THEME_KEY, JSON.stringify(colors));
+}
+
+/**
+ * Apply custom colors to CSS variables
+ */
+export function applyCustomColors(colors: CustomThemeColors): void {
+  const root = document.documentElement;
+  root.style.setProperty("--color-primary", colors.primary);
+  root.style.setProperty("--color-secondary", colors.secondary);
+  root.style.setProperty("--color-bg", colors.bg);
+  root.style.setProperty("--color-bg-card", colors.bgCard);
+  root.style.setProperty("--color-text", colors.text);
+  root.style.setProperty("--color-text-muted", colors.textMuted);
+}
+
+/**
+ * Clear custom colors from CSS variables (revert to CSS defaults)
+ */
+function clearCustomColors(): void {
+  const root = document.documentElement;
+  root.style.removeProperty("--color-primary");
+  root.style.removeProperty("--color-secondary");
+  root.style.removeProperty("--color-bg");
+  root.style.removeProperty("--color-bg-card");
+  root.style.removeProperty("--color-text");
+  root.style.removeProperty("--color-text-muted");
+}
+
+/**
  * useTheme hook - manages theme state and persistence
  * Works correctly with SSR via inline script in layout.tsx
  * Supports 'system' theme mode that follows OS preference
@@ -74,6 +144,14 @@ export function useTheme() {
   const applyTheme = useCallback((themeToApply: ThemeId) => {
     const effectiveTheme = getEffectiveTheme(themeToApply);
     document.documentElement.setAttribute("data-theme", effectiveTheme);
+
+    // Apply or clear custom colors
+    if (themeToApply === "custom") {
+      const customColors = loadCustomColors();
+      applyCustomColors(customColors);
+    } else {
+      clearCustomColors();
+    }
   }, []);
 
   // Listen for system theme changes when in system mode
@@ -123,7 +201,6 @@ export function useTheme() {
   }, [theme, setTheme]);
 
   // Determine if currently in dark mode
-  const effectiveTheme = getEffectiveTheme(theme);
   const themeObj = getTheme(theme);
   const isDark = themeObj.type === "dark";
 

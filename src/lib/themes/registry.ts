@@ -33,6 +33,19 @@ export type ThemeId =
   | "nightOwl"
   | "cobalt2"
   | "ayuMirage"
+  // Style themes
+  | "blackMyth"
+  | "cyberpunk"
+  | "halloween"
+  | "christmas"
+  | "handwritten"
+  | "cottagecore"
+  | "vaporwave"
+  | "darkAcademia"
+  | "kawaii"
+  | "retro90s"
+  // Custom theme
+  | "custom"
   | "system";
 
 export interface ThemeColors {
@@ -1031,6 +1044,425 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
       accent: "#FFCC66",
     },
   },
+
+  // ==================== Style Themes ====================
+  // Black Myth Theme - 中国神话风
+  blackMyth: {
+    id: "blackMyth",
+    name: "Black Myth",
+    nameZh: "黑神话",
+    icon: "🔱",
+    type: "dark",
+    colors: {
+      primary: "#FFD700",
+      secondary: "#DC2626",
+      cta: "#50C878",
+      bg: "#1a1a2e",
+      bgCard: "#16213e",
+      bgElevated: "#1f2b47",
+      bgHover: "#1f2b47",
+      text: "#E8E8E8",
+      textMuted: "#A0A0A0",
+      textInverse: "#1a1a2e",
+      border: "#2a2a4a",
+      borderLight: "#3a3a5a",
+      success: "#50C878",
+      warning: "#FFD700",
+      error: "#DC2626",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3)",
+        md: "0 4px 8px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.4)",
+        lg: "0 8px 16px rgba(0,0,0,0.6), 0 16px 32px rgba(0,0,0,0.5)",
+        xl: "0 12px 24px rgba(0,0,0,0.7), 0 24px 48px rgba(0,0,0,0.6)",
+        glow: "0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.2)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.4)",
+      },
+      accent: "#50C878",
+    },
+  },
+
+  // Cyberpunk Theme - 赛博朋克
+  cyberpunk: {
+    id: "cyberpunk",
+    name: "Cyberpunk",
+    nameZh: "赛博朋克",
+    icon: "🤖",
+    type: "dark",
+    colors: {
+      primary: "#00F0FF",
+      secondary: "#FF00FF",
+      cta: "#9D00FF",
+      bg: "#0a0a0f",
+      bgCard: "#12121a",
+      bgElevated: "#1a1a25",
+      bgHover: "#1a1a25",
+      text: "#E0E0E0",
+      textMuted: "#8888AA",
+      textInverse: "#0a0a0f",
+      border: "#2a2a3a",
+      borderLight: "#3a3a4a",
+      success: "#00FF6B",
+      warning: "#FFD700",
+      error: "#FF0055",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+        md: "0 4px 8px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.5)",
+        lg: "0 8px 16px rgba(0,0,0,0.7), 0 16px 32px rgba(0,0,0,0.6)",
+        xl: "0 12px 24px rgba(0,0,0,0.8), 0 24px 48px rgba(0,0,0,0.7)",
+        glow: "0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(0,240,255,0.2)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
+      },
+      accent: "#9D00FF",
+    },
+  },
+
+  // Halloween Theme - 万圣节
+  halloween: {
+    id: "halloween",
+    name: "Halloween",
+    nameZh: "万圣节",
+    icon: "🎃",
+    type: "dark",
+    colors: {
+      primary: "#FF6B00",
+      secondary: "#6B00FF",
+      cta: "#00FF6B",
+      bg: "#1a0f0a",
+      bgCard: "#251810",
+      bgElevated: "#302015",
+      bgHover: "#302015",
+      text: "#F5E6D3",
+      textMuted: "#B8A090",
+      textInverse: "#1a0f0a",
+      border: "#3a2520",
+      borderLight: "#4a3530",
+      success: "#00FF6B",
+      warning: "#FF6B00",
+      error: "#FF0040",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+        md: "0 4px 8px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.5)",
+        lg: "0 8px 16px rgba(0,0,0,0.7), 0 16px 32px rgba(0,0,0,0.6)",
+        xl: "0 12px 24px rgba(0,0,0,0.8), 0 24px 48px rgba(0,0,0,0.7)",
+        glow: "0 0 20px rgba(255, 107, 0, 0.5), 0 0 40px rgba(255, 107, 0, 0.3)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
+      },
+      accent: "#00FF6B",
+    },
+  },
+
+  // Christmas Theme - 圣诞节 (Light)
+  christmas: {
+    id: "christmas",
+    name: "Christmas",
+    nameZh: "圣诞节",
+    icon: "🎄",
+    type: "light",
+    colors: {
+      primary: "#C41E3A",
+      secondary: "#228B22",
+      cta: "#FFD700",
+      bg: "#f8faf8",
+      bgCard: "#ffffff",
+      bgElevated: "#f0f5f0",
+      bgHover: "#e8f0e8",
+      text: "#2d2d2d",
+      textMuted: "#666666",
+      textInverse: "#ffffff",
+      border: "#d0e0d0",
+      borderLight: "#e0f0e0",
+      success: "#228B22",
+      warning: "#FFD700",
+      error: "#C41E3A",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03)",
+        md: "0 4px 8px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.04)",
+        lg: "0 8px 16px rgba(0,0,0,0.12), 0 16px 32px rgba(0,0,0,0.06)",
+        xl: "0 12px 24px rgba(0,0,0,0.16), 0 24px 48px rgba(0,0,0,0.08)",
+        glow: "0 0 20px rgba(196, 30, 58, 0.3), 0 0 40px rgba(196, 30, 58, 0.15)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.5)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
+      },
+      accent: "#FFD700",
+    },
+  },
+
+  // Handwritten Theme - 手账风 (Light)
+  handwritten: {
+    id: "handwritten",
+    name: "Handwritten",
+    nameZh: "手账风",
+    icon: "📝",
+    type: "light",
+    colors: {
+      primary: "#8B4513",
+      secondary: "#D2691E",
+      cta: "#FFB6C1",
+      bg: "#FAF0E6",
+      bgCard: "#FFFAF5",
+      bgElevated: "#F5EDE5",
+      bgHover: "#F0E8E0",
+      text: "#4A3728",
+      textMuted: "#8B7355",
+      textInverse: "#FAF0E6",
+      border: "#E8D8C8",
+      borderLight: "#F0E0D0",
+      success: "#6B8E23",
+      warning: "#D2691E",
+      error: "#CD5C5C",
+      shadows: {
+        sm: "0 1px 2px rgba(74, 55, 40, 0.06), 0 2px 4px rgba(74, 55, 40, 0.04)",
+        md: "0 4px 8px rgba(74, 55, 40, 0.08), 0 8px 16px rgba(74, 55, 40, 0.05)",
+        lg: "0 8px 16px rgba(74, 55, 40, 0.1), 0 16px 32px rgba(74, 55, 40, 0.06)",
+        xl: "0 12px 24px rgba(74, 55, 40, 0.12), 0 24px 48px rgba(74, 55, 40, 0.08)",
+        glow: "0 0 20px rgba(139, 69, 19, 0.3), 0 0 40px rgba(139, 69, 19, 0.15)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+        innerShadow: "inset 0 1px 2px rgba(74, 55, 40, 0.05)",
+      },
+      accent: "#FFB6C1",
+    },
+  },
+
+  // Cottagecore Theme - 田园风 (Light)
+  cottagecore: {
+    id: "cottagecore",
+    name: "Cottagecore",
+    nameZh: "田园风",
+    icon: "🌻",
+    type: "light",
+    colors: {
+      primary: "#8FBC8F",
+      secondary: "#F5DEB3",
+      cta: "#FFB6C1",
+      bg: "#FDF5E6",
+      bgCard: "#FFFEF8",
+      bgElevated: "#F8F0E0",
+      bgHover: "#F0E8D8",
+      text: "#3D3D3D",
+      textMuted: "#7A7A6A",
+      textInverse: "#FDF5E6",
+      border: "#D8C8A8",
+      borderLight: "#E8D8B8",
+      success: "#8FBC8F",
+      warning: "#DEB887",
+      error: "#CD853F",
+      shadows: {
+        sm: "0 1px 2px rgba(61, 61, 61, 0.05), 0 2px 4px rgba(61, 61, 61, 0.03)",
+        md: "0 4px 8px rgba(61, 61, 61, 0.08), 0 8px 16px rgba(61, 61, 61, 0.04)",
+        lg: "0 8px 16px rgba(61, 61, 61, 0.1), 0 16px 32px rgba(61, 61, 61, 0.06)",
+        xl: "0 12px 24px rgba(61, 61, 61, 0.12), 0 24px 48px rgba(61, 61, 61, 0.08)",
+        glow: "0 0 20px rgba(143, 188, 143, 0.3), 0 0 40px rgba(143, 188, 143, 0.15)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+        innerShadow: "inset 0 1px 2px rgba(61, 61, 61, 0.05)",
+      },
+      accent: "#FFB6C1",
+    },
+  },
+
+  // Vaporwave Theme - 蒸汽波
+  vaporwave: {
+    id: "vaporwave",
+    name: "Vaporwave",
+    nameZh: "蒸汽波",
+    icon: "💜",
+    type: "dark",
+    colors: {
+      primary: "#FF71CE",
+      secondary: "#B967FF",
+      cta: "#00F0FF",
+      bg: "#1a0a1a",
+      bgCard: "#251525",
+      bgElevated: "#302030",
+      bgHover: "#302030",
+      text: "#F0E6F6",
+      textMuted: "#B0A0C0",
+      textInverse: "#1a0a1a",
+      border: "#3a2540",
+      borderLight: "#4a3550",
+      success: "#00F0FF",
+      warning: "#FF71CE",
+      error: "#FF0080",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+        md: "0 4px 8px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.5)",
+        lg: "0 8px 16px rgba(0,0,0,0.7), 0 16px 32px rgba(0,0,0,0.6)",
+        xl: "0 12px 24px rgba(0,0,0,0.8), 0 24px 48px rgba(0,0,0,0.7)",
+        glow: "0 0 20px rgba(255, 113, 206, 0.5), 0 0 40px rgba(185, 103, 255, 0.3)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,113,206,0.2)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
+      },
+      accent: "#00F0FF",
+    },
+  },
+
+  // Dark Academia Theme - 暗黑学院
+  darkAcademia: {
+    id: "darkAcademia",
+    name: "Dark Academia",
+    nameZh: "暗黑学院",
+    icon: "📚",
+    type: "dark",
+    colors: {
+      primary: "#C19A6B",
+      secondary: "#722F37",
+      cta: "#2F4F4F",
+      bg: "#2C1810",
+      bgCard: "#3A2218",
+      bgElevated: "#482A1E",
+      bgHover: "#482A1E",
+      text: "#FFFFF0",
+      textMuted: "#C8B8A0",
+      textInverse: "#2C1810",
+      border: "#4A3020",
+      borderLight: "#5A3828",
+      success: "#6B8E6B",
+      warning: "#C19A6B",
+      error: "#8B0000",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+        md: "0 4px 8px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.5)",
+        lg: "0 8px 16px rgba(0,0,0,0.7), 0 16px 32px rgba(0,0,0,0.6)",
+        xl: "0 12px 24px rgba(0,0,0,0.8), 0 24px 48px rgba(0,0,0,0.7)",
+        glow: "0 0 20px rgba(193, 154, 107, 0.4), 0 0 40px rgba(193, 154, 107, 0.2)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
+      },
+      accent: "#2F4F4F",
+    },
+  },
+
+  // Kawaii Theme - 可爱风 (Light)
+  kawaii: {
+    id: "kawaii",
+    name: "Kawaii",
+    nameZh: "可爱风",
+    icon: "🌸",
+    type: "light",
+    colors: {
+      primary: "#FFB6C1",
+      secondary: "#98FF98",
+      cta: "#87CEEB",
+      bg: "#FFF0F5",
+      bgCard: "#FFFFFF",
+      bgElevated: "#FFF8FA",
+      bgHover: "#FFE8EE",
+      text: "#4A3A40",
+      textMuted: "#8A7A80",
+      textInverse: "#FFF0F5",
+      border: "#FFD8E8",
+      borderLight: "#FFE8F0",
+      success: "#98FF98",
+      warning: "#FFD700",
+      error: "#FF6B8A",
+      shadows: {
+        sm: "0 1px 2px rgba(74, 58, 64, 0.05), 0 2px 4px rgba(74, 58, 64, 0.03)",
+        md: "0 4px 8px rgba(74, 58, 64, 0.08), 0 8px 16px rgba(74, 58, 64, 0.04)",
+        lg: "0 8px 16px rgba(74, 58, 64, 0.1), 0 16px 32px rgba(74, 58, 64, 0.06)",
+        xl: "0 12px 24px rgba(74, 58, 64, 0.12), 0 24px 48px rgba(74, 58, 64, 0.08)",
+        glow: "0 0 20px rgba(255, 182, 193, 0.4), 0 0 40px rgba(255, 182, 193, 0.2)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+        innerShadow: "inset 0 1px 2px rgba(74, 58, 64, 0.05)",
+      },
+      accent: "#87CEEB",
+    },
+  },
+
+  // Retro 90s Theme - 复古90s
+  retro90s: {
+    id: "retro90s",
+    name: "Retro 90s",
+    nameZh: "复古90s",
+    icon: "🕹️",
+    type: "dark",
+    colors: {
+      primary: "#BF00FF",
+      secondary: "#00CED1",
+      cta: "#FF69B4",
+      bg: "#1a0a2e",
+      bgCard: "#251540",
+      bgElevated: "#301F52",
+      bgHover: "#301F52",
+      text: "#F0E8F8",
+      textMuted: "#B0A0C0",
+      textInverse: "#1a0a2e",
+      border: "#3a2550",
+      borderLight: "#4a3560",
+      success: "#00CED1",
+      warning: "#FFD700",
+      error: "#FF1493",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+        md: "0 4px 8px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.5)",
+        lg: "0 8px 16px rgba(0,0,0,0.7), 0 16px 32px rgba(0,0,0,0.6)",
+        xl: "0 12px 24px rgba(0,0,0,0.8), 0 24px 48px rgba(0,0,0,0.7)",
+        glow: "0 0 20px rgba(191, 0, 255, 0.5), 0 0 40px rgba(0, 206, 209, 0.3)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(191,0,255,0.2)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
+      },
+      accent: "#FF69B4",
+    },
+  },
+
+  // Custom Theme - 用户自定义主题
+  custom: {
+    id: "custom",
+    name: "Custom",
+    nameZh: "自定义",
+    icon: "🎨",
+    type: "dark",
+    colors: {
+      primary: "#14B8A6",
+      secondary: "#2DD4BF",
+      cta: "#FB923C",
+      bg: "#0F172A",
+      bgCard: "#1E293B",
+      bgElevated: "#334155",
+      bgHover: "#1E293B",
+      text: "#F1F5F9",
+      textMuted: "#94A3B8",
+      textInverse: "#0F172A",
+      border: "#334155",
+      borderLight: "#475569",
+      success: "#4ADE80",
+      warning: "#FBBF24",
+      error: "#F87171",
+      shadows: {
+        sm: "0 1px 2px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        md: "0 4px 8px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.3)",
+        lg: "0 8px 16px rgba(0,0,0,0.5), 0 16px 32px rgba(0,0,0,0.4)",
+        xl: "0 12px 24px rgba(0,0,0,0.6), 0 24px 48px rgba(0,0,0,0.5)",
+        glow: "0 0 20px rgba(20, 184, 166, 0.4), 0 0 40px rgba(20, 184, 166, 0.2)",
+      },
+      glass: {
+        borderGlow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+        innerShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
+      },
+      accent: "#14B8A6",
+    },
+  },
 };
 
 export const themeList = Object.values(themes);
@@ -1091,3 +1523,24 @@ export const themeListWithSystem = [...themeList, systemThemeDisplay];
 // Theme type filters
 export const lightThemes = themeList.filter((t) => t.type === "light");
 export const darkThemes = themeList.filter((t) => t.type === "dark");
+
+// Style themes (aesthetic themes)
+export const styleThemeIds: ThemeId[] = [
+  "blackMyth",
+  "cyberpunk",
+  "halloween",
+  "christmas",
+  "handwritten",
+  "cottagecore",
+  "vaporwave",
+  "darkAcademia",
+  "kawaii",
+  "retro90s",
+];
+
+export const styleThemes = themeList.filter((t) =>
+  styleThemeIds.includes(t.id),
+);
+
+// Custom theme placeholder
+export const customThemeDisplay: Theme = themes.custom;
