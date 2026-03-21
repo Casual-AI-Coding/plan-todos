@@ -32,6 +32,8 @@ import {
   useGoogleDriveBackups,
   useGoogleDriveRestore,
 } from "@/hooks/useGoogleDrive";
+import { SyncStatusIndicator } from "@/components/features/SyncStatusIndicator";
+import { ConflictList } from "@/components/features/ConflictList";
 import type { SyncConflict, DeviceInfo } from "@/lib/api/sync";
 import type { DriveFile } from "@/lib/api/googleDrive";
 
@@ -309,6 +311,11 @@ export function SettingsSyncView() {
           同步状态
         </h3>
 
+        {/* Real-time sync progress indicator */}
+        <div className="mb-4">
+          <SyncStatusIndicator />
+        </div>
+
         <div className="space-y-3">
           <div
             className="flex items-center justify-between p-3 rounded-lg"
@@ -436,6 +443,13 @@ export function SettingsSyncView() {
           )}
         </div>
       </Card>
+
+      {/* Conflict Resolution */}
+      {status && status.conflicts_count > 0 && (
+        <Card className="mb-6">
+          <ConflictList />
+        </Card>
+      )}
 
       {/* Google Drive Sync */}
       <Card className="mb-6">
