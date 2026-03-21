@@ -11,29 +11,34 @@ export function useAutoUpdate() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const checkUpdate = useCallback(async (showToast = true) => {
-    setChecking(true);
-    setError(null);
-    try {
-      const info = await checkForUpdates();
-      setUpdateInfo(info);
+  const checkUpdate = useCallback(
+    async (showToast = true): Promise<UpdateInfo | null> => {
+      setChecking(true);
+      setError(null);
+      try {
+        const info = await checkForUpdates();
+        setUpdateInfo(info);
 
-      // Show toast notification if update available and not already shown
-      if (info && info.has_update && showToast && !hasShownUpdateToast) {
-        hasShownUpdateToast = true;
-        // Use custom event to trigger toast from anywhere
-        window.dispatchEvent(
-          new CustomEvent("app:update-available", {
-            detail: info,
-          }),
-        );
+        // Show toast notification if update available and not already shown
+        if (info && info.has_update && showToast && !hasShownUpdateToast) {
+          hasShownUpdateToast = true;
+          // Use custom event to trigger toast from anywhere
+          window.dispatchEvent(
+            new CustomEvent("app:update-available", {
+              detail: info,
+            }),
+          );
+        }
+        return info;
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "检查更新失败");
+        return null;
+      } finally {
+        setChecking(false);
       }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "检查更新失败");
-    } finally {
-      setChecking(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handleSkip = async () => {
     if (updateInfo) {

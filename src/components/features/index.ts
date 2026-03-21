@@ -21,3 +21,4 @@ export { TodoForm } from "./TodoForm";
 export { TodoItem } from "./TodoItem";
 export { NotificationBell } from "./NotificationBell";
 export { NotificationModal } from "./NotificationModal";
+export { UpdateNotificationListener } from "./UpdateNotificationListener";

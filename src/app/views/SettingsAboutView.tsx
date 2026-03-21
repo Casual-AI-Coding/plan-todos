@@ -1,43 +1,30 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState } from "react";
 import { Card, Button } from "@/components/ui";
-import { useAutoUpdate } from "@/hooks/useAutoUpdate";
 import { useToast } from "@/components/ui/Toast";
+import { checkForUpdates, type UpdateInfo } from "@/lib/api/update";
 import packageJson from "../../../package.json";
 
 export function SettingsAboutView() {
-  const { checking, updateInfo, error, checkUpdate, handleSkip } =
-    useAutoUpdate();
+  const [checking, setChecking] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const toast = useToast();
 
-  // Listen for update available event and show toast
-  useEffect(() => {
-    const handleUpdateAvailable = (e: CustomEvent) => {
-      const info = e.detail;
-      if (info?.has_update) {
-        toast.info(`发现新版本 ${info.latest_version}，请前往设置 > 关于下载`);
-      }
-    };
-
-    window.addEventListener(
-      "app:update-available",
-      handleUpdateAvailable as EventListener,
-    );
-    return () => {
-      window.removeEventListener(
-        "app:update-available",
-        handleUpdateAvailable as EventListener,
-      );
-    };
-  }, [toast]);
-
   const handleManualCheck = async () => {
-    await checkUpdate(false);
-    if (updateInfo?.has_update) {
-      toast.info(`发现新版本 ${updateInfo.latest_version}`);
-    } else if (!error) {
-      toast.success("当前已是最新版本");
+    setChecking(true);
+    try {
+      const info = await checkForUpdates();
+      setUpdateInfo(info);
+      if (info?.has_update) {
+        toast.info(`发现新版本 ${info.latest_version}`);
+      } else {
+        toast.success("当前已是最新版本");
+      }
+    } catch {
+      toast.error("检查更新失败");
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -67,28 +54,6 @@ export function SettingsAboutView() {
       >
         设置 &gt; 关于
       </h2>
-
-      {/* Error Message */}
-      {error && (
-        <Card className="mb-6">
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: "var(--color-error-bg)" }}
-          >
-            <p className="text-sm" style={{ color: "var(--color-error)" }}>
-              {error}
-            </p>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="mt-2"
-              onClick={handleManualCheck}
-            >
-              重试
-            </Button>
-          </div>
-        </Card>
-      )}
 
       {/* Project Info & Tech Stack - 2 columns on desktop */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

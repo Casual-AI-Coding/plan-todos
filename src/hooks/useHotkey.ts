@@ -1,14 +1,21 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { useHotkeyStore, DEFAULT_HOTKEYS } from "@/lib/useHotkeyStore";
 
 export function useHotkey(
   action: keyof typeof DEFAULT_HOTKEYS,
   callback: () => void,
-  deps: React.DependencyList = [],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _deps: React.DependencyList = [],
 ) {
   const register = useHotkeyStore((s) => s.register);
   const unregister = useHotkeyStore((s) => s.unregister);
-  const memoizedCallback = useCallback(callback, deps);
+
+  // Use ref to always have latest callback without causing re-registration
+  const callbackRef = useRef(callback);
+  // Update ref inside effect to avoid "update during render" warning
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     const defaultBinding = DEFAULT_HOTKEYS[action];
@@ -26,10 +33,10 @@ export function useHotkey(
         alt: defaultBinding.alt,
         description: defaultBinding.description,
       },
-      memoizedCallback,
+      () => callbackRef.current(),
     );
     return () => unregister(action);
-  }, [action, memoizedCallback, register, unregister]);
+  }, [action, register, unregister]);
 }
 
 export function useHotkeys(

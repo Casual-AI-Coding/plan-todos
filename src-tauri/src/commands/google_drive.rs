@@ -43,12 +43,44 @@ pub struct GoogleDriveStatus {
 // Google OAuth Configuration
 // ============================================================================
 
-/// Google OAuth client configuration
-/// TODO: Replace with your actual Google OAuth credentials
-const GOOGLE_CLIENT_ID: &str = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET: &str = "YOUR_GOOGLE_CLIENT_SECRET";
+/// Google OAuth client configuration loaded from config file
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct GoogleOAuthConfig {
+    pub client_id: String,
+    pub client_secret: String,
+}
+
 const REDIRECT_URI: &str = "plan-todos://oauth/callback";
 const SCOPES: &str = "https://www.googleapis.com/auth/drive.file";
+
+/// Load Google OAuth config from app data directory
+fn load_oauth_config(app_data_dir: &PathBuf) -> Result<GoogleOAuthConfig, String> {
+    let config_path = app_data_dir.join("google_oauth_config.json");
+    
+    if !config_path.exists() {
+        return Err(
+            "Google OAuth 配置文件不存在。请在应用数据目录创建 google_oauth_config.json 文件。\n\
+             文件格式: {\"client_id\": \"YOUR_CLIENT_ID\", \"client_secret\": \"YOUR_CLIENT_SECRET\"}"
+                .to_string(),
+        );
+    }
+    
+    let content = fs::read_to_string(&config_path)
+        .map_err(|e| format!("无法读取 OAuth 配置文件: {}", e))?;
+    
+    let config: GoogleOAuthConfig = serde_json::from_str(&content)
+        .map_err(|e| format!("OAuth 配置文件格式错误: {}", e))?;
+    
+    if config.client_id.is_empty() || config.client_id.starts_with("YOUR_") {
+        return Err("请在 google_oauth_config.json 中配置有效的 client_id".to_string());
+    }
+    
+    if config.client_secret.is_empty() || config.client_secret.starts_with("YOUR_") {
+        return Err("请在 google_oauth_config.json 中配置有效的 client_secret".to_string());
+    }
+    
+    Ok(config)
+}
 
 // ============================================================================
 // Token Storage
@@ -119,7 +151,7 @@ fn generate_pkce() -> Result<(String, String), String> {
 }
 
 /// Build the Google OAuth URL
-fn build_auth_url(code_challenge: &str, state: &str) -> String {
+fn build_auth_url(config: &GoogleOAuthConfig, code_challenge: &str, state: &str) -> String {
     format!(
         "https://accounts.google.com/o/oauth2/v2/auth?\
          client_id={}\
@@ -131,7 +163,7 @@ fn build_auth_url(code_challenge: &str, state: &str) -> String {
          &code_challenge={}\
          &code_challenge_method=S256\
          &state={}",
-        encode(GOOGLE_CLIENT_ID),
+        encode(&config.client_id),
         encode(REDIRECT_URI),
         encode(SCOPES),
         encode(code_challenge),
@@ -141,14 +173,15 @@ fn build_auth_url(code_challenge: &str, state: &str) -> String {
 
 /// Exchange authorization code for tokens
 async fn exchange_code_for_tokens(
+    config: &GoogleOAuthConfig,
     code: &str,
     code_verifier: &str,
 ) -> Result<GoogleTokens, String> {
     let client = reqwest::Client::new();
     
     let params = [
-        ("client_id", GOOGLE_CLIENT_ID),
-        ("client_secret", GOOGLE_CLIENT_SECRET),
+        ("client_id", config.client_id.as_str()),
+        ("client_secret", config.client_secret.as_str()),
         ("code", code),
         ("grant_type", "authorization_code"),
         ("redirect_uri", REDIRECT_URI),
@@ -190,12 +223,12 @@ async fn exchange_code_for_tokens(
 }
 
 /// Refresh the access token
-async fn refresh_access_token(refresh_token: &str) -> Result<(String, i64), String> {
+async fn refresh_access_token(config: &GoogleOAuthConfig, refresh_token: &str) -> Result<(String, i64), String> {
     let client = reqwest::Client::new();
     
     let params = [
-        ("client_id", GOOGLE_CLIENT_ID),
-        ("client_secret", GOOGLE_CLIENT_SECRET),
+        ("client_id", config.client_id.as_str()),
+        ("client_secret", config.client_secret.as_str()),
         ("refresh_token", refresh_token),
         ("grant_type", "refresh_token"),
     ];
@@ -258,6 +291,7 @@ async fn get_user_email(access_token: &str) -> Result<Option<String>, String> {
 /// Ensure we have a valid access token
 async fn ensure_valid_token(
     app_data_dir: &PathBuf,
+    config: &GoogleOAuthConfig,
 ) -> Result<String, String> {
     let mut tokens = load_tokens(app_data_dir)?
         .ok_or_else(|| "Not connected to Google Drive".to_string())?;
@@ -268,7 +302,7 @@ async fn ensure_valid_token(
     }
     
     // Refresh the token
-    let (new_access_token, new_expires_at) = refresh_access_token(&tokens.refresh_token).await?;
+    let (new_access_token, new_expires_at) = refresh_access_token(config, &tokens.refresh_token).await?;
     tokens.access_token = new_access_token;
     tokens.expires_at = new_expires_at;
     save_tokens(app_data_dir, &tokens)?;
@@ -282,13 +316,17 @@ async fn ensure_valid_token(
 
 /// Get the Google OAuth authorization URL
 #[tauri::command]
-pub fn get_google_drive_auth_url() -> Result<String, String> {
+pub fn get_google_drive_auth_url(app_handle: AppHandle) -> Result<String, String> {
+    let app_data_dir = app_handle.path().app_data_dir()
+        .map_err(|e| format!("Failed to get app data dir: {}", e))?;
+    
+    let config = load_oauth_config(&app_data_dir)?;
     let (code_verifier, code_challenge) = generate_pkce()?;
     let state = URL_SAFE_NO_PAD.encode(fastrand::u64(..).to_be_bytes());
     
     // Store code verifier for later use (in production, use secure storage)
     // For simplicity, we pass it via the state parameter (base64 encoded)
-    let auth_url = build_auth_url(&code_challenge, &state);
+    let auth_url = build_auth_url(&config, &code_challenge, &state);
     
     // Store code verifier in memory for this session
     // In production, you'd want to store this securely
@@ -306,8 +344,10 @@ pub async fn exchange_google_drive_code(
     let app_data_dir = app_handle.path().app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
     
+    let config = load_oauth_config(&app_data_dir)?;
+    
     // Exchange code for tokens
-    let tokens = exchange_code_for_tokens(&code, "").await?;
+    let tokens = exchange_code_for_tokens(&config, &code, "").await?;
     
     // Get user email
     let email = get_user_email(&tokens.access_token).await?;
@@ -356,7 +396,8 @@ pub async fn google_drive_upload(
     let app_data_dir = app_handle.path().app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
     
-    let access_token = ensure_valid_token(&app_data_dir).await?;
+    let config = load_oauth_config(&app_data_dir)?;
+    let access_token = ensure_valid_token(&app_data_dir, &config).await?;
     let client = reqwest::Client::new();
     
     // Create multipart request
@@ -409,7 +450,8 @@ pub async fn google_drive_download(
     let app_data_dir = app_handle.path().app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
     
-    let access_token = ensure_valid_token(&app_data_dir).await?;
+    let config = load_oauth_config(&app_data_dir)?;
+    let access_token = ensure_valid_token(&app_data_dir, &config).await?;
     let client = reqwest::Client::new();
     
     let response = client
@@ -444,7 +486,8 @@ pub async fn google_drive_list_files(
     let app_data_dir = app_handle.path().app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
     
-    let access_token = ensure_valid_token(&app_data_dir).await?;
+    let config = load_oauth_config(&app_data_dir)?;
+    let access_token = ensure_valid_token(&app_data_dir, &config).await?;
     let client = reqwest::Client::new();
     
     let response = client
@@ -496,7 +539,8 @@ pub async fn google_drive_sync(app_handle: AppHandle) -> Result<(), String> {
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
     
     // Check connection
-    ensure_valid_token(&app_data_dir).await?;
+    let config = load_oauth_config(&app_data_dir)?;
+    ensure_valid_token(&app_data_dir, &config).await?;
     
     // Get current database path
     let db_path = app_data_dir.join("data.db");

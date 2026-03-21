@@ -57,7 +57,7 @@ export function SettingsNotificationsView() {
   const [initialized, setInitialized] = useState(false);
 
   // Sync local state with server data (only once when settings load)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+   
   useEffect(() => {
     if (settings && !initialized) {
       setMasterEnabled(settings.master_enabled);

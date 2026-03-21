@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+ 
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { EmptyStateCard } from "../EmptyStateCard";

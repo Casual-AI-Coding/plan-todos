@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+// Runtime binding with callback (not serializable)
 export interface HotkeyBinding {
   key: string;
   ctrl?: boolean;
@@ -10,6 +11,7 @@ export interface HotkeyBinding {
   action: () => void;
 }
 
+// Serializable config (persisted to localStorage)
 export interface HotkeyConfig {
   key: string;
   ctrl?: boolean;
@@ -17,12 +19,24 @@ export interface HotkeyConfig {
   alt?: boolean;
 }
 
+// Default hotkey definition
+export interface HotkeyDefinition {
+  key: string;
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+  description: string;
+}
+
 interface HotkeyStore {
+  // Runtime state (not persisted)
   hotkeys: Record<string, HotkeyBinding>;
+  // Persisted custom configurations
   customConfigs: Record<string, HotkeyConfig>;
+  // Actions
   register: (
     action: string,
-    binding: Omit<HotkeyBinding, "action">,
+    binding: HotkeyDefinition,
     callback: () => void,
   ) => void;
   unregister: (action: string) => void;
@@ -36,16 +50,7 @@ interface HotkeyStore {
   ) => string | null;
 }
 
-export const DEFAULT_HOTKEYS: Record<
-  string,
-  {
-    key: string;
-    ctrl?: boolean;
-    shift?: boolean;
-    alt?: boolean;
-    description: string;
-  }
-> = {
+export const DEFAULT_HOTKEYS: Record<string, HotkeyDefinition> = {
   "new-todo": { key: "n", ctrl: true, description: "新建 Todo" },
   search: { key: "k", ctrl: true, description: "打开搜索" },
   "view-dashboard": { key: "1", ctrl: true, description: "切换到概览" },
@@ -87,11 +92,11 @@ export const useHotkeyStore = create<HotkeyStore>()(
           hotkeys: {
             ...state.hotkeys,
             [action]: {
-              ...binding,
               key: config.key,
               ctrl: config.ctrl,
               shift: config.shift,
               alt: config.alt,
+              description: binding.description,
               action: callback,
             },
           },
@@ -131,6 +136,9 @@ export const useHotkeyStore = create<HotkeyStore>()(
         const custom = get().customConfigs[action];
         if (custom) return custom;
         const def = DEFAULT_HOTKEYS[action];
+        if (!def) {
+          return { key: "", ctrl: false, shift: false, alt: false };
+        }
         return { key: def.key, ctrl: def.ctrl, shift: def.shift, alt: def.alt };
       },
 
@@ -152,6 +160,7 @@ export const useHotkeyStore = create<HotkeyStore>()(
     }),
     {
       name: "plan-todos-hotkeys",
+      // Only persist customConfigs (serializable), not hotkeys (contains functions)
       partialize: (state) => ({ customConfigs: state.customConfigs }),
     },
   ),

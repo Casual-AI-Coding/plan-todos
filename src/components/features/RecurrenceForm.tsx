@@ -21,23 +21,32 @@ export function RecurrenceForm({
   onChange,
   onClear,
 }: RecurrenceFormProps) {
-  const [enabled, setEnabled] = useState(false);
-  const [type, setType] = useState<Recurrence["type"]>("daily");
-  const [interval, setInterval] = useState(1);
-  const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
-  const [dayOfMonth, setDayOfMonth] = useState<number | undefined>(undefined);
-  const [endDate, setEndDate] = useState("");
-  const [maxOccurrences, setMaxOccurrences] = useState<number | undefined>(
-    undefined,
+  // Initialize state from value prop to avoid cascading setState in effect
+  const [enabled, setEnabled] = useState(() => !!value);
+  const [type, setType] = useState<Recurrence["type"]>(
+    () => value?.type ?? "daily",
   );
-  const isInitialized = useRef(false);
+  const [interval, setInterval] = useState(() => value?.interval ?? 1);
+  const [daysOfWeek, setDaysOfWeek] = useState<number[]>(
+    () => value?.daysOfWeek ?? [],
+  );
+  const [dayOfMonth, setDayOfMonth] = useState<number | undefined>(
+    () => value?.dayOfMonth,
+  );
+  const [endDate, setEndDate] = useState(() => value?.endDate ?? "");
+  const [maxOccurrences, setMaxOccurrences] = useState<number | undefined>(
+    () => value?.maxOccurrences,
+  );
+  const prevValueRef = useRef(value);
 
+  // Sync when value prop changes (e.g., editing a different todo)
   useEffect(() => {
-    if (!isInitialized.current && !value) {
-      isInitialized.current = true;
-      return;
-    }
+    // Only sync if value reference changed (not on every render)
+    if (value === prevValueRef.current) return;
+    prevValueRef.current = value;
+
     if (value) {
+      // Batch all state updates together
       setEnabled(true);
       setType(value.type);
       setInterval(value.interval);
@@ -46,7 +55,6 @@ export function RecurrenceForm({
       setEndDate(value.endDate || "");
       setMaxOccurrences(value.maxOccurrences);
     }
-    isInitialized.current = true;
   }, [value]);
 
   const updateRecurrence = (updates: Partial<Recurrence>) => {

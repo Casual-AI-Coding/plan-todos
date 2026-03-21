@@ -10,10 +10,80 @@ import {
   addMonths,
   addYears,
   isAfter,
-  isBefore,
   isEqual,
+  isValid,
 } from "date-fns";
 import type { Recurrence, Todo } from "@/lib/types/todo";
+
+// Valid days of week (0-6, 0 = Sunday)
+const VALID_DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6];
+
+/**
+ * Validate recurrence configuration
+ * @param recurrence - The recurrence configuration to validate
+ * @returns True if valid, throws error if invalid
+ */
+export function validateRecurrence(recurrence: Recurrence): boolean {
+  // Validate interval
+  if (!Number.isInteger(recurrence.interval) || recurrence.interval < 1) {
+    throw new Error("Interval must be a positive integer");
+  }
+
+  // Validate daysOfWeek for weekly recurrence
+  if (recurrence.type === "weekly" && recurrence.daysOfWeek) {
+    if (
+      !Array.isArray(recurrence.daysOfWeek) ||
+      recurrence.daysOfWeek.length === 0
+    ) {
+      throw new Error(
+        "daysOfWeek must be a non-empty array for weekly recurrence",
+      );
+    }
+    for (const day of recurrence.daysOfWeek) {
+      if (!VALID_DAYS_OF_WEEK.includes(day)) {
+        throw new Error(
+          `Invalid day of week: ${day}. Must be 0-6 (Sunday-Saturday)`,
+        );
+      }
+    }
+    // Remove duplicates
+    const uniqueDays = [...new Set(recurrence.daysOfWeek)];
+    if (uniqueDays.length !== recurrence.daysOfWeek.length) {
+      console.warn("Duplicate days in daysOfWeek will be ignored");
+    }
+  }
+
+  // Validate dayOfMonth for monthly recurrence
+  if (recurrence.type === "monthly" && recurrence.dayOfMonth !== undefined) {
+    if (
+      !Number.isInteger(recurrence.dayOfMonth) ||
+      recurrence.dayOfMonth < 1 ||
+      recurrence.dayOfMonth > 31
+    ) {
+      throw new Error("dayOfMonth must be an integer between 1 and 31");
+    }
+  }
+
+  // Validate endDate
+  if (recurrence.endDate) {
+    const endDate = new Date(recurrence.endDate);
+    if (!isValid(endDate)) {
+      throw new Error("Invalid endDate format");
+    }
+  }
+
+  // Validate maxOccurrences
+  if (recurrence.maxOccurrences !== undefined) {
+    if (
+      !Number.isInteger(recurrence.maxOccurrences) ||
+      recurrence.maxOccurrences < 1
+    ) {
+      throw new Error("maxOccurrences must be a positive integer");
+    }
+  }
+
+  return true;
+}
 
 /**
  * Calculate the next due date based on recurrence configuration.
@@ -27,6 +97,12 @@ export function calculateNextDueDate(
   currentDate: Date,
   currentIndex: number,
 ): Date | null {
+  // Validate input date
+  if (!isValid(currentDate)) {
+    console.error("Invalid currentDate provided to calculateNextDueDate");
+    return null;
+  }
+
   // Check end conditions
   if (recurrence.maxOccurrences !== undefined) {
     if (currentIndex >= recurrence.maxOccurrences) {
@@ -38,13 +114,13 @@ export function calculateNextDueDate(
 
   switch (recurrence.type) {
     case "daily":
-      nextDate = addDays(currentDate, recurrence.interval);
+      nextDate = addDays(currentDate, Math.max(1, recurrence.interval));
       break;
     case "weekly":
-      nextDate = addWeeks(currentDate, recurrence.interval);
+      nextDate = addWeeks(currentDate, Math.max(1, recurrence.interval));
       // Handle daysOfWeek for weekly recurrence
       if (recurrence.daysOfWeek && recurrence.daysOfWeek.length > 0) {
-        // Find the next day of week
+        // Find the next day of week (max 7 days to search)
         let attempts = 0;
         while (attempts < 7) {
           nextDate = addDays(nextDate, 1);
@@ -54,39 +130,40 @@ export function calculateNextDueDate(
           }
           attempts++;
         }
-      }
-      break;
-    case "monthly":
-      nextDate = addMonths(currentDate, recurrence.interval);
-      // Handle dayOfMonth for monthly recurrence
-      if (recurrence.dayOfMonth !== undefined) {
-        // Adjust to the specified day of month
-        const targetDay = recurrence.dayOfMonth;
-        const currentDay = nextDate.getDate();
-        if (targetDay < currentDay) {
-          // If target day has passed, the addMonths already moved to next month
-          // Set to the target day
-          nextDate.setDate(targetDay);
-        } else if (targetDay !== currentDay) {
-          nextDate.setDate(targetDay);
+        // If no matching day found after 7 attempts, use the calculated date
+        if (attempts >= 7) {
+          console.warn(
+            "Could not find matching day of week in weekly recurrence",
+          );
         }
       }
       break;
+    case "monthly":
+      nextDate = addMonths(currentDate, Math.max(1, recurrence.interval));
+      // Handle dayOfMonth for monthly recurrence
+      if (recurrence.dayOfMonth !== undefined) {
+        // Clamp to valid day (28 for February, 30/31 for others)
+        const targetDay = Math.min(recurrence.dayOfMonth, 28);
+        nextDate.setDate(targetDay);
+      }
+      break;
     case "yearly":
-      nextDate = addYears(currentDate, recurrence.interval);
+      nextDate = addYears(currentDate, Math.max(1, recurrence.interval));
       break;
     case "custom":
       // For custom, use daily interval as default
-      nextDate = addDays(currentDate, recurrence.interval);
+      nextDate = addDays(currentDate, Math.max(1, recurrence.interval));
       break;
     default:
-      nextDate = addDays(currentDate, recurrence.interval);
+      nextDate = addDays(currentDate, Math.max(1, recurrence.interval));
   }
 
   // Check endDate condition
   if (recurrence.endDate) {
     const endDate = new Date(recurrence.endDate);
-    if (isAfter(nextDate, endDate) || isEqual(nextDate, endDate)) {
+    if (!isValid(endDate)) {
+      console.warn("Invalid endDate in recurrence config");
+    } else if (isAfter(nextDate, endDate) || isEqual(nextDate, endDate)) {
       return null;
     }
   }

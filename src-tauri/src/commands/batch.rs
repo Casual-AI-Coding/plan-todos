@@ -5,6 +5,56 @@ use crate::AppState;
 use serde::Deserialize;
 use serde::Serialize;
 
+// Valid values for status and priority
+const VALID_TODO_STATUSES: &[&str] = &["pending", "in-progress", "done", "archived"];
+const VALID_PLAN_STATUSES: &[&str] = &["draft", "active", "completed", "archived"];
+const VALID_TARGET_STATUSES: &[&str] = &["active", "completed", "abandoned", "archived"];
+const VALID_PRIORITIES: &[&str] = &["P0", "P1", "P2", "P3"];
+
+fn validate_todo_status(status: &str) -> Result<(), String> {
+    if !VALID_TODO_STATUSES.contains(&status) {
+        Err(format!(
+            "Invalid todo status: '{}'. Valid values: {:?}",
+            status, VALID_TODO_STATUSES
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_plan_status(status: &str) -> Result<(), String> {
+    if !VALID_PLAN_STATUSES.contains(&status) {
+        Err(format!(
+            "Invalid plan status: '{}'. Valid values: {:?}",
+            status, VALID_PLAN_STATUSES
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_target_status(status: &str) -> Result<(), String> {
+    if !VALID_TARGET_STATUSES.contains(&status) {
+        Err(format!(
+            "Invalid target status: '{}'. Valid values: {:?}",
+            status, VALID_TARGET_STATUSES
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_priority(priority: &str) -> Result<(), String> {
+    if !VALID_PRIORITIES.contains(&priority) {
+        Err(format!(
+            "Invalid priority: '{}'. Valid values: {:?}",
+            priority, VALID_PRIORITIES
+        ))
+    } else {
+        Ok(())
+    }
+}
+
 #[derive(Debug, Serialize)]
 pub struct BatchUpdateResult {
     pub updated: i32,
@@ -23,6 +73,9 @@ pub fn bulk_update_todo_status(
     ids: Vec<String>,
     status: String,
 ) -> Result<BatchUpdateResult, String> {
+    // Validate status
+    validate_todo_status(&status)?;
+
     log_command!("bulk_update_todo_status", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
@@ -207,6 +260,14 @@ pub fn bulk_update_todos(
     ids: Vec<String>,
     updates: BulkTodoUpdates,
 ) -> Result<BatchUpdateResult, String> {
+    // Validate inputs
+    if let Some(ref status) = updates.status {
+        validate_todo_status(status)?;
+    }
+    if let Some(ref priority) = updates.priority {
+        validate_priority(priority)?;
+    }
+
     log_command!("bulk_update_todos", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
@@ -308,6 +369,11 @@ pub fn bulk_update_plans(
     status: Option<String>,
     archived: Option<bool>,
 ) -> Result<BatchUpdateResult, String> {
+    // Validate status if provided
+    if let Some(ref s) = status {
+        validate_plan_status(s)?;
+    }
+
     log_command!("bulk_update_plans", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();
@@ -387,6 +453,11 @@ pub fn bulk_update_targets(
     status: Option<String>,
     archived: Option<bool>,
 ) -> Result<BatchUpdateResult, String> {
+    // Validate status if provided
+    if let Some(ref s) = status {
+        validate_target_status(s)?;
+    }
+
     log_command!("bulk_update_targets", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
         let now = chrono::Utc::now().to_rfc3339();

@@ -52,12 +52,14 @@ const PRIORITY_OPTIONS = [
 export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
-  const selectedIds = useBatchSelect(
-    useShallow((s) => Array.from(s.selectedIds)),
+  const { selectedIds, selectAll, deselectAll, exitMode } = useBatchSelect(
+    useShallow((s) => ({
+      selectedIds: Array.from(s.selectedIds),
+      selectAll: s.selectAll,
+      deselectAll: s.deselectAll,
+      exitMode: s.exitMode,
+    })),
   );
-  const selectAll = useBatchSelect((s) => s.selectAll);
-  const deselectAll = useBatchSelect((s) => s.deselectAll);
-  const exitMode = useBatchSelect((s) => s.exitMode);
   const hasSelection = selectedIds.length > 0;
 
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
