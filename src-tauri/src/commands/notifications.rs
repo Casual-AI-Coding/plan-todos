@@ -744,6 +744,42 @@ pub fn reset_global_notification_settings(
     get_global_notification_settings(state)
 }
 
+/// Send a test notification
+/// Uses the first available notification plugin to verify the system is working
+#[tauri::command]
+pub async fn send_test_notification() -> Result<(), String> {
+    use crate::commands::notification_plugins::GLOBAL_REGISTRY;
+    
+    // Try to send using the global registry
+    // Check if there's any registered sender
+    let registry = &*GLOBAL_REGISTRY;
+    
+    // Try common notification channels
+    let channels = ["webhook", "feishu", "dingtalk", "email"];
+    let mut sent = false;
+    
+    for channel in channels {
+        if let Some(sender) = registry.get(channel) {
+            match sender.send("Plan Todos 测试通知", "如果您看到这条消息，说明通知功能正常工作！").await {
+                Ok(_) => {
+                    log::info!("Test notification sent successfully via {}", channel);
+                    sent = true;
+                    break;
+                }
+                Err(e) => {
+                    log::warn!("Failed to send test notification via {}: {}", channel, e);
+                }
+            }
+        }
+    }
+    
+    if sent {
+        Ok(())
+    } else {
+        Err("No notification plugin configured. Please configure a notification channel in Settings.".to_string())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -7,6 +7,7 @@ import {
   useUpdateDailySummarySettings,
 } from "@/hooks/useDailySummarySettings";
 import { useNotificationPlugins } from "@/hooks/useNotificationPlugins";
+import { sendTestNotification } from "@/lib/api/notifications";
 import type { NotificationPlugin } from "@/lib/api";
 
 export function SettingsDailySummaryView() {
@@ -54,10 +55,11 @@ export function SettingsDailySummaryView() {
 
   const handleTest = async () => {
     try {
-      // TODO: Implement test send
-      alert("测试功能开发中");
+      await sendTestNotification();
+      alert("测试通知已发送");
     } catch (error) {
       console.error("Failed to send test:", error);
+      alert("发送失败: " + error);
     }
   };
 

@@ -166,6 +166,7 @@ pub fn run() {
             commands::notifications::get_global_notification_settings,
             commands::notifications::update_global_notification_settings,
             commands::notifications::reset_global_notification_settings,
+            commands::notifications::send_test_notification,
             commands::circulation_notifications::get_circulation_notification_settings,
             commands::circulation_notifications::update_circulation_notification_settings,
             commands::circulation_notifications::delete_circulation_notification_settings,

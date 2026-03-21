@@ -320,3 +320,14 @@ export async function getCirculationsWithNotificationSettings(): Promise<
     },
   );
 }
+
+/**
+ * Send a test notification
+ * Uses the first available notification plugin to verify the system is working
+ */
+export async function sendTestNotification(): Promise<void> {
+  return withTauriError("send test notification", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<void>("send_test_notification");
+  });
+}
