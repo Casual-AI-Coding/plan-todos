@@ -67,3 +67,42 @@ export async function bulkDeleteTargets(
 ): Promise<BulkUpdateResult> {
   return await invoke<BulkUpdateResult>("bulk_delete_targets", { ids });
 }
+
+// Bulk tag operations
+
+export interface BulkTagResult {
+  entity_type: string;
+  tag_id: string;
+  success_count: number;
+  failed_ids: string[];
+}
+
+/**
+ * Add a tag to multiple entities
+ */
+export async function bulkAddTags(
+  entityType: "todo" | "plan" | "target",
+  entityIds: string[],
+  tagId: string,
+): Promise<BulkTagResult> {
+  return await invoke<BulkTagResult>("bulk_add_tags", {
+    entityType,
+    entityIds,
+    tagId,
+  });
+}
+
+/**
+ * Remove a tag from multiple entities
+ */
+export async function bulkRemoveTags(
+  entityType: "todo" | "plan" | "target",
+  entityIds: string[],
+  tagId: string,
+): Promise<BulkTagResult> {
+  return await invoke<BulkTagResult>("bulk_remove_tags", {
+    entityType,
+    entityIds,
+    tagId,
+  });
+}

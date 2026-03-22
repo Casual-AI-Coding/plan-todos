@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { useShallow } from "zustand/react/shallow";
 import {
@@ -13,11 +13,16 @@ import {
   bulkDeletePlans,
   bulkUpdateTargets,
   bulkDeleteTargets,
+  bulkAddTags,
+  bulkRemoveTags,
   type BulkTodoUpdates,
 } from "@/lib/api/bulk";
+import { getTags, createTag } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useToast } from "@/components/ui/Toast";
+import { TagSelector } from "./TagSelector";
+import type { Tag } from "@/lib/types";
 
 interface BatchActionBarProps {
   entityType: "todo" | "plan" | "target";
@@ -64,6 +69,12 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
 
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
+
+  // Fetch all tags
+  const { data: tags = [] } = useQuery({
+    queryKey: ["tags"],
+    queryFn: getTags,
+  });
 
   // Update mutation
   const updateMutation = useMutation({
@@ -145,6 +156,53 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
     },
   });
 
+  // Bulk add tag mutation
+  const addTagMutation = useMutation({
+    mutationFn: async (tagId: string) => {
+      return bulkAddTags(entityType, selectedIds, tagId);
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: [entityType + "s"] });
+      queryClient.invalidateQueries({ queryKey: ["entityTags"] });
+      toast.success(`已添加标签到 ${result.success_count} 项`);
+      if (result.failed_ids.length > 0) {
+        toast.error(`${result.failed_ids.length} 项添加失败`);
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(`添加标签失败: ${error.message}`);
+    },
+  });
+
+  // Bulk remove tag mutation
+  const removeTagMutation = useMutation({
+    mutationFn: async (tagId: string) => {
+      return bulkRemoveTags(entityType, selectedIds, tagId);
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: [entityType + "s"] });
+      queryClient.invalidateQueries({ queryKey: ["entityTags"] });
+      toast.success(`已移除标签从 ${result.success_count} 项`);
+      if (result.failed_ids.length > 0) {
+        toast.error(`${result.failed_ids.length} 项移除失败`);
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(`移除标签失败: ${error.message}`);
+    },
+  });
+
+  // Create tag mutation
+  const createTagMutation = useMutation({
+    mutationFn: async ({ name, color }: { name: string; color: string }) => {
+      return createTag(name, color);
+    },
+    onSuccess: (tag) => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      return tag;
+    },
+  });
+
   const handleStatusChange = (value: string) => {
     updateMutation.mutate({ status: value });
     setShowStatusDropdown(false);
@@ -175,12 +233,26 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
     }
   };
 
+  const handleAddTag = (tagId: string) => {
+    addTagMutation.mutate(tagId);
+  };
+
+  const handleRemoveTag = (tagId: string) => {
+    removeTagMutation.mutate(tagId);
+  };
+
+  const handleCreateTag = async (name: string, color: string) => {
+    return createTagMutation.mutateAsync({ name, color });
+  };
+
   const isAllSelected =
     selectedIds.length === allIds.length && allIds.length > 0;
   const isLoading =
     updateMutation.isPending ||
     deleteMutation.isPending ||
-    archiveMutation.isPending;
+    archiveMutation.isPending ||
+    addTagMutation.isPending ||
+    removeTagMutation.isPending;
 
   return (
     <motion.div
@@ -302,6 +374,16 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
           </AnimatePresence>
         </div>
       )}
+
+      {/* Tag selector */}
+      <TagSelector
+        tags={tags}
+        selectedTagIds={[]}
+        onAddTag={handleAddTag}
+        onRemoveTag={handleRemoveTag}
+        onCreateTag={handleCreateTag}
+        isLoading={isLoading}
+      />
 
       {/* Spacer */}
       <div className="flex-1" />

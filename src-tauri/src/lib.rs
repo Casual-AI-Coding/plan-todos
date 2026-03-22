@@ -140,6 +140,8 @@ pub fn run() {
             commands::tags::get_entity_tags,
             commands::tags::set_entity_tags,
             commands::tags::get_entities_by_tag,
+            commands::tags::bulk_add_tags,
+            commands::tags::bulk_remove_tags,
             commands::tasks::get_task,
             commands::tasks::get_tasks,
             commands::tasks::get_tasks_by_plan,

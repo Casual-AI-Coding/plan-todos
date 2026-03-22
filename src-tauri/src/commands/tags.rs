@@ -1,8 +1,8 @@
 // Tag CRUD commands
 
+use super::validation::{normalize_color_or_default, validate_tag_name};
 use crate::log_command;
 use crate::AppState;
-use super::validation::{validate_tag_name, normalize_color_or_default};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct Tag {
@@ -60,13 +60,11 @@ pub fn create_tag(
         validate_tag_name(&name)?;
         let name = name.trim().to_string();
 
-
         let id = uuid::Uuid::new_v4().to_string();
         let now = chrono::Utc::now().to_rfc3339();
 
         // Validate and normalize color using centralized validation
         let color = normalize_color_or_default(&color.unwrap_or_default());
-
 
         conn.execute(
             "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -119,8 +117,9 @@ pub fn update_tag(
         let new_name = name.unwrap_or(tag.name);
 
         // Validate and normalize color if provided
-        let new_color = color.map(|c| normalize_color_or_default(&c)).unwrap_or_else(|| tag.color.clone());
-
+        let new_color = color
+            .map(|c| normalize_color_or_default(&c))
+            .unwrap_or_else(|| tag.color.clone());
 
         // Description can be cleared (None) or set
         let new_description = description;
@@ -252,5 +251,105 @@ pub fn get_entities_by_tag(
             .map_err(|e| e.to_string())?;
 
         Ok(id_iter.filter_map(|r| r.ok()).collect())
+    })
+}
+
+/// Result for bulk tag operations
+#[derive(Debug, serde::Serialize)]
+pub struct BulkTagResult {
+    pub entity_type: String,
+    pub tag_id: String,
+    pub success_count: usize,
+    pub failed_ids: Vec<String>,
+}
+
+#[tauri::command]
+pub fn bulk_add_tags(
+    state: tauri::State<AppState>,
+    entity_type: String,
+    entity_ids: Vec<String>,
+    tag_id: String,
+) -> Result<BulkTagResult, String> {
+    log_command!("bulk_add_tags", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+        let mut success_count = 0;
+        let mut failed_ids = Vec::new();
+
+        for entity_id in &entity_ids {
+            // Check if the tag already exists for this entity
+            let exists: bool = conn
+                .query_row(
+                    "SELECT COUNT(*) FROM entity_tags WHERE entity_type = ? AND entity_id = ? AND tag_id = ?",
+                    rusqlite::params![&entity_type, entity_id, &tag_id],
+                    |row| row.get::<_, i32>(0).map(|count| count > 0),
+                )
+                .unwrap_or(false);
+
+            if exists {
+                // Already has this tag, count as success
+                success_count += 1;
+                continue;
+            }
+
+            let result = conn.execute(
+                "INSERT INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
+                rusqlite::params![&entity_type, entity_id, &tag_id],
+            );
+
+            match result {
+                Ok(_) => success_count += 1,
+                Err(_) => failed_ids.push(entity_id.clone()),
+            }
+        }
+
+        Ok(BulkTagResult {
+            entity_type,
+            tag_id,
+            success_count,
+            failed_ids,
+        })
+    })
+}
+
+#[tauri::command]
+pub fn bulk_remove_tags(
+    state: tauri::State<AppState>,
+    entity_type: String,
+    entity_ids: Vec<String>,
+    tag_id: String,
+) -> Result<BulkTagResult, String> {
+    log_command!("bulk_remove_tags", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+
+        let mut success_count = 0;
+        let mut failed_ids = Vec::new();
+
+        for entity_id in &entity_ids {
+            let result = conn.execute(
+                "DELETE FROM entity_tags WHERE entity_type = ? AND entity_id = ? AND tag_id = ?",
+                rusqlite::params![&entity_type, entity_id, &tag_id],
+            );
+
+            match result {
+                Ok(rows_affected) => {
+                    if rows_affected > 0 {
+                        success_count += 1;
+                    }
+                    // If rows_affected is 0, the tag wasn't associated, count as success
+                    if rows_affected == 0 {
+                        success_count += 1;
+                    }
+                }
+                Err(_) => failed_ids.push(entity_id.clone()),
+            }
+        }
+
+        Ok(BulkTagResult {
+            entity_type,
+            tag_id,
+            success_count,
+            failed_ids,
+        })
     })
 }
