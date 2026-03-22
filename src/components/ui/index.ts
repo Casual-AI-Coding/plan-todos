@@ -12,3 +12,11 @@ export { Skeleton } from "./Skeleton";
 export { Badge } from "./Badge";
 export { ScrollArea } from "./ScrollArea";
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
+export {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuLabel,
+} from "./ContextMenu";

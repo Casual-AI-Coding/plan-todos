@@ -1,7 +1,15 @@
 "use client";
 
 import React from "react";
-import { Card } from "@/components/ui";
+import { Trash2, Archive } from "lucide-react";
+import {
+  Card,
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@/components/ui";
 import { ReminderQuickButton } from "./ReminderQuickButton";
 import type { Plan, Tag } from "@/lib/types";
 
@@ -24,6 +32,7 @@ export interface PlanItemProps {
   onDelete?: (id: string) => void;
   onClick?: (plan: Plan) => void;
   onReminderUpdate?: (planId: string, times: number[]) => void;
+  onArchive?: (plan: Plan) => void;
 }
 
 /**
@@ -56,74 +65,101 @@ export const PlanItem = React.memo(function PlanItem({
   onDelete,
   onClick,
   onReminderUpdate,
+  onArchive,
 }: PlanItemProps) {
   return (
-    <Card
-      hoverable
-      onClick={() => onClick?.(plan)}
-      onKeyDown={(e) => e.key === "Enter" && onClick?.(plan)}
-      role="button"
-      tabIndex={0}
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
-          <div
-            className={
-              plan.status === "archived" ? "line-through text-gray-400" : ""
-            }
-          >
-            {plan.title}
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <Card
+          hoverable
+          onClick={() => onClick?.(plan)}
+          onKeyDown={(e) => e.key === "Enter" && onClick?.(plan)}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <div
+                className={
+                  plan.status === "archived" ? "line-through text-gray-400" : ""
+                }
+              >
+                {plan.title}
+              </div>
+              {/* Reminder button */}
+              <ReminderQuickButton
+                entityType="plan"
+                entityId={plan.id}
+                reminderTimes={reminderTimes || []}
+                onUpdate={(times) => onReminderUpdate?.(plan.id, times)}
+              />
+              {/* Tags display */}
+              {tags && tags.length > 0 && (
+                <div className="flex gap-1 mt-1 flex-wrap">
+                  {tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-2 py-0.5 rounded text-xs"
+                      style={{
+                        backgroundColor: `${tag.color}20`,
+                        color: tag.color,
+                      }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {plan.start_date && (
+                <div className="text-xs text-gray-500 mt-1">
+                  📅 {plan.start_date}
+                  {plan.start_date && plan.end_date && " ~ "}
+                  {plan.end_date || "进行中"}
+                </div>
+              )}
+              {plan.description && (
+                <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                  {plan.description}
+                </div>
+              )}
+            </div>
+            {onDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(plan.id);
+                }}
+                className="text-gray-400 hover:text-red-500 px-2"
+                aria-label="删除计划"
+              >
+                🗑️
+              </button>
+            )}
           </div>
-          {/* Reminder button */}
-          <ReminderQuickButton
-            entityType="plan"
-            entityId={plan.id}
-            reminderTimes={reminderTimes || []}
-            onUpdate={(times) => onReminderUpdate?.(plan.id, times)}
-          />
-          {/* Tags display */}
-          {tags && tags.length > 0 && (
-            <div className="flex gap-1 mt-1 flex-wrap">
-              {tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="px-2 py-0.5 rounded text-xs"
-                  style={{
-                    backgroundColor: `${tag.color}20`,
-                    color: tag.color,
-                  }}
-                >
-                  {tag.name}
-                </span>
-              ))}
-            </div>
-          )}
-          {plan.start_date && (
-            <div className="text-xs text-gray-500 mt-1">
-              📅 {plan.start_date}
-              {plan.start_date && plan.end_date && " ~ "}
-              {plan.end_date || "进行中"}
-            </div>
-          )}
-          {plan.description && (
-            <div className="text-xs text-gray-500 mt-1 line-clamp-2">
-              {plan.description}
-            </div>
-          )}
-        </div>
-        {onDelete && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(plan.id);
-            }}
-            className="text-gray-400 hover:text-red-500 px-2"
-            aria-label="删除计划"
+        </Card>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        {onArchive && (
+          <ContextMenuItem
+            icon={<Archive className="w-4 h-4" />}
+            onClick={() => onArchive(plan)}
           >
-            🗑️
-          </button>
+            {plan.status === "archived" ? "取消归档" : "归档"}
+          </ContextMenuItem>
         )}
-      </div>
-    </Card>
+        {onDelete && (
+          <>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+              icon={<Trash2 className="w-4 h-4" />}
+              variant="danger"
+              onClick={() => onDelete(plan.id)}
+            >
+              删除
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }, areEqual);
