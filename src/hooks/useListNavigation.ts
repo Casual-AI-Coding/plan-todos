@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export interface UseListNavigationOptions<T> {
   items: T[];
-  getItemId: (item: T) => string;
   onSelect?: (item: T) => void;
   onActivate?: (item: T) => void;
   enabled?: boolean;
@@ -34,13 +33,11 @@ export interface ListNavigationState<T> {
  */
 export function useListNavigation<T>({
   items,
-  getItemId,
   onSelect,
   onActivate,
   enabled = true,
 }: UseListNavigationOptions<T>): ListNavigationState<T> {
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  const containerRef = useRef<HTMLElement | null>(null);
 
   const focusedItem =
     focusedIndex >= 0 && focusedIndex < items.length
@@ -84,13 +81,6 @@ export function useListNavigation<T>({
   const resetFocus = useCallback(() => {
     setFocusedIndex(-1);
   }, []);
-
-  // Reset focus when items change
-  useEffect(() => {
-    if (focusedIndex >= items.length) {
-      setFocusedIndex(items.length > 0 ? items.length - 1 : -1);
-    }
-  }, [items, focusedIndex]);
 
   // Keyboard event handler
   useEffect(() => {
