@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2026-03-22
+
+### Added
+
+**同步状态管理 (Sync State Management)**:
+
+- 新增 `SyncState` 模块 (Rust) - 原子化的同步状态追踪
+- 新增 `get_sync_progress` 命令 - 实时查询同步进度
+- 同步引擎集成 SyncState，支持进度百分比和状态文本
+
+**同步触发与进度追踪**:
+
+- `trigger_sync` 命令返回 `SyncResult` 结构体
+- 支持同步进度实时更新：总条目数、已处理数、当前操作
+- 前端 `useSyncProgress` hook 封装进度状态管理
+
+**冲突管理**:
+
+- 冲突检测和记录机制
+- 新增冲突管理 API：`get_conflicts`, `resolve_conflict`
+- 冲突数据结构：实体类型、字段、本地值、远程值
+
+**前端组件**:
+
+- `SyncStatusIndicator` - 同步状态指示器组件
+- `ConflictList` - 冲突列表组件
+- `ConflictCard` - 冲突卡片组件
+- 集成到同步设置页面 (`SettingsSyncView`)
+
+**测试通知功能**:
+
+- 新增 `send_test_notification` 命令
+- 设置页面添加"测试通知"按钮，验证通知渠道配置
+
+### Changed
+
+- 依赖更新：next 16.1.6 → 16.1.7
+- 依赖更新：rustls-webpki 0.103.9 → 0.103.10
+- 依赖更新：flatted 3.3.3 → 3.4.2
+
+---
+
 ## [0.7.0] - 2026-03-22
 
 ### Added
