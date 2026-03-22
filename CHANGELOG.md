@@ -5,6 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2026-03-22
+
+### Added
+
+**拖拽排序 (Drag-Drop Sorting)**:
+
+- Todos/Plans/Targets 列表支持拖拽排序
+- 后端新增 `sort_order` 字段到数据库模型
+- 新增 `reorder_todos`, `reorder_plans`, `reorder_targets` 命令
+- 新增 `update_*_sort_order` 单项排序更新命令
+- 前端集成 `SortableList` 组件到三个列表视图
+- 导出功能包含 `sort_order` 字段
+
+**右键菜单 (Context Menu)**:
+
+- 新增 `ContextMenu` UI 组件系列
+- `ContextMenuTrigger` - 右键触发器
+- `ContextMenuContent` - 带动画的菜单内容
+- `ContextMenuItem` - 支持 default/danger 变体
+- TodoItem: 切换状态、删除操作
+- PlanItem: 归档、删除操作
+- TargetItem: 展开/折叠、删除操作
+
+**批量标签管理 (Batch Tags)**:
+
+- 新增 `bulk_add_tags`, `bulk_remove_tags` 后端命令
+- 新增 `TagSelector` 组件用于标签选择
+- BatchActionBar 集成标签管理功能
+- 支持新建标签并设置颜色
+- 10 种预设颜色供选择
+
+**键盘导航 (Keyboard Navigation)**:
+
+- 新增 `useListNavigation` hook
+- Arrow Up/Down 或 j/k 导航列表项
+- Home/End 跳转到首/末项
+- Enter 选择，Shift+Enter 激活
+- Escape 重置焦点
+
+**快捷操作栏 (Quick Action Bar)**:
+
+- 新增 `QuickActionBar` 组件
+- 悬停显示快捷操作按钮
+- 切换状态、归档、删除等操作
+- 动画显示/隐藏效果
+
+**列表密度切换 (List Density Toggle)**:
+
+- 新增 `useListDensity` store
+- 三种密度模式：紧凑、标准、舒适
+- 通过 CSS 变量控制间距和字体大小
+- 设置持久化到本地存储
+
+**完成动画 (Completion Animation)**:
+
+- 新增 `CompletionAnimation` 组件 - 打勾动画
+- 新增 `ConfettiCelebration` 组件 - 彩带庆祝效果
+- Framer Motion 弹簧动画
+- 可配置持续时间和粒子数量
+
+---
+
 ## [0.7.1] - 2026-03-22
 
 ### Added
