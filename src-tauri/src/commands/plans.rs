@@ -10,7 +10,7 @@ pub fn get_plan(state: tauri::State<AppState>, id: String) -> Result<Plan, Strin
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, title, description, start_date, end_date, status, created_at, updated_at FROM plans WHERE id = ?")
+            .prepare("SELECT id, title, description, start_date, end_date, status, sort_order, created_at, updated_at FROM plans WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         stmt.query_row([&id], |row| {
@@ -21,8 +21,9 @@ pub fn get_plan(state: tauri::State<AppState>, id: String) -> Result<Plan, Strin
                 start_date: row.get(3)?,
                 end_date: row.get(4)?,
                 status: row.get(5)?,
-                created_at: row.get(6)?,
-                updated_at: row.get(7)?,
+                sort_order: row.get(6)?,
+                created_at: row.get(7)?,
+                updated_at: row.get(8)?,
             })
         })
         .map_err(|e| e.to_string())
@@ -35,7 +36,7 @@ pub fn get_plans(state: tauri::State<AppState>) -> Result<Vec<Plan>, String> {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, title, description, start_date, end_date, status, created_at, updated_at FROM plans")
+            .prepare("SELECT id, title, description, start_date, end_date, status, sort_order, created_at, updated_at FROM plans ORDER BY sort_order ASC, created_at DESC")
             .map_err(|e| e.to_string())?;
 
         let plan_iter = stmt
@@ -47,8 +48,9 @@ pub fn get_plans(state: tauri::State<AppState>) -> Result<Vec<Plan>, String> {
                     start_date: row.get(3)?,
                     end_date: row.get(4)?,
                     status: row.get(5)?,
-                    created_at: row.get(6)?,
-                    updated_at: row.get(7)?,
+                    sort_order: row.get(6)?,
+                    created_at: row.get(7)?,
+                    updated_at: row.get(8)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -72,7 +74,7 @@ pub fn create_plan(
         let now = chrono::Utc::now().to_rfc3339();
 
         conn.execute(
-            "INSERT INTO plans (id, title, description, start_date, end_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'active', ?, ?)",
+            "INSERT INTO plans (id, title, description, start_date, end_date, status, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'active', 0, ?, ?)",
             rusqlite::params![id, title, description, start_date, end_date, now, now],
         ).map_err(|e| e.to_string())?;
 
@@ -83,6 +85,7 @@ pub fn create_plan(
             start_date,
             end_date,
             status: "active".to_string(),
+            sort_order: 0,
             created_at: now.clone(),
             updated_at: now,
         })
@@ -104,7 +107,7 @@ pub fn update_plan(
         let now = chrono::Utc::now().to_rfc3339();
 
         let mut stmt = conn
-            .prepare("SELECT id, title, description, start_date, end_date, status, created_at, updated_at FROM plans WHERE id = ?")
+            .prepare("SELECT id, title, description, start_date, end_date, status, sort_order, created_at, updated_at FROM plans WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let plan: Plan = stmt
@@ -116,8 +119,9 @@ pub fn update_plan(
                     start_date: row.get(3)?,
                     end_date: row.get(4)?,
                     status: row.get(5)?,
-                    created_at: row.get(6)?,
-                    updated_at: row.get(7)?,
+                    sort_order: row.get(6)?,
+                    created_at: row.get(7)?,
+                    updated_at: row.get(8)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -140,6 +144,7 @@ pub fn update_plan(
             start_date: new_start_date,
             end_date: new_end_date,
             status: new_status,
+            sort_order: plan.sort_order,
             created_at: plan.created_at,
             updated_at: now,
         })
@@ -157,5 +162,49 @@ pub fn delete_plan(state: tauri::State<AppState>, id: String) -> Result<(), Stri
             .map_err(|e| e.to_string())?;
 
         Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn update_plan_sort_order(
+    state: tauri::State<AppState>,
+    id: String,
+    sort_order: i32,
+) -> Result<(), String> {
+    log_command!("update_plan_sort_order", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "UPDATE plans SET sort_order = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![sort_order, now, id],
+        )
+        .map_err(|e| e.to_string())?;
+
+        Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn reorder_plans(
+    state: tauri::State<AppState>,
+    orders: Vec<(String, i32)>, // (id, sort_order) pairs
+) -> Result<usize, String> {
+    log_command!("reorder_plans", {
+        let mut conn = state.db.lock().map_err(|e| e.to_string())?;
+        let tx = conn.transaction().map_err(|e| e.to_string())?;
+        let mut count = 0;
+
+        for (id, sort_order) in orders {
+            tx.execute(
+                "UPDATE plans SET sort_order = ?, updated_at = ? WHERE id = ?",
+                rusqlite::params![sort_order, chrono::Utc::now().to_rfc3339(), id],
+            )
+            .map_err(|e| e.to_string())?;
+            count += 1;
+        }
+
+        tx.commit().map_err(|e| e.to_string())?;
+        Ok(count)
     })
 }

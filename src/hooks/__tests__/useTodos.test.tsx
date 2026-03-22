@@ -62,6 +62,7 @@ const mockTodos: Todo[] = [
     due_date: "2024-01-01",
     status: "pending",
     priority: "P1",
+    sort_order: 0,
     created_at: "2024-01-01",
     updated_at: "2024-01-01",
   },
@@ -72,6 +73,7 @@ const mockTodos: Todo[] = [
     due_date: "2024-01-02",
     status: "done",
     priority: "P2",
+    sort_order: 0,
     created_at: "2024-01-01",
     updated_at: "2024-01-02",
   },
@@ -155,6 +157,7 @@ describe("useTodos", () => {
         due_date: "2024-01-01",
         status: "pending",
         priority: "P1",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };

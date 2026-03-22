@@ -83,6 +83,7 @@ const mockTarget: Target = {
   due_date: "2024-12-31",
   status: "active",
   progress: 0,
+  sort_order: 0,
   created_at: "2024-01-01",
   updated_at: "2024-01-01",
 };

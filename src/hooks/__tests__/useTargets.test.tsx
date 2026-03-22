@@ -70,6 +70,7 @@ const mockTargets: Target[] = [
     due_date: "2024-12-31",
     status: "active",
     progress: 50,
+    sort_order: 0,
     created_at: "2024-01-01",
     updated_at: "2024-01-01",
   },
@@ -80,6 +81,7 @@ const mockTargets: Target[] = [
     due_date: "2024-06-30",
     status: "completed",
     progress: 100,
+    sort_order: 1,
     created_at: "2024-01-01",
     updated_at: "2024-02-01",
   },
@@ -248,6 +250,7 @@ describe("useTargets", () => {
         due_date: "2024-12-31",
         status: "active",
         progress: 0,
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -279,6 +282,7 @@ describe("useTargets", () => {
         due_date: null,
         status: "active",
         progress: 0,
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };

@@ -31,6 +31,7 @@ export interface Todo {
   due_date: string | null;
   status: "pending" | "in-progress" | "done";
   priority: Priority;
+  sort_order: number; // For drag-drop sorting
   created_at: string;
   updated_at: string;
   tags?: Tag[];

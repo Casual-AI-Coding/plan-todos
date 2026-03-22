@@ -15,7 +15,8 @@ pub struct Plan {
     pub description: Option<String>,
     pub start_date: Option<String>,
     pub end_date: Option<String>,
-    pub status: String, // active | completed | archived
+    pub status: String,  // active | completed | archived
+    pub sort_order: i32, // For drag-drop sorting
     pub created_at: String,
     pub updated_at: String,
 }
@@ -40,8 +41,9 @@ pub struct Target {
     pub title: String,
     pub description: Option<String>,
     pub due_date: Option<String>,
-    pub status: String, // active | completed | archived
-    pub progress: i32,  // Calculated from Steps (0-100)
+    pub status: String,  // active | completed | archived
+    pub progress: i32,   // Calculated from Steps (0-100)
+    pub sort_order: i32, // For drag-drop sorting
     pub created_at: String,
     pub updated_at: String,
 }
@@ -69,6 +71,7 @@ pub struct Todo {
     pub recurrence: Option<String>,      // JSON string of Recurrence config
     pub recurrence_from: Option<String>, // Original todo ID for tracking chain
     pub recurrence_index: Option<i32>,   // Current occurrence number
+    pub sort_order: i32,                 // For drag-drop sorting
     pub created_at: String,
     pub updated_at: String,
 }

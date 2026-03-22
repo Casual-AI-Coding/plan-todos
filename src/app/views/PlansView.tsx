@@ -9,7 +9,6 @@ import {
   ProgressBar,
   Checkbox,
 } from "@/components/ui";
-import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { EmptyStateCard } from "@/components/features";
 import { useToast } from "@/components/ui/Toast";
 import {
@@ -19,6 +18,7 @@ import {
   useCreatePlan,
   useUpdatePlan,
   useDeletePlan,
+  useReorderPlans,
 } from "@/hooks/usePlans";
 import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useTags } from "@/hooks/useTags";
@@ -29,6 +29,7 @@ import type { Plan, Task } from "@/lib/api";
 import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { getNotificationSettings } from "@/lib/api/notifications";
 import { PlanForm, type PlanFormData } from "@/components/features/PlanForm";
+import { SortableList } from "@/components/features/SortableList";
 
 export function PlansView() {
   const toast = useToast();
@@ -70,6 +71,8 @@ export function PlansView() {
       toast.error("操作失败");
     },
   });
+
+  const reorderPlansMutation = useReorderPlans();
 
   const createTaskMutation = useCreateTask({
     onSuccess: () => {
@@ -221,6 +224,15 @@ export function PlansView() {
     updateTaskMutation.mutate({ id: task.id, status: next });
   }
 
+  async function handleReorder(newItems: Plan[]) {
+    // Calculate new sort_order values based on position
+    const orders = newItems.map((item, index) => ({
+      id: item.id,
+      sort_order: index,
+    }));
+    await reorderPlansMutation.mutateAsync(orders);
+  }
+
   // Loading state
   if (plansLoading) {
     return (
@@ -315,25 +327,27 @@ export function PlansView() {
       )}
 
       {filteredPlans.length > 0 ? (
-        <StaggeredList className="space-y-4" staggerDelay={80}>
-          {filteredPlans.map((plan, index) => (
-            <StaggeredListItem key={plan.id}>
-              <SelectableItem id={plan.id}>
-                <PlanCard
-                  plan={plan}
-                  index={index}
-                  expandedPlans={expandedPlans}
-                  togglePlan={togglePlan}
-                  setSelectedPlanId={setSelectedPlanId}
-                  setShowTaskForm={setShowTaskForm}
-                  handleDeletePlan={handleDeletePlan}
-                  handleToggleTask={handleToggleTask}
-                  handleDeleteTask={handleDeleteTask}
-                />
-              </SelectableItem>
-            </StaggeredListItem>
-          ))}
-        </StaggeredList>
+        <SortableList
+          items={filteredPlans}
+          onReorder={handleReorder}
+          getItemId={(plan) => plan.id}
+          layout="vertical"
+          renderItem={(plan, index) => (
+            <SelectableItem id={plan.id}>
+              <PlanCard
+                plan={plan}
+                index={index}
+                expandedPlans={expandedPlans}
+                togglePlan={togglePlan}
+                setSelectedPlanId={setSelectedPlanId}
+                setShowTaskForm={setShowTaskForm}
+                handleDeletePlan={handleDeletePlan}
+                handleToggleTask={handleToggleTask}
+                handleDeleteTask={handleDeleteTask}
+              />
+            </SelectableItem>
+          )}
+        />
       ) : (
         <EmptyStateCard
           icon="📝"

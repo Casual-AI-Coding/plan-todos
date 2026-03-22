@@ -516,6 +516,25 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Migration: Add priority columns
 
+    // Migration: Add sort_order columns for drag-drop sorting
+    add_column_if_not_exists(conn, "todos", "sort_order", "INTEGER DEFAULT 0")?;
+    add_column_if_not_exists(conn, "plans", "sort_order", "INTEGER DEFAULT 0")?;
+    add_column_if_not_exists(conn, "targets", "sort_order", "INTEGER DEFAULT 0")?;
+
+    // Create indexes for sort_order
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_todos_sort_order ON todos(sort_order)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_plans_sort_order ON plans(sort_order)",
+        [],
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_targets_sort_order ON targets(sort_order)",
+        [],
+    )?;
+
     // Migration: Add priority columns (SQLite doesn't support IF NOT EXISTS for ALTER TABLE)
     // Check if column exists first, then add if not
     add_column_if_not_exists(conn, "todos", "priority", "TEXT DEFAULT 'P2'")?;

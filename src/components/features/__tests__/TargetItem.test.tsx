@@ -53,6 +53,7 @@ const mockTarget: Target = {
   description: null,
   status: "active",
   progress: 50,
+  sort_order: 0,
   due_date: "2024-12-31",
   created_at: "2024-01-01",
   updated_at: "2024-01-01",

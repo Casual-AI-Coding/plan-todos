@@ -39,6 +39,7 @@ const mockPlan: Plan = {
   title: "测试计划",
   description: "这是一个测试计划",
   status: "active",
+  sort_order: 0,
   start_date: "2024-01-01",
   end_date: "2024-12-31",
   created_at: "2024-01-01",

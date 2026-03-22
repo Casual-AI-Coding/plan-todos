@@ -9,8 +9,11 @@ import {
   ProgressBar,
   Checkbox,
 } from "@/components/ui";
-import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { EmptyStateCard, TargetForm } from "@/components/features";
+import {
+  StaggeredList,
+  StaggeredListItem,
+} from "@/components/ui/animations/StaggeredList";
 import { useToast } from "@/components/ui/Toast";
 import {
   useTargets,
@@ -21,6 +24,7 @@ import {
   useCreateStep,
   useUpdateStep,
   useDeleteStep,
+  useReorderTargets,
 } from "@/hooks/useTargets";
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
@@ -33,6 +37,7 @@ import {
   updateTarget as updateTargetApi,
   getNotificationSettings,
 } from "@/lib/api";
+import { SortableList } from "@/components/features/SortableList";
 
 interface TargetCardProps {
   target: Target;
@@ -231,6 +236,8 @@ export function TargetsView() {
       toast.error("操作失败");
     },
   });
+
+  const reorderTargetsMutation = useReorderTargets();
 
   const createStepMutation = useCreateStep({
     onSuccess: () => {

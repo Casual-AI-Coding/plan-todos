@@ -61,6 +61,7 @@ const mockPlans: Plan[] = [
     start_date: "2024-01-01",
     end_date: "2024-12-31",
     status: "active",
+    sort_order: 0,
     created_at: "2024-01-01",
     updated_at: "2024-01-01",
   },
@@ -71,6 +72,7 @@ const mockPlans: Plan[] = [
     start_date: "2024-02-01",
     end_date: "2024-06-30",
     status: "completed",
+    sort_order: 0,
     created_at: "2024-01-01",
     updated_at: "2024-02-01",
   },
@@ -231,6 +233,7 @@ describe("usePlans", () => {
         start_date: "2024-01-01",
         end_date: "2024-12-31",
         status: "active",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -262,6 +265,7 @@ describe("usePlans", () => {
         start_date: null,
         end_date: null,
         status: "active",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };

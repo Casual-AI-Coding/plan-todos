@@ -50,6 +50,7 @@ describe("Target API", () => {
         due_date: null,
         status: "active",
         progress: 0,
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -97,6 +98,7 @@ describe("Target API", () => {
         id: "new-id",
         ...params,
         status: "active",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       });

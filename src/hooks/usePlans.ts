@@ -15,6 +15,7 @@ import {
   updatePlan,
   deletePlan,
 } from "@/lib/api";
+import { reorderPlans } from "@/lib/api/reorder";
 
 // Query Keys
 export const planKeys = {
@@ -185,6 +186,57 @@ export function useDeletePlan(
   return useMutation<void, Error, string>({
     mutationFn: deletePlan,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: planKeys.plans });
+    },
+    ...options,
+  });
+}
+
+/**
+ * Reorder plans with optimistic updates
+ */
+export function useReorderPlans(
+  options?: Omit<
+    UseMutationOptions<number, Error, { id: string; sort_order: number }[]>,
+    "mutationFn"
+  >,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation<number, Error, { id: string; sort_order: number }[]>({
+    mutationFn: reorderPlans,
+    onMutate: async (newOrders) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: planKeys.plans });
+
+      // Snapshot the previous value
+      const previousPlans = queryClient.getQueryData<Plan[]>(planKeys.plans);
+
+      // Optimistically update to the new value
+      if (previousPlans) {
+        const updatedPlans = previousPlans.map((plan) => {
+          const order = newOrders.find((o) => o.id === plan.id);
+          if (order) {
+            return { ...plan, sort_order: order.sort_order };
+          }
+          return plan;
+        });
+        // Sort by sort_order
+        updatedPlans.sort((a, b) => a.sort_order - b.sort_order);
+        queryClient.setQueryData(planKeys.plans, updatedPlans);
+      }
+
+      return { previousPlans };
+    },
+    onError: (_err, _newOrders, context) => {
+      // Rollback on error
+      const ctx = context as { previousPlans?: Plan[] } | undefined;
+      if (ctx?.previousPlans) {
+        queryClient.setQueryData(planKeys.plans, ctx.previousPlans);
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: planKeys.plans });
     },
     ...options,

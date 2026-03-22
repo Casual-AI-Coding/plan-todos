@@ -51,6 +51,7 @@ describe("Todo API", () => {
         due_date: "2024-01-01",
         status: "pending",
         priority: "P1",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -90,6 +91,7 @@ describe("Todo API", () => {
           due_date: null,
           status: "pending",
           priority: "P1",
+          sort_order: 0,
           created_at: "2024-01-01",
           updated_at: "2024-01-01",
         },
@@ -100,6 +102,7 @@ describe("Todo API", () => {
           due_date: "2024-01-02",
           status: "done",
           priority: "P2",
+          sort_order: 0,
           created_at: "2024-01-01",
           updated_at: "2024-01-02",
         },
@@ -140,6 +143,7 @@ describe("Todo API", () => {
           due_date: null,
           status: "pending",
           priority: "P1",
+          sort_order: 0,
           created_at: "2024-01-01",
           updated_at: "2024-01-01",
         },
@@ -189,6 +193,7 @@ describe("Todo API", () => {
         due_date: "2024-01-01",
         status: "pending",
         priority: "P1",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -215,6 +220,7 @@ describe("Todo API", () => {
         due_date: null,
         status: "pending",
         priority: "P2",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -269,6 +275,7 @@ describe("Todo API", () => {
         due_date: "2024-01-02",
         status: "done",
         priority: "P0",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-02",
       };
@@ -297,6 +304,7 @@ describe("Todo API", () => {
         due_date: null,
         status: "pending",
         priority: "P2",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-01",
       };
@@ -325,6 +333,7 @@ describe("Todo API", () => {
         due_date: null,
         status: "in-progress",
         priority: "P2",
+        sort_order: 0,
         created_at: "2024-01-01",
         updated_at: "2024-01-02",
       };

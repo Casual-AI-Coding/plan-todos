@@ -83,6 +83,7 @@ const mockPlan: Plan = {
   start_date: "2024-01-01",
   end_date: "2024-12-31",
   status: "active",
+  sort_order: 0,
   created_at: "2024-01-01",
   updated_at: "2024-01-01",
 };

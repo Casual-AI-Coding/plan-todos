@@ -234,6 +234,7 @@ describe("createNextOccurrence", () => {
     due_date: "2024-01-15",
     status: "done",
     priority: "P2",
+    sort_order: 0,
     created_at: "2024-01-01T00:00:00.000Z",
     updated_at: "2024-01-15T00:00:00.000Z",
     tags: [],

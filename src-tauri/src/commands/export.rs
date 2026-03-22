@@ -179,7 +179,7 @@ pub fn export_data(state: tauri::State<AppState>) -> Result<ExportData, String> 
 
 fn export_todos(conn: &rusqlite::Connection) -> Result<Vec<Todo>, String> {
     let mut stmt = conn
-        .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, created_at, updated_at FROM todos")
+        .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, sort_order, created_at, updated_at FROM todos")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
@@ -194,8 +194,9 @@ fn export_todos(conn: &rusqlite::Connection) -> Result<Vec<Todo>, String> {
                 recurrence: row.get(6)?,
                 recurrence_from: row.get(7)?,
                 recurrence_index: row.get(8)?,
-                created_at: row.get(9)?,
-                updated_at: row.get(10)?,
+                sort_order: row.get(9)?,
+                created_at: row.get(10)?,
+                updated_at: row.get(11)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -230,7 +231,7 @@ fn export_tasks(conn: &rusqlite::Connection) -> Result<Vec<Task>, String> {
 
 fn export_plans(conn: &rusqlite::Connection) -> Result<Vec<Plan>, String> {
     let mut stmt = conn
-        .prepare("SELECT id, title, description, start_date, end_date, status, created_at, updated_at FROM plans")
+        .prepare("SELECT id, title, description, start_date, end_date, status, sort_order, created_at, updated_at FROM plans")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
@@ -242,8 +243,9 @@ fn export_plans(conn: &rusqlite::Connection) -> Result<Vec<Plan>, String> {
                 start_date: row.get(3)?,
                 end_date: row.get(4)?,
                 status: row.get(5)?,
-                created_at: row.get(6)?,
-                updated_at: row.get(7)?,
+                sort_order: row.get(6)?,
+                created_at: row.get(7)?,
+                updated_at: row.get(8)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -253,7 +255,7 @@ fn export_plans(conn: &rusqlite::Connection) -> Result<Vec<Plan>, String> {
 
 fn export_targets(conn: &rusqlite::Connection) -> Result<Vec<Target>, String> {
     let mut stmt = conn
-        .prepare("SELECT id, title, description, due_date, status, progress, created_at, updated_at FROM targets")
+        .prepare("SELECT id, title, description, due_date, status, progress, sort_order, created_at, updated_at FROM targets")
         .map_err(|e| e.to_string())?;
 
     let rows = stmt
@@ -265,8 +267,9 @@ fn export_targets(conn: &rusqlite::Connection) -> Result<Vec<Target>, String> {
                 due_date: row.get(3)?,
                 status: row.get(4)?,
                 progress: row.get(5)?,
-                created_at: row.get(6)?,
-                updated_at: row.get(7)?,
+                sort_order: row.get(6)?,
+                created_at: row.get(7)?,
+                updated_at: row.get(8)?,
             })
         })
         .map_err(|e| e.to_string())?;

@@ -722,6 +722,7 @@ describe("Export Data Structure", () => {
             due_date: "2026-02-20",
             status: "pending",
             priority: "P1",
+            sort_order: 0,
             created_at: "2026-02-15T10:00:00Z",
             updated_at: "2026-02-15T10:00:00Z",
           },
@@ -748,6 +749,7 @@ describe("Export Data Structure", () => {
             start_date: "2026-02-01",
             end_date: "2026-02-28",
             status: "active",
+            sort_order: 0,
             created_at: "2026-02-15T10:00:00Z",
             updated_at: "2026-02-15T10:00:00Z",
           },
@@ -1000,6 +1002,7 @@ describe("Type Definitions", () => {
       start_date: null,
       end_date: null,
       status: "active",
+      sort_order: 0,
       created_at: "2026-01-01T00:00:00Z",
       updated_at: "2026-01-01T00:00:00Z",
     };
@@ -1014,6 +1017,7 @@ describe("Type Definitions", () => {
       start_date: null,
       end_date: null,
       status: "completed",
+      sort_order: 0,
       created_at: "2026-01-01T00:00:00Z",
       updated_at: "2026-01-01T00:00:00Z",
     };
@@ -1028,6 +1032,7 @@ describe("Type Definitions", () => {
       start_date: null,
       end_date: null,
       status: "archived",
+      sort_order: 0,
       created_at: "2026-01-01T00:00:00Z",
       updated_at: "2026-01-01T00:00:00Z",
     };
@@ -1090,6 +1095,7 @@ describe("Type Definitions", () => {
       due_date: null,
       status: "active",
       progress: 50,
+      sort_order: 0,
       created_at: "2026-01-01T00:00:00Z",
       updated_at: "2026-01-01T00:00:00Z",
     };
@@ -1134,6 +1140,7 @@ describe("Type Definitions", () => {
       due_date: null,
       status: "pending",
       priority: "P1",
+      sort_order: 0,
       created_at: "2026-01-01T00:00:00Z",
       updated_at: "2026-01-01T00:00:00Z",
       tags: [

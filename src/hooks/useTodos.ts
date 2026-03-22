@@ -13,6 +13,7 @@ import {
   updateTodo,
   deleteTodo,
 } from "@/lib/api";
+import { reorderTodos } from "@/lib/api/reorder";
 
 // Types for mutations
 export type CreateTodoInput = {
@@ -128,6 +129,57 @@ export function useDeleteTodo(
     mutationFn: deleteTodo,
     onSuccess: () => {
       // Invalidate todos query to refetch
+      queryClient.invalidateQueries({ queryKey: queryKeys.todos });
+    },
+    ...options,
+  });
+}
+
+/**
+ * Reorder todos with optimistic updates
+ */
+export function useReorderTodos(
+  options?: Omit<
+    UseMutationOptions<number, Error, { id: string; sort_order: number }[]>,
+    "mutationFn"
+  >,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation<number, Error, { id: string; sort_order: number }[]>({
+    mutationFn: reorderTodos,
+    onMutate: async (newOrders) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: queryKeys.todos });
+
+      // Snapshot the previous value
+      const previousTodos = queryClient.getQueryData<Todo[]>(queryKeys.todos);
+
+      // Optimistically update to the new value
+      if (previousTodos) {
+        const updatedTodos = previousTodos.map((todo) => {
+          const order = newOrders.find((o) => o.id === todo.id);
+          if (order) {
+            return { ...todo, sort_order: order.sort_order };
+          }
+          return todo;
+        });
+        // Sort by sort_order
+        updatedTodos.sort((a, b) => a.sort_order - b.sort_order);
+        queryClient.setQueryData(queryKeys.todos, updatedTodos);
+      }
+
+      return { previousTodos };
+    },
+    onError: (_err, _newOrders, context) => {
+      // Rollback on error
+      const ctx = context as { previousTodos?: Todo[] } | undefined;
+      if (ctx?.previousTodos) {
+        queryClient.setQueryData(queryKeys.todos, ctx.previousTodos);
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: queryKeys.todos });
     },
     ...options,

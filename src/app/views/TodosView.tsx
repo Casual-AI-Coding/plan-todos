@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Card, Button } from "@/components/ui";
-import { StaggeredList, StaggeredListItem } from "@/components/ui/animations";
 import { Calendar } from "@/components/ui/Calendar";
 import { EmptyStateCard } from "@/components/features";
 import { useToast } from "@/components/ui/Toast";
@@ -11,6 +10,7 @@ import {
   useCreateTodo,
   useUpdateTodo,
   useDeleteTodo,
+  useReorderTodos,
 } from "@/hooks/useTodos";
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
@@ -21,6 +21,7 @@ import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { TodoItem } from "@/components/features/TodoItem";
 import { TodoForm, type TodoFormData } from "@/components/features/TodoForm";
 import { TodoFilters } from "@/components/features/TodoFilters";
+import { SortableList } from "@/components/features/SortableList";
 
 interface CalendarEvent {
   id: string;
@@ -55,6 +56,7 @@ export function TodosView() {
   const createTodo = useCreateTodo();
   const updateTodo = useUpdateTodo();
   const deleteTodo = useDeleteTodo();
+  const reorderTodosMutation = useReorderTodos();
 
   const todos = todosData || [];
 
@@ -176,6 +178,15 @@ export function TodosView() {
     setEditingTodo(null);
   }
 
+  async function handleReorder(newItems: Todo[]) {
+    // Calculate new sort_order values based on position
+    const orders = newItems.map((item, index) => ({
+      id: item.id,
+      sort_order: index,
+    }));
+    await reorderTodosMutation.mutateAsync(orders);
+  }
+
   if (error) {
     return (
       <div className="p-2 sm:p-4 md:p-6">
@@ -254,21 +265,23 @@ export function TodosView() {
             />
           )}
           {filteredTodos.length > 0 ? (
-            <StaggeredList className="space-y-2" staggerDelay={50}>
-              {filteredTodos.map((todo) => (
-                <StaggeredListItem key={todo.id}>
-                  <SelectableItem id={todo.id}>
-                    <TodoItem
-                      todo={todo}
-                      onToggle={handleToggle}
-                      onDelete={handleDelete}
-                      onClick={handleEditClick}
-                      onReminderUpdate={handleReminderUpdate}
-                    />
-                  </SelectableItem>
-                </StaggeredListItem>
-              ))}
-            </StaggeredList>
+            <SortableList
+              items={filteredTodos}
+              onReorder={handleReorder}
+              getItemId={(todo) => todo.id}
+              layout="vertical"
+              renderItem={(todo) => (
+                <SelectableItem id={todo.id}>
+                  <TodoItem
+                    todo={todo}
+                    onToggle={handleToggle}
+                    onDelete={handleDelete}
+                    onClick={handleEditClick}
+                    onReminderUpdate={handleReminderUpdate}
+                  />
+                </SelectableItem>
+              )}
+            />
           ) : (
             <EmptyStateCard
               icon="📋"

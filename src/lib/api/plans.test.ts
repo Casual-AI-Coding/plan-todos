@@ -44,6 +44,7 @@ describe("getPlan", () => {
       start_date: "2024-01-01",
       end_date: "2024-12-31",
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     };
@@ -97,6 +98,7 @@ describe("getPlans", () => {
         start_date: "2024-01-01",
         end_date: "2024-12-31",
         status: "active",
+        sort_order: 0,
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-01T00:00:00Z",
       },
@@ -107,6 +109,7 @@ describe("getPlans", () => {
         start_date: null,
         end_date: null,
         status: "completed",
+        sort_order: 0,
         created_at: "2024-02-01T00:00:00Z",
         updated_at: "2024-02-01T00:00:00Z",
       },
@@ -176,6 +179,7 @@ describe("createPlan", () => {
       start_date: "2024-01-01",
       end_date: "2024-12-31",
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     };
@@ -201,6 +205,7 @@ describe("createPlan", () => {
       start_date: null,
       end_date: null,
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     };
@@ -228,6 +233,7 @@ describe("createPlan", () => {
       start_date: null,
       end_date: null,
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     };
@@ -255,6 +261,7 @@ describe("createPlan", () => {
       start_date: "2024-01-01",
       end_date: null,
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     };
@@ -279,6 +286,7 @@ describe("createPlan", () => {
       start_date: null,
       end_date: "2024-12-31",
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     };
@@ -345,6 +353,7 @@ describe("updatePlan", () => {
       start_date: "2024-01-01",
       end_date: "2024-12-31",
       status: "completed",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-02-01T00:00:00Z",
     };
@@ -372,6 +381,7 @@ describe("updatePlan", () => {
       start_date: "2024-01-01",
       end_date: "2024-12-31",
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-02-01T00:00:00Z",
     };
@@ -398,6 +408,7 @@ describe("updatePlan", () => {
       start_date: "2024-01-01",
       end_date: "2024-12-31",
       status: "archived",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-02-01T00:00:00Z",
     };
@@ -424,6 +435,7 @@ describe("updatePlan", () => {
       start_date: null,
       end_date: null,
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-02-01T00:00:00Z",
     };
@@ -453,6 +465,7 @@ describe("updatePlan", () => {
       start_date: "2024-06-01",
       end_date: "2024-06-30",
       status: "active",
+      sort_order: 0,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-02-01T00:00:00Z",
     };

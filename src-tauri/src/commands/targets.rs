@@ -41,7 +41,7 @@ pub fn get_target(state: tauri::State<AppState>, id: String) -> Result<Target, S
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, title, description, due_date, status, created_at, updated_at FROM targets WHERE id = ?")
+            .prepare("SELECT id, title, description, due_date, status, sort_order, created_at, updated_at FROM targets WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let target: Target = stmt
@@ -53,8 +53,9 @@ pub fn get_target(state: tauri::State<AppState>, id: String) -> Result<Target, S
                     due_date: row.get(3)?,
                     status: row.get(4)?,
                     progress: 0,
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    sort_order: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -72,7 +73,7 @@ pub fn get_targets(state: tauri::State<AppState>) -> Result<Vec<Target>, String>
 
         let mut stmt = conn
             .prepare(
-                "SELECT id, title, description, due_date, status, created_at, updated_at FROM targets",
+                "SELECT id, title, description, due_date, status, sort_order, created_at, updated_at FROM targets ORDER BY sort_order ASC, created_at DESC",
             )
             .map_err(|e| e.to_string())?;
 
@@ -85,8 +86,9 @@ pub fn get_targets(state: tauri::State<AppState>) -> Result<Vec<Target>, String>
                     due_date: row.get(3)?,
                     status: row.get(4)?,
                     progress: 0, // Will be calculated
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    sort_order: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -116,7 +118,7 @@ pub fn create_target(
         let now = chrono::Utc::now().to_rfc3339();
 
         conn.execute(
-            "INSERT INTO targets (id, title, description, due_date, status, created_at, updated_at) VALUES (?, ?, ?, ?, 'active', ?, ?)",
+            "INSERT INTO targets (id, title, description, due_date, status, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, 'active', 0, ?, ?)",
             rusqlite::params![id, title, description, due_date, now, now],
         ).map_err(|e| e.to_string())?;
 
@@ -127,6 +129,7 @@ pub fn create_target(
             due_date,
             status: "active".to_string(),
             progress: 0,
+            sort_order: 0,
             created_at: now.clone(),
             updated_at: now,
         })
@@ -147,7 +150,7 @@ pub fn update_target(
         let now = chrono::Utc::now().to_rfc3339();
 
         let mut stmt = conn
-            .prepare("SELECT id, title, description, due_date, status, created_at, updated_at FROM targets WHERE id = ?")
+            .prepare("SELECT id, title, description, due_date, status, sort_order, created_at, updated_at FROM targets WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let target: Target = stmt
@@ -159,8 +162,9 @@ pub fn update_target(
                     due_date: row.get(3)?,
                     status: row.get(4)?,
                     progress: 0,
-                    created_at: row.get(5)?,
-                    updated_at: row.get(6)?,
+                    sort_order: row.get(5)?,
+                    created_at: row.get(6)?,
+                    updated_at: row.get(7)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -184,6 +188,7 @@ pub fn update_target(
             due_date: new_due_date,
             status: new_status,
             progress,
+            sort_order: target.sort_order,
             created_at: target.created_at,
             updated_at: now,
         })
@@ -198,5 +203,49 @@ pub fn delete_target(state: tauri::State<AppState>, id: String) -> Result<(), St
         conn.execute("DELETE FROM targets WHERE id = ?", [&id])
             .map_err(|e| e.to_string())?;
         Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn update_target_sort_order(
+    state: tauri::State<AppState>,
+    id: String,
+    sort_order: i32,
+) -> Result<(), String> {
+    log_command!("update_target_sort_order", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "UPDATE targets SET sort_order = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![sort_order, now, id],
+        )
+        .map_err(|e| e.to_string())?;
+
+        Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn reorder_targets(
+    state: tauri::State<AppState>,
+    orders: Vec<(String, i32)>, // (id, sort_order) pairs
+) -> Result<usize, String> {
+    log_command!("reorder_targets", {
+        let mut conn = state.db.lock().map_err(|e| e.to_string())?;
+        let tx = conn.transaction().map_err(|e| e.to_string())?;
+        let mut count = 0;
+
+        for (id, sort_order) in orders {
+            tx.execute(
+                "UPDATE targets SET sort_order = ?, updated_at = ? WHERE id = ?",
+                rusqlite::params![sort_order, chrono::Utc::now().to_rfc3339(), id],
+            )
+            .map_err(|e| e.to_string())?;
+            count += 1;
+        }
+
+        tx.commit().map_err(|e| e.to_string())?;
+        Ok(count)
     })
 }

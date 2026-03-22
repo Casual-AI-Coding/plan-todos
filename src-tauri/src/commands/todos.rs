@@ -10,7 +10,7 @@ pub fn get_todo(state: tauri::State<AppState>, id: String) -> Result<Todo, Strin
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
         let mut stmt = conn
-            .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, created_at, updated_at FROM todos WHERE id = ?")
+            .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, sort_order, created_at, updated_at FROM todos WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         stmt.query_row([&id], |row| {
@@ -24,8 +24,9 @@ pub fn get_todo(state: tauri::State<AppState>, id: String) -> Result<Todo, Strin
                 recurrence: row.get(6)?,
                 recurrence_from: row.get(7)?,
                 recurrence_index: row.get(8)?,
-                created_at: row.get(9)?,
-                updated_at: row.get(10)?,
+                sort_order: row.get(9)?,
+                created_at: row.get(10)?,
+                updated_at: row.get(11)?,
             })
         })
         .map_err(|e| e.to_string())
@@ -39,7 +40,7 @@ pub fn get_todos(state: tauri::State<AppState>) -> Result<Vec<Todo>, String> {
 
         let mut stmt = conn
             .prepare(
-                "SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, created_at, updated_at FROM todos",
+                "SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, sort_order, created_at, updated_at FROM todos ORDER BY sort_order ASC, created_at DESC",
             )
             .map_err(|e| e.to_string())?;
 
@@ -55,8 +56,9 @@ pub fn get_todos(state: tauri::State<AppState>) -> Result<Vec<Todo>, String> {
                     recurrence: row.get(6)?,
                     recurrence_from: row.get(7)?,
                     recurrence_index: row.get(8)?,
-                    created_at: row.get(9)?,
-                    updated_at: row.get(10)?,
+                    sort_order: row.get(9)?,
+                    created_at: row.get(10)?,
+                    updated_at: row.get(11)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -85,7 +87,7 @@ pub fn create_todo(
         let recurrence_index = recurrence_index.unwrap_or(0);
 
         conn.execute(
-            "INSERT INTO todos (id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, created_at, updated_at) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO todos (id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, 0, ?, ?)",
             rusqlite::params![id, title, content, due_date, priority, recurrence, recurrence_from, recurrence_index, now, now],
         ).map_err(|e| e.to_string())?;
 
@@ -99,6 +101,7 @@ pub fn create_todo(
             recurrence,
             recurrence_from,
             recurrence_index: Some(recurrence_index),
+            sort_order: 0,
             created_at: now.clone(),
             updated_at: now,
         })
@@ -123,7 +126,7 @@ pub fn update_todo(
         let now = chrono::Utc::now().to_rfc3339();
 
         let mut stmt = conn
-            .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, created_at, updated_at FROM todos WHERE id = ?")
+            .prepare("SELECT id, title, content, due_date, status, priority, recurrence, recurrence_from, recurrence_index, sort_order, created_at, updated_at FROM todos WHERE id = ?")
             .map_err(|e| e.to_string())?;
 
         let todo: Todo = stmt
@@ -138,8 +141,9 @@ pub fn update_todo(
                     recurrence: row.get(6)?,
                     recurrence_from: row.get(7)?,
                     recurrence_index: row.get(8)?,
-                    created_at: row.get(9)?,
-                    updated_at: row.get(10)?,
+                    sort_order: row.get(9)?,
+                    created_at: row.get(10)?,
+                    updated_at: row.get(11)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -168,6 +172,7 @@ pub fn update_todo(
             recurrence: new_recurrence,
             recurrence_from: new_recurrence_from,
             recurrence_index: new_recurrence_index,
+            sort_order: todo.sort_order,
             created_at: todo.created_at,
             updated_at: now,
         })
@@ -181,5 +186,49 @@ pub fn delete_todo(state: tauri::State<AppState>, id: String) -> Result<(), Stri
         conn.execute("DELETE FROM todos WHERE id = ?", [&id])
             .map_err(|e| e.to_string())?;
         Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn update_todo_sort_order(
+    state: tauri::State<AppState>,
+    id: String,
+    sort_order: i32,
+) -> Result<(), String> {
+    log_command!("update_todo_sort_order", {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        let now = chrono::Utc::now().to_rfc3339();
+
+        conn.execute(
+            "UPDATE todos SET sort_order = ?, updated_at = ? WHERE id = ?",
+            rusqlite::params![sort_order, now, id],
+        )
+        .map_err(|e| e.to_string())?;
+
+        Ok(())
+    })
+}
+
+#[tauri::command]
+pub fn reorder_todos(
+    state: tauri::State<AppState>,
+    orders: Vec<(String, i32)>, // (id, sort_order) pairs
+) -> Result<usize, String> {
+    log_command!("reorder_todos", {
+        let mut conn = state.db.lock().map_err(|e| e.to_string())?;
+        let tx = conn.transaction().map_err(|e| e.to_string())?;
+        let mut count = 0;
+
+        for (id, sort_order) in orders {
+            tx.execute(
+                "UPDATE todos SET sort_order = ?, updated_at = ? WHERE id = ?",
+                rusqlite::params![sort_order, chrono::Utc::now().to_rfc3339(), id],
+            )
+            .map_err(|e| e.to_string())?;
+            count += 1;
+        }
+
+        tx.commit().map_err(|e| e.to_string())?;
+        Ok(count)
     })
 }

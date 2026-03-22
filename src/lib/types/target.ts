@@ -16,6 +16,7 @@ export interface Target {
   due_date: string | null;
   status: "active" | "completed" | "archived";
   progress: number; // 0-100, calculated from Steps
+  sort_order: number; // For drag-drop sorting
   created_at: string;
   updated_at: string;
   reminder_times?: number[]; // 提醒时间（分钟数数组）

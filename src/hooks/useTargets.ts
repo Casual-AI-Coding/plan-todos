@@ -18,6 +18,7 @@ import {
   updateStep,
   deleteStep,
 } from "@/lib/api";
+import { reorderTargets } from "@/lib/api/reorder";
 
 // Query Keys
 export const targetKeys = {
@@ -281,6 +282,59 @@ export function useDeleteStep(
     mutationFn: deleteStep,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["targets", "steps"] });
+    },
+    ...options,
+  });
+}
+
+/**
+ * Reorder targets with optimistic updates
+ */
+export function useReorderTargets(
+  options?: Omit<
+    UseMutationOptions<number, Error, { id: string; sort_order: number }[]>,
+    "mutationFn"
+  >,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation<number, Error, { id: string; sort_order: number }[]>({
+    mutationFn: reorderTargets,
+    onMutate: async (newOrders) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: targetKeys.targets });
+
+      // Snapshot the previous value
+      const previousTargets = queryClient.getQueryData<Target[]>(
+        targetKeys.targets,
+      );
+
+      // Optimistically update to the new value
+      if (previousTargets) {
+        const updatedTargets = previousTargets.map((target) => {
+          const order = newOrders.find((o) => o.id === target.id);
+          if (order) {
+            return { ...target, sort_order: order.sort_order };
+          }
+          return target;
+        });
+        // Sort by sort_order
+        updatedTargets.sort((a, b) => a.sort_order - b.sort_order);
+        queryClient.setQueryData(targetKeys.targets, updatedTargets);
+      }
+
+      return { previousTargets };
+    },
+    onError: (_err, _newOrders, context) => {
+      // Rollback on error
+      const ctx = context as { previousTargets?: Target[] } | undefined;
+      if (ctx?.previousTargets) {
+        queryClient.setQueryData(targetKeys.targets, ctx.previousTargets);
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: targetKeys.targets });
     },
     ...options,
   });
