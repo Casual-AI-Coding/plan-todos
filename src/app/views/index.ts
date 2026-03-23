@@ -11,6 +11,7 @@ export { SettingsDailySummaryView } from "./SettingsDailySummaryView";
 export { SettingsAboutView } from "./SettingsAboutView";
 export { SettingsTagsView } from "./SettingsTagsView";
 export { SettingsSyncView } from "./SettingsSyncView";
+export { SettingsNotificationsView } from "./SettingsNotificationsView";
 export { SettingsCirculationNotificationsView } from "./SettingsCirculationNotificationsView";
 export { CirculationsView } from "./CirculationsView";
 export { CirculationDetailView } from "./CirculationDetailView";

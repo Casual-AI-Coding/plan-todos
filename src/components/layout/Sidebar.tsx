@@ -35,6 +35,7 @@ const menus: MenuItem[] = [
     label: "通知",
     children: [
       { id: "notification-center", icon: "📨", label: "通知中心" },
+      { id: "settings-notifications", icon: "⚙️", label: "通知设置" },
       { id: "settings-channels", icon: "📢", label: "通知渠道" },
       { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
       {

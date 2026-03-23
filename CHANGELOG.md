@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.3] - 2026-03-24
+
+### Fixed
+
+**通知系统导航 (Notification Navigation)**:
+
+- 修复通知设置页面无法访问的问题
+- 添加"通知设置"菜单项链接到 SettingsNotificationsView
+- 通知设置页面包含：主开关、桌面通知、提示音、默认提醒时间、免打扰模式、渠道优先级、保留设置
+
 ## [0.7.2] - 2026-03-22
 
 ### Added

@@ -19,6 +19,7 @@ import {
   SettingsAboutView,
   SettingsTagsView,
   SettingsCirculationNotificationsView,
+  SettingsNotificationsView,
   SettingsSyncView,
   CirculationsView,
   CirculationDetailView,
@@ -115,6 +116,9 @@ export default function Home() {
         break;
       case "settings-circulation-notifications":
         view = <SettingsCirculationNotificationsView />;
+        break;
+      case "settings-notifications":
+        view = <SettingsNotificationsView />;
         break;
       case "data-management":
       case "data-import-export":
