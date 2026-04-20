@@ -1,6 +1,5 @@
 // Input validation utilities for CRUD commands
 
-/// Validates title: must be non-empty and length <= 500
 pub fn validate_title(title: &str) -> Result<(), String> {
     let trimmed = title.trim();
     if trimmed.is_empty() {
@@ -25,9 +24,8 @@ pub fn validate_priority(priority: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// Validates status: must be one of pending, in_progress, completed, cancelled
 pub fn validate_status(status: &str) -> Result<(), String> {
-    let valid_statuses = ["pending", "in_progress", "completed", "cancelled"];
+    let valid_statuses = ["pending", "in-progress", "completed", "cancelled"];
     if !valid_statuses.contains(&status) {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
