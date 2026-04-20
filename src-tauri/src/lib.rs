@@ -6,7 +6,6 @@ mod commands;
 mod db;
 mod models;
 mod sync;
-pub mod repositories;
 #[cfg(test)]
 mod tests;
 

@@ -24,4 +24,5 @@ pub mod validation;
 pub mod update;
 
 pub mod data;
+pub mod repositories;
 pub mod window;
