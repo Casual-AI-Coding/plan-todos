@@ -1,30 +1,21 @@
-// src/lib/services/validation.ts
+import { VALID_PRIORITIES, VALID_STATUSES } from "@/config/constants";
+import { requiredMessage, maxLengthMessage, t } from "@/config/i18n";
 export interface ValidationError {
   field: string;
   message: string;
 }
 
-/** 有效优先级列表 */
-export const VALID_PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
-
-/** 有效状态列表 */
-export const VALID_STATUSES = [
-  "pending",
-  "in_progress",
-  "completed",
-  "cancelled",
-] as const;
+export { VALID_PRIORITIES, VALID_STATUSES };
 
 export function required(
   value: unknown,
   fieldName: string,
 ): ValidationError | null {
   if (value === null || value === undefined || value === "") {
-    return { field: fieldName, message: `${fieldName}不能为空` };
+    return { field: fieldName, message: requiredMessage(fieldName) };
   }
-  // 检查纯空白字符串
   if (typeof value === "string" && value.trim() === "") {
-    return { field: fieldName, message: `${fieldName}不能为空` };
+    return { field: fieldName, message: requiredMessage(fieldName) };
   }
   return null;
 }
@@ -35,7 +26,7 @@ export function maxLength(
   fieldName: string,
 ): ValidationError | null {
   if (value && value.length > max) {
-    return { field: fieldName, message: `${fieldName}不能超过${max}个字符` };
+    return { field: fieldName, message: maxLengthMessage(fieldName, max) };
   }
   return null;
 }
@@ -44,14 +35,14 @@ export function validatePriority(priority: string): ValidationError | null {
   if (
     !VALID_PRIORITIES.includes(priority as (typeof VALID_PRIORITIES)[number])
   ) {
-    return { field: "priority", message: "无效的优先级" };
+    return { field: "priority", message: t.validation.invalidPriority };
   }
   return null;
 }
 
 export function validateStatus(status: string): ValidationError | null {
   if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
-    return { field: "status", message: "无效的状态" };
+    return { field: "status", message: t.validation.invalidStatus };
   }
   return null;
 }

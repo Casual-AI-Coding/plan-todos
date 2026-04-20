@@ -10,7 +10,8 @@ import {
   getTheme,
 } from "@/lib/themes/registry";
 
-const THEME_KEY = "plan-todos-theme";
+import { STORAGE_KEYS } from "@/config/constants";
+
 const CUSTOM_THEME_KEY = "plan-todos-custom-theme-colors";
 
 // Custom theme colors interface
@@ -69,7 +70,7 @@ function getStoredTheme(): ThemeId {
   }
 
   // Then check localStorage
-  const stored = localStorage.getItem(THEME_KEY) as ThemeId;
+  const stored = localStorage.getItem(STORAGE_KEYS.THEME) as ThemeId;
   if (stored && validThemeIds.includes(stored)) {
     return stored;
   }
@@ -187,7 +188,7 @@ export function useTheme() {
     setThemeState(newTheme);
 
     // Persist to localStorage
-    localStorage.setItem(THEME_KEY, newTheme);
+    localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
   }, []);
 
   const toggleTheme = useCallback(() => {

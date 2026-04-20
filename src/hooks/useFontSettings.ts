@@ -2,14 +2,9 @@
 
 import { useCallback, useState, useEffect } from "react";
 
-const FONT_SIZE_KEY = "plan-todos-font-size";
+import { STORAGE_KEYS, FONT_SIZE } from "@/config/constants";
 
-// Default font size (in pixels)
 const defaultFontSize = 16;
-
-// Valid font size range
-const MIN_FONT_SIZE = 12;
-const MAX_FONT_SIZE = 24;
 
 /**
  * Get current font size from DOM or localStorage
@@ -26,11 +21,11 @@ function getStoredFontSize(): number {
   }
 
   // Then check localStorage
-  const stored = localStorage.getItem(FONT_SIZE_KEY);
-  if (stored) {
-    const parsed = parseInt(stored, 10);
-    if (!isNaN(parsed) && parsed >= MIN_FONT_SIZE && parsed <= MAX_FONT_SIZE) {
-      return parsed;
+  const stored = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
+    if (stored) {
+      const parsed = parseInt(stored, 10);
+      if (!isNaN(parsed) && parsed >= FONT_SIZE.MIN && parsed <= FONT_SIZE.MAX) {
+        return parsed;
     }
   }
 
@@ -59,9 +54,9 @@ export function useFontSettings() {
 
   const setFontSize = useCallback((size: number) => {
     // Clamp to valid range
-    const clampedSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, size));
+    const clampedSize = Math.max(FONT_SIZE.MIN, Math.min(FONT_SIZE.MAX, size));
     setFontSizeState(clampedSize);
-    localStorage.setItem(FONT_SIZE_KEY, String(clampedSize));
+    localStorage.setItem(STORAGE_KEYS.FONT_SIZE, String(clampedSize));
     applyFontSize(clampedSize);
   }, []);
 
@@ -83,8 +78,8 @@ export function useFontSettings() {
     increaseFontSize,
     decreaseFontSize,
     resetFontSize,
-    minSize: MIN_FONT_SIZE,
-    maxSize: MAX_FONT_SIZE,
+    minSize: FONT_SIZE.MIN,
+    maxSize: FONT_SIZE.MAX,
     defaultSize: defaultFontSize,
   };
 }

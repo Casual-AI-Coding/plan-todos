@@ -5,6 +5,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { PageSlide } from "@/components/ui/animations";
+import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
+import { t } from "@/config/i18n";
 import {
   Dashboard,
   TodosView,
@@ -42,7 +44,7 @@ export default function Home() {
 
   // Sync with localStorage after mount
   useEffect(() => {
-    const saved = localStorage.getItem("sidebar-collapsed");
+    const saved = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
     if (saved === "true") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSidebarCollapsed(true);
@@ -202,7 +204,7 @@ export default function Home() {
             onClick={() => setMobileSidebarOpen(true)}
             className="p-2 -ml-2 rounded hover:opacity-80"
             style={{ color: "var(--color-text)" }}
-            aria-label="打开菜单"
+            aria-label={t.nav.openMenu}
           >
             <svg
               width="20"
@@ -229,8 +231,8 @@ export default function Home() {
           className="flex-1 overflow-auto"
           style={{
             backgroundColor: "var(--color-bg)",
-            paddingTop: "calc(3.5rem + env(safe-area-inset-top))",
-            paddingBottom: "calc(3.5rem + env(safe-area-inset-bottom))",
+            paddingTop: LAYOUT.MOBILE_HEADER_CALC,
+            paddingBottom: LAYOUT.MOBILE_FOOTER_CALC,
           }}
         >
           {renderContent()}
@@ -257,7 +259,7 @@ export default function Home() {
               <div
                 className="flex items-center justify-between px-4 border-b"
                 style={{
-                  height: "calc(3.5rem + env(safe-area-inset-top))",
+height: LAYOUT.MOBILE_HEADER_CALC,
                   paddingTop: "env(safe-area-inset-top)",
                 }}
               >
@@ -265,13 +267,13 @@ export default function Home() {
                   className="font-semibold"
                   style={{ color: "var(--color-text)" }}
                 >
-                  菜单
+{t.nav.menu}
                 </span>
                 <button
                   onClick={() => setMobileSidebarOpen(false)}
                   className="p-2 rounded hover:opacity-80"
                   style={{ color: "var(--color-text)" }}
-                  aria-label="关闭菜单"
+                  aria-label={t.nav.closeMenu}
                 >
                   <svg
                     width="20"

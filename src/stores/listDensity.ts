@@ -3,6 +3,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { STORAGE_KEYS } from "@/config/constants";
+
 export type ListDensity = "compact" | "standard" | "comfortable";
 
 interface ListDensityState {
@@ -17,7 +19,7 @@ export const useListDensity = create<ListDensityState>()(
       setDensity: (density) => set({ density }),
     }),
     {
-      name: "list-density-settings",
+      name: STORAGE_KEYS.LIST_DENSITY,
     },
   ),
 );

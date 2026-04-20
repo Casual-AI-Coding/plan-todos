@@ -4,67 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import { SearchBar } from "@/components/features";
 import { ChevronRight, LucideIcon } from "lucide-react";
 import { ComponentType } from "react";
-interface MenuItem {
-  id: string;
-  icon: string | LucideIcon;
-  label: string;
+import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
+import { NAV_MENU_ITEMS_RESOLVED, ENTITY_ROUTE_MAP, DEFAULT_EXPANDED_GROUPS } from "@/config/routes";
+import type { NavItem } from "@/config/routes";
+
+interface MenuItem extends NavItem {
   children?: MenuItem[];
-  href?: string;
 }
+
+const menus: MenuItem[] = NAV_MENU_ITEMS_RESOLVED as MenuItem[];
 
 interface SidebarProps {
   activeMenu: string;
   onMenuChange: (menu: string) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
-  /** Mobile mode: show as full-height panel without collapse */
   isMobile?: boolean;
 }
-
-const menus: MenuItem[] = [
-  { id: "dashboard", icon: "📊", label: "今日总览" },
-  { id: "todos", icon: "📋", label: "TODOS" },
-  { id: "circulations", icon: "🔄", label: "CIRCULATIONS" },
-  { id: "plans", icon: "🚀", label: "PLANS" },
-  { id: "goals", icon: "🎯", label: "GOALS" },
-  { id: "milestones", icon: "🏆", label: "MILESTONES" },
-  { id: "views", icon: "👁️", label: "视图查看" },
-  { id: "statistics", icon: "📈", label: "数据统计" },
-  {
-    id: "notifications",
-    icon: "🔔",
-    label: "通知",
-    children: [
-      { id: "notification-center", icon: "📨", label: "通知中心" },
-      { id: "settings-notifications", icon: "⚙️", label: "通知设置" },
-      { id: "settings-channels", icon: "📢", label: "通知渠道" },
-      { id: "settings-daily-summary", icon: "📅", label: "每日汇总" },
-      {
-        id: "settings-circulation-notifications",
-        icon: "⏰",
-        label: "打卡通知",
-      },
-    ],
-  },
-  {
-    id: "data-management",
-    icon: "💾",
-    label: "数据管理",
-    children: [
-      { id: "data-import-export", icon: "🔄", label: "导入/导出" },
-      { id: "settings-sync", icon: "☁️", label: "云同步" },
-    ],
-  },
-  {
-    id: "settings",
-    icon: "⚙️",
-    label: "设置",
-    children: [
-      { id: "settings-general", icon: "🎨", label: "通用" },
-      { id: "settings-tags", icon: "🏷️", label: "标签管理" },
-    ],
-  },
-  { id: "settings-about", icon: "ℹ️", label: "关于" },
-];
 
 export function Sidebar({
   activeMenu,
@@ -73,7 +28,7 @@ export function Sidebar({
   isMobile = false,
 }: SidebarProps) {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(
-    new Set(["notifications", "data-management", "settings"]),
+    new Set(DEFAULT_EXPANDED_GROUPS),
   );
 
   // Use useEffect to avoid hydration mismatch - start with false on both server and client
@@ -88,7 +43,7 @@ export function Sidebar({
       setIsCollapsed(false);
       return;
     }
-    const saved = localStorage.getItem("sidebar-collapsed");
+    const saved = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
     if (saved === "true") {
       setIsCollapsed(true);
     }
@@ -150,7 +105,7 @@ export function Sidebar({
   const toggleCollapse = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
-    localStorage.setItem("sidebar-collapsed", String(newState));
+    localStorage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, String(newState));
     onCollapseChange?.(newState);
   };
 
@@ -338,7 +293,7 @@ export function Sidebar({
     <aside
       className={`${isMobile ? "" : "border-r"} flex flex-col h-full transition-all duration-300`}
       style={{
-        width: isMobile ? "100%" : isCollapsed ? "4rem" : "13rem",
+        width: isMobile ? "100%" : isCollapsed ? LAYOUT.SIDEBAR_WIDTH_COLLAPSED : LAYOUT.SIDEBAR_WIDTH_EXPANDED,
         backgroundColor: "var(--color-bg-card)",
         borderColor: "var(--color-border)",
       }}
@@ -376,15 +331,8 @@ export function Sidebar({
       {!isMobile && !isCollapsed && (
         <div className="px-2 pb-2">
           <SearchBar
-            onResultClick={(entityType, id) => {
-              // Navigate to the entity based on type
-              const menuMap: Record<string, string> = {
-                todo: "todos",
-                plan: "plans",
-                target: "goals",
-                milestone: "milestones",
-              };
-              const menu = menuMap[entityType];
+onResultClick={(entityType, id) => {
+              const menu = ENTITY_ROUTE_MAP[entityType];
               if (menu) {
                 onMenuChange(menu);
               }
@@ -405,7 +353,7 @@ export function Sidebar({
           style={{
             backgroundColor: "var(--color-bg-card)",
             top: popupPosition.top,
-            left: "4rem",
+            left: LAYOUT.SIDEBAR_WIDTH_COLLAPSED,
           }}
           onMouseEnter={handlePopupMouseEnter}
           onMouseLeave={handlePopupMouseLeave}

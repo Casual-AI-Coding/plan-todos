@@ -1,4 +1,5 @@
 import type { Todo } from "@/lib/types";
+import { PRIORITY_ORDER } from "@/config/constants";
 
 export function filterTodosByPriority(todos: Todo[], priority: string): Todo[] {
   return todos.filter((t) => t.priority === priority);
@@ -31,15 +32,9 @@ export function getTodosDueSoon(todos: Todo[], days: number = 3): Todo[] {
 }
 
 export function sortTodosByPriority(todos: Todo[]): Todo[] {
-  const priorityOrder: Record<string, number> = {
-    P0: 0,
-    P1: 1,
-    P2: 2,
-    P3: 3,
-  };
   return [...todos].sort((a, b) => {
-    const aPriority = priorityOrder[a.priority || "P3"] ?? 3;
-    const bPriority = priorityOrder[b.priority || "P3"] ?? 3;
+    const aPriority = PRIORITY_ORDER[a.priority || "P3"] ?? 3;
+    const bPriority = PRIORITY_ORDER[b.priority || "P3"] ?? 3;
     return aPriority - bPriority;
   });
 }

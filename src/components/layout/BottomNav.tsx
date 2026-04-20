@@ -1,17 +1,14 @@
 "use client";
 
+import { BOTTOM_NAV_ITEMS_RESOLVED } from "@/config/routes";
+import { t } from "@/config/i18n";
+
 interface BottomNavProps {
   activeMenu: string;
   onMenuChange: (menu: string) => void;
 }
 
-const navItems = [
-  { id: "dashboard", icon: "📊", label: "首页" },
-  { id: "todos", icon: "📋", label: "待办" },
-  { id: "circulations", icon: "🔄", label: "打卡" },
-  { id: "plans", icon: "🚀", label: "计划" },
-  { id: "settings", icon: "⚙️", label: "更多" },
-];
+const navItems = BOTTOM_NAV_ITEMS_RESOLVED;
 
 export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
   return (

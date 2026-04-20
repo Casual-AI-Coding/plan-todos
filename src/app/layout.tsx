@@ -37,22 +37,25 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-// Inline script to set theme and font size before React loads - prevents hydration mismatch
+import { allThemeIds } from "@/lib/themes/registry";
+import { STORAGE_KEYS } from "@/config/constants";
+
+/** Inline script to set theme and font size before React loads - prevents hydration mismatch */
+const validThemesStr = JSON.stringify(allThemeIds);
+
 const initScript = `
 (function() {
-  // Set theme
-  var theme = localStorage.getItem('plan-todos-theme');
+  var validThemes = ${validThemesStr};
+  var theme = localStorage.getItem('${STORAGE_KEYS.THEME}');
   if (!theme) {
     theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  if (theme === 'light' || theme === 'dark' || theme === 'dracula' || theme === 'nord' || theme === 'monokai' || theme === 'glass' || theme === 'spring' || theme === 'catppuccin' || theme === 'tokyoNight' || theme === 'oneDark' || theme === 'system') {
+  if (validThemes.indexOf(theme) !== -1) {
     document.documentElement.setAttribute('data-theme', theme);
   } else {
     document.documentElement.setAttribute('data-theme', 'light');
   }
-  
-  // Set font size
-  var fontSize = localStorage.getItem('plan-todos-font-size');
+  var fontSize = localStorage.getItem('${STORAGE_KEYS.FONT_SIZE}');
   if (fontSize) {
     var parsed = parseInt(fontSize, 10);
     if (!isNaN(parsed) && parsed >= 12 && parsed <= 24) {
