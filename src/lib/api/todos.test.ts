@@ -206,6 +206,7 @@ describe("Todo API", () => {
         content: "Test content",
         dueDate: "2024-01-01",
         priority: "P1",
+        recurrence: null,
       });
       expect(result).toEqual(mockTodo);
     });
@@ -233,6 +234,7 @@ describe("Todo API", () => {
         content: null,
         dueDate: null,
         priority: null,
+        recurrence: null,
       });
       expect(result).toEqual(mockTodo);
     });
@@ -290,6 +292,7 @@ describe("Todo API", () => {
         dueDate: "2024-01-02",
         status: "done",
         priority: "P0",
+        recurrence: null,
       });
       expect(result).toEqual(mockTodo);
     });
@@ -319,6 +322,7 @@ describe("Todo API", () => {
         dueDate: undefined,
         status: undefined,
         priority: undefined,
+        recurrence: null,
       });
       expect(result).toEqual(mockTodo);
     });
@@ -348,6 +352,7 @@ describe("Todo API", () => {
         dueDate: undefined,
         status: "in-progress",
         priority: undefined,
+        recurrence: null,
       });
       expect(result).toEqual(mockTodo);
     });
