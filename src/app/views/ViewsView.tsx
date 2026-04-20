@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
-import { Card, ProgressBar } from "@/components/ui";
+import { useState, useMemo } from "react";
+import { Card } from "@/components/ui";
 import { useTodos } from "@/hooks/useTodos";
 import { usePlans } from "@/hooks/usePlans";
 import { useTargets, targetKeys } from "@/hooks/useTargets";
@@ -18,9 +18,12 @@ import {
 } from "@/lib/api";
 import { ViewsCalendar } from "@/components/views/ViewsCalendar";
 import { ViewsGantt } from "@/components/views/ViewsGantt";
-import { useQueries } from "@tanstack/react-query";
+import { ViewsList } from "@/components/views/ViewsList";
+import { ViewsBoard } from "@/components/views/ViewsBoard";
+import { ViewsFilters } from "@/components/views/ViewsFilters";
+import { ItemTooltip } from "@/components/views/ItemTooltip";
 import { ViewModeSelector } from "./components/ViewModeSelector";
-import { ScrollIndicators } from "./components/ScrollIndicators";
+import { useQueries } from "@tanstack/react-query";
 
 type ViewMode = "list" | "board" | "calendar" | "gantt";
 
@@ -30,39 +33,6 @@ interface FilterState {
   plan: boolean;
   target: boolean;
   milestone: boolean;
-}
-
-// Custom hook for entity filters (matching current functionality)
-function useEntityFilters() {
-  const [filters, setFilters] = useState<FilterState>({
-    todo: true,
-    task: true,
-    plan: true,
-    target: true,
-    milestone: true,
-  });
-
-  const selectAll = () => {
-    setFilters({
-      todo: true,
-      task: true,
-      plan: true,
-      target: true,
-      milestone: true,
-    });
-  };
-
-  const invertAll = () => {
-    setFilters({
-      todo: !filters.todo,
-      task: !filters.task,
-      plan: !filters.plan,
-      target: !filters.target,
-      milestone: !filters.milestone,
-    });
-  };
-
-  return { filters, setFilters, selectAll, invertAll };
 }
 
 export function ViewsView() {
@@ -75,20 +45,20 @@ export function ViewsView() {
   } | null>(null);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
 
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    todo: true,
+    task: true,
+    plan: true,
+    target: true,
+    milestone: true,
+  });
+
   // Calendar navigation state
   const [calendarDate, setCalendarDate] = useState(new Date());
 
   // Gantt timeline zoom state
   const [ganttZoom, setGanttZoom] = useState(3);
-
-  // Scroll indicator state for board view
-  const scrollContainerRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [scrollIndicators, setScrollIndicators] = useState<
-    Record<string, { showTop: boolean; showBottom: boolean }>
-  >({});
-
-  // Entity filters
-  const { filters, setFilters, selectAll, invertAll } = useEntityFilters();
 
   // ==================== DATA FETCHING ====================
   const { data: todos = [] } = useTodos();
@@ -124,614 +94,7 @@ export function ViewsView() {
     targetSteps[target.id] = targetStepsResults[index]?.data ?? [];
   });
 
-  // ==================== SCROLL HANDLERS ====================
-  const handleScroll = (columnId: string, e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const isAtTop = target.scrollTop <= 10;
-    const isAtBottom =
-      target.scrollTop + target.clientHeight >= target.scrollHeight - 10;
-    setScrollIndicators((prev) => ({
-      ...prev,
-      [columnId]: {
-        showTop: !isAtTop,
-        showBottom: !isAtBottom,
-      },
-    }));
-  };
-
-  const checkScrollNeeded = (columnId: string) => {
-    const container = scrollContainerRefs.current[columnId];
-    if (container) {
-      const hasScroll = container.scrollHeight > container.clientHeight + 10;
-      if (hasScroll) {
-        const isAtTop = container.scrollTop <= 10;
-        const isAtBottom =
-          container.scrollTop + container.clientHeight >=
-          container.scrollHeight - 10;
-        setScrollIndicators((prev) => ({
-          ...prev,
-          [columnId]: {
-            showTop: !isAtTop,
-            showBottom: !isAtBottom,
-          },
-        }));
-      } else {
-        setScrollIndicators((prev) => ({
-          ...prev,
-          [columnId]: { showTop: false, showBottom: false },
-        }));
-      }
-    }
-  };
-
-  // Check scroll on mount and data changes
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      ["pending", "in-progress", "done"].forEach(checkScrollNeeded);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [todos, allTasks, plans, targets, milestones, filters]);
-
-  // ==================== FILTER OPTIONS ====================
-  const filterOptions = [
-    { id: "plan", label: "计划", color: "purple" },
-    { id: "task", label: "任务", color: "teal" },
-    { id: "target", label: "目标", color: "orange" },
-    { id: "todo", label: "待办", color: "blue" },
-    { id: "milestone", label: "里程碑", color: "pink" },
-  ];
-
-  // ==================== TOOLTIP ====================
-  const renderTooltip = () => {
-    if (!hoveredItem) return null;
-
-    const data = hoveredItem.data;
-    const typeLabels: Record<string, string> = {
-      todo: "待办",
-      task: "任务",
-      plan: "计划",
-      target: "目标",
-      milestone: "里程碑",
-    };
-
-    return (
-      <div
-        className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[200px]"
-        style={{
-          left: hoverPosition.x + 10,
-          top: hoverPosition.y + 10,
-          pointerEvents: "none",
-        }}
-      >
-        <div
-          className="font-medium text-sm mb-2"
-          style={{ color: "var(--color-text)" }}
-        >
-          {typeLabels[hoveredItem.type]}详情
-        </div>
-        <div className="text-sm font-medium">
-          {"title" in data ? data.title : ""}
-        </div>
-        {"description" in data && data.description && (
-          <div className="text-xs text-gray-500 mt-1">{data.description}</div>
-        )}
-        {"status" in data && (
-          <div className="text-xs mt-2">
-            状态:{" "}
-            <span
-              className={`px-1.5 py-0.5 rounded ${
-                data.status === "done" || data.status === "completed"
-                  ? "bg-green-100 text-green-700"
-                  : data.status === "in-progress" || data.status === "active"
-                    ? "bg-orange-100 text-orange-700"
-                    : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              {data.status}
-            </span>
-          </div>
-        )}
-        {"progress" in data && (
-          <div className="mt-2">
-            <div className="text-xs text-gray-500">进度: {data.progress}%</div>
-            <div className="w-full h-1.5 bg-gray-200 rounded mt-1">
-              <div
-                className="h-full bg-teal-500 rounded"
-                style={{ width: `${data.progress}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
-        {"due_date" in data && data.due_date && (
-          <div className="text-xs text-gray-500 mt-1">📅 {data.due_date}</div>
-        )}
-        {"start_date" in data && data.start_date && (
-          <div className="text-xs text-gray-500 mt-1">
-            开始: {data.start_date}
-          </div>
-        )}
-        {"end_date" in data && data.end_date && (
-          <div className="text-xs text-gray-500 mt-1">
-            结束: {data.end_date}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ==================== LIST VIEW ====================
-  const renderListView = () => (
-    <div className="space-y-6">
-      {filters.plan && (
-        <Card>
-          <h3
-            className="font-semibold mb-4"
-            style={{ color: "var(--color-text)" }}
-          >
-            🚀 计划 (Plans)
-          </h3>
-          {plans.length === 0 ? (
-            <p className="text-gray-400 text-sm">暂无计划</p>
-          ) : (
-            <div className="space-y-4">
-              {plans.map((plan) => (
-                <div key={plan.id} className="border-l-4 border-teal-400 pl-4">
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium">{plan.title}</div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded ${
-                        plan.status === "active"
-                          ? "bg-teal-100 text-teal-700"
-                          : plan.status === "completed"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {plan.status}
-                    </span>
-                  </div>
-                  {plan.description && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      {plan.description}
-                    </p>
-                  )}
-                  {plan.start_date && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      📅 {plan.start_date}{" "}
-                      {plan.end_date && `~ ${plan.end_date}`}
-                    </p>
-                  )}
-                  {filters.task && (tasksByPlan[plan.id] || []).length > 0 && (
-                    <div className="mt-2 pl-4 space-y-2">
-                      {(tasksByPlan[plan.id] || []).map((task) => (
-                        <div
-                          key={task.id}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              task.status === "done"
-                                ? "bg-green-500"
-                                : task.status === "in-progress"
-                                  ? "bg-orange-500"
-                                  : "bg-gray-300"
-                            }`}
-                          ></span>
-                          <span
-                            className={
-                              task.status === "done"
-                                ? "line-through text-gray-400"
-                                : ""
-                            }
-                          >
-                            {task.title}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      )}
-
-      {filters.target && (
-        <Card>
-          <h3
-            className="font-semibold mb-4"
-            style={{ color: "var(--color-text)" }}
-          >
-            🎯 目标 (Targets)
-          </h3>
-          {targets.length === 0 ? (
-            <p className="text-gray-400 text-sm">暂无目标</p>
-          ) : (
-            <div className="space-y-4">
-              {targets.map((target) => (
-                <div
-                  key={target.id}
-                  className="border-l-4 border-orange-400 pl-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium">{target.title}</div>
-                    <span className="text-orange-500 font-medium">
-                      {target.progress}%
-                    </span>
-                  </div>
-                  {target.description && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      {target.description}
-                    </p>
-                  )}
-                  {target.due_date && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      📅 {target.due_date}
-                    </p>
-                  )}
-                  <ProgressBar
-                    value={target.progress}
-                    color="orange"
-                    size="sm"
-                    className="mt-2"
-                  />
-                  {(targetSteps[target.id] || []).length > 0 && (
-                    <div className="mt-2 pl-4 space-y-2">
-                      {(targetSteps[target.id] || []).map((step) => (
-                        <div
-                          key={step.id}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              step.status === "completed"
-                                ? "bg-green-500"
-                                : "bg-gray-300"
-                            }`}
-                          ></span>
-                          <span
-                            className={
-                              step.status === "completed"
-                                ? "line-through text-gray-400"
-                                : ""
-                            }
-                          >
-                            {step.title}
-                          </span>
-                          <span className="text-xs bg-gray-200 px-1 rounded">
-                            {step.weight}%
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      )}
-
-      {filters.todo && (
-        <Card>
-          <h3
-            className="font-semibold mb-4"
-            style={{ color: "var(--color-text)" }}
-          >
-            ✅ 待办 (Todos)
-          </h3>
-          {todos.filter((t) => t.status !== "done").length === 0 ? (
-            <p className="text-gray-400 text-sm">暂无待办</p>
-          ) : (
-            <div className="space-y-2">
-              {todos
-                .filter((t) => t.status !== "done")
-                .map((todo) => (
-                  <div
-                    key={todo.id}
-                    className="flex items-center gap-3 p-2 bg-gray-50 rounded"
-                  >
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        todo.status === "done"
-                          ? "bg-green-500"
-                          : todo.status === "in-progress"
-                            ? "bg-orange-500"
-                            : "bg-gray-300"
-                      }`}
-                    ></span>
-                    <span
-                      className={
-                        todo.status === "done"
-                          ? "line-through text-gray-400 flex-1"
-                          : "flex-1"
-                      }
-                    >
-                      {todo.title}
-                    </span>
-                    {todo.due_date && (
-                      <span className="text-xs text-gray-500">
-                        📅 {todo.due_date}
-                      </span>
-                    )}
-                  </div>
-                ))}
-            </div>
-          )}
-        </Card>
-      )}
-
-      {filters.milestone && (
-        <Card>
-          <h3
-            className="font-semibold mb-4"
-            style={{ color: "var(--color-text)" }}
-          >
-            🏁 里程碑 (Milestones)
-          </h3>
-          {milestones.length === 0 ? (
-            <p className="text-gray-400 text-sm">暂无里程碑</p>
-          ) : (
-            <div className="space-y-2">
-              {milestones.map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center gap-3 p-2 bg-gray-50 rounded"
-                >
-                  <span
-                    className={`w-2 h-2 rounded-full ${m.status === "completed" ? "bg-green-500" : "bg-gray-300"}`}
-                  ></span>
-                  <span className="flex-1">{m.title}</span>
-                  <span className="text-xs text-gray-500">{m.progress}%</span>
-                  {m.target_date && (
-                    <span className="text-xs text-gray-500">
-                      📅 {m.target_date}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      )}
-    </div>
-  );
-
-  // ==================== BOARD VIEW ====================
-  const renderBoardView = () => {
-    const columns = [
-      { id: "pending", label: "待处理", color: "gray" },
-      { id: "in-progress", label: "进行中", color: "orange" },
-      { id: "done", label: "已完成", color: "green" },
-    ];
-
-    const getItemsByStatus = (status: string) => {
-      const items: {
-        type: string;
-        data: Todo | Task | Plan | Target | Milestone;
-      }[] = [];
-
-      if (filters.todo) {
-        todos
-          .filter((t) => t.status === status)
-          .forEach((t) => items.push({ type: "todo", data: t }));
-      }
-      if (filters.task) {
-        allTasks
-          .filter((t) => t.status === status)
-          .forEach((t) => items.push({ type: "task", data: t }));
-      }
-      if (filters.plan) {
-        plans
-          .filter(
-            (p) =>
-              p.status ===
-              (status === "done"
-                ? "completed"
-                : status === "pending"
-                  ? "active"
-                  : "active"),
-          )
-          .forEach((p) => items.push({ type: "plan", data: p }));
-      }
-      if (filters.target) {
-        targets
-          .filter(
-            (t) =>
-              t.status ===
-              (status === "done"
-                ? "completed"
-                : status === "pending"
-                  ? "active"
-                  : "active"),
-          )
-          .forEach((t) => items.push({ type: "target", data: t }));
-      }
-      if (filters.milestone) {
-        milestones
-          .filter(
-            (m) => m.status === (status === "done" ? "completed" : "pending"),
-          )
-          .forEach((m) => items.push({ type: "milestone", data: m }));
-      }
-
-      return items;
-    };
-
-    const handleMouseEnter = (
-      e: React.MouseEvent,
-      item: { type: string; data: Todo | Task | Plan | Target | Milestone },
-    ) => {
-      setHoveredItem(item);
-      setHoverPosition({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseLeave = () => setHoveredItem(null);
-
-    return (
-      <div className="relative h-full">
-        {renderTooltip()}
-        <div className="grid grid-cols-3 gap-4 h-full">
-          {columns.map((col) => (
-            <div
-              key={col.id}
-              className="rounded-lg p-4 flex flex-col overflow-hidden h-[65vh] relative"
-              style={{ backgroundColor: "var(--color-bg-hover)" }}
-            >
-              <h3
-                className="font-semibold mb-4 flex items-center gap-2 flex-shrink-0"
-                style={{
-                  color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}`,
-                }}
-              >
-                <span
-                  className={`w-3 h-3 rounded-full bg-${col.color}-500`}
-                ></span>
-                {col.label}
-                <span
-                  className="ml-auto text-sm"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  {getItemsByStatus(col.id).length}
-                </span>
-              </h3>
-              <div className="relative flex-1 min-h-0">
-                <div
-                  ref={(el) => {
-                    scrollContainerRefs.current[col.id] = el;
-                  }}
-                  className="space-y-1.5 overflow-y-auto h-full scroll-smooth scrollbar-hide-board"
-                  onScroll={(e) => handleScroll(col.id, e)}
-                >
-                  {getItemsByStatus(col.id).map((item, idx) => (
-                    <div
-                      key={`${item.type}-${idx}`}
-                      onMouseEnter={(e) => handleMouseEnter(e, item)}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span
-                            className={`text-[10px] px-1 py-0.5 rounded ${
-                              item.type === "todo"
-                                ? "bg-blue-100 text-blue-700"
-                                : item.type === "task"
-                                  ? "bg-teal-100 text-teal-700"
-                                  : item.type === "plan"
-                                    ? "bg-purple-100 text-purple-700"
-                                    : item.type === "target"
-                                      ? "bg-orange-100 text-orange-700"
-                                      : "bg-gray-100 text-gray-700"
-                            }`}
-                          >
-                            {item.type}
-                          </span>
-                        </div>
-                        <div className="font-medium text-xs">
-                          {"title" in item.data ? item.data.title : ""}
-                        </div>
-                        {"progress" in item.data && (
-                          <div className="mt-1.5">
-                            <ProgressBar
-                              value={item.data.progress}
-                              color={
-                                col.color === "green"
-                                  ? "teal"
-                                  : (col.color as "gray" | "orange" | "teal")
-                              }
-                              size="sm"
-                            />
-                          </div>
-                        )}
-                      </Card>
-                    </div>
-                  ))}
-                  {getItemsByStatus(col.id).length === 0 && (
-                    <p
-                      className="text-center py-4"
-                      style={{ color: "var(--color-text-muted)" }}
-                    >
-                      无
-                    </p>
-                  )}
-                </div>
-                {/* Using ScrollIndicators component */}
-                <ScrollIndicators
-                  showTop={scrollIndicators[col.id]?.showTop ?? false}
-                  showBottom={scrollIndicators[col.id]?.showBottom ?? false}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <style jsx global>{`
-          .scrollbar-hide-board::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide-board {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-            scroll-behavior: smooth;
-          }
-          .scroll-indicator-fade {
-            background: linear-gradient(
-              to top,
-              var(--color-bg-hover) 0%,
-              transparent 100%
-            );
-          }
-          .scroll-indicator-fade-top {
-            background: linear-gradient(
-              to bottom,
-              var(--color-bg-hover) 0%,
-              transparent 100%
-            );
-          }
-          .scroll-indicator-fade-bottom {
-            background: linear-gradient(
-              to top,
-              var(--color-bg-hover) 0%,
-              transparent 100%
-            );
-          }
-          @keyframes bounce-arrow {
-            0%,
-            100% {
-              transform: translateY(0);
-              opacity: 0.6;
-            }
-            50% {
-              transform: translateY(4px);
-              opacity: 1;
-            }
-          }
-          @keyframes bounce-arrow-up {
-            0%,
-            100% {
-              transform: translateY(0);
-              opacity: 0.6;
-            }
-            50% {
-              transform: translateY(-4px);
-              opacity: 1;
-            }
-          }
-          .scroll-bounce-arrow {
-            animation: bounce-arrow 1.5s ease-in-out infinite;
-          }
-          .scroll-bounce-arrow-up {
-            animation: bounce-arrow-up 1.5s ease-in-out infinite;
-          }
-        `}</style>
-      </div>
-    );
-  };
-
-  // ==================== MAIN RENDER ====================
-  const allSelected = Object.values(filters).every((v) => v);
-  const noneSelected = Object.values(filters).every((v) => !v);
-
+  // ==================== RENDER ====================
   return (
     <div className="p-6">
       <h2
@@ -741,62 +104,41 @@ export function ViewsView() {
         视图查看
       </h2>
 
-      {/* View Mode Selector - Using new component */}
+      {/* View Mode Selector */}
       <ViewModeSelector viewMode={viewMode} onViewModeChange={setViewMode} />
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4 mb-4 mt-4">
-        <div className="flex gap-2">
-          <button
-            onClick={selectAll}
-            disabled={allSelected}
-            className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
-          >
-            全选
-          </button>
-          <button
-            onClick={invertAll}
-            disabled={noneSelected}
-            className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
-          >
-            取反
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {filterOptions.map((item) => (
-            <label
-              key={item.id}
-              className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-sm cursor-pointer transition-all ${
-                filters[item.id as keyof FilterState]
-                  ? `bg-${item.color}-100 text-${item.color}-700 border border-${item.color}-300`
-                  : "bg-gray-50 text-gray-400 border border-gray-200"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={filters[item.id as keyof FilterState]}
-                onChange={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    [item.id]: !prev[item.id as keyof FilterState],
-                  }))
-                }
-                className="sr-only"
-              />
-              <span className="w-3 h-3 rounded border flex items-center justify-center">
-                {filters[item.id as keyof FilterState] && (
-                  <span className="text-[10px]">✓</span>
-                )}
-              </span>
-              {item.label}
-            </label>
-          ))}
-        </div>
-      </div>
+      <ViewsFilters filters={filters} setFilters={setFilters} />
+
+      {/* Global tooltip for board view */}
+      <ItemTooltip hoveredItem={hoveredItem} hoverPosition={hoverPosition} />
 
       <Card>
-        {viewMode === "list" && renderListView()}
-        {viewMode === "board" && renderBoardView()}
+        {viewMode === "list" && (
+          <ViewsList
+            todos={todos}
+            plans={plans}
+            targets={targets}
+            milestones={milestones}
+            tasksByPlan={tasksByPlan}
+            targetSteps={targetSteps}
+            filters={filters}
+          />
+        )}
+        {viewMode === "board" && (
+          <ViewsBoard
+            todos={todos}
+            plans={plans}
+            targets={targets}
+            milestones={milestones}
+            allTasks={allTasks}
+            filters={filters}
+            hoveredItem={hoveredItem}
+            setHoveredItem={setHoveredItem}
+            hoverPosition={hoverPosition}
+            setHoverPosition={setHoverPosition}
+          />
+        )}
         {viewMode === "calendar" && (
           <ViewsCalendar
             todos={todos}
