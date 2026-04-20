@@ -147,12 +147,12 @@ impl TagRepository {
     }
 
     pub fn set_entity_tags(
-        conn: &mut rusqlite::Connection,
+        conn: &rusqlite::Connection,
         entity_type: &str,
         entity_id: &str,
         tag_ids: &[String],
     ) -> Result<(), String> {
-        let tx = conn.transaction().map_err(|e| e.to_string())?;
+        let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
 
         tx.execute(
             "DELETE FROM entity_tags WHERE entity_type = ? AND entity_id = ?",

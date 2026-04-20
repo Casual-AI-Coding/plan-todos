@@ -95,7 +95,7 @@ pub fn set_entity_tags(
 ) -> Result<(), String> {
     log_command!("set_entity_tags", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-        TagRepository::set_entity_tags(&*conn, &entity_type, &entity_id, &tag_ids)
+        TagRepository::set_entity_tags(&conn, &entity_type, &entity_id, &tag_ids)
     })
 }
 

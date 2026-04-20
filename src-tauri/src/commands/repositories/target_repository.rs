@@ -159,11 +159,8 @@ impl TargetRepository {
         Ok(())
     }
 
-    pub fn reorder(
-        conn: &mut rusqlite::Connection,
-        orders: &[(String, i32)],
-    ) -> Result<usize, String> {
-        let tx = conn.transaction().map_err(|e| e.to_string())?;
+    pub fn reorder(conn: &rusqlite::Connection, orders: &[(String, i32)]) -> Result<usize, String> {
+        let tx = conn.unchecked_transaction().map_err(|e| e.to_string())?;
         let mut count = 0;
 
         for (id, sort_order) in orders {
