@@ -8,7 +8,7 @@ import {
   useCreateTodo,
   useUpdateTodo,
   useDeleteTodo,
-  queryKeys,
+  todoKeys,
   type CreateTodoInput,
   type UpdateTodoInput,
 } from "@/hooks/useTodos";
@@ -290,10 +290,10 @@ describe("useTodos", () => {
     });
   });
 
-  describe("queryKeys", () => {
+  describe("todoKeys", () => {
     it("should have correct query keys", () => {
-      expect(queryKeys.todos).toEqual(["todos"]);
-      expect(queryKeys.todo("todo-1")).toEqual(["todos", "todo-1"]);
+      expect(todoKeys.todos).toEqual(["todos"]);
+      expect(todoKeys.todo("todo-1")).toEqual(["todos", "todo-1"]);
     });
   });
 });

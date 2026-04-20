@@ -5,7 +5,7 @@ import { Card, Button, Modal, Checkbox } from "@/components/ui";
 import { ImportExportView } from "./ImportExportView";
 import { seedTestData, resetData } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys as todoKeys } from "@/hooks/useTodos";
+import { todoKeys } from "@/hooks/useTodos";
 import { planKeys } from "@/hooks/usePlans";
 import { targetKeys } from "@/hooks/useTargets";
 import { taskKeys } from "@/hooks/useTasks";

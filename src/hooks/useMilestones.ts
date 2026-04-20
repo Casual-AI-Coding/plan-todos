@@ -1,33 +1,20 @@
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  type UseQueryOptions,
-  type UseMutationOptions,
-} from "@tanstack/react-query";
-import {
   getMilestones,
-  getPlans,
-  getTargets,
-  getTasks,
-  getCirculations,
+  getMilestone,
   createMilestone,
   updateMilestone,
   deleteMilestone,
+  getPlans,
+  getTargets,
+  getCirculations,
   type Milestone,
   type Plan,
   type Target,
-  type Task,
   type Circulation,
 } from "@/lib/api";
+import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { createEntityHooks } from "./createEntityHooks";
 
-// Query Keys
-export const milestoneKeys = {
-  milestones: ["milestones"] as const,
-  milestone: (id: string) => ["milestones", id] as const,
-};
-
-// Types
 export type CreateMilestoneInput = {
   title: string;
   target_date?: string;
@@ -42,108 +29,20 @@ export type UpdateMilestoneInput = {
   status?: "pending" | "completed";
 };
 
-// =============================================================================
-// Milestone Hooks
-// =============================================================================
+export const milestoneKeys = {
+  milestones: ["milestones"] as const,
+  milestone: (id: string) => ["milestones", id] as const,
+};
 
-/**
- * Get all milestones
- */
-export function useMilestones(
-  options?: Omit<UseQueryOptions<Milestone[], Error>, "queryKey" | "queryFn">,
-) {
-  return useQuery<Milestone[], Error>({
-    queryKey: milestoneKeys.milestones,
-    queryFn: getMilestones,
-    ...options,
-  });
-}
+const { useGetAll: useMilestones, useGetOne: useMilestone, useCreate: useCreateMilestone, useUpdate: useUpdateMilestone, useDelete: useDeleteMilestone } = createEntityHooks<Milestone, CreateMilestoneInput, UpdateMilestoneInput>({
+  entityName: "milestones",
+  apiGetAll: getMilestones,
+  apiGetOne: getMilestone,
+  apiCreate: createMilestone,
+  apiUpdate: updateMilestone,
+  apiDelete: deleteMilestone,
+});
 
-/**
- * Get a single milestone by ID
- */
-export function useMilestone(
-  id: string,
-  options?: Omit<UseQueryOptions<Milestone, Error>, "queryKey" | "queryFn">,
-) {
-  return useQuery<Milestone, Error>({
-    queryKey: milestoneKeys.milestone(id),
-    queryFn: () =>
-      getMilestones().then((milestones) => {
-        const milestone = milestones.find((m) => m.id === id);
-        if (!milestone) {
-          throw new Error(`Milestone with id "${id}" not found`);
-        }
-        return milestone;
-      }),
-    enabled: !!id,
-    ...options,
-  });
-}
-
-/**
- * Create a new milestone
- */
-export function useCreateMilestone(
-  options?: Omit<
-    UseMutationOptions<Milestone, Error, CreateMilestoneInput>,
-    "mutationFn"
-  >,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<Milestone, Error, CreateMilestoneInput>({
-    mutationFn: createMilestone,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: milestoneKeys.milestones });
-    },
-    ...options,
-  });
-}
-
-/**
- * Update an existing milestone
- */
-export function useUpdateMilestone(
-  options?: Omit<
-    UseMutationOptions<Milestone, Error, UpdateMilestoneInput>,
-    "mutationFn"
-  >,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<Milestone, Error, UpdateMilestoneInput>({
-    mutationFn: ({ id, ...data }) => updateMilestone(id, data),
-    onSuccess: (data) => {
-      queryClient.setQueryData<Milestone[]>(milestoneKeys.milestones, (old) => {
-        if (!old) return old;
-        return old.map((m) => (m.id === data.id ? data : m));
-      });
-    },
-    ...options,
-  });
-}
-
-/**
- * Delete a milestone
- */
-export function useDeleteMilestone(
-  options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, string>({
-    mutationFn: deleteMilestone,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: milestoneKeys.milestones });
-    },
-    ...options,
-  });
-}
-
-/**
- * Get all plans for linking
- */
 export function usePlansForMilestone(
   options?: Omit<UseQueryOptions<Plan[], Error>, "queryKey" | "queryFn">,
 ) {
@@ -154,9 +53,6 @@ export function usePlansForMilestone(
   });
 }
 
-/**
- * Get all targets for linking
- */
 export function useTargetsForMilestone(
   options?: Omit<UseQueryOptions<Target[], Error>, "queryKey" | "queryFn">,
 ) {
@@ -167,9 +63,6 @@ export function useTargetsForMilestone(
   });
 }
 
-/**
- * Get all circulations for linking
- */
 export function useCirculationsForMilestone(
   options?: Omit<UseQueryOptions<Circulation[], Error>, "queryKey" | "queryFn">,
 ) {
@@ -179,3 +72,5 @@ export function useCirculationsForMilestone(
     ...options,
   });
 }
+
+export { useMilestones, useMilestone, useCreateMilestone, useUpdateMilestone, useDeleteMilestone };

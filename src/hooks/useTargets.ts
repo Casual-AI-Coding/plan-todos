@@ -1,34 +1,9 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  type UseQueryOptions,
-  type UseMutationOptions,
-} from "@tanstack/react-query";
 import type { Target, Step, Tag } from "@/lib/types";
-import {
-  getTargets,
-  getSteps,
-  getEntityTags,
-  setEntityTags,
-  createTarget,
-  updateTarget,
-  deleteTarget,
-  createStep,
-  updateStep,
-  deleteStep,
-} from "@/lib/api";
+import { getTargets, createTarget, updateTarget, deleteTarget, getEntityTags, setEntityTags, createStep, updateStep, deleteStep, getSteps } from "@/lib/api";
 import { reorderTargets } from "@/lib/api/reorder";
+import { useQuery, useMutation, useQueryClient, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
+import { createEntityHooks } from "./createEntityHooks";
 
-// Query Keys
-export const targetKeys = {
-  targets: ["targets"] as const,
-  target: (id: string) => ["targets", id] as const,
-  targetTags: (targetId: string) => ["targets", targetId, "tags"] as const,
-  targetSteps: (targetId: string) => ["targets", targetId, "steps"] as const,
-};
-
-// Types for mutations
 export type TargetStatus = "active" | "completed" | "archived";
 
 export type CreateTargetInput = {
@@ -36,6 +11,7 @@ export type CreateTargetInput = {
   description?: string;
   due_date?: string;
   status?: TargetStatus;
+  tagIds?: string[];
 };
 
 export type UpdateTargetInput = {
@@ -44,15 +20,40 @@ export type UpdateTargetInput = {
   description?: string;
   due_date?: string;
   status?: TargetStatus;
+  tagIds?: string[];
 };
 
-// =============================================================================
-// Target Hooks
-// =============================================================================
+export const targetKeys = {
+  targets: ["targets"] as const,
+  target: (id: string) => ["targets", id] as const,
+  targetTags: (targetId: string) => ["targets", targetId, "tags"] as const,
+  targetSteps: (targetId: string) => ["targets", targetId, "steps"] as const,
+};
 
-/**
- * Get target tags by target ID
- */
+const { useGetAll: useTargets, useGetOne: useTarget, useCreate: useCreateTargetBase, useUpdate: useUpdateTargetBase, useDelete: useDeleteTarget, useReorder: useReorderTargets } = createEntityHooks<Target, CreateTargetInput, UpdateTargetInput>({
+  entityName: "targets",
+  apiGetAll: getTargets,
+  apiCreate: async (data) => {
+    const { tagIds, ...targetData } = data;
+    const target = await createTarget(targetData);
+    if (tagIds && tagIds.length > 0) {
+      await setEntityTags("target", target.id, tagIds);
+    }
+    return target;
+  },
+  apiUpdate: updateTarget,
+  apiDelete: deleteTarget,
+  apiReorder: reorderTargets,
+  customUpdateMutate: async ({ id, tagIds, ...data }) => {
+    const target = await updateTarget(id, data);
+    if (tagIds !== undefined) {
+      await setEntityTags("target", id, tagIds);
+    }
+    return target;
+  },
+  extraInvalidateKeys: [["targets", "steps"]],
+});
+
 export function useTargetTags(
   targetId: string,
   options?: Omit<UseQueryOptions<Tag[], Error>, "queryKey" | "queryFn">,
@@ -65,9 +66,6 @@ export function useTargetTags(
   });
 }
 
-/**
- * Get target steps by target ID
- */
 export function useTargetSteps(
   targetId: string,
   options?: Omit<UseQueryOptions<Step[], Error>, "queryKey" | "queryFn">,
@@ -80,188 +78,31 @@ export function useTargetSteps(
   });
 }
 
-/**
- * Get all targets
- */
-export function useTargets(
-  options?: Omit<UseQueryOptions<Target[], Error>, "queryKey" | "queryFn">,
-) {
-  return useQuery<Target[], Error>({
-    queryKey: targetKeys.targets,
-    queryFn: getTargets,
-    ...options,
-  });
-}
-
-/**
- * Get a single target by ID
- */
-export function useTarget(
-  id: string,
-  options?: Omit<UseQueryOptions<Target, Error>, "queryKey" | "queryFn">,
-) {
-  return useQuery<Target, Error>({
-    queryKey: targetKeys.target(id),
-    queryFn: () =>
-      getTargets().then((targets) => {
-        const target = targets.find((t) => t.id === id);
-        if (!target) {
-          throw new Error(`Target with id "${id}" not found`);
-        }
-        return target;
-      }),
-    enabled: !!id,
-    ...options,
-  });
-}
-
-/**
- * Create a new target
- */
-export function useCreateTarget(
-  options?: Omit<
-    UseMutationOptions<
-      Target,
-      Error,
-      CreateTargetInput & { tagIds?: string[] }
-    >,
-    "mutationFn"
-  >,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<Target, Error, CreateTargetInput & { tagIds?: string[] }>({
-    mutationFn: async (data) => {
-      const { tagIds, ...targetData } = data;
-      const target = await createTarget(targetData);
-      if (tagIds && tagIds.length > 0) {
-        await setEntityTags("target", target.id, tagIds);
-      }
-      return target;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: targetKeys.targets });
-    },
-    ...options,
-  });
-}
-
-/**
- * Update an existing target
- */
-export function useUpdateTarget(
-  options?: Omit<
-    UseMutationOptions<Target, Error, UpdateTargetInput>,
-    "mutationFn"
-  >,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<Target, Error, UpdateTargetInput>({
-    mutationFn: ({ id, ...data }) => updateTarget(id, data),
-    onSuccess: (data) => {
-      queryClient.setQueryData<Target[]>(targetKeys.targets, (old) => {
-        if (!old) return old;
-        return old.map((target) => (target.id === data.id ? data : target));
-      });
-    },
-    ...options,
-  });
-}
-
-/**
- * Delete a target
- */
-export function useDeleteTarget(
-  options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, string>({
-    mutationFn: deleteTarget,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: targetKeys.targets });
-    },
-    ...options,
-  });
-}
-
-/**
- * Create a new step
- */
 export function useCreateStep(
   options?: Omit<
-    UseMutationOptions<
-      Step,
-      Error,
-      {
-        target_id: string;
-        title: string;
-        weight: number;
-        priority?: "P0" | "P1" | "P2" | "P3";
-      }
-    >,
+    UseMutationOptions<Step, Error, { target_id: string; title: string; weight: number; priority?: "P0" | "P1" | "P2" | "P3" }>,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
-
-  return useMutation<
-    Step,
-    Error,
-    {
-      target_id: string;
-      title: string;
-      weight: number;
-      priority?: "P0" | "P1" | "P2" | "P3";
-    }
-  >({
+  return useMutation<Step, Error, { target_id: string; title: string; weight: number; priority?: "P0" | "P1" | "P2" | "P3" }>({
     mutationFn: createStep,
     onSuccess: (data) => {
-      // Invalidate steps for this target
-      queryClient.invalidateQueries({
-        queryKey: targetKeys.targetSteps(data.target_id),
-      });
+      queryClient.invalidateQueries({ queryKey: targetKeys.targetSteps(data.target_id) });
     },
     ...options,
   });
 }
 
-/**
- * Update an existing step
- */
 export function useUpdateStep(
   options?: Omit<
-    UseMutationOptions<
-      Step,
-      Error,
-      {
-        id: string;
-        title?: string;
-        weight?: number;
-        status?: "pending" | "completed";
-        priority?: "P0" | "P1" | "P2" | "P3";
-      }
-    >,
+    UseMutationOptions<Step, Error, { id: string; title?: string; weight?: number; status?: "pending" | "completed"; priority?: "P0" | "P1" | "P2" | "P3" }>,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
-
-  return useMutation<
-    Step,
-    Error,
-    {
-      id: string;
-      title?: string;
-      weight?: number;
-      status?: "pending" | "completed";
-      priority?: "P0" | "P1" | "P2" | "P3";
-    }
-  >({
+  return useMutation<Step, Error, { id: string; title?: string; weight?: number; status?: "pending" | "completed"; priority?: "P0" | "P1" | "P2" | "P3" }>({
     mutationFn: async ({ id, ...data }) => {
-      // We need to find the step to get its target_id
-      // For now, invalidate all target steps
       const result = await updateStep(id, data);
       queryClient.invalidateQueries({ queryKey: ["targets", "steps"] });
       return result;
@@ -270,14 +111,10 @@ export function useUpdateStep(
   });
 }
 
-/**
- * Delete a step
- */
 export function useDeleteStep(
   options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
 ) {
   const queryClient = useQueryClient();
-
   return useMutation<void, Error, string>({
     mutationFn: deleteStep,
     onSuccess: () => {
@@ -287,55 +124,6 @@ export function useDeleteStep(
   });
 }
 
-/**
- * Reorder targets with optimistic updates
- */
-export function useReorderTargets(
-  options?: Omit<
-    UseMutationOptions<number, Error, { id: string; sort_order: number }[]>,
-    "mutationFn"
-  >,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<number, Error, { id: string; sort_order: number }[]>({
-    mutationFn: reorderTargets,
-    onMutate: async (newOrders) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: targetKeys.targets });
-
-      // Snapshot the previous value
-      const previousTargets = queryClient.getQueryData<Target[]>(
-        targetKeys.targets,
-      );
-
-      // Optimistically update to the new value
-      if (previousTargets) {
-        const updatedTargets = previousTargets.map((target) => {
-          const order = newOrders.find((o) => o.id === target.id);
-          if (order) {
-            return { ...target, sort_order: order.sort_order };
-          }
-          return target;
-        });
-        // Sort by sort_order
-        updatedTargets.sort((a, b) => a.sort_order - b.sort_order);
-        queryClient.setQueryData(targetKeys.targets, updatedTargets);
-      }
-
-      return { previousTargets };
-    },
-    onError: (_err, _newOrders, context) => {
-      // Rollback on error
-      const ctx = context as { previousTargets?: Target[] } | undefined;
-      if (ctx?.previousTargets) {
-        queryClient.setQueryData(targetKeys.targets, ctx.previousTargets);
-      }
-    },
-    onSettled: () => {
-      // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: targetKeys.targets });
-    },
-    ...options,
-  });
-}
+export { useTargets, useTarget, useDeleteTarget, useReorderTargets };
+export const useCreateTarget = useCreateTargetBase;
+export const useUpdateTarget = useUpdateTargetBase;
