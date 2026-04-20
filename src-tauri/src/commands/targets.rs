@@ -90,6 +90,6 @@ pub fn reorder_targets(
 ) -> Result<usize, String> {
     log_command!("reorder_targets", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-        TargetRepository::reorder(&conn, &orders)
+        TargetRepository::reorder(&*conn, &orders)
     })
 }
