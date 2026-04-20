@@ -50,7 +50,7 @@ impl PlanRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let plans: Result<Vec<Plan>, String> = plan_iter.collect();
+        let plans: Result<Vec<Plan>, String> = Ok(plan_iter.filter_map(|t| t.ok()).collect());
         plans
     }
 
@@ -120,7 +120,10 @@ impl PlanRepository {
         Ok(())
     }
 
-    pub fn reorder(conn: &rusqlite::Connection, orders: &[(String, i32)]) -> Result<usize, String> {
+    pub fn reorder(
+        conn: &mut rusqlite::Connection,
+        orders: &[(String, i32)],
+    ) -> Result<usize, String> {
         let tx = conn.transaction().map_err(|e| e.to_string())?;
         let mut count = 0;
 

@@ -52,7 +52,7 @@ impl TaskRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let tasks: Result<Vec<Task>, String> = task_iter.collect();
+        let tasks: Result<Vec<Task>, String> = Ok(task_iter.filter_map(|t| t.ok()).collect());
         tasks
     }
 
@@ -80,7 +80,7 @@ impl TaskRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let tasks: Result<Vec<Task>, String> = task_iter.collect();
+        let tasks: Result<Vec<Task>, String> = Ok(task_iter.filter_map(|t| t.ok()).collect());
         tasks
     }
 

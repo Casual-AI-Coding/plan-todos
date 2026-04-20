@@ -147,7 +147,7 @@ impl TagRepository {
     }
 
     pub fn set_entity_tags(
-        conn: &Connection,
+        conn: &mut rusqlite::Connection,
         entity_type: &str,
         entity_id: &str,
         tag_ids: &[String],

@@ -1,26 +1,10 @@
 // Tag CRUD commands
 
 use super::validation::{normalize_color_or_default, validate_tag_name};
+use crate::commands::repositories::tag_repository::{BulkTagResult, EntityTag, Tag};
 use crate::commands::repositories::TagRepository;
 use crate::log_command;
 use crate::AppState;
-
-#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
-pub struct Tag {
-    pub id: String,
-    pub name: String,
-    pub color: String,
-    pub description: Option<String>,
-    pub created_at: String,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
-#[allow(dead_code)]
-pub struct EntityTag {
-    pub entity_type: String,
-    pub entity_id: String,
-    pub tag_id: String,
-}
 
 #[tauri::command]
 pub fn get_tags(state: tauri::State<AppState>) -> Result<Vec<Tag>, String> {
@@ -127,14 +111,7 @@ pub fn get_entities_by_tag(
     })
 }
 
-/// Result for bulk tag operations
-#[derive(Debug, serde::Serialize)]
-pub struct BulkTagResult {
-    pub entity_type: String,
-    pub tag_id: String,
-    pub success_count: usize,
-    pub failed_ids: Vec<String>,
-}
+/// Result for bulk tag operations (imported from tag_repository)
 
 #[tauri::command]
 pub fn bulk_add_tags(

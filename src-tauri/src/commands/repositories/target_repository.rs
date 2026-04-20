@@ -83,7 +83,8 @@ impl TargetRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let mut targets: Result<Vec<Target>, String> = target_iter.collect();
+        let mut targets: Result<Vec<Target>, String> =
+            Ok(target_iter.filter_map(|t| t.ok()).collect());
 
         // Calculate progress for each target
         if let Ok(ref mut targets) = targets {
@@ -158,7 +159,10 @@ impl TargetRepository {
         Ok(())
     }
 
-    pub fn reorder(conn: &rusqlite::Connection, orders: &[(String, i32)]) -> Result<usize, String> {
+    pub fn reorder(
+        conn: &mut rusqlite::Connection,
+        orders: &[(String, i32)],
+    ) -> Result<usize, String> {
         let tx = conn.transaction().map_err(|e| e.to_string())?;
         let mut count = 0;
 

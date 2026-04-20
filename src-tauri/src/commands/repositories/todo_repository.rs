@@ -57,7 +57,7 @@ impl TodoRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let todos: Result<Vec<Todo>, String> = todo_iter.collect();
+        let todos: Result<Vec<Todo>, String> = Ok(todo_iter.filter_map(|t| t.ok()).collect());
         todos
     }
 
@@ -147,7 +147,7 @@ impl TodoRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let todos: Result<Vec<Todo>, String> = todo_iter.collect();
+        let todos: Result<Vec<Todo>, String> = Ok(todo_iter.filter_map(|t| t.ok()).collect());
         todos
     }
 }

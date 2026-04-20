@@ -108,7 +108,8 @@ impl MilestoneRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let milestones: Result<Vec<Milestone>, String> = milestone_iter.collect();
+        let milestones: Result<Vec<Milestone>, String> =
+            Ok(milestone_iter.filter_map(|t| t.ok()).collect());
         milestones
     }
 
