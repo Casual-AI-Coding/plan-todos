@@ -1,6 +1,7 @@
 // Tag CRUD commands
 
 use super::validation::{normalize_color_or_default, validate_tag_name};
+use crate::commands::repositories::TagRepository;
 use crate::log_command;
 use crate::AppState;
 
@@ -25,24 +26,7 @@ pub struct EntityTag {
 pub fn get_tags(state: tauri::State<AppState>) -> Result<Vec<Tag>, String> {
     log_command!("get_tags", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-
-        let mut stmt = conn
-            .prepare("SELECT id, name, color, description, created_at FROM tags ORDER BY name")
-            .map_err(|e| e.to_string())?;
-
-        let tag_iter = stmt
-            .query_map([], |row| {
-                Ok(Tag {
-                    id: row.get(0)?,
-                    name: row.get(1)?,
-                    color: row.get(2)?,
-                    description: row.get(3)?,
-                    created_at: row.get(4)?,
-                })
-            })
-            .map_err(|e| e.to_string())?;
-
-        Ok(tag_iter.filter_map(|t| t.ok()).collect())
+        TagRepository::get_all(&conn)
     })
 }
 
@@ -61,24 +45,11 @@ pub fn create_tag(
         let name = name.trim().to_string();
 
         let id = uuid::Uuid::new_v4().to_string();
-        let now = chrono::Utc::now().to_rfc3339();
 
         // Validate and normalize color using centralized validation
         let color = normalize_color_or_default(&color.unwrap_or_default());
 
-        conn.execute(
-            "INSERT INTO tags (id, name, color, description, created_at) VALUES (?, ?, ?, ?, ?)",
-            rusqlite::params![id, name, color, description, now],
-        )
-        .map_err(|e| e.to_string())?;
-
-        Ok(Tag {
-            id,
-            name,
-            color,
-            description,
-            created_at: now,
-        })
+        TagRepository::create(&conn, &id, &name, &color, description.as_deref())
     })
 }
 
@@ -93,50 +64,21 @@ pub fn update_tag(
     log_command!("update_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-        let mut stmt = conn
-            .prepare("SELECT id, name, color, description, created_at FROM tags WHERE id = ?")
-            .map_err(|e| e.to_string())?;
-
-        let tag: Tag = stmt
-            .query_row([&id], |row| {
-                Ok(Tag {
-                    id: row.get(0)?,
-                    name: row.get(1)?,
-                    color: row.get(2)?,
-                    description: row.get(3)?,
-                    created_at: row.get(4)?,
-                })
-            })
-            .map_err(|e| e.to_string())?;
-
         // Validate name if provided using centralized validation
         if let Some(ref n) = name {
             validate_tag_name(n)?;
         }
 
-        let new_name = name.unwrap_or(tag.name);
-
         // Validate and normalize color if provided
-        let new_color = color
-            .map(|c| normalize_color_or_default(&c))
-            .unwrap_or_else(|| tag.color.clone());
+        let normalized_color = color.map(|c| normalize_color_or_default(&c));
 
-        // Description can be cleared (None) or set
-        let new_description = description;
-
-        conn.execute(
-            "UPDATE tags SET name = ?, color = ?, description = ? WHERE id = ?",
-            rusqlite::params![new_name, new_color, new_description, id],
+        TagRepository::update(
+            &conn,
+            &id,
+            name.as_deref(),
+            normalized_color.as_deref(),
+            description.as_deref(),
         )
-        .map_err(|e| e.to_string())?;
-
-        Ok(Tag {
-            id: tag.id,
-            name: new_name,
-            color: new_color,
-            description: new_description,
-            created_at: tag.created_at,
-        })
     })
 }
 
@@ -144,9 +86,7 @@ pub fn update_tag(
 pub fn delete_tag(state: tauri::State<AppState>, id: String) -> Result<(), String> {
     log_command!("delete_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-        conn.execute("DELETE FROM tags WHERE id = ?", [&id])
-            .map_err(|e| e.to_string())?;
-        Ok(())
+        TagRepository::delete(&conn, &id)
     })
 }
 
@@ -158,29 +98,7 @@ pub fn get_entity_tags(
 ) -> Result<Vec<Tag>, String> {
     log_command!("get_entity_tags", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-
-        let mut stmt = conn
-            .prepare(
-                "SELECT t.id, t.name, t.color, t.description, t.created_at 
-                 FROM tags t 
-                 INNER JOIN entity_tags et ON t.id = et.tag_id 
-                 WHERE et.entity_type = ? AND et.entity_id = ?",
-            )
-            .map_err(|e| e.to_string())?;
-
-        let tag_iter = stmt
-            .query_map(rusqlite::params![entity_type, entity_id], |row| {
-                Ok(Tag {
-                    id: row.get(0)?,
-                    name: row.get(1)?,
-                    color: row.get(2)?,
-                    description: row.get(3)?,
-                    created_at: row.get(4)?,
-                })
-            })
-            .map_err(|e| e.to_string())?;
-
-        Ok(tag_iter.filter_map(|t| t.ok()).collect())
+        TagRepository::get_by_entity(&conn, &entity_type, &entity_id)
     })
 }
 
@@ -192,30 +110,8 @@ pub fn set_entity_tags(
     tag_ids: Vec<String>,
 ) -> Result<(), String> {
     log_command!("set_entity_tags", {
-        let mut conn = state.db.lock().map_err(|e| e.to_string())?;
-
-        // Use transaction for data safety
-        let tx = conn.transaction().map_err(|e| e.to_string())?;
-
-        // Delete existing tags for this entity
-        tx.execute(
-            "DELETE FROM entity_tags WHERE entity_type = ? AND entity_id = ?",
-            rusqlite::params![entity_type, entity_id],
-        )
-        .map_err(|e| e.to_string())?;
-
-        // Insert new tags
-        for tag_id in tag_ids {
-            tx.execute(
-                "INSERT INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
-                rusqlite::params![entity_type, entity_id, tag_id],
-            )
-            .map_err(|e| e.to_string())?;
-        }
-
-        tx.commit().map_err(|e| e.to_string())?;
-
-        Ok(())
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        TagRepository::set_entity_tags(&conn, &entity_type, &entity_id, &tag_ids)
     })
 }
 
@@ -227,30 +123,7 @@ pub fn get_entities_by_tag(
 ) -> Result<Vec<String>, String> {
     log_command!("get_entities_by_tag", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-
-        if tag_ids.is_empty() {
-            return Ok(vec![]);
-        }
-
-        let placeholders: Vec<String> = tag_ids.iter().map(|_| "?".to_string()).collect();
-        let query = format!(
-            "SELECT DISTINCT entity_id FROM entity_tags WHERE entity_type = ? AND tag_id IN ({})",
-            placeholders.join(",")
-        );
-
-        let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
-
-        let mut params: Vec<Box<dyn rusqlite::ToSql>> = vec![Box::new(entity_type.clone())];
-        for tag_id in &tag_ids {
-            params.push(Box::new(tag_id.clone()));
-        }
-        let params_ref: Vec<&dyn rusqlite::ToSql> = params.iter().map(|p| p.as_ref()).collect();
-
-        let id_iter = stmt
-            .query_map(params_ref.as_slice(), |row| row.get(0))
-            .map_err(|e| e.to_string())?;
-
-        Ok(id_iter.filter_map(|r| r.ok()).collect())
+        TagRepository::get_entities_by_tag(&conn, &entity_type, &tag_ids)
     })
 }
 
@@ -272,43 +145,7 @@ pub fn bulk_add_tags(
 ) -> Result<BulkTagResult, String> {
     log_command!("bulk_add_tags", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-
-        let mut success_count = 0;
-        let mut failed_ids = Vec::new();
-
-        for entity_id in &entity_ids {
-            // Check if the tag already exists for this entity
-            let exists: bool = conn
-                .query_row(
-                    "SELECT COUNT(*) FROM entity_tags WHERE entity_type = ? AND entity_id = ? AND tag_id = ?",
-                    rusqlite::params![&entity_type, entity_id, &tag_id],
-                    |row| row.get::<_, i32>(0).map(|count| count > 0),
-                )
-                .unwrap_or(false);
-
-            if exists {
-                // Already has this tag, count as success
-                success_count += 1;
-                continue;
-            }
-
-            let result = conn.execute(
-                "INSERT INTO entity_tags (entity_type, entity_id, tag_id) VALUES (?, ?, ?)",
-                rusqlite::params![&entity_type, entity_id, &tag_id],
-            );
-
-            match result {
-                Ok(_) => success_count += 1,
-                Err(_) => failed_ids.push(entity_id.clone()),
-            }
-        }
-
-        Ok(BulkTagResult {
-            entity_type,
-            tag_id,
-            success_count,
-            failed_ids,
-        })
+        TagRepository::bulk_add_tags(&conn, &entity_type, &entity_ids, &tag_id)
     })
 }
 
@@ -321,35 +158,6 @@ pub fn bulk_remove_tags(
 ) -> Result<BulkTagResult, String> {
     log_command!("bulk_remove_tags", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-
-        let mut success_count = 0;
-        let mut failed_ids = Vec::new();
-
-        for entity_id in &entity_ids {
-            let result = conn.execute(
-                "DELETE FROM entity_tags WHERE entity_type = ? AND entity_id = ? AND tag_id = ?",
-                rusqlite::params![&entity_type, entity_id, &tag_id],
-            );
-
-            match result {
-                Ok(rows_affected) => {
-                    if rows_affected > 0 {
-                        success_count += 1;
-                    }
-                    // If rows_affected is 0, the tag wasn't associated, count as success
-                    if rows_affected == 0 {
-                        success_count += 1;
-                    }
-                }
-                Err(_) => failed_ids.push(entity_id.clone()),
-            }
-        }
-
-        Ok(BulkTagResult {
-            entity_type,
-            tag_id,
-            success_count,
-            failed_ids,
-        })
+        TagRepository::bulk_remove_tags(&conn, &entity_type, &entity_ids, &tag_id)
     })
 }
