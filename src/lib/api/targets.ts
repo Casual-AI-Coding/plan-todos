@@ -1,28 +1,20 @@
-/**
- * Target APIs
- *
- * API functions for Target entity.
- */
-
 import type {
   Target,
   CreateTargetParams,
   UpdateTargetParams,
 } from "@/lib/types";
-import { withTauriError, withTauriFallback } from "./utils";
+import { invoke, withTauriError, withTauriFallback } from "./utils";
 
 export async function getTarget(id: string): Promise<Target> {
-  return withTauriError("get targets", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
+  return withTauriError("获取 Target", async () => {
     return invoke<Target>("get_target", { id });
   });
 }
 
 export async function getTargets(): Promise<Target[]> {
   return withTauriFallback(
-    "targets",
+    "获取 Target 列表",
     async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
       return invoke<Target[]>("get_targets");
     },
     [],
@@ -30,8 +22,7 @@ export async function getTargets(): Promise<Target[]> {
 }
 
 export async function createTarget(data: CreateTargetParams): Promise<Target> {
-  return withTauriError("create targets", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
+  return withTauriError("创建 Target", async () => {
     return invoke<Target>("create_target", {
       title: data.title,
       description: data.description || null,
@@ -44,8 +35,7 @@ export async function updateTarget(
   id: string,
   data: UpdateTargetParams,
 ): Promise<Target> {
-  return withTauriError("update targets", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
+  return withTauriError("更新 Target", async () => {
     return invoke<Target>("update_target", {
       id,
       title: data.title,
@@ -57,8 +47,7 @@ export async function updateTarget(
 }
 
 export async function deleteTarget(id: string): Promise<void> {
-  return withTauriError("delete targets", async () => {
-    const { invoke } = await import("@tauri-apps/api/core");
+  return withTauriError("删除 Target", async () => {
     return invoke<void>("delete_target", { id });
   });
 }

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Modal, Button, Input } from "@/components/ui";
+import { TagBadgeList } from "@/components/ui/TagBadge";
 import { ReminderSettings } from "./ReminderSettings";
-import type { Target, Tag } from "@/lib/api";
+import type { Target, Tag } from "@/lib/types";
 
 export interface TargetFormData {
   title: string;
@@ -131,35 +132,12 @@ export function TargetForm({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             标签
           </label>
-          <div className="flex flex-wrap gap-2">
-            {allTags.length === 0 ? (
-              <span className="text-sm text-gray-400">暂无标签</span>
-            ) : (
-              allTags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => toggleTag(tag.id)}
-                  className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                    tags.includes(tag.id)
-                      ? "border-teal-500 bg-teal-50 text-teal-700"
-                      : "border-gray-200 text-gray-600 hover:border-teal-300"
-                  }`}
-                  style={
-                    tags.includes(tag.id)
-                      ? {}
-                      : {
-                          backgroundColor: `${tag.color}20`,
-                          color: tag.color,
-                          borderColor: tag.color,
-                        }
-                  }
-                >
-                  {tag.name}
-                </button>
-              ))
-            )}
-          </div>
+          <TagBadgeList
+            tags={allTags}
+            selectedIds={tags}
+            onToggle={toggleTag}
+            size="md"
+          />
         </div>
         <ReminderSettings value={reminderTimes} onChange={setReminderTimes} />
       </div>

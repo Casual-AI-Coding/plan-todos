@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Modal, Button, Input } from "@/components/ui";
+import { TagBadge, TagBadgeList } from "@/components/ui/TagBadge";
 import { ReminderSettings } from "./ReminderSettings";
 import { RecurrenceForm } from "./RecurrenceForm";
 import type { Todo, Priority, Tag, Recurrence } from "@/lib/types";
@@ -172,29 +173,11 @@ export function TodoForm({
               标签
             </label>
             <div className="flex flex-wrap gap-1.5">
-              {allTags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => toggleTag(tag.id)}
-                  className={`px-2 py-0.5 rounded-full text-xs border transition-colors ${
-                    tags.includes(tag.id)
-                      ? "border-teal-500 bg-teal-50 text-teal-700"
-                      : "border-gray-200 text-gray-600 hover:border-teal-300"
-                  }`}
-                  style={
-                    tags.includes(tag.id)
-                      ? {}
-                      : {
-                          backgroundColor: `${tag.color}20`,
-                          color: tag.color,
-                          borderColor: tag.color,
-                        }
-                  }
-                >
-                  {tag.name}
-                </button>
-              ))}
+              <TagBadgeList
+                tags={allTags}
+                selectedIds={tags}
+                onToggle={toggleTag}
+              />
             </div>
           </div>
         )}

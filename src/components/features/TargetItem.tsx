@@ -12,20 +12,10 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
 } from "@/components/ui";
+import { TagBadge } from "@/components/ui/TagBadge";
 import { ReminderQuickButton } from "./ReminderQuickButton";
+import { arraysEqual, areTagsEqual } from "@/lib/utils/compare";
 import type { Target, Tag, Step } from "@/lib/types";
-
-/**
- * Shallow compare two arrays of primitive values (numbers, strings)
- * More efficient than JSON.stringify for small arrays
- */
-function arraysEqual(a: unknown[], b: unknown[]): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
 
 export interface TargetItemProps {
   target: Target;
@@ -49,14 +39,10 @@ function areEqual(
   prevProps: TargetItemProps,
   nextProps: TargetItemProps,
 ): boolean {
-  // Shallow compare tags - check length and IDs
   const prevTags = prevProps.tags || [];
   const nextTags = nextProps.tags || [];
-  const tagsEqual =
-    prevTags.length === nextTags.length &&
-    prevTags.every((tag, index) => tag.id === nextTags[index]?.id);
+  const tagsEqual = areTagsEqual(prevTags, nextTags);
 
-  // Compare steps
   const prevSteps = prevProps.steps || [];
   const nextSteps = nextProps.steps || [];
   const stepsEqual =
@@ -159,16 +145,7 @@ export const TargetItem = React.memo(function TargetItem({
             {tags && tags.length > 0 && (
               <div className="flex gap-1 mt-2 flex-wrap">
                 {tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="px-2 py-0.5 rounded text-xs"
-                    style={{
-                      backgroundColor: `${tag.color}20`,
-                      color: tag.color,
-                    }}
-                  >
-                    {tag.name}
-                  </span>
+                  <TagBadge key={tag.id} tag={tag} size="sm" />
                 ))}
               </div>
             )}
