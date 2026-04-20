@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-04-20
+
+### Refactored
+
+**后端 Repository 层抽象 (Backend Repository Layer)**:
+
+- 新增 `repositories/` 目录，抽象数据访问层
+- 新增 `todo_repository.rs` - Todo 数据访问
+- 新增 `task_repository.rs` - Task 数据访问
+- 新增 `plan_repository.rs` - Plan 数据访问
+- 新增 `target_repository.rs` - Target 数据访问
+- 新增 `circulation_repository.rs` - Circulation 数据访问
+- 新增 `milestone_repository.rs` - Milestone 数据访问
+- 新增 `tag_repository.rs` - Tag 数据访问
+- 重构 `circulations/mod.rs` 和 `milestones.rs` 使用 Repository 模式
+- 重构 `plans.rs`、`tags.rs`、`targets.rs` 使用 Repository 模式
+- 重构 `tasks.rs` 使用 Repository 模式
+
+**前端组件化解构 (Frontend Component Decomposition)**:
+
+- `ViewsView.tsx` 从 752 行瘦身为更小的组件化架构
+- 提取 `TagBadge` 组件，消除 11 处重复代码
+- 提取 `ItemTooltip` 组件，提供统一的悬浮提示
+
+**validation.rs 状态值统一**:
+
+- 统一状态值命名：`in_progress` 改为 `in-progress`
+
+### Fixed
+
+**测试增强 (Test Enhancement)**:
+
+- `updateTodo` 和 `createTodo` 测试添加 `recurrence` 字段验证
+
 ## [0.7.3] - 2026-03-24
 
 ### Fixed
