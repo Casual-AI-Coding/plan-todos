@@ -1,4 +1,3 @@
-// src/lib/services/circulationService.test.ts
 import { describe, it, expect } from "vitest";
 import {
   calculateCirculationStats,
@@ -16,9 +15,9 @@ describe("circulationService", () => {
 
     it("should calculate correct stats", () => {
       const logs = [
-        { id: "1", count: 10, date: "2026-03-01" },
-        { id: "2", count: 20, date: "2026-03-02" },
-        { id: "3", count: 30, date: "2026-03-03" },
+        { id: "1", circulation_id: "c1", count: 10, completed_at: "2026-03-01T00:00:00Z", note: null, period: null },
+        { id: "2", circulation_id: "c1", count: 20, completed_at: "2026-03-02T00:00:00Z", note: null, period: null },
+        { id: "3", circulation_id: "c1", count: 30, completed_at: "2026-03-03T00:00:00Z", note: null, period: null },
       ];
       const result = calculateCirculationStats(logs);
       expect(result.totalCount).toBe(60);
@@ -30,12 +29,12 @@ describe("circulationService", () => {
     it("should return array of 7 zeros for empty logs", () => {
       const result = getCirculationTrend([]);
       expect(result.length).toBe(7);
-      expect(result.every((v) => v === 0)).toBe(true);
+      expect(result.every((v: number) => v === 0)).toBe(true);
     });
 
     it("should return trend for specified days", () => {
       const today = new Date().toISOString().split("T")[0];
-      const logs = [{ id: "1", count: 5, date: today }];
+      const logs = [{ id: "1", circulation_id: "c1", count: 5, completed_at: `${today}T10:00:00Z`, note: null, period: null }];
       const result = getCirculationTrend(logs, 3);
       expect(result.length).toBe(3);
       expect(result[2]).toBe(5);
@@ -49,9 +48,9 @@ describe("circulationService", () => {
 
     it("should return log with highest count", () => {
       const logs = [
-        { id: "1", count: 10, date: "2026-03-01" },
-        { id: "2", count: 50, date: "2026-03-02" },
-        { id: "3", count: 30, date: "2026-03-03" },
+        { id: "1", circulation_id: "c1", count: 10, completed_at: "2026-03-01T00:00:00Z", note: null, period: null },
+        { id: "2", circulation_id: "c1", count: 50, completed_at: "2026-03-02T00:00:00Z", note: null, period: null },
+        { id: "3", circulation_id: "c1", count: 30, completed_at: "2026-03-03T00:00:00Z", note: null, period: null },
       ];
       const result = getHighestCirculationDay(logs);
       expect(result?.id).toBe("2");
@@ -65,9 +64,9 @@ describe("circulationService", () => {
 
     it("should return log with lowest count", () => {
       const logs = [
-        { id: "1", count: 10, date: "2026-03-01" },
-        { id: "2", count: 50, date: "2026-03-02" },
-        { id: "3", count: 30, date: "2026-03-03" },
+        { id: "1", circulation_id: "c1", count: 10, completed_at: "2026-03-01T00:00:00Z", note: null, period: null },
+        { id: "2", circulation_id: "c1", count: 50, completed_at: "2026-03-02T00:00:00Z", note: null, period: null },
+        { id: "3", circulation_id: "c1", count: 30, completed_at: "2026-03-03T00:00:00Z", note: null, period: null },
       ];
       const result = getLowestCirculationDay(logs);
       expect(result?.id).toBe("1");

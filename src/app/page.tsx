@@ -4,197 +4,54 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { TitleBar } from "@/components/layout/TitleBar";
-import { PageSlide } from "@/components/ui/animations";
+import { ViewRouter } from "@/components/layout/ViewRouter";
+import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
-import { t } from "@/config/i18n";
-import {
-  Dashboard,
-  TodosView,
-  PlansView,
-  TargetsView,
-  MilestonesView,
-  ViewsView,
-  StatisticsView,
-  SettingsGeneralView,
-  SettingsChannelsView,
-  SettingsDailySummaryView,
-  SettingsAboutView,
-  SettingsTagsView,
-  SettingsCirculationNotificationsView,
-  SettingsNotificationsView,
-  SettingsSyncView,
-  CirculationsView,
-  CirculationDetailView,
-  NotificationCenterView,
-  DataManagementView,
-} from "./views";
+import { CirculationDetailView } from "./views";
 
-// Main App
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState("dashboard");
-  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(
-    null,
-  );
+  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Use useEffect to avoid hydration mismatch - start with false on both server and client
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
-
-  // Mobile sidebar overlay state
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
-
-  // Sync with localStorage after mount
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
     if (saved === "true") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSidebarCollapsed(true);
     }
   }, []);
 
-  // Global keyboard shortcut for search (Ctrl+K / Cmd+K)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        const searchInput = document.getElementById("sidebar-search-input");
-        if (searchInput) {
-          searchInput.focus();
-        }
+        document.getElementById("sidebar-search-input")?.focus();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const renderContent = () => {
-    let view;
-    switch (activeMenu) {
-      case "dashboard":
-        view = <Dashboard />;
-        break;
-      case "todos":
-      case "todos-all":
-      case "todos-today":
-      case "todos-upcoming":
-      case "todos-completed":
-        view = <TodosView />;
-        break;
-      case "plans":
-      case "plans-active":
-      case "plans-archived":
-        view = <PlansView />;
-        break;
-      case "goals":
-      case "goals-active":
-      case "goals-completed":
-        view = <TargetsView />;
-        break;
-      case "milestones":
-        view = <MilestonesView />;
-        break;
-      case "views":
-        view = <ViewsView />;
-        break;
-      case "circulations":
-      case "circulations-today":
-        view = <CirculationsView mode="today" />;
-        break;
-      case "circulations-settings":
-        view = <CirculationsView mode="settings" />;
-        break;
-      case "statistics":
-        view = <StatisticsView />;
-        break;
-      case "notifications":
-      case "notification-center":
-        view = <NotificationCenterView />;
-        break;
-      case "settings-channels":
-        view = <SettingsChannelsView />;
-        break;
-      case "settings-daily-summary":
-        view = <SettingsDailySummaryView />;
-        break;
-      case "settings-circulation-notifications":
-        view = <SettingsCirculationNotificationsView />;
-        break;
-      case "settings-notifications":
-        view = <SettingsNotificationsView />;
-        break;
-      case "data-management":
-      case "data-import-export":
-        view = <DataManagementView />;
-        break;
-      case "settings-sync":
-        view = <SettingsSyncView />;
-        break;
-      case "settings":
-      case "settings-general":
-        view = <SettingsGeneralView />;
-        break;
-      case "settings-tags":
-        view = <SettingsTagsView />;
-        break;
-      case "settings-sync":
-        view = <SettingsSyncView />;
-        break;
-      case "settings-circulation-notifications":
-        view = <SettingsCirculationNotificationsView />;
-        break;
-      case "settings-channels":
-        view = <SettingsChannelsView />;
-        break;
-      case "settings-daily-summary":
-        view = <SettingsDailySummaryView />;
-        break;
-      case "settings-about":
-        view = <SettingsAboutView />;
-        break;
-      default:
-        view = <Dashboard />;
-    }
-    return <PageSlide key={activeMenu}>{view}</PageSlide>;
-  };
-
   return (
-    <div
-      className="flex flex-col h-screen"
-      style={{ background: "transparent", fontFamily: "var(--font-sans)" }}
-    >
-      {/* Desktop: entire app with rounded corners, shadow, border */}
+    <div className="flex flex-col h-screen" style={{ background: "transparent", fontFamily: "var(--font-sans)" }}>
       <div className="hidden md:flex flex-col h-screen rounded-lg overflow-hidden border border-[var(--color-border)] shadow-lg">
         <TitleBar />
-
         <div className="flex flex-1 overflow-hidden">
-          {/* Desktop Sidebar - hidden on mobile */}
           <div className="hidden md:block h-full">
-            <Sidebar
-              activeMenu={activeMenu}
-              onMenuChange={setActiveMenu}
-              onCollapseChange={setSidebarCollapsed}
-            />
+            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
           </div>
-
-          {/* Main Content */}
-          <main
-            className="flex-1 overflow-auto pb-16 md:pb-0"
-            style={{
-              backgroundColor: "var(--color-bg)",
-            }}
-          >
-            {renderContent()}
+          <main className="flex-1 overflow-auto pb-16 md:pb-0" style={{ backgroundColor: "var(--color-bg)" }}>
+            <ViewRouter activeMenu={activeMenu} />
           </main>
         </div>
       </div>
 
-      {/* Mobile: with hamburger menu */}
       <div className="md:hidden flex flex-col h-full">
-        {/* Mobile Header with hamburger */}
         <header
           className="flex items-center px-4 border-b fixed top-0 left-0 right-0 z-40"
           style={{
-            height: "calc(3.5rem + env(safe-area-inset-top))",
+            height: LAYOUT.MOBILE_HEADER_CALC,
             paddingTop: "env(safe-area-inset-top)",
             backgroundColor: "var(--color-bg-card)",
             borderColor: "var(--color-border)",
@@ -204,29 +61,19 @@ export default function Home() {
             onClick={() => setMobileSidebarOpen(true)}
             className="p-2 -ml-2 rounded hover:opacity-80"
             style={{ color: "var(--color-text)" }}
-            aria-label={t.nav.openMenu}
+            aria-label="打开菜单"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <rect x="2" y="4" width="16" height="1.5" />
               <rect x="2" y="9" width="16" height="1.5" />
               <rect x="2" y="14" width="16" height="1.5" />
             </svg>
           </button>
-          <h1
-            className="ml-2 text-lg font-semibold"
-            style={{ color: "var(--color-text)" }}
-          >
+          <h1 className="ml-2 text-lg font-semibold" style={{ color: "var(--color-text)" }}>
             Plan Todos
           </h1>
         </header>
 
-        {/* Main Content */}
         <main
           className="flex-1 overflow-auto"
           style={{
@@ -235,91 +82,23 @@ export default function Home() {
             paddingBottom: LAYOUT.MOBILE_FOOTER_CALC,
           }}
         >
-          {renderContent()}
+          <ViewRouter activeMenu={activeMenu} />
         </main>
 
-        {/* Mobile Sidebar Overlay */}
         {mobileSidebarOpen && (
-          <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-50 bg-black/50"
-              onClick={() => setMobileSidebarOpen(false)}
-            />
-            {/* Sidebar Panel */}
-            <div
-              className="fixed left-0 top-0 h-full z-50 w-64"
-              style={{
-                backgroundColor: "var(--color-bg-card)",
-                transform: "translateX(0)",
-                transition: "transform 0.3s ease",
-              }}
-            >
-              {/* Mobile sidebar header with close button */}
-              <div
-                className="flex items-center justify-between px-4 border-b"
-                style={{
-height: LAYOUT.MOBILE_HEADER_CALC,
-                  paddingTop: "env(safe-area-inset-top)",
-                }}
-              >
-                <span
-                  className="font-semibold"
-                  style={{ color: "var(--color-text)" }}
-                >
-{t.nav.menu}
-                </span>
-                <button
-                  onClick={() => setMobileSidebarOpen(false)}
-                  className="p-2 rounded hover:opacity-80"
-                  style={{ color: "var(--color-text)" }}
-                  aria-label={t.nav.closeMenu}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="4"
-                      y="4"
-                      width="12"
-                      height="1.5"
-                      transform="rotate(45 10 10)"
-                    />
-                    <rect
-                      x="4"
-                      y="4"
-                      width="12"
-                      height="1.5"
-                      transform="rotate(-45 10 10)"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <Sidebar
-                activeMenu={activeMenu}
-                onMenuChange={(menu) => {
-                  setActiveMenu(menu);
-                  setMobileSidebarOpen(false);
-                }}
-                onCollapseChange={setSidebarCollapsed}
-                isMobile
-              />
-            </div>
-          </>
+          <MobileSidebar
+            activeMenu={activeMenu}
+            onMenuChange={setActiveMenu}
+            onClose={() => setMobileSidebarOpen(false)}
+            onCollapseChange={setSidebarCollapsed}
+          />
         )}
       </div>
 
       <BottomNav activeMenu={activeMenu} onMenuChange={setActiveMenu} />
 
       {circulationDetailId && (
-        <CirculationDetailView
-          id={circulationDetailId}
-          onClose={() => setCirculationDetailId(null)}
-        />
+        <CirculationDetailView id={circulationDetailId} onClose={() => setCirculationDetailId(null)} />
       )}
     </div>
   );
