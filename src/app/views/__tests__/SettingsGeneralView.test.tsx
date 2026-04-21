@@ -1,6 +1,8 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SettingsGeneralView } from "@/app/views/SettingsGeneralView";
+import { ToastProvider } from "@/components/ui/Toast";
 
 vi.mock("@/lib/api", () => ({
   seedTestData: vi.fn(),
@@ -58,40 +60,35 @@ describe("SettingsGeneralView", () => {
     vi.clearAllMocks();
   });
 
+  const renderWithProvider = (ui: React.ReactElement) => {
+    return render(<ToastProvider>{ui}</ToastProvider>);
+  };
+
   it("renders settings general view with title", () => {
-    render(<SettingsGeneralView />);
+    renderWithProvider(<SettingsGeneralView />);
     expect(screen.getByText("设置 > 通用")).toBeInTheDocument();
   });
 
   it("renders appearance section", () => {
-    render(<SettingsGeneralView />);
+    renderWithProvider(<SettingsGeneralView />);
     expect(screen.getByText("外观")).toBeInTheDocument();
     expect(screen.getByText("主题")).toBeInTheDocument();
     expect(screen.getByText("语言")).toBeInTheDocument();
   });
 
-  it("renders data management section", () => {
-    render(<SettingsGeneralView />);
-    expect(screen.getByText("数据管理")).toBeInTheDocument();
-    expect(screen.getByText("自动备份")).toBeInTheDocument();
-    expect(screen.getByText("备份路径")).toBeInTheDocument();
-  });
-
-  it("renders data operations section", () => {
-    render(<SettingsGeneralView />);
-    expect(screen.getByText("数据操作")).toBeInTheDocument();
-    expect(screen.getByText("生成测试数据")).toBeInTheDocument();
-    expect(screen.getByText("重置数据")).toBeInTheDocument();
+  it("renders hotkeys section", () => {
+    renderWithProvider(<SettingsGeneralView />);
+    expect(screen.getByText("快捷键")).toBeInTheDocument();
   });
 
   it("renders language options", () => {
-    render(<SettingsGeneralView />);
+    renderWithProvider(<SettingsGeneralView />);
     expect(screen.getByText("中文")).toBeInTheDocument();
     expect(screen.getByText("English")).toBeInTheDocument();
   });
 
-  it("renders warning about dangerous operations", () => {
-    render(<SettingsGeneralView />);
-    expect(screen.getByText("危险操作")).toBeInTheDocument();
+  it("renders restore default hotkeys button", () => {
+    renderWithProvider(<SettingsGeneralView />);
+    expect(screen.getByText("恢复默认")).toBeInTheDocument();
   });
 });
