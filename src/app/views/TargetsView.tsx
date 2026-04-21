@@ -14,30 +14,28 @@ import {
   StaggeredList,
   StaggeredListItem,
 } from "@/components/ui/animations/StaggeredList";
-import { useToast } from "@/components/ui/Toast";
 import {
   useTargets,
   useTargetTags,
   useTargetSteps,
   useCreateTarget,
+  useUpdateTarget,
   useDeleteTarget,
   useCreateStep,
   useUpdateStep,
   useDeleteStep,
-  useReorderTargets,
 } from "@/hooks/useTargets";
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
+import { useToast } from "@/components/ui/Toast";
+import { useEntityOperations } from "@/hooks/useEntityOperations";
+import { useFilteredTargets } from "@/hooks/useEntityFilter";
+import { t } from "@/config/i18n";
 import { BatchActionBar } from "@/components/features/BatchActionBar";
 import { SelectableItem } from "@/components/features/SelectableItem";
 import type { Target, Step } from "@/lib/api";
 import type { TargetFormData } from "@/components/features/TargetForm";
-import {
-  setEntityTags,
-  updateTarget as updateTargetApi,
-  getNotificationSettings,
-} from "@/lib/api";
-import { SortableList } from "@/components/features/SortableList";
+import { getNotificationSettings } from "@/lib/api";
 
 interface TargetCardProps {
   target: Target;
@@ -218,26 +216,26 @@ export function TargetsView() {
   const { data: tags = [] } = useTags();
 
   // Mutations
-  const createTargetMutation = useCreateTarget({
-    onSuccess: () => {
-      toast.success("目标创建成功");
-      closeForm();
-    },
-    onError: () => {
-      toast.error("操作失败");
+  const createTargetMutation = useCreateTarget();
+  const updateTargetMutation = useUpdateTarget();
+  const deleteTargetMutation = useDeleteTarget();
+
+  const operations = useEntityOperations({
+    entityType: "target",
+    createMutation: createTargetMutation,
+    updateMutation: updateTargetMutation,
+    deleteMutation: deleteTargetMutation,
+    completedStatus: "completed",
+    pendingStatus: "active",
+    messages: {
+      created: t.target.created,
+      updated: t.target.updated,
+      deleted: t.target.deleted,
+      toggledDone: t.target.completed,
+      toggledUndone: t.target.uncompleted,
+      error: t.error.operationFailed,
     },
   });
-
-  const deleteTargetMutation = useDeleteTarget({
-    onSuccess: () => {
-      toast.success("目标已删除");
-    },
-    onError: () => {
-      toast.error("操作失败");
-    },
-  });
-
-  const reorderTargetsMutation = useReorderTargets();
 
   const createStepMutation = useCreateStep({
     onSuccess: () => {
@@ -306,26 +304,19 @@ export function TargetsView() {
   }
 
   async function handleSaveTarget(data: TargetFormData, tagIds: string[]) {
-    if (editingTarget) {
-      // Update existing target
-      await updateTargetApi(editingTarget.id, {
-        title: data.title,
-        description: data.description,
-        due_date: data.due_date,
-      });
-      await setEntityTags("target", editingTarget.id, tagIds);
-      toast.success("目标更新成功");
-    } else {
-      // Create new target
-      const targetData = {
-        title: data.title,
-        description: data.description,
-        due_date: data.due_date,
-        tagIds,
-      };
-      createTargetMutation.mutate(targetData);
+    const saveData = {
+      title: data.title,
+      description: data.description,
+      due_date: data.due_date,
+      tagIds,
+    };
+    const result = await operations.save(saveData, tagIds, {
+      isEditing: !!editingTarget,
+      editingId: editingTarget?.id,
+    });
+    if (result) {
+      closeForm();
     }
-    closeForm();
   }
 
   function handleSubmitStep() {
@@ -339,8 +330,7 @@ export function TargetsView() {
   }
 
   function handleDeleteTarget(id: string) {
-    if (!confirm("Delete target and all steps?")) return;
-    deleteTargetMutation.mutate(id);
+    void operations.remove(id, t.confirm.deleteConfirm);
   }
 
   function handleDeleteStep(id: string) {
@@ -352,7 +342,12 @@ export function TargetsView() {
     updateStepMutation.mutate({ id: step.id, status: next });
   }
 
-  // Loading state
+  const filteredTargets = useFilteredTargets({
+    targets,
+    tagFilters,
+    showArchived: false,
+  });
+
   if (targetsLoading) {
     return (
       <div className="p-6">
@@ -364,17 +359,10 @@ export function TargetsView() {
             GOALS
           </h2>
         </div>
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">{t.loading.default}</div>
       </div>
     );
   }
-
-  // Filter targets by tags (OR logic)
-  const filteredTargets = targets.filter((t) => {
-    if (t.status === "archived") return false;
-    if (tagFilters.length === 0) return true;
-    return true; // Note: For full tag filtering, we'd need to fetch tags for each target
-  });
 
   return (
     <div className="p-6">

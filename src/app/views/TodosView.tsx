@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Card, Button } from "@/components/ui";
 import { Calendar } from "@/components/ui/Calendar";
 import { EmptyStateCard } from "@/components/features";
-import { useToast } from "@/components/ui/Toast";
 import {
   useTodos,
   useCreateTodo,
@@ -14,21 +13,16 @@ import {
 } from "@/hooks/useTodos";
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
+import { useEntityOperations } from "@/hooks/useEntityOperations";
+import { useFilteredTodos, useCalendarEvents } from "@/hooks/useEntityFilter";
 import { BatchActionBar } from "@/components/features/BatchActionBar";
 import { SelectableItem } from "@/components/features/SelectableItem";
 import type { Todo, Priority } from "@/lib/types";
-import { setEntityTags, setNotificationSettings } from "@/lib/api";
 import { TodoItem } from "@/components/features/TodoItem";
 import { TodoForm, type TodoFormData } from "@/components/features/TodoForm";
 import { TodoFilters } from "@/components/features/TodoFilters";
 import { SortableList } from "@/components/features/SortableList";
-
-interface CalendarEvent {
-  id: string;
-  title: string;
-  date: string;
-  type: "todo" | "task" | "plan" | "milestone";
-}
+import { t } from "@/config/i18n";
 
 export function TodosView() {
   const [filter, setFilter] = useState<
@@ -44,13 +38,9 @@ export function TodosView() {
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const toast = useToast();
-
-  // Batch mode state
   const batchMode = useBatchSelect((s) => s.mode);
   const toggleBatchMode = useBatchSelect((s) => s.toggleMode);
 
-  // Use React Query hooks
   const { data: todosData, isLoading, error } = useTodos();
   const { data: allTags = [] } = useTags();
   const createTodo = useCreateTodo();
@@ -60,112 +50,57 @@ export function TodosView() {
 
   const todos = todosData || [];
 
-  // Convert todos to calendar events
-  const calendarEvents: CalendarEvent[] = todos
-    .filter((t) => t.due_date)
-    .map((t) => ({
-      id: t.id,
-      title: t.title,
-      date: t.due_date!,
-      type: "todo" as const,
-    }));
+  const calendarEvents = useCalendarEvents(todos);
 
-  const filteredTodos = todos.filter((t) => {
-    // Search filter
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (
-        !t.title.toLowerCase().includes(q) &&
-        !t.content?.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-    }
-    // Priority filter
-    if (priorityFilter !== "all" && t.priority !== priorityFilter) {
-      return false;
-    }
-    // Tag filter (OR logic - multiple tags)
-    if (tagFilters.length > 0) {
-      // Note: This needs entity tags loaded - simplified for now
-      const hasTag = tagFilters.some((tagId) =>
-        (t as unknown as { tags?: { id: string }[] }).tags?.some(
-          (tag) => tag.id === tagId,
-        ),
-      );
-      if (!hasTag) return false;
-    }
-    // Status filter
-    const today = new Date().toISOString().split("T")[0];
-    if (filter === "today") return t.due_date?.startsWith(today);
-    if (filter === "upcoming") return t.due_date && t.due_date > today;
-    if (filter === "completed") return t.status === "done";
-    return true;
+  const filteredTodos = useFilteredTodos({
+    todos,
+    filter,
+    priorityFilter,
+    tagFilters,
+    searchQuery,
+  });
+
+  const operations = useEntityOperations({
+    entityType: "todo",
+    createMutation: createTodo,
+    updateMutation: updateTodo,
+    deleteMutation: deleteTodo,
+    reorderMutation: reorderTodosMutation,
+    completedStatus: "done",
+    pendingStatus: "pending",
+    messages: {
+      created: t.todo.created,
+      updated: t.todo.updated,
+      deleted: t.todo.deleted,
+      toggledDone: t.todo.completed,
+      toggledUndone: t.todo.uncompleted,
+      error: t.error.operationFailed,
+      reminderError: t.error.reminderUpdateFailed,
+    },
   });
 
   async function handleSave(data: TodoFormData, tags: string[]) {
     if (!data.title.trim()) return;
-    try {
-      let todoId: string;
-      if (editingTodo) {
-        await updateTodo.mutateAsync({
-          id: editingTodo.id,
-          title: data.title,
-          content: data.content,
-          due_date: data.due_date,
-          priority: data.priority,
-          recurrence: data.recurrence,
-        });
-        todoId = editingTodo.id;
-        toast.success("待办已更新");
-      } else {
-        const newTodo = await createTodo.mutateAsync({
-          title: data.title,
-          content: data.content,
-          due_date: data.due_date,
-          priority: data.priority,
-          recurrence: data.recurrence,
-        });
-        todoId = newTodo.id;
-        toast.success("待办已创建");
-      }
-      // Save tags
-      await setEntityTags("todo", todoId, tags);
+    const result = await operations.save(data, tags, {
+      isEditing: !!editingTodo,
+      editingId: editingTodo?.id,
+    });
+    if (result) {
       setShowForm(false);
       setEditingTodo(null);
-    } catch (e) {
-      console.error(e);
-      toast.error("操作失败");
     }
   }
 
   async function handleToggle(todo: Todo) {
-    const next = todo.status === "done" ? "pending" : "done";
-    try {
-      await updateTodo.mutateAsync({ id: todo.id, status: next });
-      toast.success(next === "done" ? "已完成" : "已取消完成");
-    } catch (e) {
-      console.error(e);
-    }
+    await operations.toggle(todo);
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete?")) return;
-    try {
-      await deleteTodo.mutateAsync(id);
-      toast.success("待办已删除");
-    } catch (e) {
-      console.error(e);
-    }
+    await operations.remove(id, t.confirm.delete);
   }
 
   async function handleReminderUpdate(todoId: string, times: number[]) {
-    try {
-      await setNotificationSettings("todo", todoId, times);
-    } catch (e) {
-      console.error("Failed to update reminder settings:", e);
-      toast.error("提醒设置更新失败");
-    }
+    await operations.updateReminder(todoId, times);
   }
 
   function handleEditClick(todo: Todo) {
@@ -179,18 +114,13 @@ export function TodosView() {
   }
 
   async function handleReorder(newItems: Todo[]) {
-    // Calculate new sort_order values based on position
-    const orders = newItems.map((item, index) => ({
-      id: item.id,
-      sort_order: index,
-    }));
-    await reorderTodosMutation.mutateAsync(orders);
+    await operations.reorder(newItems);
   }
 
   if (error) {
     return (
       <div className="p-2 sm:p-4 md:p-6">
-        <p className="text-red-500">加载失败: {error.message}</p>
+        <p className="text-red-500">{t.error.networkError}: {error.message}</p>
       </div>
     );
   }
@@ -254,7 +184,7 @@ export function TodosView() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-500">{t.loading.default}</div>
       ) : viewMode === "list" ? (
         <>
           {/* Batch Action Bar */}

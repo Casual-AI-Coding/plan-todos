@@ -51,6 +51,7 @@ export const t = {
     search: "搜索",
     selectAll: "全选",
     deselectAll: "取消全选",
+    select: "请选择",
   },
 
   // Status labels
@@ -88,12 +89,40 @@ export const t = {
     board: "看板",
   },
 
-  // Todo-specific
   todo: {
     created: "待办已创建",
     updated: "待办已更新",
     deleted: "待办已删除",
     emptyTitle: "标题不能为空",
+    completed: "已完成",
+    uncompleted: "已取消完成",
+  },
+  plan: {
+    created: "计划已创建",
+    updated: "计划已更新",
+    deleted: "计划已删除",
+    completed: "已完成",
+    uncompleted: "已取消完成",
+  },
+  target: {
+    created: "目标已创建",
+    updated: "目标已更新",
+    deleted: "目标已删除",
+    completed: "已完成",
+    uncompleted: "已取消完成",
+  },
+  milestone: {
+    created: "里程碑创建成功",
+    updated: "里程碑已更新",
+    deleted: "里程碑已删除",
+    completed: "已完成",
+    uncompleted: "进行中",
+    noLink: "未关联",
+  },
+  circulation: {
+    created: "打卡已创建",
+    updated: "打卡已更新",
+    deleted: "打卡已删除",
   },
 
   // View modes
@@ -140,6 +169,8 @@ export const t = {
       `${entity} with id "${id}" not found`,
     networkError: "网络错误，请重试",
     unknownError: "未知错误",
+    operationFailed: "操作失败",
+    reminderUpdateFailed: "提醒设置更新失败",
   },
 } as const;
 

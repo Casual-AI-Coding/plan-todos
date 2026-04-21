@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   Button,
@@ -10,7 +10,6 @@ import {
   Checkbox,
 } from "@/components/ui";
 import { EmptyStateCard } from "@/components/features";
-import { useToast } from "@/components/ui/Toast";
 import {
   usePlans,
   usePlanTags,
@@ -23,17 +22,16 @@ import {
 import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
+import { useEntityOperations } from "@/hooks/useEntityOperations";
+import { useFilteredPlans } from "@/hooks/useEntityFilter";
 import { BatchActionBar } from "@/components/features/BatchActionBar";
 import { SelectableItem } from "@/components/features/SelectableItem";
 import type { Plan, Task } from "@/lib/api";
-import { setEntityTags, setNotificationSettings } from "@/lib/api";
-import { getNotificationSettings } from "@/lib/api/notifications";
 import { PlanForm, type PlanFormData } from "@/components/features/PlanForm";
 import { SortableList } from "@/components/features/SortableList";
+import { t } from "@/config/i18n";
 
 export function PlansView() {
-  const toast = useToast();
-
   // Batch mode state
   const batchMode = useBatchSelect((s) => s.mode);
   const toggleBatchMode = useBatchSelect((s) => s.toggleMode);
@@ -43,61 +41,20 @@ export function PlansView() {
   const { data: tags = [] } = useTags();
 
   // Mutations
-  const createPlanMutation = useCreatePlan({
-    onSuccess: () => {
-      toast.success("计划创建成功");
-      closeForm();
-    },
-    onError: () => {
-      toast.error("操作失败");
-    },
-  });
-
-  const updatePlanMutation = useUpdatePlan({
-    onSuccess: () => {
-      toast.success("计划更新成功");
-      closeForm();
-    },
-    onError: () => {
-      toast.error("操作失败");
-    },
-  });
-
-  const deletePlanMutation = useDeletePlan({
-    onSuccess: () => {
-      toast.success("计划已删除");
-    },
-    onError: () => {
-      toast.error("操作失败");
-    },
-  });
-
+  const createPlanMutation = useCreatePlan({});
+  const updatePlanMutation = useUpdatePlan({});
+  const deletePlanMutation = useDeletePlan({});
   const reorderPlansMutation = useReorderPlans();
 
+  // Task mutations - keep intact
   const createTaskMutation = useCreateTask({
     onSuccess: () => {
-      toast.success("任务创建成功");
       closeTaskForm();
     },
-    onError: () => {
-      toast.error("操作失败");
-    },
   });
 
-  const updateTaskMutation = useUpdateTask({
-    onError: () => {
-      toast.error("操作失败");
-    },
-  });
-
-  const deleteTaskMutation = useDeleteTask({
-    onSuccess: () => {
-      toast.success("任务已删除");
-    },
-    onError: () => {
-      toast.error("操作失败");
-    },
-  });
+  const updateTaskMutation = useUpdateTask({});
+  const deleteTaskMutation = useDeleteTask({});
 
   // UI State
   const [tagFilters, setTagFilters] = useState<string[]>([]);
@@ -107,49 +64,26 @@ export function PlansView() {
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>(
-    [],
-  );
+  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>([]);
 
-  // Fetch reminder times when editing plan
-  useEffect(() => {
-    async function fetchReminderTimes() {
-      if (editingPlan?.id) {
-        try {
-          const settings = await getNotificationSettings(
-            "plan",
-            editingPlan.id,
-          );
-          if (settings && settings.reminder_times) {
-            setEditingReminderTimes(settings.reminder_times);
-          } else {
-            setEditingReminderTimes([]);
-          }
-        } catch (error) {
-          console.warn("Failed to fetch reminder settings:", error);
-          setEditingReminderTimes([]);
-        }
-      } else {
-        setEditingReminderTimes([]);
-      }
-    }
-    fetchReminderTimes();
-  }, [editingPlan]);
+  const selectedTags: string[] = [];
 
   function closeForm() {
     setShowForm(false);
     setEditingPlan(null);
     setTitle("");
-    setDescription("");
     setStartDate("");
     setEndDate("");
-    setSelectedTags([]);
     setEditingReminderTimes([]);
   }
+
+  const filteredPlans = useFilteredPlans({
+    plans,
+    tagFilters,
+    showArchived: false,
+  });
 
   function closeTaskForm() {
     setShowTaskForm(false);
@@ -168,35 +102,44 @@ export function PlansView() {
     });
   }
 
-  async function handleSavePlan(data: PlanFormData, tags: string[]) {
+  const operations = useEntityOperations({
+    entityType: "plan",
+    createMutation: createPlanMutation,
+    updateMutation: updatePlanMutation,
+    deleteMutation: deletePlanMutation,
+    reorderMutation: reorderPlansMutation,
+    completedStatus: "completed",
+    pendingStatus: "active",
+    messages: {
+      created: t.plan.created,
+      updated: t.plan.updated,
+      deleted: t.plan.deleted,
+      toggledDone: t.plan.completed,
+      toggledUndone: t.plan.uncompleted,
+      error: t.error.operationFailed,
+      reminderError: t.error.reminderUpdateFailed,
+    },
+  });
+
+  async function handleSavePlan(data: PlanFormData, formTags: string[]) {
     const planData = {
       title: data.title,
       description: data.description,
       start_date: data.start_date,
       end_date: data.end_date,
-      tagIds: tags,
     };
 
-    let planId: string;
+    const result = await operations.save(planData, formTags, {
+      isEditing: !!editingPlan,
+      editingId: editingPlan?.id,
+    });
 
-    if (editingPlan) {
-      await updatePlanMutation.mutateAsync({ id: editingPlan.id, ...planData });
-      planId = editingPlan.id;
-      // Handle tags
-      if (tags.length > 0) {
-        await setEntityTags("plan", planId, tags);
+    if (result) {
+      if (data.reminder_times && data.reminder_times.length > 0) {
+        await operations.updateReminder(result.id, data.reminder_times);
       }
-    } else {
-      const newPlan = await createPlanMutation.mutateAsync(planData);
-      planId = newPlan.id;
+      closeForm();
     }
-
-    // Save reminder settings
-    if (data.reminder_times && data.reminder_times.length > 0) {
-      await setNotificationSettings("plan", planId, data.reminder_times);
-    }
-
-    closeForm();
   }
 
   function handleSubmitTask() {
@@ -210,9 +153,8 @@ export function PlansView() {
     });
   }
 
-  function handleDeletePlan(id: string) {
-    if (!confirm("Delete plan and all tasks?")) return;
-    deletePlanMutation.mutate(id);
+  async function handleDeletePlan(id: string) {
+    await operations.remove(id, t.confirm.delete);
   }
 
   function handleDeleteTask(id: string) {
@@ -225,12 +167,7 @@ export function PlansView() {
   }
 
   async function handleReorder(newItems: Plan[]) {
-    // Calculate new sort_order values based on position
-    const orders = newItems.map((item, index) => ({
-      id: item.id,
-      sort_order: index,
-    }));
-    await reorderPlansMutation.mutateAsync(orders);
+    await operations.reorder(newItems);
   }
 
   // Loading state
@@ -245,19 +182,10 @@ export function PlansView() {
             PLANS
           </h2>
         </div>
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">{t.loading.default}</div>
       </div>
     );
   }
-
-  // Filter plans by tags (OR logic)
-  const filteredPlans = plans.filter((p) => {
-    if (p.status === "archived") return false;
-    if (tagFilters.length === 0) return true;
-    // Note: For full tag filtering, we'd need to fetch tags for each plan
-    // For now, just show all plans when filters are active but no tag data
-    return true;
-  });
 
   return (
     <div className="p-6">
@@ -332,11 +260,10 @@ export function PlansView() {
           onReorder={handleReorder}
           getItemId={(plan) => plan.id}
           layout="vertical"
-          renderItem={(plan, index) => (
+          renderItem={(plan) => (
             <SelectableItem id={plan.id}>
               <PlanCard
                 plan={plan}
-                index={index}
                 expandedPlans={expandedPlans}
                 togglePlan={togglePlan}
                 setSelectedPlanId={setSelectedPlanId}
@@ -417,7 +344,6 @@ export function PlansView() {
 // PlanCard subcomponent - handles its own data fetching
 interface PlanCardProps {
   plan: Plan;
-  index: number;
   expandedPlans: Set<string>;
   togglePlan: (id: string) => void;
   setSelectedPlanId: (id: string) => void;
@@ -429,7 +355,6 @@ interface PlanCardProps {
 
 function PlanCard({
   plan,
-  index,
   expandedPlans,
   togglePlan,
   setSelectedPlanId,
