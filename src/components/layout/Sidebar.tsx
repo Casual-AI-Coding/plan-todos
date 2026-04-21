@@ -7,6 +7,7 @@ import { ComponentType } from "react";
 import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
 import { NAV_MENU_ITEMS_RESOLVED, ENTITY_ROUTE_MAP, DEFAULT_EXPANDED_GROUPS } from "@/config/routes";
 import type { NavItem } from "@/config/routes";
+import { t } from "@/config/i18n";
 
 interface MenuItem extends NavItem {
   children?: MenuItem[];
@@ -319,8 +320,8 @@ export function Sidebar({
             onClick={toggleCollapse}
             className="p-1 rounded hover:opacity-80 transition-opacity cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
-            title={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
-            aria-label={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
+            title={isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
+            aria-label={isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
           >
             {isCollapsed ? "→" : "←"}
           </button>

@@ -36,6 +36,8 @@ export const t = {
     menu: "菜单",
     closeMenu: "关闭菜单",
     openMenu: "打开菜单",
+    expandSidebar: "展开侧边栏",
+    collapseSidebar: "收起侧边栏",
   },
 
   // Common actions
