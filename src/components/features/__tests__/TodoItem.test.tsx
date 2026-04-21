@@ -260,7 +260,7 @@ describe("TodoItem", () => {
       );
 
       // 验证截止日期显示
-      expect(screen.getByText(/2024\/12\/31/)).toBeInTheDocument();
+      expect(screen.getByText(/12\/31\/2024/)).toBeInTheDocument();
     });
 
     it("点击 checkbox 切换完成状态", () => {
