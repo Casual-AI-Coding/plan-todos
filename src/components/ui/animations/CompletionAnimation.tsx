@@ -19,13 +19,18 @@ export function CompletionAnimation({
   const prevIsComplete = useRef(isComplete);
 
   useEffect(() => {
-    // Only trigger animation when transitioning from false to true
     if (isComplete && !prevIsComplete.current) {
-      setShowAnimation(true);
+      const frame = requestAnimationFrame(() => {
+        setShowAnimation(true);
+      });
       const timer = setTimeout(() => {
         setShowAnimation(false);
       }, duration);
-      return () => clearTimeout(timer);
+      prevIsComplete.current = isComplete;
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(timer);
+      };
     }
     prevIsComplete.current = isComplete;
   }, [isComplete, duration]);
@@ -98,7 +103,6 @@ export function ConfettiCelebration({
   const prevTrigger = useRef(trigger);
 
   useEffect(() => {
-    // Only trigger when transitioning from false to true
     if (trigger && !prevTrigger.current) {
       const colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7"];
       const newParticles = Array.from({ length: particleCount }, (_, i) => ({
@@ -108,12 +112,18 @@ export function ConfettiCelebration({
         color: colors[Math.floor(Math.random() * colors.length)],
         delay: Math.random() * 0.5,
       }));
-      setParticles(newParticles);
+      const frame = requestAnimationFrame(() => {
+        setParticles(newParticles);
+      });
 
       const timer = setTimeout(() => {
         setParticles([]);
       }, duration);
-      return () => clearTimeout(timer);
+      prevTrigger.current = trigger;
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(timer);
+      };
     }
     prevTrigger.current = trigger;
   }, [trigger, particleCount, duration]);
