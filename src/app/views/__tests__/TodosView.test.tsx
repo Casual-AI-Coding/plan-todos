@@ -28,6 +28,7 @@ vi.mock("@/hooks/useTodos", () => ({
   useCreateTodo: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useUpdateTodo: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useDeleteTodo: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
+  useReorderTodos: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
 }));
 
 vi.mock("@/hooks/useTags", () => ({

@@ -48,7 +48,7 @@ describe("SettingsChannelsView", () => {
     } as any);
 
     render(<SettingsChannelsView />);
-    expect(screen.getByText("设置 > 通知 > 通知渠道")).toBeInTheDocument();
+    expect(screen.getByText("通知 > 通知渠道")).toBeInTheDocument();
   });
 
   it("renders loading state", () => {

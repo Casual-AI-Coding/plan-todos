@@ -33,7 +33,7 @@ describe("SettingsDailySummaryView", () => {
 
   it("renders settings daily summary view with title", () => {
     render(<SettingsDailySummaryView />);
-    expect(screen.getByText("设置 > 通知 > 每日汇总")).toBeInTheDocument();
+    expect(screen.getByText("通知 > 每日汇总")).toBeInTheDocument();
   });
 
   it("renders summary time section", () => {
