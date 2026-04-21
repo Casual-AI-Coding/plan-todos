@@ -35,6 +35,7 @@ const mockDocumentElement = {
   getAttribute: vi.fn(),
   style: {
     setProperty: vi.fn(),
+    removeProperty: vi.fn(),
   },
 };
 

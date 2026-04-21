@@ -201,9 +201,8 @@ export function useTheme() {
     }
   }, [theme, setTheme]);
 
-  // Determine if currently in dark mode
-  const themeObj = getTheme(theme);
-  const isDark = themeObj.type === "dark";
+  const effectiveTheme = getEffectiveTheme(theme);
+  const isDark = getTheme(effectiveTheme).type === "dark";
 
   return {
     theme,
