@@ -88,7 +88,7 @@ describe("MilestonesView", () => {
     } as any);
 
     render(<MilestonesView />);
-    expect(screen.getByText("暂无里程碑")).toBeInTheDocument();
+    expect(screen.getByText("未关联")).toBeInTheDocument();
   });
 
   it("shows create button", () => {
@@ -98,6 +98,6 @@ describe("MilestonesView", () => {
     } as any);
 
     render(<MilestonesView />);
-    expect(screen.getByText("+ 新建")).toBeInTheDocument();
+    expect(screen.getByText("+ 创建")).toBeInTheDocument();
   });
 });

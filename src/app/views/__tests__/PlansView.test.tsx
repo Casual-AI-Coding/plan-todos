@@ -21,6 +21,7 @@ vi.mock("@/hooks/usePlans", () => ({
   useCreatePlan: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useUpdatePlan: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useDeletePlan: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
+  useReorderPlans: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
 }));
 
 vi.mock("@/hooks/useTasks", () => ({

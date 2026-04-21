@@ -19,6 +19,7 @@ vi.mock("@/hooks/useTargets", () => ({
   useTargetTags: vi.fn(() => ({ data: [] })),
   useTargetSteps: vi.fn(() => ({ data: [] })),
   useCreateTarget: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
+  useUpdateTarget: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useDeleteTarget: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useCreateStep: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useUpdateStep: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
