@@ -120,7 +120,7 @@ plan-todos/
 
 ## 迭代计划
 
-详见 [docs/plans/iteration-plan.md](./docs/plans/iteration-plan.md)
+详见 [docs/archived/iteration-plan.md](./docs/archived/iteration-plan.md)
 
 - **Phase 1**: 数据可用 ✅
 - **Phase 2**: 增强功能 (Priority + Tags + Import/Export) ✅

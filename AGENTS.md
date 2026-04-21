@@ -532,42 +532,37 @@ Before marking any work as complete:
 
 ### File Location
 
-- `docs/AGENTS.md` defines the canonical layout for everything under `docs/`.
-- Use `docs/plans/` for current designs and solution writeups.
-- Use `docs/specs/` for executable specs.
-- Use `docs/archived/` for historical records and versioned past work.
-- Keep long-lived standards and explanatory references directly under `docs/`.
+- `docs/AGENTS.md` defines the canonical taxonomy for everything under `docs/`.
+- `docs/standards/` — long-term standards and conceptual reference docs.
+- `docs/guides/` — how-to, packaging, and usage guides.
+- `docs/plans/` — flat process/implementation plan documents only (no nested project subdirectories).
+- `docs/specs/` — living design/spec documents that continue to evolve with feature work.
+- `docs/archived/` — historical/completed/old plan documents.
 
 ### Version Control Rules
 
-1. **Current design docs**
-   - Keep active design documents in `docs/plans/`
-   - Use descriptive filenames like `database-schema.md`, `api-design.md`, and `navigation-ui-design.md`
-
-2. **Executable specs**
-   - Keep implementation-ready specs in `docs/specs/`
-   - Use dated filenames for versioned specs when helpful
-
-3. **Historical records**
-   - Move completed or superseded material into `docs/archived/`
-   - Preserve version subdirectories when they already communicate release history clearly
+1. **Standards and guides** — keep long-lived reference material in `docs/standards/` and `docs/guides/`.
+2. **Active specs** — keep design documents that evolve with feature work in `docs/specs/`.
+3. **Process docs** — keep implementation plans in `docs/plans/` (flat, no nested subdirectories).
+4. **Historical records** — move completed or superseded material into `docs/archived/`.
 
 ### Example
 
 ```
 docs/
-├── AGENTS.md                # docs layout rules
-├── core-concepts.md         # long-lived standard/reference
-├── packaging-guide.md       # long-lived standard/reference
+├── AGENTS.md                # docs layout rules (this file)
+├── standards/
+│   └── core-concepts.md     # long-lived standards
+├── guides/
+│   └── packaging-guide.md  # how-to guides
 ├── plans/
-│   ├── api-design.md        # current design
-│   ├── component-design.md  # current design
-│   └── superpowers/         # scoped current plans
+│   ├── 2026-03-22-plan.md   # process docs (flat)
+│   └── 2026-03-22-task.md   # implementation tasks
 ├── specs/
-│   ├── 2026-03-22-roadmap.md
-│   └── 2026-03-22-v0.7.1-sync-enhancement-design.md
+│   ├── api-design.md        # living design docs
+│   └── component-design.md  # evolving specs
 └── archived/
     ├── 0.4.x/
     ├── 0.5.x/
-    └── iteration-plan.md
+    └── iteration-plan.md    # old completed docs
 ```
