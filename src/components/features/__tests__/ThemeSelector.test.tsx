@@ -34,30 +34,45 @@ vi.mock("@/hooks/useGlassSettings", () => ({
 
 // Mock themes registry
 vi.mock("@/lib/themes/registry", () => ({
-  themeListWithSystem: [
-    {
-      id: "system",
-      name: "System",
-      icon: "🖥️",
-      colors: { bg: "#fff", border: "#ddd" },
-    },
+  systemThemeDisplay: {
+    id: "system",
+    name: "System",
+    nameZh: "系统",
+    icon: "🖥️",
+    type: "system",
+    colors: { bg: "#fff", border: "#ddd" },
+  },
+  lightThemes: [
     {
       id: "light",
       name: "Light",
+      nameZh: "浅色",
       icon: "☀️",
+      type: "light",
       colors: { bg: "#fff", border: "#ddd" },
     },
+  ],
+  darkThemes: [
     {
       id: "dark",
       name: "Dark",
+      nameZh: "深色",
       icon: "🌙",
+      type: "dark",
       colors: { bg: "#222", border: "#444" },
     },
+  ],
+  styleThemes: [
     {
       id: "glass",
       name: "Glass",
+      nameZh: "玻璃",
       icon: "🔮",
-      colors: { bg: "rgba(255,255,255,0.5)", border: "rgba(255,255,255,0.3)" },
+      type: "light",
+      colors: {
+        bg: "rgba(255,255,255,0.5)",
+        border: "rgba(255,255,255,0.3)",
+      },
     },
   ],
 }));
@@ -127,9 +142,11 @@ describe("ThemeSelector", () => {
       render(<ThemeSelector />);
       // Check for theme names in the rendered output
       expect(screen.getByText("System")).toBeInTheDocument();
-      expect(screen.getByText("Light")).toBeInTheDocument();
-      expect(screen.getByText("Dark")).toBeInTheDocument();
-      expect(screen.getByText("Glass")).toBeInTheDocument();
+      expect(screen.getAllByText("Light").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Dark").length).toBeGreaterThan(0);
+
+      fireEvent.click(screen.getByRole("button", { name: /Style/ }));
+      expect(screen.getByRole("button", { name: /Glass/ })).toBeInTheDocument();
     });
   });
 
@@ -138,7 +155,7 @@ describe("ThemeSelector", () => {
       render(<ThemeSelector />);
 
       // 点击 Dark 主题按钮
-      const darkButton = screen.getByText("Dark").closest("button");
+      const darkButton = screen.getAllByRole("button", { name: /Dark/ })[1];
       fireEvent.click(darkButton!);
 
       expect(mockSetTheme).toHaveBeenCalledWith("dark");
@@ -148,7 +165,7 @@ describe("ThemeSelector", () => {
       render(<ThemeSelector />);
 
       // 点击当前选中的 Light 主题
-      const lightButton = screen.getByText("Light").closest("button");
+      const lightButton = screen.getAllByRole("button", { name: /Light/ })[1];
       fireEvent.click(lightButton!);
 
       // 应该打开 Modal
@@ -168,9 +185,10 @@ describe("ThemeSelector", () => {
 
       render(<ThemeSelector />);
 
+      fireEvent.click(screen.getByRole("button", { name: /Style/ }));
+
       // 点击当前选中的 Glass 主题
-      const glassButton = screen.getByText("Glass").closest("button");
-      fireEvent.click(glassButton!);
+      fireEvent.click(screen.getByRole("button", { name: /Glass/ }));
 
       // 应该打开 Modal
       expect(screen.getByTestId("modal")).toBeInTheDocument();
@@ -189,9 +207,10 @@ describe("ThemeSelector", () => {
 
       const { rerender } = render(<ThemeSelector />);
 
+      fireEvent.click(screen.getByRole("button", { name: /Style/ }));
+
       // 点击 Glass 主题打开弹窗
-      const glassButton = screen.getByText("Glass").closest("button");
-      fireEvent.click(glassButton!);
+      fireEvent.click(screen.getByRole("button", { name: /Glass/ }));
       expect(screen.getByTestId("modal")).toBeInTheDocument();
 
       // 切换到其他主题 - 弹窗状态由组件内部管理
@@ -228,7 +247,7 @@ describe("ThemeSelector", () => {
       render(<ThemeSelector />);
 
       // Dark 按钮应该有 active 样式类
-      const darkButton = screen.getByText("Dark").closest("button");
+      const darkButton = screen.getAllByRole("button", { name: /Dark/ })[1];
       expect(darkButton).toHaveClass("border-[var(--color-primary)]");
     });
 
@@ -246,7 +265,7 @@ describe("ThemeSelector", () => {
       render(<ThemeSelector />);
 
       // Dark 按钮不应该有 active 样式类
-      const darkButton = screen.getByText("Dark").closest("button");
+      const darkButton = screen.getAllByRole("button", { name: /Dark/ })[1];
       expect(darkButton).not.toHaveClass("border-[var(--color-primary)]");
     });
   });
@@ -265,9 +284,10 @@ describe("ThemeSelector", () => {
 
       render(<ThemeSelector />);
 
+      fireEvent.click(screen.getByRole("button", { name: /Style/ }));
+
       // 点击 Glass 主题
-      const glassButton = screen.getByText("Glass").closest("button");
-      fireEvent.click(glassButton!);
+      fireEvent.click(screen.getByRole("button", { name: /Glass/ }));
 
       expect(screen.getByTestId("modal-title")).toHaveTextContent(
         "Theme Settings",
@@ -287,9 +307,10 @@ describe("ThemeSelector", () => {
 
       render(<ThemeSelector />);
 
+      fireEvent.click(screen.getByRole("button", { name: /Style/ }));
+
       // 点击 Glass 主题打开弹窗
-      const glassButton = screen.getByText("Glass").closest("button");
-      fireEvent.click(glassButton!);
+      fireEvent.click(screen.getByRole("button", { name: /Glass/ }));
       expect(screen.getByTestId("modal")).toBeInTheDocument();
 
       // 点击关闭按钮
@@ -305,7 +326,7 @@ describe("ThemeSelector", () => {
     it("点击后按钮失去焦点", () => {
       render(<ThemeSelector />);
 
-      const darkButton = screen.getByText("Dark").closest("button");
+      const darkButton = screen.getAllByRole("button", { name: /Dark/ })[1];
 
       // 模拟点击事件
       fireEvent.click(darkButton!);

@@ -17,6 +17,7 @@ import type { Plan, Task, Tag } from "@/lib/types";
 // Mock the API functions
 vi.mock("@/lib/api", () => ({
   getPlans: vi.fn(),
+  getPlan: vi.fn(),
   getTasksByPlan: vi.fn(),
   getEntityTags: vi.fn(),
   setEntityTags: vi.fn(),
@@ -27,6 +28,7 @@ vi.mock("@/lib/api", () => ({
 
 import {
   getPlans,
+  getPlan,
   getTasksByPlan,
   getEntityTags,
   setEntityTags,
@@ -147,7 +149,7 @@ describe("usePlans", () => {
 
   describe("usePlan (get single plan)", () => {
     it("should return plan by id", async () => {
-      vi.mocked(getPlans).mockResolvedValue(mockPlans);
+      vi.mocked(getPlan).mockResolvedValue(mockPlans[0]);
 
       const { result } = renderHook(() => usePlan("plan-1"), {
         wrapper: createWrapper(),
@@ -159,7 +161,9 @@ describe("usePlans", () => {
     });
 
     it("should throw error when plan not found", async () => {
-      vi.mocked(getPlans).mockResolvedValue([]);
+      vi.mocked(getPlan).mockRejectedValue(
+        new Error('plans with id "non-existent" not found'),
+      );
 
       const { result } = renderHook(() => usePlan("non-existent"), {
         wrapper: createWrapper(),

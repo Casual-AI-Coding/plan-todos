@@ -18,6 +18,7 @@ import type { Milestone, Plan, Target, Circulation } from "@/lib/types";
 // Mock the API functions
 vi.mock("@/lib/api", () => ({
   getMilestones: vi.fn(),
+  getMilestone: vi.fn(),
   getPlans: vi.fn(),
   getTargets: vi.fn(),
   getCirculations: vi.fn(),
@@ -28,6 +29,7 @@ vi.mock("@/lib/api", () => ({
 
 import {
   getMilestones,
+  getMilestone,
   getPlans,
   getTargets,
   getCirculations,
@@ -170,7 +172,7 @@ describe("useMilestones", () => {
 
   describe("useMilestone (get single milestone)", () => {
     it("should return milestone by id", async () => {
-      vi.mocked(getMilestones).mockResolvedValue(mockMilestones);
+      vi.mocked(getMilestone).mockResolvedValue(mockMilestones[0]);
 
       const { result } = renderHook(() => useMilestone("milestone-1"), {
         wrapper: createWrapper(),
@@ -182,7 +184,9 @@ describe("useMilestones", () => {
     });
 
     it("should throw error when milestone not found", async () => {
-      vi.mocked(getMilestones).mockResolvedValue([]);
+      vi.mocked(getMilestone).mockRejectedValue(
+        new Error('milestones with id "non-existent" not found'),
+      );
 
       const { result } = renderHook(() => useMilestone("non-existent"), {
         wrapper: createWrapper(),
