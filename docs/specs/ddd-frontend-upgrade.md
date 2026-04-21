@@ -3,7 +3,7 @@
 > 版本: v2.0
 > 日期: 2026-04-20
 > 状态: 方案设计
-> 关联: docs/plans/architecture-upgrade-design.md (Phase 1-3 已完成)
+> 关联: docs/specs/architecture-upgrade-design.md (Phase 1-3 已完成)
 
 ---
 
