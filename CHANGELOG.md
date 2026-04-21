@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-04-21
+
+### Refactored
+
+**Documentation Taxonomy Restructuring**:
+
+- Reorganize `docs/` into canonical taxonomy (standards/, guides/, plans/, specs/, archived/)
+- Move historical iteration docs into `docs/archived/`
+- Establish `docs/AGENTS.md` as the definitive taxonomy guide
+- Remove obsolete `docs/superpowers/` paths
+- Update all doc references to reflect new structure
+
+**Frontend DDD Domain Layer (Phase 2)**:
+
+- Establish `src/domain/` layer with service migration
+- Extract `ViewRouter` and `MobileSidebar` from `page.tsx` god component
+- Phase 2B: Extract shared view logic with `useEntityOperations` and `useEntityFilter` hooks
+- Phase 2C: Complete Sidebar/BottomNav i18n cleanup
+- Create generic CRUD hook factory, eliminating ~550 lines of duplicate code
+- Extract config constants, i18n configuration, and navigation config
+
+**Component Architecture**:
+
+- Add `MobileSidebar` component for mobile navigation
+- Add `ViewRouter` for centralized view routing logic
+- Refactor `Sidebar` with improved i18n support
+- Add `useMilestoneLinkLabel` hook for consistent milestone labels
+
+### Fixed
+
+**UI/UX Fixes**:
+
+- Defer completion animation effect updates to prevent jank
+- Initialize sidebar state lazily to improve initial load
+- Stabilize `CirculationsView` loading state
+- Align system `isDark` with effective theme
+
+**Test Stability**:
+
+- Update view assertions for refactored components
+- Stabilize `ThemeSelector` test queries
+- Align view hook mocks with refactored APIs
+- Add toast provider to settings view tests
+
 ## [0.8.0] - 2026-04-20
 
 ### Refactored
