@@ -51,6 +51,8 @@ interface CirculationsViewProps {
   mode?: ViewMode;
 }
 
+const EMPTY_CIRCULATIONS: Circulation[] = [];
+
 // Sortable Card Component
 interface SortableCardProps {
   circulation: Circulation;
@@ -367,7 +369,8 @@ export function CirculationsView({ mode = "today" }: CirculationsViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>(mode);
 
   // React Query for data fetching
-  const { data: circulations = [], isLoading } = useCirculations();
+  const { data: circulationData, isLoading } = useCirculations();
+  const circulations = circulationData ?? EMPTY_CIRCULATIONS;
 
   // Track if stats are being loaded
   const [statsLoading, setStatsLoading] = useState(false);
