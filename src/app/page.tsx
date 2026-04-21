@@ -9,18 +9,16 @@ import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
 import { CirculationDetailView } from "./views";
 
+function getInitialSidebarCollapsed(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED) === "true";
+}
+
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [, setSidebarCollapsed] = useState(getInitialSidebarCollapsed);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
-    if (saved === "true") {
-      setSidebarCollapsed(true);
-    }
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
