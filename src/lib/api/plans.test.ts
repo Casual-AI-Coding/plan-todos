@@ -118,7 +118,7 @@ describe("getPlans", () => {
 
     const result = await getPlans();
 
-    expect(invoke).toHaveBeenCalledWith("get_plans");
+    expect(invoke).toHaveBeenCalledWith("get_plans", undefined);
     expect(result).toEqual(mockPlans);
   });
 

@@ -37,7 +37,7 @@ describe("Target API", () => {
     it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
       await expect(getTarget("target-1")).rejects.toThrow(
-        "This app must run in Tauri to get target",
+        "此操作需要在 Tauri 环境中运行: 获取 Target",
       );
     });
 
@@ -83,7 +83,7 @@ describe("Target API", () => {
       vi.mocked(isTauri).mockReturnValue(false);
       const params: CreateTargetParams = { title: "New Target" };
       await expect(createTarget(params)).rejects.toThrow(
-        "This app must run in Tauri to create targets",
+        "此操作需要在 Tauri 环境中运行: 创建 Target",
       );
     });
 
@@ -131,7 +131,7 @@ describe("Target API", () => {
       vi.mocked(isTauri).mockReturnValue(false);
       await expect(
         updateTarget("target-1", { title: "Updated" }),
-      ).rejects.toThrow("This app must run in Tauri to update targets");
+      ).rejects.toThrow("此操作需要在 Tauri 环境中运行: 更新 Target");
     });
 
     it("should call invoke with update_target command", async () => {
@@ -160,7 +160,7 @@ describe("Target API", () => {
     it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
       await expect(deleteTarget("target-1")).rejects.toThrow(
-        "This app must run in Tauri to delete targets",
+        "此操作需要在 Tauri 环境中运行: 删除 Target",
       );
     });
 

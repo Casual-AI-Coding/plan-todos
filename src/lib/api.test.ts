@@ -248,19 +248,19 @@ describe("API Functions - Target Write Operations (non-Tauri)", () => {
 
   it("createTarget throws error when not in Tauri", async () => {
     await expect(createTarget({ title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to create targets",
+      "此操作需要在 Tauri 环境中运行: 创建 Target",
     );
   });
 
   it("updateTarget throws error when not in Tauri", async () => {
     await expect(updateTarget("id", { title: "Test" })).rejects.toThrow(
-      "This app must run in Tauri to update targets",
+      "此操作需要在 Tauri 环境中运行: 更新 Target",
     );
   });
 
   it("deleteTarget throws error when not in Tauri", async () => {
     await expect(deleteTarget("id")).rejects.toThrow(
-      "This app must run in Tauri to delete targets",
+      "此操作需要在 Tauri 环境中运行: 删除 Target",
     );
   });
 });
