@@ -1154,7 +1154,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 - 添加迭代计划文档 (docs/plans/iteration-plan.md)
-- 重组文档目录，归档旧版本文档到 docs/plans/archived/
+- 重组文档目录，归档旧版本文档到 docs/archived/
 
 ---
 

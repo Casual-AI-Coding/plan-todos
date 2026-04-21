@@ -528,34 +528,46 @@ Before marking any work as complete:
 
 ## Documentation Guidelines
 
+> Canonical docs taxonomy: see `docs/AGENTS.md`.
+
 ### File Location
 
-**设计文档**保存在 `docs/plans/` 目录：
-
-- `docs/plans/*.md` - 各模块最新设计文档
-- `docs/plans/v1/` - 历史版本归档
+- `docs/AGENTS.md` defines the canonical layout for everything under `docs/`.
+- Use `docs/plans/` for current designs and solution writeups.
+- Use `docs/specs/` for executable specs.
+- Use `docs/archived/` for historical records and versioned past work.
+- Keep long-lived standards and explanatory references directly under `docs/`.
 
 ### Version Control Rules
 
-1. **更新独立设计文档**
-   - 各模块设计文档保持在根目录
-   - 如 `database-schema.md`、`api-design.md` 等
+1. **Current design docs**
+   - Keep active design documents in `docs/plans/`
+   - Use descriptive filenames like `database-schema.md`, `api-design.md`, and `navigation-ui-design.md`
 
-2. **历史归档到子目录**
-   - 创建版本子目录如 `v1/`, `v2/`
-   - 将完整旧版本设计移动到归档目录
-   - 文件名包含版本号如 `2026-02-13-todo-plan-design-v1.md`
+2. **Executable specs**
+   - Keep implementation-ready specs in `docs/specs/`
+   - Use dated filenames for versioned specs when helpful
+
+3. **Historical records**
+   - Move completed or superseded material into `docs/archived/`
+   - Preserve version subdirectories when they already communicate release history clearly
 
 ### Example
 
 ```
-docs/plans/
-├── navigation-ui-design.md    # 最新 UI 设计
-├── core-concepts.md          # 最新核心概念
-├── database-schema.md       # 最新数据库设计
-├── api-design.md            # 最新 API 设计
-├── component-design.md      # 最新组件设计
-├── v1/
-│   └── 2026-02-13-todo-plan-design-v1.md  # 旧版归档
-└── v2/                      # 未来版本
+docs/
+├── AGENTS.md                # docs layout rules
+├── core-concepts.md         # long-lived standard/reference
+├── packaging-guide.md       # long-lived standard/reference
+├── plans/
+│   ├── api-design.md        # current design
+│   ├── component-design.md  # current design
+│   └── superpowers/         # scoped current plans
+├── specs/
+│   ├── 2026-03-22-roadmap.md
+│   └── 2026-03-22-v0.7.1-sync-enhancement-design.md
+└── archived/
+    ├── 0.4.x/
+    ├── 0.5.x/
+    └── iteration-plan.md
 ```
