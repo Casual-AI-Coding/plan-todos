@@ -46,6 +46,31 @@ describe("useHotkey", () => {
     expect(mockUnregister).toHaveBeenCalledWith("new-todo");
   });
 
+  it("should invoke the latest callback through the registered wrapper", () => {
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+
+    const { rerender } = renderHook(
+      ({ callback }) => useHotkey("new-todo", callback),
+      {
+        initialProps: { callback: firstCallback },
+      },
+    );
+
+    const registeredCallback = mockRegister.mock.calls[0]?.[2] as
+      | (() => void)
+      | undefined;
+
+    rerender({ callback: secondCallback });
+
+    act(() => {
+      registeredCallback?.();
+    });
+
+    expect(firstCallback).not.toHaveBeenCalled();
+    expect(secondCallback).toHaveBeenCalledTimes(1);
+  });
+
   it("should warn for unknown action", () => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const callback = vi.fn();
@@ -101,5 +126,28 @@ describe("useHotkeys", () => {
     unmount();
 
     expect(mockUnregister).toHaveBeenCalledTimes(2);
+  });
+
+  it("should skip unknown actions without throwing", () => {
+    const callback = vi.fn();
+
+    expect(() => {
+      renderHook(() =>
+        useHotkeys([
+          { action: "new-todo", callback },
+          {
+            action: "unknown-action" as keyof typeof DEFAULT_HOTKEYS,
+            callback,
+          },
+        ]),
+      );
+    }).not.toThrow();
+
+    expect(mockRegister).toHaveBeenCalledTimes(1);
+    expect(mockRegister).toHaveBeenCalledWith(
+      "new-todo",
+      expect.objectContaining({ key: "n", ctrl: true }),
+      callback,
+    );
   });
 });

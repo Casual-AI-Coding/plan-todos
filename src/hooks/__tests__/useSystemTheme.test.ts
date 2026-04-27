@@ -98,6 +98,14 @@ describe("useSystemTheme", () => {
       );
     });
 
+    it("should query the dark-mode media preference on mount", () => {
+      renderHook(() => useSystemTheme());
+
+      expect(mockMatchMedia).toHaveBeenCalledWith(
+        "(prefers-color-scheme: dark)",
+      );
+    });
+
     it("卸载时应该移除与注册时相同的监听器", () => {
       const { unmount } = renderHook(() => useSystemTheme());
 

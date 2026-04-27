@@ -281,6 +281,65 @@ describe("useTasks", () => {
         }),
       ).rejects.toThrow("Failed to update");
     });
+
+    it("should return undefined from the cache updater when no previous tasks exist", async () => {
+      const updatedTask = { ...mockTasks[0], title: "Updated Title" };
+      vi.mocked(updateTask).mockResolvedValue(updatedTask);
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      });
+
+      const setQueryDataSpy = vi.spyOn(queryClient, "setQueryData");
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      );
+
+      const { result } = renderHook(() => useUpdateTask(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.mutateAsync({
+          id: "task-1",
+          title: "Updated Title",
+        });
+      });
+
+      const updater = setQueryDataSpy.mock.calls[0]?.[1] as
+        | ((old: Task[] | undefined) => Task[] | undefined)
+        | undefined;
+
+      expect(updater?.(undefined)).toBeUndefined();
+    });
+
+    it("should replace the matching task in cache and keep non-matching tasks", async () => {
+      const updatedTask = { ...mockTasks[0], title: "Updated Title" };
+      vi.mocked(updateTask).mockResolvedValue(updatedTask);
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      });
+
+      queryClient.setQueryData(taskKeys.tasks, mockTasks);
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      );
+
+      const { result } = renderHook(() => useUpdateTask(), {
+        wrapper,
+      });
+
+      await act(async () => {
+        await result.current.mutateAsync({
+          id: "task-1",
+          title: "Updated Title",
+        });
+      });
+
+      expect(queryClient.getQueryData(taskKeys.tasks)).toEqual([
+        updatedTask,
+        mockTasks[1],
+      ]);
+    });
   });
 
   describe("useDeleteTask (delete task)", () => {

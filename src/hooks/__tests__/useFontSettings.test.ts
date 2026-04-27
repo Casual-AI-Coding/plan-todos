@@ -41,8 +41,25 @@ describe("useFontSettings", () => {
     );
   });
 
+  it("falls back to localStorage when the DOM font size is non-numeric", () => {
+    document.documentElement.style.setProperty("--font-size-base", "abc");
+    localStorage.setItem(STORAGE_KEYS.FONT_SIZE, "19");
+
+    const { result } = renderHook(() => useFontSettings());
+
+    expect(result.current.fontSize).toBe(19);
+  });
+
   it("ignores invalid stored font sizes and falls back to the default", () => {
     localStorage.setItem(STORAGE_KEYS.FONT_SIZE, "200");
+
+    const { result } = renderHook(() => useFontSettings());
+
+    expect(result.current.fontSize).toBe(16);
+  });
+
+  it("ignores out-of-range localStorage values even when they parse correctly", () => {
+    localStorage.setItem(STORAGE_KEYS.FONT_SIZE, String(FONT_SIZE.MIN - 1));
 
     const { result } = renderHook(() => useFontSettings());
 
