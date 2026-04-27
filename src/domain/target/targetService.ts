@@ -1,5 +1,5 @@
 import type { Target } from "@/lib/types";
-import type { TargetStatus, ProgressCategory } from "@/domain/shared/domainTypes";
+import type { ProgressCategory } from "@/domain/shared/domainTypes";
 
 export interface TargetProgress {
   id: string;
