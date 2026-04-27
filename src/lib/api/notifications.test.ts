@@ -602,9 +602,8 @@ describe("Notification API", () => {
       vi.mocked(isTauri).mockReturnValue(true);
       mockInvoke.mockResolvedValue(true);
 
-      const result = await deleteCirculationNotificationSettings(
-        "circulation-1",
-      );
+      const result =
+        await deleteCirculationNotificationSettings("circulation-1");
 
       expect(mockInvoke).toHaveBeenCalledWith(
         "delete_circulation_notification_settings",
@@ -705,9 +704,9 @@ describe("Notification API", () => {
     it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
 
-      await expect(
-        getCirculationsWithNotificationSettings(),
-      ).rejects.toThrow("This app must run in Tauri");
+      await expect(getCirculationsWithNotificationSettings()).rejects.toThrow(
+        "This app must run in Tauri",
+      );
     });
 
     it("should call invoke with get_circulations_with_notification_settings command", async () => {

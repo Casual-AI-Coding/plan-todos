@@ -421,7 +421,11 @@ describe("Bulk API Functions", () => {
       };
       mockInvoke.mockResolvedValue(mockResult);
 
-      const result = await bulkRemoveTags("plan", ["plan-1", "plan-2"], "tag-2");
+      const result = await bulkRemoveTags(
+        "plan",
+        ["plan-1", "plan-2"],
+        "tag-2",
+      );
 
       expect(mockInvoke).toHaveBeenCalledWith("bulk_remove_tags", {
         entity_type: "plan",

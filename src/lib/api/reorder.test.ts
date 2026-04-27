@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ReorderItem } from "@/lib/api/reorder";
-import {
-  reorderPlans,
-  reorderTargets,
-  reorderTodos,
-} from "@/lib/api/reorder";
+import { reorderPlans, reorderTargets, reorderTodos } from "@/lib/api/reorder";
 
 const { mockInvoke, mockIsTauri } = vi.hoisted(() => ({
   mockInvoke: vi.fn(),
