@@ -110,11 +110,11 @@ export async function updateSyncConfig(
   return withTauriError("更新同步配置", async () => {
     return invoke<void>("update_sync_config", {
       enabled: params.enabled,
-      serverUrl: params.server_url,
+      server_url: params.server_url,
       username: params.username,
-      remotePath: params.remote_path,
-      syncIntervalMinutes: params.sync_interval_minutes,
-      conflictStrategy: params.conflict_strategy,
+      remote_path: params.remote_path,
+      sync_interval_minutes: params.sync_interval_minutes,
+      conflict_strategy: params.conflict_strategy,
     });
   });
 }
@@ -130,7 +130,7 @@ export async function testSyncConnection(
 ): Promise<boolean> {
   return withTauriError("测试同步连接", async () => {
     return invoke<boolean>("test_sync_connection", {
-      serverUrl,
+      server_url: serverUrl,
       username,
       password,
     });
@@ -227,7 +227,7 @@ export async function getDevices(): Promise<DeviceInfo[]> {
 
 export async function unregisterDevice(deviceId: string): Promise<void> {
   return withTauriError("注销设备", async () => {
-    return invoke<void>("unregister_device", { deviceId });
+    return invoke<void>("unregister_device", { device_id: deviceId });
   });
 }
 
@@ -248,9 +248,9 @@ export async function resolveConflict(
 ): Promise<void> {
   return withTauriError("解决冲突", async () => {
     return invoke<void>("resolve_conflict", {
-      conflictId,
+      conflict_id: conflictId,
       resolution,
-      mergedData,
+      merged_data: mergedData,
     });
   });
 }

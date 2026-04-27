@@ -86,9 +86,9 @@ export async function bulkAddTags(
   tagId: string,
 ): Promise<BulkTagResult> {
   return await invoke<BulkTagResult>("bulk_add_tags", {
-    entityType,
-    entityIds,
-    tagId,
+    entity_type: entityType,
+    entity_ids: entityIds,
+    tag_id: tagId,
   });
 }
 
@@ -101,8 +101,8 @@ export async function bulkRemoveTags(
   tagId: string,
 ): Promise<BulkTagResult> {
   return await invoke<BulkTagResult>("bulk_remove_tags", {
-    entityType,
-    entityIds,
-    tagId,
+    entity_type: entityType,
+    entity_ids: entityIds,
+    tag_id: tagId,
   });
 }

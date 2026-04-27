@@ -26,7 +26,7 @@ export async function createTarget(data: CreateTargetParams): Promise<Target> {
     return invoke<Target>("create_target", {
       title: data.title,
       description: data.description || null,
-      dueDate: data.due_date || null,
+      due_date: data.due_date || null,
     });
   });
 }
@@ -40,7 +40,7 @@ export async function updateTarget(
       id,
       title: data.title,
       description: data.description,
-      dueDate: data.due_date,
+      due_date: data.due_date,
       status: data.status,
     });
   });

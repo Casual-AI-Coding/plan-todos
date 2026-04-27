@@ -36,7 +36,7 @@ export async function getMilestonesByTarget(
     "milestones by target",
     async () => {
       const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Milestone[]>("get_milestones_by_target", { targetId });
+      return invoke<Milestone[]>("get_milestones_by_target", { target_id: targetId });
     },
     [],
   );
@@ -49,9 +49,9 @@ export async function createMilestone(
     const { invoke } = await import("@tauri-apps/api/core");
     return invoke<Milestone>("create_milestone", {
       title: data.title,
-      targetDate: data.target_date || null,
-      bizType: data.biz_type || null,
-      bizId: data.biz_id || null,
+      target_date: data.target_date || null,
+      biz_type: data.biz_type || null,
+      biz_id: data.biz_id || null,
     });
   });
 }
@@ -65,7 +65,9 @@ export async function updateMilestone(
     return invoke<Milestone>("update_milestone", {
       id,
       title: data.title,
-      targetDate: data.target_date,
+      target_date: data.target_date,
+      biz_type: data.biz_type,
+      biz_id: data.biz_id,
       status: data.status,
     });
   });
