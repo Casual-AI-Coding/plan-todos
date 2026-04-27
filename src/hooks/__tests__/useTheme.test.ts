@@ -1,6 +1,12 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { useTheme } from "../useTheme";
+import {
+  applyCustomColors,
+  loadCustomColors,
+  saveCustomColors,
+  useTheme,
+} from "../useTheme";
+import { logger } from "@/lib/utils/logger";
 
 // Mock dependencies
 vi.mock("@/lib/utils/logger", () => ({
@@ -188,6 +194,80 @@ describe("useTheme", () => {
 
       // Should fall back to light
       expect(result.current.theme).toBe("light");
+      expect(logger.warn).toHaveBeenCalledWith(
+        "Invalid theme: invalid-theme, falling back to light",
+      );
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "plan-todos-theme",
+        "light",
+      );
+    });
+
+    it("切换到 custom 主题时应该应用自定义颜色", () => {
+      mockMatchMedia.mockReturnValue({ matches: false });
+      mockLocalStorage.getItem.mockImplementation((key: string) => {
+        if (key === "plan-todos-custom-theme-colors") {
+          return JSON.stringify({
+            primary: "#111111",
+            secondary: "#222222",
+            bg: "#333333",
+            bgCard: "#444444",
+            text: "#555555",
+            textMuted: "#666666",
+          });
+        }
+        return null;
+      });
+
+      const { result } = renderHook(() => useTheme());
+
+      act(() => {
+        result.current.setTheme("custom");
+      });
+
+      expect(mockDocumentElement.setAttribute).toHaveBeenCalledWith(
+        "data-theme",
+        "custom",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-primary",
+        "#111111",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-text-muted",
+        "#666666",
+      );
+    });
+
+    it("离开 custom 主题时应该清理自定义颜色", () => {
+      mockMatchMedia.mockReturnValue({ matches: false });
+      mockLocalStorage.getItem.mockImplementation((key: string) => {
+        if (key === "plan-todos-custom-theme-colors") {
+          return JSON.stringify({
+            primary: "#111111",
+            secondary: "#222222",
+            bg: "#333333",
+            bgCard: "#444444",
+            text: "#555555",
+            textMuted: "#666666",
+          });
+        }
+        return null;
+      });
+
+      const { result } = renderHook(() => useTheme());
+
+      act(() => {
+        result.current.setTheme("custom");
+        result.current.setTheme("dark");
+      });
+
+      expect(mockDocumentElement.style.removeProperty).toHaveBeenCalledWith(
+        "--color-primary",
+      );
+      expect(mockDocumentElement.style.removeProperty).toHaveBeenCalledWith(
+        "--color-text-muted",
+      );
     });
   });
 
@@ -289,6 +369,21 @@ describe("useTheme", () => {
         expect.any(Function),
       );
     });
+
+    it("非 system 模式下不应该监听系统主题变化", () => {
+      const mockAddEventListener = vi.fn();
+
+      mockMatchMedia.mockReturnValue({
+        matches: false,
+        addEventListener: mockAddEventListener,
+        removeEventListener: vi.fn(),
+      });
+      mockLocalStorage.getItem.mockReturnValue("dark");
+
+      renderHook(() => useTheme());
+
+      expect(mockAddEventListener).not.toHaveBeenCalled();
+    });
   });
 
   describe("主题验证", () => {
@@ -309,6 +404,32 @@ describe("useTheme", () => {
         "catppuccin",
         "tokyoNight",
         "oneDark",
+        "pastel",
+        "mint",
+        "lavender",
+        "ocean",
+        "rose",
+        "ayuLight",
+        "githubLight",
+        "midnight",
+        "purple",
+        "forest",
+        "coffee",
+        "sunset",
+        "nightOwl",
+        "cobalt2",
+        "ayuMirage",
+        "blackMyth",
+        "cyberpunk",
+        "halloween",
+        "christmas",
+        "handwritten",
+        "cottagecore",
+        "vaporwave",
+        "darkAcademia",
+        "kawaii",
+        "retro90s",
+        "custom",
         "system",
       ];
 
@@ -320,6 +441,96 @@ describe("useTheme", () => {
         });
         expect(result.current.theme).toBe(theme);
       }
+    });
+
+    it("应该忽略无效的 DOM 主题并回退到 localStorage", () => {
+      mockMatchMedia.mockReturnValue({ matches: false });
+      mockDocumentElement.getAttribute.mockReturnValue("not-a-theme");
+      mockLocalStorage.getItem.mockReturnValue("dark");
+
+      const { result } = renderHook(() => useTheme());
+
+      expect(result.current.theme).toBe("dark");
+    });
+
+    it("当 localStorage 中的主题无效时应该回退到系统偏好", () => {
+      mockMatchMedia.mockReturnValue({ matches: true });
+      mockDocumentElement.getAttribute.mockReturnValue(null);
+      mockLocalStorage.getItem.mockReturnValue("not-a-theme");
+
+      const { result } = renderHook(() => useTheme());
+
+      expect(result.current.theme).toBe("dark");
+      expect(result.current.isDark).toBe(true);
+    });
+  });
+
+  describe("自定义颜色工具函数", () => {
+    it("loadCustomColors 在 JSON 无效时应返回默认值", () => {
+      mockLocalStorage.getItem.mockReturnValue("not-json");
+
+      expect(loadCustomColors()).toEqual({
+        primary: "#14B8A6",
+        secondary: "#2DD4BF",
+        bg: "#0F172A",
+        bgCard: "#1E293B",
+        text: "#F1F5F9",
+        textMuted: "#94A3B8",
+      });
+    });
+
+    it("saveCustomColors 应该写入 localStorage", () => {
+      const colors = {
+        primary: "#101010",
+        secondary: "#202020",
+        bg: "#303030",
+        bgCard: "#404040",
+        text: "#505050",
+        textMuted: "#606060",
+      };
+
+      saveCustomColors(colors);
+
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+        "plan-todos-custom-theme-colors",
+        JSON.stringify(colors),
+      );
+    });
+
+    it("applyCustomColors 应该设置所有 CSS 变量", () => {
+      applyCustomColors({
+        primary: "#101010",
+        secondary: "#202020",
+        bg: "#303030",
+        bgCard: "#404040",
+        text: "#505050",
+        textMuted: "#606060",
+      });
+
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-primary",
+        "#101010",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-secondary",
+        "#202020",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-bg",
+        "#303030",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-bg-card",
+        "#404040",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-text",
+        "#505050",
+      );
+      expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith(
+        "--color-text-muted",
+        "#606060",
+      );
     });
   });
 });

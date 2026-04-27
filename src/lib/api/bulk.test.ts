@@ -8,7 +8,10 @@ import {
   bulkDeletePlans,
   bulkUpdateTargets,
   bulkDeleteTargets,
+  bulkAddTags,
+  bulkRemoveTags,
 } from "@/lib/api/bulk";
+import type { BulkTagResult } from "@/lib/api/bulk";
 // Use vi.hoisted to create mock reference before vi.mock
 const { mockInvoke } = vi.hoisted(() => ({
   mockInvoke: vi.fn(),
@@ -384,6 +387,48 @@ describe("Bulk API Functions", () => {
         ids: specialIds,
       });
       expect(result.updated).toBe(3);
+    });
+  });
+
+  describe("bulkAddTags", () => {
+    it("should call invoke with correct bulk_add_tags parameters", async () => {
+      const mockResult: BulkTagResult = {
+        entity_type: "todo",
+        tag_id: "tag-1",
+        success_count: 2,
+        failed_ids: [],
+      };
+      mockInvoke.mockResolvedValue(mockResult);
+
+      const result = await bulkAddTags("todo", ["todo-1", "todo-2"], "tag-1");
+
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_add_tags", {
+        entity_type: "todo",
+        entity_ids: ["todo-1", "todo-2"],
+        tag_id: "tag-1",
+      });
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe("bulkRemoveTags", () => {
+    it("should call invoke with correct bulk_remove_tags parameters", async () => {
+      const mockResult: BulkTagResult = {
+        entity_type: "plan",
+        tag_id: "tag-2",
+        success_count: 1,
+        failed_ids: ["plan-2"],
+      };
+      mockInvoke.mockResolvedValue(mockResult);
+
+      const result = await bulkRemoveTags("plan", ["plan-1", "plan-2"], "tag-2");
+
+      expect(mockInvoke).toHaveBeenCalledWith("bulk_remove_tags", {
+        entity_type: "plan",
+        entity_ids: ["plan-1", "plan-2"],
+        tag_id: "tag-2",
+      });
+      expect(result).toEqual(mockResult);
     });
   });
 });

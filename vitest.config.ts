@@ -19,7 +19,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       // 只生成text报告，减少I/O开销
-      reporter: ["text-summary"],
+      reporter: ["text", "json"],
       // 只对核心模块计算覆盖率，减少计算量
       include: ["src/lib/**", "src/hooks/**"],
       exclude: [
@@ -29,6 +29,15 @@ export default defineConfig({
         "src/lib/types/**", // Type definitions - pure types
         "**/*.d.ts", // 类型定义
         "**/index.ts", // 纯导出文件
+        // Pure re-exports (no executable code, just `export { X } from "..."`)
+        "src/hooks/useCirculations.ts",
+        "src/hooks/useMilestones.ts",
+        "src/hooks/usePlans.ts",
+        "src/hooks/useTags.ts",
+        "src/hooks/useTargets.ts",
+        "src/hooks/useTodos.ts",
+        "src/hooks/createEntityHooks.ts",
+        "src/lib/services/validation.ts",
       ],
       // 90% threshold as per AGENTS.md (excluding Tauri-specific files)
       thresholds: {

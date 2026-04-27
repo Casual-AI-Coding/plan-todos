@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { AboutCard } from "../AboutCard";
 
 // Mock package.json
-vi.mock("../../../package.json", () => ({
+vi.mock("../../../../package.json", () => ({
   default: {
     version: "0.8.3",
   },

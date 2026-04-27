@@ -1,8 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  deserializeRecurrence,
+  formatRecurrence,
+  hasRecurrenceEnded,
   validateRecurrence,
   calculateNextDueDate,
   createNextOccurrence,
+  serializeRecurrence,
+  shouldCreateNextOccurrence,
 } from "../recurrenceService";
 import type { Recurrence, Todo } from "@/lib/types/todo";
 
@@ -332,5 +337,205 @@ describe("createNextOccurrence", () => {
 
     const next = createNextOccurrence(todo);
     expect(next).toBeNull();
+  });
+});
+
+describe("shouldCreateNextOccurrence", () => {
+  const baseTodo: Todo = {
+    id: "todo-recurring",
+    title: "Recurring task",
+    content: null,
+    due_date: "2024-01-15T00:00:00.000Z",
+    status: "pending",
+    priority: "P2",
+    sort_order: 0,
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-15T00:00:00.000Z",
+    tags: [],
+  };
+
+  it("returns true for a completed recurring todo", () => {
+    expect(
+      shouldCreateNextOccurrence({
+        ...baseTodo,
+        status: "done",
+        recurrence: { type: "daily", interval: 1 },
+      }),
+    ).toBe(true);
+  });
+
+  it("returns false when the todo is not completed", () => {
+    expect(
+      shouldCreateNextOccurrence({
+        ...baseTodo,
+        status: "pending",
+        recurrence: { type: "daily", interval: 1 },
+      }),
+    ).toBe(false);
+  });
+
+  it("returns false when recurrence is missing", () => {
+    expect(
+      shouldCreateNextOccurrence({
+        ...baseTodo,
+        status: "done",
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("serializeRecurrence", () => {
+  it("serializes a recurrence configuration to JSON", () => {
+    const recurrence: Recurrence = {
+      type: "weekly",
+      interval: 2,
+      daysOfWeek: [1, 3, 5],
+      endDate: "2025-12-31",
+      maxOccurrences: 10,
+    };
+
+    expect(serializeRecurrence(recurrence)).toBe(JSON.stringify(recurrence));
+  });
+});
+
+describe("deserializeRecurrence", () => {
+  it("deserializes a stored recurrence configuration", () => {
+    const json =
+      '{"type":"monthly","interval":3,"dayOfMonth":15,"maxOccurrences":4}';
+
+    expect(deserializeRecurrence(json)).toEqual({
+      type: "monthly",
+      interval: 3,
+      dayOfMonth: 15,
+      maxOccurrences: 4,
+    });
+  });
+
+  it("returns null when the stored value is null", () => {
+    expect(deserializeRecurrence(null)).toBeNull();
+  });
+
+  it("returns null for invalid JSON", () => {
+    expect(deserializeRecurrence("{invalid-json}")).toBeNull();
+  });
+});
+
+describe("hasRecurrenceEnded", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("returns true when max occurrences has been reached", () => {
+    expect(
+      hasRecurrenceEnded(
+        { type: "daily", interval: 1, maxOccurrences: 3 },
+        3,
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false when max occurrences has not been reached", () => {
+    expect(
+      hasRecurrenceEnded(
+        { type: "daily", interval: 1, maxOccurrences: 3 },
+        2,
+      ),
+    ).toBe(false);
+  });
+
+  it("returns true when the end date is today", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-05-10T00:00:00.000Z"));
+
+    expect(
+      hasRecurrenceEnded(
+        { type: "daily", interval: 1, endDate: "2025-05-10T00:00:00.000Z" },
+        0,
+      ),
+    ).toBe(true);
+  });
+
+  it("returns true when the current date is after the end date", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-05-11T00:00:00.000Z"));
+
+    expect(
+      hasRecurrenceEnded(
+        { type: "daily", interval: 1, endDate: "2025-05-10T00:00:00.000Z" },
+        0,
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false when the end date is still in the future", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-05-09T00:00:00.000Z"));
+
+    expect(
+      hasRecurrenceEnded(
+        { type: "daily", interval: 1, endDate: "2025-05-10T00:00:00.000Z" },
+        0,
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when no end condition is configured", () => {
+    expect(hasRecurrenceEnded({ type: "daily", interval: 1 }, 99)).toBe(
+      false,
+    );
+  });
+});
+
+describe("formatRecurrence", () => {
+  it("formats daily recurrence", () => {
+    expect(formatRecurrence({ type: "daily", interval: 1 })).toBe("Every day");
+    expect(formatRecurrence({ type: "daily", interval: 3 })).toBe(
+      "Every 3 days",
+    );
+  });
+
+  it("formats weekly recurrence with specific days", () => {
+    expect(
+      formatRecurrence({ type: "weekly", interval: 1, daysOfWeek: [1, 3] }),
+    ).toBe("Weekly on Mon, Wed");
+
+    expect(
+      formatRecurrence({ type: "weekly", interval: 2, daysOfWeek: [0, 6] }),
+    ).toBe("Every 2 weeks on Sun, Sat");
+  });
+
+  it("formats weekly recurrence without specific days", () => {
+    expect(formatRecurrence({ type: "weekly", interval: 1 })).toBe(
+      "Every week",
+    );
+    expect(formatRecurrence({ type: "weekly", interval: 4 })).toBe(
+      "Every 4 weeks",
+    );
+  });
+
+  it("formats monthly recurrence", () => {
+    expect(
+      formatRecurrence({ type: "monthly", interval: 1, dayOfMonth: 10 }),
+    ).toBe("Monthly on day 10");
+
+    expect(
+      formatRecurrence({ type: "monthly", interval: 2, dayOfMonth: 20 }),
+    ).toBe("Every 2 months on day 20");
+
+    expect(formatRecurrence({ type: "monthly", interval: 1 })).toBe(
+      "Every month",
+    );
+  });
+
+  it("formats yearly and custom recurrence", () => {
+    expect(formatRecurrence({ type: "yearly", interval: 1 })).toBe(
+      "Every year",
+    );
+    expect(formatRecurrence({ type: "yearly", interval: 5 })).toBe(
+      "Every 5 years",
+    );
+    expect(formatRecurrence({ type: "custom", interval: 6 })).toBe(
+      "Every 6 days",
+    );
   });
 });

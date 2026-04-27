@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useSystemTheme } from "../useSystemTheme";
 
@@ -13,13 +13,24 @@ Object.defineProperty(window, "matchMedia", {
 describe("useSystemTheme", () => {
   const mockAddEventListener = vi.fn();
   const mockRemoveEventListener = vi.fn();
+  let changeHandler: ((event: MediaQueryListEvent) => void) | undefined;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    changeHandler = undefined;
     mockMatchMedia.mockReturnValue({
       matches: false,
-      addEventListener: mockAddEventListener,
-      removeEventListener: mockRemoveEventListener,
+      addEventListener: vi.fn(
+        (_event: string, handler: (event: MediaQueryListEvent) => void) => {
+          mockAddEventListener(_event, handler);
+          changeHandler = handler;
+        },
+      ),
+      removeEventListener: vi.fn(
+        (_event: string, handler: (event: MediaQueryListEvent) => void) => {
+          mockRemoveEventListener(_event, handler);
+        },
+      ),
     } as unknown as MediaQueryList);
   });
 
@@ -57,6 +68,25 @@ describe("useSystemTheme", () => {
       );
     });
 
+    it("系统主题变化时应该更新返回值", () => {
+      const { result } = renderHook(() => useSystemTheme());
+
+      expect(result.current).toBe("light");
+      expect(changeHandler).toBeDefined();
+
+      act(() => {
+        changeHandler?.({ matches: true } as MediaQueryListEvent);
+      });
+
+      expect(result.current).toBe("dark");
+
+      act(() => {
+        changeHandler?.({ matches: false } as MediaQueryListEvent);
+      });
+
+      expect(result.current).toBe("light");
+    });
+
     it("组件卸载时应该移除监听器", () => {
       const { unmount } = renderHook(() => useSystemTheme());
 
@@ -65,6 +95,19 @@ describe("useSystemTheme", () => {
       expect(mockRemoveEventListener).toHaveBeenCalledWith(
         "change",
         expect.any(Function),
+      );
+    });
+
+    it("卸载时应该移除与注册时相同的监听器", () => {
+      const { unmount } = renderHook(() => useSystemTheme());
+
+      const registeredHandler = mockAddEventListener.mock.calls[0]?.[1];
+
+      unmount();
+
+      expect(mockRemoveEventListener).toHaveBeenCalledWith(
+        "change",
+        registeredHandler,
       );
     });
   });
