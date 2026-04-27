@@ -10,7 +10,7 @@ import {
   useUpdateTodo,
   useDeleteTodo,
   useReorderTodos,
-} from "@/hooks/useTodos";
+} from "@/domain/todo/todoQueries";
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useEntityOperations } from "@/hooks/useEntityOperations";

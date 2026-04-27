@@ -23,7 +23,7 @@ vi.mock("@tanstack/react-query", () => ({
 }));
 
 // Mock hooks
-vi.mock("@/hooks/useTodos", () => ({
+vi.mock("@/domain/todo/todoQueries", () => ({
   useTodos: vi.fn(() => ({ data: [], isLoading: false, error: null })),
   useCreateTodo: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
   useUpdateTodo: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),

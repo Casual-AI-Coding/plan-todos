@@ -45,4 +45,13 @@ export const todoDomainService = {
   isValidStatus(status: string): status is TodoStatus {
     return (TODO_STATUSES as readonly string[]).includes(status);
   },
+
+  toReorderInput(
+    todos: Array<Pick<Todo, "id"> & Partial<Pick<Todo, "sort_order">>>,
+  ): Array<{ id: string; sort_order: number }> {
+    return todos.map((todo, index) => ({
+      id: todo.id,
+      sort_order: index,
+    }));
+  },
 };
