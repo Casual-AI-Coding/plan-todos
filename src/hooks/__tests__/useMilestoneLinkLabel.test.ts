@@ -10,14 +10,12 @@ function createMilestone(overrides: Partial<Milestone> = {}): Milestone {
     id: overrides.id ?? "milestone-1",
     title: overrides.title ?? "Milestone",
     target_date: overrides.target_date ?? null,
-    biz_type:
-      Object.prototype.hasOwnProperty.call(overrides, "biz_type")
-        ? overrides.biz_type ?? null
-        : "plan",
-    biz_id:
-      Object.prototype.hasOwnProperty.call(overrides, "biz_id")
-        ? overrides.biz_id ?? null
-        : "entity-1",
+    biz_type: Object.prototype.hasOwnProperty.call(overrides, "biz_type")
+      ? (overrides.biz_type ?? null)
+      : "plan",
+    biz_id: Object.prototype.hasOwnProperty.call(overrides, "biz_id")
+      ? (overrides.biz_id ?? null)
+      : "entity-1",
     status: overrides.status ?? "pending",
     progress: overrides.progress ?? 0,
     created_at: overrides.created_at ?? "2026-01-01",
@@ -92,7 +90,10 @@ describe("useMilestoneLinkLabel", () => {
   });
 
   it("falls back to the default plan label when the plan is missing", () => {
-    const milestone = createMilestone({ biz_type: "plan", biz_id: "missing-plan" });
+    const milestone = createMilestone({
+      biz_type: "plan",
+      biz_id: "missing-plan",
+    });
 
     const { result } = renderHook(() =>
       useMilestoneLinkLabel(milestone, plans, targets, circulations),
@@ -102,7 +103,10 @@ describe("useMilestoneLinkLabel", () => {
   });
 
   it("returns the linked target label and icon", () => {
-    const milestone = createMilestone({ biz_type: "target", biz_id: "target-1" });
+    const milestone = createMilestone({
+      biz_type: "target",
+      biz_id: "target-1",
+    });
 
     const { result } = renderHook(() =>
       useMilestoneLinkLabel(milestone, plans, targets, circulations),
@@ -148,7 +152,10 @@ describe("useMilestoneLinkLabel", () => {
   });
 
   it("returns the unlinked fallback for unknown biz types", () => {
-    const milestone = createMilestone({ biz_type: "unknown", biz_id: "entity-1" });
+    const milestone = createMilestone({
+      biz_type: "unknown",
+      biz_id: "entity-1",
+    });
 
     const { result } = renderHook(() =>
       useMilestoneLinkLabel(milestone, plans, targets, circulations),

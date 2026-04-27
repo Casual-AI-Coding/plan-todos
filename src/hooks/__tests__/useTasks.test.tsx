@@ -286,12 +286,17 @@ describe("useTasks", () => {
       const updatedTask = { ...mockTasks[0], title: "Updated Title" };
       vi.mocked(updateTask).mockResolvedValue(updatedTask);
       const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false },
+        },
       });
 
       const setQueryDataSpy = vi.spyOn(queryClient, "setQueryData");
       const wrapper = ({ children }: { children: ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       );
 
       const { result } = renderHook(() => useUpdateTask(), {
@@ -316,12 +321,17 @@ describe("useTasks", () => {
       const updatedTask = { ...mockTasks[0], title: "Updated Title" };
       vi.mocked(updateTask).mockResolvedValue(updatedTask);
       const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false },
+        },
       });
 
       queryClient.setQueryData(taskKeys.tasks, mockTasks);
       const wrapper = ({ children }: { children: ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       );
 
       const { result } = renderHook(() => useUpdateTask(), {
