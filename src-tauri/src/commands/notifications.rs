@@ -169,7 +169,7 @@ pub fn set_notification_settings(
             // Parse reminder_times from JSON string
             let reminder_times_str: String = row.get(3)?;
             let reminder_times_vec: Vec<i32> = serde_json::from_str(&reminder_times_str).unwrap_or_default();
-            
+
             Ok(NotificationSettings {
                 id: row.get(0)?,
                 entity_type: row.get(1)?,
@@ -516,26 +516,30 @@ pub fn get_notification_history(
 ) -> Result<Vec<NotificationHistory>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-    // Build base query
     let mut query = String::from(
         "SELECT id, entity_type, entity_id, title, message, reminder_time,
                 scheduled_at, sent_at, channel, status, error_message, created_at
          FROM notification_history WHERE 1=1",
     );
 
-    // Apply filters
+    let mut param_values: Vec<Box<dyn rusqlite::types::ToSql>> = Vec::new();
+
     if let Some(ref f) = filters {
         if let Some(ref status) = f.status {
-            query.push_str(&format!(" AND status = '{}'", status));
+            query.push_str(" AND status = ?");
+            param_values.push(Box::new(status.clone()));
         }
         if let Some(ref entity_type) = f.entity_type {
-            query.push_str(&format!(" AND entity_type = '{}'", entity_type));
+            query.push_str(" AND entity_type = ?");
+            param_values.push(Box::new(entity_type.clone()));
         }
         if let Some(ref start_date) = f.start_date {
-            query.push_str(&format!(" AND created_at >= '{}'", start_date));
+            query.push_str(" AND created_at >= ?");
+            param_values.push(Box::new(start_date.clone()));
         }
         if let Some(ref end_date) = f.end_date {
-            query.push_str(&format!(" AND created_at <= '{}'", end_date));
+            query.push_str(" AND created_at <= ?");
+            param_values.push(Box::new(end_date.clone()));
         }
     }
 
@@ -543,8 +547,10 @@ pub fn get_notification_history(
     query.push_str(" ORDER BY created_at DESC");
 
     let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
+    let param_refs: Vec<&dyn rusqlite::types::ToSql> =
+        param_values.iter().map(|p| p.as_ref()).collect();
     let items = stmt
-        .query_map([], |row| {
+        .query_map(param_refs.as_slice(), |row| {
             Ok(NotificationHistory {
                 id: row.get(0)?,
                 entity_type: row.get(1)?,
@@ -624,39 +630,39 @@ pub fn get_global_notification_settings(
          FROM global_notification_settings LIMIT 1",
         [],
         |row| {
-            let default_reminder_times_str: String = row.get(3)?;
+            let default_reminder_times_str: String = row.get(4)?;
             let default_reminder_times: Vec<i32> = serde_json::from_str(&default_reminder_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
-            
-            let todo_default_times_str: String = row.get(5)?;
+
+            let todo_default_times_str: String = row.get(6)?;
             let todo_default_times: Vec<i32> = serde_json::from_str(&todo_default_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
-            
-            let plan_default_times_str: String = row.get(7)?;
+
+            let plan_default_times_str: String = row.get(8)?;
             let plan_default_times: Vec<i32> = serde_json::from_str(&plan_default_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
-            
-            let target_default_times_str: String = row.get(9)?;
+
+            let target_default_times_str: String = row.get(10)?;
             let target_default_times: Vec<i32> = serde_json::from_str(&target_default_times_str).unwrap_or_else(|_| vec![5, 15, 30]);
-            
+
             let dnd_days_str: String = row.get(14)?;
             let dnd_days: Vec<i32> = serde_json::from_str(&dnd_days_str).unwrap_or_else(|_| vec![0, 1, 2, 3, 4, 5, 6]);
-            
+
             let channel_priority_str: String = row.get(15)?;
             let channel_priority: Vec<String> = serde_json::from_str(&channel_priority_str).unwrap_or_else(|_| vec!["desktop".to_string(), "email".to_string(), "webhook".to_string()]);
-            
+
             Ok(GlobalNotificationSettings {
                 id: row.get(0)?,
                 master_enabled: row.get::<_, i32>(1)? != 0,
                 desktop_enabled: row.get::<_, i32>(2)? != 0,
                 sound_enabled: row.get::<_, i32>(3)? != 0,
                 default_reminder_times,
-                todo_default_enabled: row.get::<_, i32>(4)? != 0,
+                todo_default_enabled: row.get::<_, i32>(5)? != 0,
                 todo_default_times,
-                plan_default_enabled: row.get::<_, i32>(6)? != 0,
+                plan_default_enabled: row.get::<_, i32>(7)? != 0,
                 plan_default_times,
-                target_default_enabled: row.get::<_, i32>(8)? != 0,
+                target_default_enabled: row.get::<_, i32>(9)? != 0,
                 target_default_times,
-                dnd_enabled: row.get::<_, i32>(10)? != 0,
-                dnd_start_time: row.get(11)?,
-                dnd_end_time: row.get(12)?,
+                dnd_enabled: row.get::<_, i32>(11)? != 0,
+                dnd_start_time: row.get(12)?,
+                dnd_end_time: row.get(13)?,
                 dnd_days,
                 channel_priority,
                 retention_days: row.get(16)?,
@@ -749,18 +755,24 @@ pub fn reset_global_notification_settings(
 #[tauri::command]
 pub async fn send_test_notification() -> Result<(), String> {
     use crate::commands::notification_plugins::GLOBAL_REGISTRY;
-    
+
     // Try to send using the global registry
     // Check if there's any registered sender
     let registry = &*GLOBAL_REGISTRY;
-    
+
     // Try common notification channels
     let channels = ["webhook", "feishu", "dingtalk", "email"];
     let mut sent = false;
-    
+
     for channel in channels {
         if let Some(sender) = registry.get(channel) {
-            match sender.send("Plan Todos 测试通知", "如果您看到这条消息，说明通知功能正常工作！").await {
+            match sender
+                .send(
+                    "Plan Todos 测试通知",
+                    "如果您看到这条消息，说明通知功能正常工作！",
+                )
+                .await
+            {
                 Ok(_) => {
                     log::info!("Test notification sent successfully via {}", channel);
                     sent = true;
@@ -772,7 +784,7 @@ pub async fn send_test_notification() -> Result<(), String> {
             }
         }
     }
-    
+
     if sent {
         Ok(())
     } else {
