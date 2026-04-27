@@ -11,7 +11,7 @@ use tauri::State;
 #[tauri::command]
 pub fn get_sync_config(state: State<AppState>) -> Result<SyncConfig, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
+
     conn.query_row(
         "SELECT id, enabled, provider_type, server_url, username, password_encrypted,
                 remote_path, sync_interval_minutes, conflict_strategy, last_sync_at,
@@ -36,7 +36,8 @@ pub fn get_sync_config(state: State<AppState>) -> Result<SyncConfig, String> {
                 updated_at: row.get(13)?,
             })
         },
-    ).map_err(|e| e.to_string())
+    )
+    .map_err(|e| e.to_string())
 }
 
 /// Update sync configuration
@@ -51,9 +52,9 @@ pub fn update_sync_config(
     conflict_strategy: Option<String>,
 ) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
+
     let enabled_val = enabled.map(|v| if v { 1 } else { 0 });
-    
+
     conn.execute(
         "UPDATE sync_config SET
             enabled = COALESCE(?1, enabled),
@@ -72,8 +73,9 @@ pub fn update_sync_config(
             sync_interval_minutes,
             conflict_strategy,
         ],
-    ).map_err(|e| e.to_string())?;
-    
+    )
+    .map_err(|e| e.to_string())?;
+
     Ok(())
 }
 
@@ -92,20 +94,22 @@ pub async fn test_sync_connection(
             "SELECT remote_path FROM sync_config WHERE id = 'default'",
             [],
             |row| row.get::<_, Option<String>>(0),
-        ).optional().map_err(|e: rusqlite::Error| e.to_string())?
+        )
+        .optional()
+        .map_err(|e: rusqlite::Error| e.to_string())?
         .flatten()
         .unwrap_or_else(|| "/plan-todos-sync".to_string())
     };
-    
+
     // Create WebDAV client
     let client = WebDAVClient::new(server_url, username, password, remote_path)?;
-    
+
     // Test connection
     client.test_connection().await
 }
 
 /// Save sync credentials securely to platform keychain
-/// 
+///
 /// This stores the password in the OS keychain and updates the username
 /// in the database. The password is NEVER stored in the database.
 #[tauri::command]
@@ -117,14 +121,15 @@ pub async fn save_sync_credentials(
     // Save password to platform keychain
     let credential_manager = CredentialManager::new();
     credential_manager.save_credentials(&username, &password)?;
-    
+
     // Update username in database (password is only in keychain)
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     conn.execute(
         "UPDATE sync_config SET username = ?1, updated_at = datetime('now') WHERE id = 'default'",
         rusqlite::params![username],
-    ).map_err(|e| e.to_string())?;
-    
+    )
+    .map_err(|e| e.to_string())?;
+
     Ok(())
 }
 
@@ -132,22 +137,23 @@ pub async fn save_sync_credentials(
 #[tauri::command]
 pub fn get_sync_username(state: State<AppState>) -> Result<Option<String>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
-    let username = conn.query_row(
-        "SELECT username FROM sync_config WHERE id = 'default'",
-        [],
-        |row| row.get::<_, Option<String>>(0),
-    ).optional().map_err(|e: rusqlite::Error| e.to_string())?;
-    
+
+    let username = conn
+        .query_row(
+            "SELECT username FROM sync_config WHERE id = 'default'",
+            [],
+            |row| row.get::<_, Option<String>>(0),
+        )
+        .optional()
+        .map_err(|e: rusqlite::Error| e.to_string())?;
+
     // Flatten the Option<Option<String>> to Option<String>
     Ok(username.flatten())
 }
 
 /// Delete stored sync credentials from keychain and database
 #[tauri::command]
-pub async fn delete_sync_credentials(
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+pub async fn delete_sync_credentials(state: State<'_, AppState>) -> Result<(), String> {
     // Get current username to delete from keychain
     let username = {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -155,23 +161,26 @@ pub async fn delete_sync_credentials(
             "SELECT username FROM sync_config WHERE id = 'default'",
             [],
             |row| row.get::<_, Option<String>>(0),
-        ).optional().map_err(|e: rusqlite::Error| e.to_string())?
+        )
+        .optional()
+        .map_err(|e: rusqlite::Error| e.to_string())?
     };
-    
+
     // Delete from keychain if username exists
     if let Some(user) = username.flatten() {
         let credential_manager = CredentialManager::new();
         // Ignore error if credentials don't exist
         let _ = credential_manager.delete_credentials(&user);
     }
-    
+
     // Clear username in database
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     conn.execute(
         "UPDATE sync_config SET username = NULL, updated_at = datetime('now') WHERE id = 'default'",
         [],
-    ).map_err(|e| e.to_string())?;
-    
+    )
+    .map_err(|e| e.to_string())?;
+
     Ok(())
 }
 
@@ -179,13 +188,16 @@ pub async fn delete_sync_credentials(
 #[tauri::command]
 pub fn has_sync_credentials(state: State<AppState>) -> Result<bool, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
-    let username = conn.query_row(
-        "SELECT username FROM sync_config WHERE id = 'default'",
-        [],
-        |row| row.get::<_, Option<String>>(0),
-    ).optional().map_err(|e: rusqlite::Error| e.to_string())?;
-    
+
+    let username = conn
+        .query_row(
+            "SELECT username FROM sync_config WHERE id = 'default'",
+            [],
+            |row| row.get::<_, Option<String>>(0),
+        )
+        .optional()
+        .map_err(|e: rusqlite::Error| e.to_string())?;
+
     match username.flatten() {
         Some(user) if !user.is_empty() => {
             let credential_manager = CredentialManager::new();
@@ -199,17 +211,19 @@ pub fn has_sync_credentials(state: State<AppState>) -> Result<bool, String> {
 /// This is NOT a Tauri command - it's for internal use only
 pub fn get_sync_credentials_internal(state: &AppState) -> Result<(String, String), String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
-    let username: String = conn.query_row(
-        "SELECT username FROM sync_config WHERE id = 'default'",
-        [],
-        |row| row.get(0),
-    ).map_err(|e| format!("No username configured: {}", e))?;
-    
+
+    let username: String = conn
+        .query_row(
+            "SELECT username FROM sync_config WHERE id = 'default'",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|e| format!("No username configured: {}", e))?;
+
     drop(conn); // Release lock before keychain access
-    
+
     let credential_manager = CredentialManager::new();
     let password = credential_manager.get_credentials(&username)?;
-    
+
     Ok((username, password))
 }

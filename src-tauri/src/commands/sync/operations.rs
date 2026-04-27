@@ -10,7 +10,7 @@ use tauri::{AppHandle, Manager, State};
 #[tauri::command]
 pub fn get_sync_status(state: State<AppState>) -> Result<SyncStatus, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
+
     // Get config
     let (enabled, last_sync_at, last_sync_status): (i32, Option<String>, Option<String>) = conn
         .query_row(
@@ -19,7 +19,7 @@ pub fn get_sync_status(state: State<AppState>) -> Result<SyncStatus, String> {
             |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
         )
         .map_err(|e| e.to_string())?;
-    
+
     // Count pending changes
     let pending_changes: i64 = conn
         .query_row(
@@ -28,7 +28,7 @@ pub fn get_sync_status(state: State<AppState>) -> Result<SyncStatus, String> {
             |row| row.get(0),
         )
         .map_err(|e| e.to_string())?;
-    
+
     // Count conflicts
     let conflicts_count: i64 = conn
         .query_row(
@@ -37,7 +37,7 @@ pub fn get_sync_status(state: State<AppState>) -> Result<SyncStatus, String> {
             |row| row.get(0),
         )
         .map_err(|e| e.to_string())?;
-    
+
     Ok(SyncStatus {
         enabled: enabled != 0,
         is_syncing: false,
@@ -67,16 +67,16 @@ pub async fn trigger_sync(app: AppHandle) -> Result<crate::sync::engine::SyncRes
 
     // Create engine with sync state for progress tracking
     let engine = SyncEngine::with_sync_state(db, sync_state);
-    
+
     let result = engine.trigger_sync().await?;
-    
+
     log::info!(
         "Sync completed: uploaded={}, downloaded={}, conflicts={}",
         result.uploaded,
         result.downloaded,
         result.conflicts
     );
-    
+
     Ok(result)
 }
 
@@ -84,12 +84,13 @@ pub async fn trigger_sync(app: AppHandle) -> Result<crate::sync::engine::SyncRes
 #[tauri::command]
 pub fn get_pending_changes_count(state: State<AppState>) -> Result<i64, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
+
     conn.query_row(
         "SELECT COUNT(*) FROM sync_metadata WHERE sync_status = 'pending'",
         [],
         |row| row.get(0),
-    ).map_err(|e| e.to_string())
+    )
+    .map_err(|e| e.to_string())
 }
 
 /// Get sync logs (paginated)
@@ -102,7 +103,7 @@ pub fn get_sync_logs(
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     let limit = limit.unwrap_or(50);
     let offset = offset.unwrap_or(0);
-    
+
     let mut stmt = conn
         .prepare(
             "SELECT id, started_at, completed_at, status, entities_uploaded,
@@ -112,7 +113,7 @@ pub fn get_sync_logs(
              LIMIT ? OFFSET ?",
         )
         .map_err(|e| e.to_string())?;
-    
+
     let logs = stmt
         .query_map(rusqlite::params![limit, offset], |row| {
             Ok(SyncLog {
@@ -130,6 +131,6 @@ pub fn get_sync_logs(
         .map_err(|e| e.to_string())?
         .filter_map(|r| r.ok())
         .collect();
-    
+
     Ok(logs)
 }

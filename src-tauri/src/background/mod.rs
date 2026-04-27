@@ -1,15 +1,15 @@
 // Background task modules
-// 
+//
 // This module contains background tasks that run independently of user interaction:
 // - Notification checker: Polls for pending notifications and sends them
 // - Sync scheduler: Performs periodic cloud synchronization
 
 mod sync_scheduler;
 
-pub use sync_scheduler::{SchedulerState, start_sync_scheduler};
+pub use sync_scheduler::{start_sync_scheduler, SchedulerState};
 
-use crate::commands::notifications::NotificationHistory;
 use crate::commands::notification_plugins::GLOBAL_REGISTRY;
+use crate::commands::notifications::NotificationHistory;
 use crate::AppState;
 
 use rusqlite::Connection;
@@ -28,7 +28,10 @@ use tauri::{AppHandle, Manager};
 ///
 /// # Returns
 /// A shutdown sender that can be used to gracefully stop the background task
-pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio::sync::mpsc::Sender<()> {
+pub fn start_notification_checker(
+    app: &AppHandle,
+    interval_secs: u64,
+) -> tokio::sync::mpsc::Sender<()> {
     let app_handle = app.clone();
     let (shutdown_tx, mut shutdown_rx) = tokio::sync::mpsc::channel::<()>(1);
 
@@ -45,10 +48,10 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
                     // Get pending notifications in a separate scope to drop the lock before await
                     let pending = {
                         let state_result = app_handle.try_state::<AppState>();
-                        
+
                         if let Some(state) = state_result {
                             let conn_result = state.db.lock();
-                            
+
                             if let Ok(conn) = conn_result {
                                 get_pending_notifications(&conn).unwrap_or_default()
                             } else {
@@ -65,7 +68,7 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
                     for notification in pending {
                         // Send notification (async)
                         let result = send_notification(&notification).await;
-                        
+
                         // Update status (acquire new lock)
                         let state_result = app_handle.try_state::<AppState>();
                         if let Some(state) = state_result {
@@ -99,9 +102,7 @@ pub fn start_notification_checker(app: &AppHandle, interval_secs: u64) -> tokio:
 }
 
 /// Get all pending notifications that are due to be sent
-fn get_pending_notifications(
-    conn: &Connection,
-) -> Result<Vec<NotificationHistory>, String> {
+fn get_pending_notifications(conn: &Connection) -> Result<Vec<NotificationHistory>, String> {
     let mut stmt = conn
         .prepare(
             "SELECT id, entity_type, entity_id, title, message, reminder_time,
@@ -169,12 +170,7 @@ fn update_notification_status(
             "UPDATE notification_history
              SET status = ?, sent_at = ?, error_message = ?
              WHERE id = ?",
-            rusqlite::params![
-                status,
-                &sent_at.unwrap_or_default(),
-                &err,
-                id
-            ],
+            rusqlite::params![status, &sent_at.unwrap_or_default(), &err, id],
         )
         .map_err(|e| e.to_string())?;
     } else {

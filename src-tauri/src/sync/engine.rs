@@ -74,7 +74,10 @@ impl SyncEngine {
 
         // Check if currently syncing using SyncState
         let is_syncing = self.sync_state.as_ref().map_or(false, |s| {
-            matches!(s.get_status(), crate::sync::state::SyncStatus::Syncing { .. })
+            matches!(
+                s.get_status(),
+                crate::sync::state::SyncStatus::Syncing { .. }
+            )
         });
 
         Ok(SyncStatus {
@@ -156,10 +159,9 @@ impl SyncEngine {
                     }
                 }
                 Err(e) => {
-                    result.errors.push(format!(
-                        "Failed to upload {}: {}",
-                        entity.entity_id, e
-                    ));
+                    result
+                        .errors
+                        .push(format!("Failed to upload {}: {}", entity.entity_id, e));
                 }
             }
         }
@@ -169,7 +171,9 @@ impl SyncEngine {
         let remote_manifest = match self.get_remote_manifest(&client).await {
             Ok(m) => m,
             Err(e) => {
-                result.errors.push(format!("Failed to get remote manifest: {}", e));
+                result
+                    .errors
+                    .push(format!("Failed to get remote manifest: {}", e));
                 Vec::new()
             }
         };
@@ -200,15 +204,22 @@ impl SyncEngine {
             if is_deleted {
                 // Apply tombstone
                 if let Err(e) = serializer.delete_entity(entity_type, entity_id) {
-                    result.errors.push(format!("Failed to delete {}: {}", entity_id, e));
+                    result
+                        .errors
+                        .push(format!("Failed to delete {}: {}", entity_id, e));
                 }
             } else {
-                match self.download_entity(&client, &serializer, entity_type, entity_id).await {
+                match self
+                    .download_entity(&client, &serializer, entity_type, entity_id)
+                    .await
+                {
                     Ok(()) => {
                         result.downloaded += 1;
                     }
                     Err(e) => {
-                        result.errors.push(format!("Failed to download {}: {}", entity_id, e));
+                        result
+                            .errors
+                            .push(format!("Failed to download {}: {}", entity_id, e));
                     }
                 }
             }
@@ -224,7 +235,9 @@ impl SyncEngine {
         let conflicts = match resolver.detect_conflicts() {
             Ok(c) => c,
             Err(e) => {
-                result.errors.push(format!("Conflict detection failed: {}", e));
+                result
+                    .errors
+                    .push(format!("Conflict detection failed: {}", e));
                 Vec::new()
             }
         };
@@ -242,10 +255,14 @@ impl SyncEngine {
         // 11. Update sync log and config
         self.set_syncing(95);
         let duration_ms = start_time.elapsed().as_millis() as i64;
-        let status = if result.errors.is_empty() { "completed" } else { "partial" };
-        let error_msg = if result.errors.is_empty() { 
-            None 
-        } else { 
+        let status = if result.errors.is_empty() {
+            "completed"
+        } else {
+            "partial"
+        };
+        let error_msg = if result.errors.is_empty() {
+            None
+        } else {
             Some(result.errors.join("; "))
         };
 
@@ -285,10 +302,7 @@ impl SyncEngine {
         let json_str = serde_json::to_string(&data).map_err(|e| e.to_string())?;
 
         // Build remote path: entities/{type}/{id}.json
-        let remote_path = format!(
-            "entities/{}/{}.json",
-            entity.entity_type, entity.entity_id
-        );
+        let remote_path = format!("entities/{}/{}.json", entity.entity_type, entity.entity_id);
 
         // Upload to WebDAV
         if entity.is_deleted {
@@ -316,7 +330,8 @@ impl SyncEngine {
 
         // Parse JSON
         let json_str = String::from_utf8(data).map_err(|e| e.to_string())?;
-        let value: serde_json::Value = serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
+        let value: serde_json::Value =
+            serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
 
         // Deserialize and apply
         serializer.deserialize_entity(entity_type, &value)?;
@@ -324,7 +339,10 @@ impl SyncEngine {
         Ok(())
     }
 
-    async fn get_remote_manifest(&self, client: &WebDAVClient) -> Result<Vec<serde_json::Value>, String> {
+    async fn get_remote_manifest(
+        &self,
+        client: &WebDAVClient,
+    ) -> Result<Vec<serde_json::Value>, String> {
         // List entities directory
         let items = client.list("entities").await?;
 
@@ -362,9 +380,15 @@ impl SyncEngine {
     }
 
     fn create_webdav_client(&self, config: &SyncConfig) -> Result<WebDAVClient, String> {
-        let server_url = config.server_url.clone().ok_or("Server URL not configured")?;
+        let server_url = config
+            .server_url
+            .clone()
+            .ok_or("Server URL not configured")?;
         let username = config.username.clone().ok_or("Username not configured")?;
-        let password = config.password_encrypted.clone().ok_or("Password not configured")?;
+        let password = config
+            .password_encrypted
+            .clone()
+            .ok_or("Password not configured")?;
 
         WebDAVClient::new(server_url, username, password, config.remote_path.clone())
     }

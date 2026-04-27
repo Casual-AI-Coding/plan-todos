@@ -1,8 +1,8 @@
 // Retry logic with exponential backoff and jitter
 // Phase 6: Robust error handling for sync operations
 
-use std::time::Duration;
 use std::future::Future;
+use std::time::Duration;
 
 /// Configuration for retry behavior
 #[derive(Debug, Clone)]
@@ -46,11 +46,11 @@ impl RetryConfig {
 
     /// Calculate delay for a given attempt number
     pub fn delay_for_attempt(&self, attempt: u32) -> Duration {
-        let base_delay = self.initial_delay.as_secs_f64() 
-            * self.multiplier.powi(attempt as i32 - 1);
-        
+        let base_delay =
+            self.initial_delay.as_secs_f64() * self.multiplier.powi(attempt as i32 - 1);
+
         let delay_secs = base_delay.min(self.max_delay.as_secs_f64());
-        
+
         if self.with_jitter {
             // Add random jitter between 0% and 25%
             let jitter = fastrand::f64() * 0.25;
@@ -86,17 +86,19 @@ where
 
     while attempts < config.max_attempts {
         attempts += 1;
-        
+
         match operation().await {
             Ok(result) => return RetryResult::Success(result),
             Err(e) => {
                 last_error = e.to_string();
-                
+
                 if attempts < config.max_attempts {
                     let delay = config.delay_for_attempt(attempts);
                     log::warn!(
                         "Retry attempt {} failed: {}. Waiting {:?} before retry...",
-                        attempts, last_error, delay
+                        attempts,
+                        last_error,
+                        delay
                     );
                     tokio::time::sleep(delay).await;
                 }
@@ -104,7 +106,10 @@ where
         }
     }
 
-    RetryResult::Exhausted { attempts, last_error }
+    RetryResult::Exhausted {
+        attempts,
+        last_error,
+    }
 }
 
 /// Retry a fallible async operation with a custom predicate
@@ -124,23 +129,25 @@ where
 
     while attempts < config.max_attempts {
         attempts += 1;
-        
+
         match operation().await {
             Ok(result) => return RetryResult::Success(result),
             Err(e) => {
                 last_error = e.to_string();
-                
+
                 // Check if we should retry this error
                 if !should_retry(&e) {
                     log::warn!("Error is not retryable: {}", last_error);
                     break;
                 }
-                
+
                 if attempts < config.max_attempts {
                     let delay = config.delay_for_attempt(attempts);
                     log::warn!(
                         "Retry attempt {} failed: {}. Waiting {:?} before retry...",
-                        attempts, last_error, delay
+                        attempts,
+                        last_error,
+                        delay
                     );
                     tokio::time::sleep(delay).await;
                 }
@@ -148,7 +155,10 @@ where
         }
     }
 
-    RetryResult::Exhausted { attempts, last_error }
+    RetryResult::Exhausted {
+        attempts,
+        last_error,
+    }
 }
 
 #[cfg(test)]
@@ -158,12 +168,12 @@ mod tests {
     #[test]
     fn test_delay_calculation() {
         let config = RetryConfig::default();
-        
+
         // First attempt should be close to initial delay
         let delay1 = config.delay_for_attempt(1);
         assert!(delay1 >= Duration::from_millis(500));
         assert!(delay1 <= Duration::from_millis(700)); // With jitter
-        
+
         // Second attempt should be roughly doubled
         let delay2 = config.delay_for_attempt(2);
         assert!(delay2 >= Duration::from_millis(1000));
@@ -176,7 +186,7 @@ mod tests {
             max_delay: Duration::from_secs(5),
             ..Default::default()
         };
-        
+
         // Very high attempt should be capped
         let delay = config.delay_for_attempt(100);
         assert!(delay <= Duration::from_secs_f64(5.0 * 1.25)); // With jitter
@@ -186,7 +196,7 @@ mod tests {
     async fn test_retry_success() {
         let config = RetryConfig::default().with_max_attempts(3);
         let mut call_count = 0;
-        
+
         let result = retry_with_backoff(&config, || async {
             call_count += 1;
             if call_count < 2 {
@@ -194,8 +204,9 @@ mod tests {
             } else {
                 Ok(42)
             }
-        }).await;
-        
+        })
+        .await;
+
         match result {
             RetryResult::Success(value) => assert_eq!(value, 42),
             _ => panic!("Expected success"),
@@ -211,11 +222,10 @@ mod tests {
             multiplier: 2.0,
             with_jitter: false,
         };
-        
-        let result = retry_with_backoff(&config, || async {
-            Err::<i32, &str>("permanent error")
-        }).await;
-        
+
+        let result =
+            retry_with_backoff(&config, || async { Err::<i32, &str>("permanent error") }).await;
+
         match result {
             RetryResult::Exhausted { attempts, .. } => assert_eq!(attempts, 2),
             _ => panic!("Expected exhausted"),

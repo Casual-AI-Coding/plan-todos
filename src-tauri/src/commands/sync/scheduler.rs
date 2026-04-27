@@ -1,8 +1,8 @@
 // Scheduler control commands - Tauri commands for background sync scheduler
 // Phase 6: Background sync control
 
-use crate::AppState;
 use crate::background::SchedulerState;
+use crate::AppState;
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::Ordering;
 use tauri::{AppHandle, Manager};

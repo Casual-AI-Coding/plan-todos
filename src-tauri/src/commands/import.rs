@@ -5,8 +5,6 @@ use crate::AppState;
 use log::warn;
 use serde::{Deserialize, Serialize};
 
-
-
 // ============================================================================
 // Import Data Structures
 // ============================================================================
@@ -30,12 +28,21 @@ pub struct ImportResult {
 // ============================================================================
 
 const VALID_TABLES: &[&str] = &[
-    "entity_tags", "milestones", "steps", "tasks", "todos",
-    "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"
+    "entity_tags",
+    "milestones",
+    "steps",
+    "tasks",
+    "todos",
+    "targets",
+    "plans",
+    "daily_summary_settings",
+    "notification_plugins",
+    "tags",
 ];
 
 fn validate_table_name(table: &str) -> Result<&'static str, String> {
-    VALID_TABLES.iter()
+    VALID_TABLES
+        .iter()
         .find(|&&t| t == table)
         .copied()
         .ok_or_else(|| format!("Invalid table name: {}", table))
@@ -270,7 +277,6 @@ fn import_merge(
         }
     }
 
-
     for plugin in &data.settings.notification_plugins {
         let exists: bool = tx
             .query_row(
@@ -321,8 +327,16 @@ fn import_replace(
 
     // Clear all tables before import (in dependency order)
     let tables = [
-        "entity_tags", "milestones", "steps", "tasks", "todos",
-        "targets", "plans", "daily_summary_settings", "notification_plugins", "tags"
+        "entity_tags",
+        "milestones",
+        "steps",
+        "tasks",
+        "todos",
+        "targets",
+        "plans",
+        "daily_summary_settings",
+        "notification_plugins",
+        "tags",
     ];
     for table in &tables {
         match validate_table_name(table) {
@@ -435,7 +449,6 @@ fn import_replace(
             warn!("Failed to import daily_summary_settings: {}", e);
         }
     }
-
 
     for plugin in &data.settings.notification_plugins {
         match tx.execute(

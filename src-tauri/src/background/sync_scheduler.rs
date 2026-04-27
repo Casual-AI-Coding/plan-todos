@@ -2,7 +2,7 @@
 // Phase 6: Background sync with configurable intervals
 
 use crate::models::AppState;
-use crate::sync::{CircuitBreaker, CircuitBreakerConfig, RetryConfig, retry_with_backoff};
+use crate::sync::{retry_with_backoff, CircuitBreaker, CircuitBreakerConfig, RetryConfig};
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
@@ -158,7 +158,10 @@ async fn perform_sync(app: &AppHandle) {
             // Emit sync completed event
             let _ = app.emit("sync-completed", &sync_result);
         }
-        crate::sync::retry::RetryResult::Exhausted { attempts, last_error } => {
+        crate::sync::retry::RetryResult::Exhausted {
+            attempts,
+            last_error,
+        } => {
             log::error!("Sync failed after {} attempts: {}", attempts, last_error);
             scheduler_state.circuit_breaker.record_failure();
 

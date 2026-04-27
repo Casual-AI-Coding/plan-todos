@@ -11,13 +11,13 @@
 //! }
 //! ```
 //!
-//! 
+//!
 //! Implementation for generic webhook notifications.
 
+use super::r#trait::{NotificationSender, SendResult};
 use async_trait::async_trait;
 use serde::Deserialize;
 use std::collections::HashMap;
-use super::r#trait::{NotificationSender, SendResult};
 
 /// Webhook configuration
 #[derive(Debug, Deserialize)]
@@ -45,7 +45,7 @@ impl NotificationSender for WebhookSender {
     fn sender_type(&self) -> &str {
         "webhook"
     }
-    
+
     async fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
         if let Some(url) = &self.config.url {
             // TODO: 实际发送 HTTP 请求
@@ -54,13 +54,13 @@ impl NotificationSender for WebhookSender {
             //     "content": content,
             //     "timestamp": chrono::Utc::now().to_rfc3339(),
             // });
-            
+
             log::info!(
                 "[Webhook] Would send to {}: {}",
                 self.config.method.as_deref().unwrap_or("POST"),
                 url
             );
-            
+
             Ok(SendResult {
                 success: true,
                 message: "Webhook notification sent".to_string(),
@@ -70,10 +70,10 @@ impl NotificationSender for WebhookSender {
             Err("Webhook url is required".to_string())
         }
     }
-    
+
     fn validate_config(&self, config: &str) -> Result<(), String> {
-        let _: WebhookConfig = serde_json::from_str(config)
-            .map_err(|e| format!("Invalid config: {}", e))?;
+        let _: WebhookConfig =
+            serde_json::from_str(config).map_err(|e| format!("Invalid config: {}", e))?;
         Ok(())
     }
 }

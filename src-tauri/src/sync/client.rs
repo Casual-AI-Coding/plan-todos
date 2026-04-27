@@ -4,8 +4,8 @@
 use base64::Engine;
 use quick_xml::events::Event;
 use quick_xml::Reader;
+use reqwest::header::{HeaderName, AUTHORIZATION, CONTENT_TYPE};
 use reqwest::Client;
-use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderName};
 use std::time::Duration;
 
 // WebDAV Depth header
@@ -66,11 +66,20 @@ impl WebDAVClient {
     fn build_url(&self, path: &str) -> String {
         let normalized_path = path.trim_start_matches('/');
         let normalized_base = self.base_path.trim_start_matches('/').trim_end_matches('/');
-        
+
         if normalized_base.is_empty() {
-            format!("{}/{}", self.server_url.trim_end_matches('/'), normalized_path)
+            format!(
+                "{}/{}",
+                self.server_url.trim_end_matches('/'),
+                normalized_path
+            )
         } else {
-            format!("{}/{}/{}", self.server_url.trim_end_matches('/'), normalized_base, normalized_path)
+            format!(
+                "{}/{}/{}",
+                self.server_url.trim_end_matches('/'),
+                normalized_base,
+                normalized_path
+            )
         }
     }
 
@@ -147,7 +156,7 @@ impl WebDAVClient {
         for part in parts {
             current_path.push('/');
             current_path.push_str(part);
-            
+
             // Try to create each level
             let url = format!(
                 "{}/{}",
@@ -390,7 +399,7 @@ fn parse_webdav_list_response(xml: &str, base_path: &str) -> Result<Vec<WebDAVIt
             }
             Ok(Event::Text(e)) => {
                 let text = e.unescape().unwrap_or_default().to_string();
-                
+
                 if in_response && in_propstat {
                     if let Some(ref mut item) = current_item {
                         match current_element.as_str() {
@@ -426,21 +435,23 @@ fn parse_webdav_list_response(xml: &str, base_path: &str) -> Result<Vec<WebDAVIt
 fn normalize_href(href: &str, base_path: &str) -> String {
     // Remove URL encoding
     let decoded = urlencoding_decode(href);
-    
+
     // Remove base path prefix
     let base = base_path.trim_start_matches('/').trim_end_matches('/');
     if !base.is_empty() {
         let base_with_slash = format!("/{}", base);
         if decoded.starts_with(&base_with_slash) {
-            return decoded[base_with_slash.len()..].trim_start_matches('/').to_string();
+            return decoded[base_with_slash.len()..]
+                .trim_start_matches('/')
+                .to_string();
         }
     }
-    
+
     // If href ends with /, it's the directory itself, return empty to filter out
     if decoded.ends_with('/') {
         return String::new();
     }
-    
+
     decoded.trim_start_matches('/').to_string()
 }
 
@@ -448,7 +459,7 @@ fn normalize_href(href: &str, base_path: &str) -> String {
 fn urlencoding_decode(s: &str) -> String {
     let mut result = String::new();
     let mut chars = s.chars().peekable();
-    
+
     while let Some(c) = chars.next() {
         if c == '%' {
             let hex: String = chars.by_ref().take(2).collect();
@@ -462,7 +473,7 @@ fn urlencoding_decode(s: &str) -> String {
             result.push(c);
         }
     }
-    
+
     result
 }
 
@@ -480,8 +491,14 @@ mod tests {
 
     #[test]
     fn test_normalize_href() {
-        assert_eq!(normalize_href("/plan-todos-sync/file.json", "/plan-todos-sync"), "file.json");
-        assert_eq!(normalize_href("/plan-todos-sync/dir/", "/plan-todos-sync"), "");
+        assert_eq!(
+            normalize_href("/plan-todos-sync/file.json", "/plan-todos-sync"),
+            "file.json"
+        );
+        assert_eq!(
+            normalize_href("/plan-todos-sync/dir/", "/plan-todos-sync"),
+            ""
+        );
         assert_eq!(normalize_href("file.json", ""), "file.json");
     }
 }

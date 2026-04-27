@@ -10,12 +10,12 @@
 //! }
 //! ```
 //!
-//! 
+//!
 //! Implementation for DingTalk (钉钉) webhook notifications.
 
+use super::r#trait::{NotificationSender, SendResult};
 use async_trait::async_trait;
 use serde::Deserialize;
-use super::r#trait::{NotificationSender, SendResult};
 
 /// DingTalk configuration
 #[derive(Debug, Deserialize)]
@@ -45,7 +45,7 @@ impl NotificationSender for DingTalkSender {
     fn sender_type(&self) -> &str {
         "dingtalk"
     }
-    
+
     async fn send(&self, title: &str, content: &str) -> Result<SendResult, String> {
         if let Some(webhook_url) = &self.config.webhook_url {
             // TODO: 实际发送 HTTP 请求
@@ -55,10 +55,10 @@ impl NotificationSender for DingTalkSender {
             //         "content": format!("{}: {}", title, content)
             //     }
             // });
-            
+
             log::info!("[DingTalk] Would send to webhook: {}", webhook_url);
             log::info!("[DingTalk] Title: {}, Content: {}", title, content);
-            
+
             Ok(SendResult {
                 success: true,
                 message: "Notification sent to DingTalk".to_string(),
@@ -68,10 +68,10 @@ impl NotificationSender for DingTalkSender {
             Err("DingTalk webhook_url is required".to_string())
         }
     }
-    
+
     fn validate_config(&self, config: &str) -> Result<(), String> {
-        let _: DingTalkConfig = serde_json::from_str(config)
-            .map_err(|e| format!("Invalid config: {}", e))?;
+        let _: DingTalkConfig =
+            serde_json::from_str(config).map_err(|e| format!("Invalid config: {}", e))?;
         Ok(())
     }
 }

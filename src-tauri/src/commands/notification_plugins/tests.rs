@@ -98,7 +98,9 @@ mod registry_tests {
     // #[tokio::test] (ignored - needs tokio)
     async fn test_registry_send_unknown_type() {
         // Test that sending with unknown type returns error
-        let result = GLOBAL_REGISTRY.send("unknown_type", "Test Title", "Test Content").await;
+        let result = GLOBAL_REGISTRY
+            .send("unknown_type", "Test Title", "Test Content")
+            .await;
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("Unknown sender type"));
     }

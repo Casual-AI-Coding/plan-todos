@@ -2,20 +2,20 @@
 //!
 //! This module implements the OCP-compliant plugin system using Trait + Registry pattern.
 
-mod r#trait;
-pub mod registry;
-mod feishu;
 mod dingtalk;
 mod email;
+mod feishu;
+pub mod registry;
+mod r#trait;
 mod webhook;
 
 pub use r#trait::{NotificationSender, SendResult};
 pub use registry::PluginRegistry;
 pub use registry::GLOBAL_REGISTRY;
 
+use crate::AppState;
 use serde::{Deserialize, Serialize};
 use tauri::State;
-use crate::AppState;
 
 /// Notification plugin configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -35,7 +35,7 @@ pub async fn get_notification_plugins(
     state: State<'_, AppState>,
 ) -> Result<Vec<NotificationPlugin>, String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
-    
+
     let mut stmt = conn
         .prepare(
             "SELECT id, name, plugin_type, enabled, config, created_at, updated_at 
@@ -155,11 +155,8 @@ pub async fn delete_notification_plugin(
 ) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| e.to_string())?;
 
-    conn.execute(
-        "DELETE FROM notification_plugins WHERE id = ?",
-        [&id],
-    )
-    .map_err(|e| e.to_string())?;
+    conn.execute("DELETE FROM notification_plugins WHERE id = ?", [&id])
+        .map_err(|e| e.to_string())?;
 
     Ok(())
 }
@@ -175,7 +172,7 @@ pub async fn send_notification(
     // Get plugin config in a separate scope to drop conn before await
     let plugin_type = {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
-        
+
         conn.query_row(
             "SELECT plugin_type FROM notification_plugins WHERE id = ?",
             [&plugin_id],
@@ -192,8 +189,6 @@ pub async fn send_notification(
     // Send notification
     sender.send(&title, &content).await
 }
-
-
 
 /// Get supported plugin types
 #[tauri::command]
