@@ -27,14 +27,10 @@ describe("Button", () => {
 
   it("applies variant styles", () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByText("Primary")).toHaveStyle({
-      backgroundColor: "var(--color-primary)",
-    });
+    expect(screen.getByText("Primary").style.background).toContain("var(--color-primary)");
 
     rerender(<Button variant="danger">Danger</Button>);
-    expect(screen.getByText("Danger")).toHaveStyle({
-      backgroundColor: "var(--color-error)",
-    });
+    expect(screen.getByText("Danger").style.background).toContain("var(--color-error)");
   });
 
   it("applies size styles", () => {

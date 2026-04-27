@@ -39,14 +39,16 @@ export function Card({
       role={role}
       tabIndex={tabIndex}
       className={`
-        rounded-lg border shadow-sm
-        ${hoverable ? "hover:shadow-md transition-shadow cursor-pointer" : ""}
+        rounded-xl border
+        ${hoverable ? "card-hover cursor-pointer" : ""}
         ${paddingStyles[padding]}
         ${className}
       `}
       style={{
         backgroundColor: "var(--color-bg-card)",
         borderColor: "var(--color-border)",
+        boxShadow: "var(--shadow-sm)",
+        backdropFilter: "blur(8px)",
         ...style,
       }}
     >

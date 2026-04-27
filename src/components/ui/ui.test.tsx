@@ -13,58 +13,73 @@ import { Modal } from "@/components/ui/Modal";
 describe("ProgressBar", () => {
   it("renders with default props", () => {
     render(<ProgressBar value={50} />);
-    const progressBar = document.querySelector(".bg-teal-600");
-    expect(progressBar).toBeInTheDocument();
+    const track = document.querySelector("[style*='background-color']");
+    expect(track).toBeInTheDocument();
   });
 
   it("displays correct progress value", () => {
-    render(<ProgressBar value={75} />);
-    const progressFill = document.querySelector(".bg-teal-600") as HTMLElement;
-    expect(progressFill.style.width).toBe("75%");
+    const { container } = render(<ProgressBar value={75} />);
+    const fills = container.querySelectorAll("[style*='width']");
+    const progressFill = Array.from(fills).find(el => (el as HTMLElement).style.width === "75%");
+    expect(progressFill).toBeInTheDocument();
   });
 
   it("clamps value to 0 when negative", () => {
-    render(<ProgressBar value={-10} />);
-    const progressFill = document.querySelector(".bg-teal-600") as HTMLElement;
-    expect(progressFill.style.width).toBe("0%");
+    const { container } = render(<ProgressBar value={-10} />);
+    const fills = container.querySelectorAll("[style*='width']");
+    const progressFill = Array.from(fills).find(el => (el as HTMLElement).style.width === "0%");
+    expect(progressFill).toBeInTheDocument();
   });
 
   it("clamps value to 100 when over 100", () => {
-    render(<ProgressBar value={150} />);
-    const progressFill = document.querySelector(".bg-teal-600") as HTMLElement;
-    expect(progressFill.style.width).toBe("100%");
+    const { container } = render(<ProgressBar value={150} />);
+    const fills = container.querySelectorAll("[style*='width']");
+    const progressFill = Array.from(fills).find(el => (el as HTMLElement).style.width === "100%");
+    expect(progressFill).toBeInTheDocument();
   });
 
   it("applies teal color by default", () => {
-    render(<ProgressBar value={50} />);
-    expect(document.querySelector(".bg-teal-600")).toBeInTheDocument();
+    const { container } = render(<ProgressBar value={50} />);
+    const fills = container.querySelectorAll("[style*='background-color']");
+    const progressFill = Array.from(fills).find(el =>
+      (el as HTMLElement).style.backgroundColor.includes("var(--color-primary)")
+    );
+    expect(progressFill).toBeInTheDocument();
   });
 
   it("applies orange color", () => {
-    render(<ProgressBar value={50} color="orange" />);
-    expect(document.querySelector(".bg-orange-500")).toBeInTheDocument();
+    const { container } = render(<ProgressBar value={50} color="orange" />);
+    const fills = container.querySelectorAll("[style*='background-color']");
+    const progressFill = Array.from(fills).find(el =>
+      (el as HTMLElement).style.backgroundColor.includes("var(--color-warning)")
+    );
+    expect(progressFill).toBeInTheDocument();
   });
 
   it("applies gray color", () => {
-    render(<ProgressBar value={50} color="gray" />);
-    expect(document.querySelector(".bg-gray-400")).toBeInTheDocument();
+    const { container } = render(<ProgressBar value={50} color="gray" />);
+    const fills = container.querySelectorAll("[style*='background-color']");
+    const progressFill = Array.from(fills).find(el =>
+      (el as HTMLElement).style.backgroundColor.includes("var(--color-text-muted)")
+    );
+    expect(progressFill).toBeInTheDocument();
   });
 
   it("applies small size", () => {
-    render(<ProgressBar value={50} size="sm" />);
-    const track = document.querySelector(".bg-gray-200");
+    const { container } = render(<ProgressBar value={50} size="sm" />);
+    const track = container.querySelector("[style*='background-color']")?.closest("div");
     expect(track).toHaveClass("h-1.5");
   });
 
   it("applies medium size", () => {
-    render(<ProgressBar value={50} size="md" />);
-    const track = document.querySelector(".bg-gray-200");
+    const { container } = render(<ProgressBar value={50} size="md" />);
+    const track = container.querySelector("[style*='background-color']")?.closest("div");
     expect(track).toHaveClass("h-2.5");
   });
 
   it("applies large size", () => {
-    render(<ProgressBar value={50} size="lg" />);
-    const track = document.querySelector(".bg-gray-200");
+    const { container } = render(<ProgressBar value={50} size="lg" />);
+    const track = container.querySelector("[style*='background-color']")?.closest("div");
     expect(track).toHaveClass("h-4");
   });
 
@@ -231,13 +246,12 @@ describe("Button", () => {
   it("applies primary variant styles by default", () => {
     render(<Button>Primary</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveStyle({ backgroundColor: "var(--color-primary)" });
+    expect(button.style.background).toContain("var(--color-primary)");
   });
 
   it("applies secondary variant styles", () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole("button");
-    // Secondary button should have style attribute with border
     expect(button).toHaveAttribute("style");
   });
 
@@ -250,7 +264,7 @@ describe("Button", () => {
   it("applies danger variant styles", () => {
     render(<Button variant="danger">Danger</Button>);
     const button = screen.getByRole("button");
-    expect(button).toHaveStyle({ backgroundColor: "var(--color-error)" });
+    expect(button.style.background).toContain("var(--color-error)");
   });
 
   it("applies small size", () => {
@@ -446,7 +460,7 @@ describe("Card", () => {
   it("applies hoverable styles", () => {
     render(<Card hoverable>Content</Card>);
     const card = screen.getByText("Content").closest("div");
-    expect(card).toHaveClass("hover:shadow-md");
+    expect(card).toHaveClass("card-hover");
   });
 
   it("handles click events", () => {

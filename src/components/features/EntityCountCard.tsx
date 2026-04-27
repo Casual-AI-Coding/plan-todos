@@ -9,14 +9,17 @@ export interface EntityCountCardProps {
 
 export function EntityCountCard({ count, label }: EntityCountCardProps) {
   return (
-    <Card className="text-center py-2">
+    <Card className="text-center py-3 px-2">
       <div
-        className="text-lg font-semibold"
+        className="text-xl font-bold tabular-nums"
         style={{ color: "var(--color-primary)" }}
       >
         {count}
       </div>
-      <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+      <div
+        className="text-xs mt-0.5 font-medium"
+        style={{ color: "var(--color-text-muted)" }}
+      >
         {label}
       </div>
     </Card>

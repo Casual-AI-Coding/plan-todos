@@ -85,14 +85,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       switch (variant) {
         case "primary":
           return {
-            backgroundColor: "var(--color-primary)",
+            background: `linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 80%, white))`,
             color: "var(--color-text-inverse)",
+            boxShadow: "var(--shadow-sm)",
           };
         case "secondary":
           return {
             backgroundColor: "var(--color-bg-card)",
-            border: "2px solid var(--color-border)",
+            border: "1px solid var(--color-border)",
             color: "var(--color-text)",
+            boxShadow: "var(--shadow-xs)",
           };
         case "ghost":
           return {
@@ -101,8 +103,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           };
         case "danger":
           return {
-            backgroundColor: "var(--color-error)",
+            background: `linear-gradient(135deg, var(--color-error), color-mix(in srgb, var(--color-error) 80%, white))`,
             color: "var(--color-text-inverse)",
+            boxShadow: "var(--shadow-sm)",
           };
         default:
           return {};

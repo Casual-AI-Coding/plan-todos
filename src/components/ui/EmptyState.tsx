@@ -35,12 +35,22 @@ export function EmptyState({
   return (
     <div
       className={`
-        flex flex-col items-center justify-center py-12 px-4 text-center
+        flex flex-col items-center justify-center py-16 px-6 text-center rounded-2xl
         ${className}
       `}
+      style={{
+        background: "linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-hover) 100%)",
+      }}
     >
       {/* Icon */}
-      <div className="text-5xl mb-4 opacity-50" role="img" aria-label={icon}>
+      <div
+        className="w-16 h-16 flex items-center justify-center rounded-2xl text-4xl mb-5"
+        style={{
+          backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, transparent)",
+        }}
+        role="img"
+        aria-label={icon}
+      >
         {icon}
       </div>
 
@@ -55,7 +65,7 @@ export function EmptyState({
       {/* Description */}
       {description && (
         <p
-          className="text-sm mb-6 max-w-sm"
+          className="text-sm mb-6 max-w-sm leading-relaxed"
           style={{ color: "var(--color-text-muted)" }}
         >
           {description}

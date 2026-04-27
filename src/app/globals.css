@@ -13,6 +13,7 @@
   --glass-blur: 0px;
   --glass-opacity: 1;
   --font-size-base: 16px;
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.05);
 
   /* Animation timing */
   --animation-easing-spring: cubic-bezier(0.22, 1, 0.36, 1);
@@ -45,6 +46,7 @@
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.12);
   /* New shadow levels */
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.03);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 16px 32px rgba(0, 0, 0, 0.06);
@@ -72,6 +74,7 @@
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5);
   /* New shadow levels */
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.2);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 16px 32px rgba(0, 0, 0, 0.4);
@@ -1170,6 +1173,18 @@ button:active:not(:disabled) {
 .card:hover,
 [class*="Card"]:hover {
   transform: translateY(-2px);
+}
+
+/* Card hover - premium subtle lift */
+.card-hover {
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Theme blur/opacity settings - Apply to all themes */

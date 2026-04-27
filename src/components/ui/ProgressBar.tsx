@@ -17,10 +17,10 @@ export function ProgressBar({
 }: ProgressBarProps) {
   const clampedValue = Math.min(100, Math.max(0, value));
 
-  const colorStyles = {
-    teal: "bg-teal-600",
-    orange: "bg-orange-500",
-    gray: "bg-gray-400",
+  const colorMap = {
+    teal: "var(--color-primary)",
+    orange: "var(--color-warning)",
+    gray: "var(--color-text-muted)",
   };
 
   const sizeStyles = {
@@ -33,18 +33,22 @@ export function ProgressBar({
     <div className={`w-full ${className}`}>
       {showLabel && (
         <div className="flex justify-between mb-1 text-sm">
-          <span className="text-gray-600">Progress</span>
-          <span className="font-medium" style={{ color: "#134E4A" }}>
+          <span style={{ color: "var(--color-text-muted)" }}>Progress</span>
+          <span className="font-medium" style={{ color: "var(--color-text)" }}>
             {clampedValue}%
           </span>
         </div>
       )}
       <div
-        className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizeStyles[size]}`}
+        className={`w-full rounded-full overflow-hidden ${sizeStyles[size]}`}
+        style={{ backgroundColor: "color-mix(in srgb, var(--color-text-muted) 12%, transparent)" }}
       >
         <div
-          className={`h-full ${colorStyles[color]} rounded-full transition-all duration-500 ease-out`}
-          style={{ width: `${clampedValue}%` }}
+          className="h-full rounded-full transition-all duration-500 ease-out"
+          style={{
+            width: `${clampedValue}%`,
+            backgroundColor: colorMap[color],
+          }}
         />
       </div>
     </div>

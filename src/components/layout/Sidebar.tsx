@@ -326,8 +326,11 @@ export function Sidebar({
           )}
           <button
             onClick={toggleCollapse}
-            className="p-1 rounded hover:opacity-80 transition-opacity cursor-pointer"
-            style={{ color: "var(--color-text-muted)" }}
+            className="p-1.5 rounded-lg hover:opacity-80 transition-all cursor-pointer"
+            style={{
+              color: "var(--color-text-muted)",
+              backgroundColor: "color-mix(in srgb, var(--color-text-muted) 8%, transparent)",
+            }}
             title={isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
             aria-label={
               isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar

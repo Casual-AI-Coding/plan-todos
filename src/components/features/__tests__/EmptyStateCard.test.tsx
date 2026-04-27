@@ -29,7 +29,7 @@ describe("EmptyStateCard", () => {
 
     it("显示默认图标", () => {
       const { container } = render(<EmptyStateCard title="暂无数据" />);
-      const icon = container.querySelector(".text-5xl");
+      const icon = container.querySelector("[role='img']");
       expect(icon).toBeInTheDocument();
       expect(icon).toHaveTextContent("📋");
     });
@@ -38,7 +38,7 @@ describe("EmptyStateCard", () => {
       const { container } = render(
         <EmptyStateCard title="暂无数据" icon="🎯" />,
       );
-      const icon = container.querySelector(".text-5xl");
+      const icon = container.querySelector("[role='img']");
       expect(icon).toHaveTextContent("🎯");
     });
   });
@@ -56,7 +56,7 @@ describe("EmptyStateCard", () => {
 
     it("传递 icon 属性", () => {
       render(<EmptyStateCard title="标题" icon="🚀" />);
-      const icon = document.querySelector(".text-5xl");
+      const icon = document.querySelector("[role='img']");
       expect(icon).toHaveTextContent("🚀");
     });
 

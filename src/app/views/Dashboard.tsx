@@ -305,7 +305,7 @@ export function Dashboard() {
       {/* Active Milestones */}
       {active_milestones.length > 0 && (
         <Card>
-          <h3 className="font-semibold mb-4" style={{ color: "#134E4A" }}>
+          <h3 className="font-semibold mb-4" style={{ color: "var(--color-text)" }}>
             进行中的里程碑
           </h3>
           <div className="space-y-3">
@@ -313,7 +313,7 @@ export function Dashboard() {
               <div key={milestone.id}>
                 <div className="flex justify-between text-sm mb-1">
                   <span>{milestone.title}</span>
-                  <span className="text-teal-600">{milestone.progress}%</span>
+                  <span style={{ color: "var(--color-primary)" }}>{milestone.progress}%</span>
                 </div>
                 <ProgressBar
                   value={milestone.progress}

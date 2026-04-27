@@ -65,7 +65,7 @@ describe("EntityCountCard", () => {
     it("计数使用大号字体", () => {
       render(<EntityCountCard count={5} label="标签" />);
       const countElement = screen.getByText("5");
-      expect(countElement).toHaveClass("text-lg", "font-semibold");
+      expect(countElement).toHaveClass("text-xl", "font-bold");
     });
 
     it("标签使用小号字体", () => {
@@ -84,7 +84,7 @@ describe("EntityCountCard", () => {
 
     it("使用紧凑的内边距", () => {
       const { container } = render(<EntityCountCard count={1} label="标签" />);
-      const card = container.querySelector(".py-2");
+      const card = container.querySelector(".py-3");
       expect(card).toBeInTheDocument();
     });
   });
@@ -97,7 +97,7 @@ describe("EntityCountCard", () => {
       expect(screen.getByText("已完成")).toBeInTheDocument();
 
       const countElement = screen.getByText("25");
-      expect(countElement).toHaveClass("text-lg", "font-semibold");
+      expect(countElement).toHaveClass("text-xl", "font-bold");
       expect(countElement).toHaveStyle({ color: "var(--color-primary)" });
     });
   });
