@@ -64,9 +64,7 @@ describe("useHotkeyStore", () => {
   });
 
   it("unregisters a previously registered hotkey", () => {
-    useHotkeyStore
-      .getState()
-      .register("new-todo", newTodoBinding, vi.fn());
+    useHotkeyStore.getState().register("new-todo", newTodoBinding, vi.fn());
     useHotkeyStore.getState().unregister("new-todo");
 
     expect(useHotkeyStore.getState().hotkeys["new-todo"]).toBeUndefined();
@@ -89,9 +87,7 @@ describe("useHotkeyStore", () => {
   it("does not update the custom config when a conflict is detected", () => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    useHotkeyStore
-      .getState()
-      .register("new-todo", newTodoBinding, vi.fn());
+    useHotkeyStore.getState().register("new-todo", newTodoBinding, vi.fn());
     useHotkeyStore.getState().updateConfig("search", {
       key: "n",
       ctrl: true,
@@ -170,9 +166,7 @@ describe("useHotkeyStore", () => {
   });
 
   it("detects conflicts across registered hotkeys case-insensitively", () => {
-    useHotkeyStore
-      .getState()
-      .register("new-todo", newTodoBinding, vi.fn());
+    useHotkeyStore.getState().register("new-todo", newTodoBinding, vi.fn());
 
     expect(
       useHotkeyStore.getState().detectConflict({ key: "N", ctrl: true }),
@@ -180,9 +174,7 @@ describe("useHotkeyStore", () => {
   });
 
   it("ignores the excluded action when checking conflicts", () => {
-    useHotkeyStore
-      .getState()
-      .register("new-todo", newTodoBinding, vi.fn());
+    useHotkeyStore.getState().register("new-todo", newTodoBinding, vi.fn());
 
     expect(
       useHotkeyStore
@@ -192,9 +184,7 @@ describe("useHotkeyStore", () => {
   });
 
   it("returns null when no registered hotkey conflicts", () => {
-    useHotkeyStore
-      .getState()
-      .register("new-todo", newTodoBinding, vi.fn());
+    useHotkeyStore.getState().register("new-todo", newTodoBinding, vi.fn());
 
     expect(
       useHotkeyStore.getState().detectConflict({ key: "p", ctrl: true }),

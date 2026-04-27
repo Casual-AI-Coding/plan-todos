@@ -36,7 +36,9 @@ describe("areTagsEqual", () => {
   });
 
   it("returns false for tag arrays with different lengths", () => {
-    expect(areTagsEqual([{ id: "tag-1" }], [{ id: "tag-1" }, { id: "tag-2" }])).toBe(false);
+    expect(
+      areTagsEqual([{ id: "tag-1" }], [{ id: "tag-1" }, { id: "tag-2" }]),
+    ).toBe(false);
   });
 
   it("returns false for tag arrays with different ids", () => {

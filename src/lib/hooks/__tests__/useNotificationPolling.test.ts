@@ -18,12 +18,18 @@ import { getDueReminders, markReminderSent } from "@/lib/api/notifications";
 
 function createWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(QueryClientProvider, { client: queryClient }, children);
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      children,
+    );
   };
 }
 
 function getPollingOptions(queryClient: QueryClient) {
-  const query = queryClient.getQueryCache().find({ queryKey: ["dueReminders"] });
+  const query = queryClient
+    .getQueryCache()
+    .find({ queryKey: ["dueReminders"] });
   return query?.options as
     | { refetchInterval?: number; staleTime?: number }
     | undefined;
@@ -97,7 +103,10 @@ describe("useNotificationPolling", () => {
   it("marks a reminder as sent through the mutation hook", async () => {
     vi.mocked(markReminderSent).mockResolvedValue(true);
     const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     });
 
     const { result } = renderHook(() => useMarkReminderSent(), {
