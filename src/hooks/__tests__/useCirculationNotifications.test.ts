@@ -39,7 +39,11 @@ import {
 
 function createWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(QueryClientProvider, { client: queryClient }, children);
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      children,
+    );
   };
 }
 
@@ -91,7 +95,9 @@ describe("useCirculationNotifications", () => {
   });
 
   it("exposes the expected query keys", () => {
-    expect(circulationNotificationKeys.all).toEqual(["circulationNotifications"]);
+    expect(circulationNotificationKeys.all).toEqual([
+      "circulationNotifications",
+    ]);
     expect(circulationNotificationKeys.circulation("c1")).toEqual([
       "circulationNotifications",
       "circulation",

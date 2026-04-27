@@ -42,8 +42,17 @@ function createTarget(overrides: Partial<TaggedTarget> = {}): TaggedTarget {
 
 describe("useFilteredPlans", () => {
   const plans = [
-    createPlan({ id: "plan-a", title: "Active tagged", tags: [{ id: "tag-a" }] }),
-    createPlan({ id: "plan-b", title: "Archived tagged", status: "archived", tags: [{ id: "tag-b" }] }),
+    createPlan({
+      id: "plan-a",
+      title: "Active tagged",
+      tags: [{ id: "tag-a" }],
+    }),
+    createPlan({
+      id: "plan-b",
+      title: "Archived tagged",
+      status: "archived",
+      tags: [{ id: "tag-b" }],
+    }),
     createPlan({ id: "plan-c", title: "Active untagged" }),
   ];
 
@@ -85,7 +94,11 @@ describe("useFilteredPlans", () => {
 
   it("returns an empty array when there are no plans", () => {
     const { result } = renderHook(() =>
-      useFilteredPlans({ plans: [], tagFilters: ["tag-a"], showArchived: true }),
+      useFilteredPlans({
+        plans: [],
+        tagFilters: ["tag-a"],
+        showArchived: true,
+      }),
     );
 
     expect(result.current).toEqual([]);
@@ -94,8 +107,17 @@ describe("useFilteredPlans", () => {
 
 describe("useFilteredTargets", () => {
   const targets = [
-    createTarget({ id: "target-a", title: "Active tagged", tags: [{ id: "tag-a" }] }),
-    createTarget({ id: "target-b", title: "Archived tagged", status: "archived", tags: [{ id: "tag-b" }] }),
+    createTarget({
+      id: "target-a",
+      title: "Active tagged",
+      tags: [{ id: "tag-a" }],
+    }),
+    createTarget({
+      id: "target-b",
+      title: "Archived tagged",
+      status: "archived",
+      tags: [{ id: "tag-b" }],
+    }),
     createTarget({ id: "target-c", title: "Active untagged" }),
   ];
 
@@ -124,7 +146,11 @@ describe("useFilteredTargets", () => {
 
   it("filters targets by matching tags", () => {
     const { result } = renderHook(() =>
-      useFilteredTargets({ targets, tagFilters: ["tag-a"], showArchived: true }),
+      useFilteredTargets({
+        targets,
+        tagFilters: ["tag-a"],
+        showArchived: true,
+      }),
     );
 
     expect(result.current.map((target) => target.id)).toEqual(["target-a"]);
@@ -132,7 +158,11 @@ describe("useFilteredTargets", () => {
 
   it("combines archived and tag filters", () => {
     const { result } = renderHook(() =>
-      useFilteredTargets({ targets, tagFilters: ["tag-b"], showArchived: false }),
+      useFilteredTargets({
+        targets,
+        tagFilters: ["tag-b"],
+        showArchived: false,
+      }),
     );
 
     expect(result.current).toEqual([]);
@@ -140,7 +170,11 @@ describe("useFilteredTargets", () => {
 
   it("returns an empty array when there are no targets", () => {
     const { result } = renderHook(() =>
-      useFilteredTargets({ targets: [], tagFilters: ["tag-a"], showArchived: true }),
+      useFilteredTargets({
+        targets: [],
+        tagFilters: ["tag-a"],
+        showArchived: true,
+      }),
     );
 
     expect(result.current).toEqual([]);

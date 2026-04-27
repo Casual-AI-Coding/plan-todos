@@ -107,7 +107,10 @@ function createConfig(overrides?: {
 describe("useEntityOperations", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal("confirm", vi.fn(() => true));
+    vi.stubGlobal(
+      "confirm",
+      vi.fn(() => true),
+    );
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     vi.spyOn(console, "warn").mockImplementation(() => undefined);
   });
@@ -129,29 +132,28 @@ describe("useEntityOperations", () => {
       title: "New entity",
     });
     expect(mockToast.success).toHaveBeenCalledWith("Created");
-    expect(mockSideEffects.saveTags).toHaveBeenCalledWith(
-      "todo",
-      "created-1",
-      ["work"],
-    );
+    expect(mockSideEffects.saveTags).toHaveBeenCalledWith("todo", "created-1", [
+      "work",
+    ]);
   });
 
   it("updates an entity when editing", async () => {
-    const updateMutation = createMutationResult(async (input: TestUpdateInput) => ({
-      id: input.id,
-      status: "pending",
-      title: input.title ?? "updated",
-    }));
+    const updateMutation = createMutationResult(
+      async (input: TestUpdateInput) => ({
+        id: input.id,
+        status: "pending",
+        title: input.title ?? "updated",
+      }),
+    );
     const config = createConfig({ updateMutation });
 
     const { result } = renderHook(() => useEntityOperations(config));
 
     await act(async () => {
-      await result.current.save(
-        { title: "Edited title" },
-        undefined,
-        { isEditing: true, editingId: "entity-1" },
-      );
+      await result.current.save({ title: "Edited title" }, undefined, {
+        isEditing: true,
+        editingId: "entity-1",
+      });
     });
 
     expect(mockToast.success).toHaveBeenCalledWith("Updated");
@@ -181,28 +183,36 @@ describe("useEntityOperations", () => {
   });
 
   it("toggles to completed and announces success", async () => {
-    const updateMutation = createMutationResult(async (input: TestUpdateInput) => ({
-      id: input.id,
-      status: input.status ?? "completed",
-      title: "Task",
-    }));
+    const updateMutation = createMutationResult(
+      async (input: TestUpdateInput) => ({
+        id: input.id,
+        status: input.status ?? "completed",
+        title: "Task",
+      }),
+    );
     const config = createConfig({ updateMutation });
 
     const { result } = renderHook(() => useEntityOperations(config));
 
     await act(async () => {
-      await result.current.toggle({ id: "task-1", status: "pending", title: "Task" });
+      await result.current.toggle({
+        id: "task-1",
+        status: "pending",
+        title: "Task",
+      });
     });
 
     expect(mockToast.success).toHaveBeenCalledWith("Marked done");
   });
 
   it("toggles back to pending when already completed", async () => {
-    const updateMutation = createMutationResult(async (input: TestUpdateInput) => ({
-      id: input.id,
-      status: input.status ?? "pending",
-      title: "Task",
-    }));
+    const updateMutation = createMutationResult(
+      async (input: TestUpdateInput) => ({
+        id: input.id,
+        status: input.status ?? "pending",
+        title: "Task",
+      }),
+    );
     const config = createConfig({ updateMutation });
 
     const { result } = renderHook(() => useEntityOperations(config));
@@ -219,8 +229,13 @@ describe("useEntityOperations", () => {
   });
 
   it("returns false without deleting when confirm is cancelled", async () => {
-    vi.stubGlobal("confirm", vi.fn(() => false));
-    const deleteMutation = createMutationResult(async (_id: string) => undefined);
+    vi.stubGlobal(
+      "confirm",
+      vi.fn(() => false),
+    );
+    const deleteMutation = createMutationResult(
+      async (_id: string) => undefined,
+    );
     const config = createConfig({ deleteMutation });
 
     const { result } = renderHook(() => useEntityOperations(config));
@@ -235,7 +250,9 @@ describe("useEntityOperations", () => {
   });
 
   it("deletes after confirmation and returns true", async () => {
-    const deleteMutation = createMutationResult(async (_id: string) => undefined);
+    const deleteMutation = createMutationResult(
+      async (_id: string) => undefined,
+    );
     const config = createConfig({ deleteMutation });
 
     const { result } = renderHook(() => useEntityOperations(config));
@@ -283,7 +300,9 @@ describe("useEntityOperations", () => {
     };
     await act(async () => {
       await result.current.updateReminder("entity-1", [30]);
-      reminder = (await result.current.fetchReminder("entity-1")) as NotificationSettings | null;
+      reminder = (await result.current.fetchReminder(
+        "entity-1",
+      )) as NotificationSettings | null;
     });
 
     expect(mockSideEffects.updateReminder).not.toHaveBeenCalled();
@@ -329,16 +348,22 @@ describe("useEntityOperations", () => {
     >(async () => undefined, true);
     const config = createConfig({
       reorderMutation,
-      createMutation: createMutationResult(async (input: TestCreateInput) => ({
-        id: "created-1",
-        status: "pending",
-        title: input.title,
-      }), true),
-      updateMutation: createMutationResult(async (input: TestUpdateInput) => ({
-        id: input.id,
-        status: input.status ?? "pending",
-        title: input.title ?? "updated",
-      }), true),
+      createMutation: createMutationResult(
+        async (input: TestCreateInput) => ({
+          id: "created-1",
+          status: "pending",
+          title: input.title,
+        }),
+        true,
+      ),
+      updateMutation: createMutationResult(
+        async (input: TestUpdateInput) => ({
+          id: input.id,
+          status: input.status ?? "pending",
+          title: input.title ?? "updated",
+        }),
+        true,
+      ),
       deleteMutation: createMutationResult<void, string>(
         async (_id: string) => undefined,
         true,
@@ -371,6 +396,8 @@ describe("useEntityOperations", () => {
       ]);
     });
 
-    expect(console.warn).toHaveBeenCalledWith("Reorder mutation not configured");
+    expect(console.warn).toHaveBeenCalledWith(
+      "Reorder mutation not configured",
+    );
   });
 });
