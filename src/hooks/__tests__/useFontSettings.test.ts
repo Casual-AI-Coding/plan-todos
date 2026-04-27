@@ -16,9 +16,9 @@ describe("useFontSettings", () => {
 
     expect(result.current.fontSize).toBe(16);
     expect(result.current.defaultSize).toBe(16);
-    expect(document.documentElement.style.getPropertyValue("--font-size-base")).toBe(
-      "16px",
-    );
+    expect(
+      document.documentElement.style.getPropertyValue("--font-size-base"),
+    ).toBe("16px");
   });
 
   it("prefers the DOM font size over localStorage", () => {
@@ -36,9 +36,9 @@ describe("useFontSettings", () => {
     const { result } = renderHook(() => useFontSettings());
 
     expect(result.current.fontSize).toBe(20);
-    expect(document.documentElement.style.getPropertyValue("--font-size-base")).toBe(
-      "20px",
-    );
+    expect(
+      document.documentElement.style.getPropertyValue("--font-size-base"),
+    ).toBe("20px");
   });
 
   it("falls back to localStorage when the DOM font size is non-numeric", () => {
@@ -77,9 +77,9 @@ describe("useFontSettings", () => {
     expect(localStorage.getItem(STORAGE_KEYS.FONT_SIZE)).toBe(
       String(FONT_SIZE.MAX),
     );
-    expect(document.documentElement.style.getPropertyValue("--font-size-base")).toBe(
-      `${FONT_SIZE.MAX}px`,
-    );
+    expect(
+      document.documentElement.style.getPropertyValue("--font-size-base"),
+    ).toBe(`${FONT_SIZE.MAX}px`);
   });
 
   it("increases and decreases the font size by one step", () => {
