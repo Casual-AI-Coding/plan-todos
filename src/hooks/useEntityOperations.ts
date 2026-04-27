@@ -1,7 +1,16 @@
 import { useToast } from "@/components/ui/Toast";
+import { createEntitySideEffects } from "@/domain/shared/entityOperations";
 import { setEntityTags, setNotificationSettings, getNotificationSettings } from "@/lib/api";
 import type { EntityType } from "@/lib/types";
 import type { UseMutationResult } from "@tanstack/react-query";
+
+const sideEffects = createEntitySideEffects({
+  setEntityTags,
+  setNotificationSettings: async (entityType, entityId, times) => {
+    await setNotificationSettings(entityType, entityId, times);
+  },
+  getNotificationSettings,
+});
 
 export interface EntityOperationsConfig<
   TEntity,
@@ -55,7 +64,7 @@ export function useEntityOperations<
       }
 
       if (tags && entity.id && config.entityType) {
-        await setEntityTags(config.entityType, entity.id, tags);
+        await sideEffects.saveTags(config.entityType, entity.id, tags);
       }
 
       return entity;
@@ -105,7 +114,7 @@ export function useEntityOperations<
     }
 
     try {
-      await setNotificationSettings(config.entityType, entityId, times);
+      await sideEffects.updateReminder(config.entityType, entityId, times);
     } catch (e) {
       console.error("Failed to update reminder settings:", e);
       toast.error(config.messages.reminderError ?? config.messages.error);
@@ -118,7 +127,7 @@ export function useEntityOperations<
     }
 
     try {
-      return await getNotificationSettings(config.entityType, entityId);
+      return await sideEffects.fetchReminder(config.entityType, entityId);
     } catch (e) {
       console.error("Failed to fetch reminder settings:", e);
       return null;

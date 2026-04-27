@@ -39,6 +39,7 @@ vi.mock("@/hooks/useTags", () => ({
 vi.mock("@/lib/api", () => ({
   setEntityTags: vi.fn(),
   setNotificationSettings: vi.fn(),
+  getNotificationSettings: vi.fn(),
 }));
 
 // Mock UI components - define inside vi.mock to avoid hoisting issues
