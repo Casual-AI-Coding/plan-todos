@@ -52,8 +52,9 @@ impl TaskRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let tasks: Result<Vec<Task>, String> = Ok(task_iter.filter_map(|t| t.ok()).collect());
-        tasks
+        task_iter
+            .collect::<Result<Vec<Task>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn get_by_plan(conn: &rusqlite::Connection, plan_id: &str) -> Result<Vec<Task>, String> {
@@ -80,8 +81,9 @@ impl TaskRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let tasks: Result<Vec<Task>, String> = Ok(task_iter.filter_map(|t| t.ok()).collect());
-        tasks
+        task_iter
+            .collect::<Result<Vec<Task>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn create(

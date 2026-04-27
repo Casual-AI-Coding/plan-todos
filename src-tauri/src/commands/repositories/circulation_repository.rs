@@ -33,7 +33,9 @@ impl CirculationRepository {
             .query_map([], |row| Self::row_to_circulation(row))
             .map_err(|e| e.to_string())?;
 
-        Ok(circ_iter.filter_map(|c| c.ok()).collect())
+        circ_iter
+            .collect::<Result<Vec<Circulation>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn get_by_type(
@@ -72,7 +74,8 @@ impl CirculationRepository {
             .query_map(params_ref.as_slice(), |row| Self::row_to_circulation(row))
             .map_err(|e| e.to_string())?;
 
-        Ok(rows.filter_map(|c| c.ok()).collect())
+        rows.collect::<Result<Vec<Circulation>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn create(

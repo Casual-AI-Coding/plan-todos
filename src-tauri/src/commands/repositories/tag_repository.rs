@@ -62,7 +62,9 @@ impl TagRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        Ok(tag_iter.filter_map(|t| t.ok()).collect())
+        tag_iter
+            .collect::<Result<Vec<Tag>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn create(
@@ -143,7 +145,9 @@ impl TagRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        Ok(tag_iter.filter_map(|t| t.ok()).collect())
+        tag_iter
+            .collect::<Result<Vec<Tag>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn set_entity_tags(
@@ -199,7 +203,9 @@ impl TagRepository {
             .query_map(params_ref.as_slice(), |row| row.get(0))
             .map_err(|e| e.to_string())?;
 
-        Ok(id_iter.filter_map(|r| r.ok()).collect())
+        id_iter
+            .collect::<Result<Vec<String>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn bulk_add_tags(

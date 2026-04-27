@@ -57,8 +57,9 @@ impl TodoRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let todos: Result<Vec<Todo>, String> = Ok(todo_iter.filter_map(|t| t.ok()).collect());
-        todos
+        todo_iter
+            .collect::<Result<Vec<Todo>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn create(
@@ -147,7 +148,8 @@ impl TodoRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let todos: Result<Vec<Todo>, String> = Ok(todo_iter.filter_map(|t| t.ok()).collect());
-        todos
+        todo_iter
+            .collect::<Result<Vec<Todo>, _>>()
+            .map_err(|e| e.to_string())
     }
 }

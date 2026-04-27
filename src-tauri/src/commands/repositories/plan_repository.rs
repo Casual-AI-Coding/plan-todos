@@ -50,8 +50,9 @@ impl PlanRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let plans: Result<Vec<Plan>, String> = Ok(plan_iter.filter_map(|t| t.ok()).collect());
-        plans
+        plan_iter
+            .collect::<Result<Vec<Plan>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     pub fn create(

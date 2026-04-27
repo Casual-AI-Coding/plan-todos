@@ -18,7 +18,10 @@ impl TargetRepository {
         let mut total_weight = 0;
         let mut completed_weight = 0;
 
-        for step in step_iter.filter_map(|s| s.ok()) {
+        for step in step_iter
+            .collect::<Result<Vec<(i32, String)>, _>>()
+            .map_err(|e| e.to_string())?
+        {
             total_weight += step.0;
             if step.1 == "completed" {
                 completed_weight += step.0;
@@ -83,17 +86,16 @@ impl TargetRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let mut targets: Result<Vec<Target>, String> =
-            Ok(target_iter.filter_map(|t| t.ok()).collect());
+        let mut targets = target_iter
+            .collect::<Result<Vec<Target>, _>>()
+            .map_err(|e| e.to_string())?;
 
         // Calculate progress for each target
-        if let Ok(ref mut targets) = targets {
-            for target in targets.iter_mut() {
-                target.progress = Self::calculate_progress(conn, &target.id)?;
-            }
+        for target in targets.iter_mut() {
+            target.progress = Self::calculate_progress(conn, &target.id)?;
         }
 
-        targets
+        Ok(targets)
     }
 
     pub fn create(
