@@ -108,9 +108,9 @@ impl MilestoneRepository {
             })
             .map_err(|e| e.to_string())?;
 
-        let milestones: Result<Vec<Milestone>, String> =
-            Ok(milestone_iter.filter_map(|t| t.ok()).collect());
-        milestones
+        milestone_iter
+            .collect::<Result<Vec<Milestone>, _>>()
+            .map_err(|e| e.to_string())
     }
 
     /// Get milestone with calculated progress
@@ -126,13 +126,112 @@ impl MilestoneRepository {
         })
     }
 
-    /// Get all milestones with calculated progress
+    /// Get all milestones with calculated progress (batched to avoid N+1 queries)
     pub fn get_all_with_progress(conn: &rusqlite::Connection) -> Result<Vec<Milestone>, String> {
         let mut milestones = Self::get_all(conn)?;
 
-        // Calculate progress for each milestone
+        if milestones.is_empty() {
+            return Ok(milestones);
+        }
+
+        // Collect biz_ids grouped by biz_type for batch querying
+        let mut plan_ids: Vec<&str> = Vec::new();
+        let mut task_ids: Vec<&str> = Vec::new();
+        let mut target_ids: Vec<&str> = Vec::new();
+
+        for m in &milestones {
+            if let (Some(biz_type), Some(biz_id)) = (&m.biz_type, &m.biz_id) {
+                match biz_type.as_str() {
+                    "plan" => plan_ids.push(biz_id),
+                    "task" => task_ids.push(biz_id),
+                    "target" => target_ids.push(biz_id),
+                    _ => {}
+                }
+            }
+        }
+
+        // Batch query: plan progress (COUNT + SUM for tasks by plan_id)
+        use std::collections::HashMap;
+        let mut plan_progress: HashMap<String, i32> = HashMap::new();
+        if !plan_ids.is_empty() {
+            let placeholders: Vec<&str> = plan_ids.iter().map(|_| "?").collect();
+            let sql = format!(
+                "SELECT plan_id, COUNT(*), SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) \
+                 FROM tasks WHERE plan_id IN ({}) GROUP BY plan_id",
+                placeholders.join(",")
+            );
+            let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+            let rows = stmt
+                .query_map(rusqlite::params_from_iter(plan_ids.iter()), |row| {
+                    let plan_id: String = row.get(0)?;
+                    let total: i32 = row.get(1)?;
+                    let done: i32 = row.get(2)?;
+                    Ok((plan_id, if total == 0 { 0 } else { (done * 100) / total }))
+                })
+                .map_err(|e| e.to_string())?;
+            for row in rows {
+                let (id, progress) = row.map_err(|e| e.to_string())?;
+                plan_progress.insert(id, progress);
+            }
+        }
+
+        // Batch query: task status
+        let mut task_status: HashMap<String, i32> = HashMap::new();
+        if !task_ids.is_empty() {
+            let placeholders: Vec<&str> = task_ids.iter().map(|_| "?").collect();
+            let sql = format!(
+                "SELECT id, status FROM tasks WHERE id IN ({})",
+                placeholders.join(",")
+            );
+            let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+            let rows = stmt
+                .query_map(rusqlite::params_from_iter(task_ids.iter()), |row| {
+                    let id: String = row.get(0)?;
+                    let status: String = row.get(1)?;
+                    Ok((id, if status == "done" { 100 } else { 0 }))
+                })
+                .map_err(|e| e.to_string())?;
+            for row in rows {
+                let (id, progress) = row.map_err(|e| e.to_string())?;
+                task_status.insert(id, progress);
+            }
+        }
+
+        // Batch query: target progress
+        let mut target_progress: HashMap<String, i32> = HashMap::new();
+        if !target_ids.is_empty() {
+            let placeholders: Vec<&str> = target_ids.iter().map(|_| "?").collect();
+            let sql = format!(
+                "SELECT id, progress FROM targets WHERE id IN ({})",
+                placeholders.join(",")
+            );
+            let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+            let rows = stmt
+                .query_map(rusqlite::params_from_iter(target_ids.iter()), |row| {
+                    let id: String = row.get(0)?;
+                    let progress: i32 = row.get(1)?;
+                    Ok((id, progress))
+                })
+                .map_err(|e| e.to_string())?;
+            for row in rows {
+                let (id, progress) = row.map_err(|e| e.to_string())?;
+                target_progress.insert(id, progress);
+            }
+        }
+
+        // Map progress back to milestones
         for milestone in &mut milestones {
-            milestone.progress = Self::calculate_progress(conn, milestone)?;
+            milestone.progress =
+                if let (Some(biz_type), Some(biz_id)) = (&milestone.biz_type, &milestone.biz_id) {
+                    match biz_type.as_str() {
+                        "plan" => plan_progress.get(biz_id).copied().unwrap_or(0),
+                        "task" => task_status.get(biz_id).copied().unwrap_or(0),
+                        "target" => target_progress.get(biz_id).copied().unwrap_or(0),
+                        _ => 0,
+                    }
+                } else {
+                    0
+                };
         }
 
         Ok(milestones)
