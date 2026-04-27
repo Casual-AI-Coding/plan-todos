@@ -18,8 +18,8 @@ export async function createPlan(data: CreatePlanParams): Promise<Plan> {
     return invoke<Plan>("create_plan", {
       title: data.title,
       description: data.description || null,
-      startDate: data.start_date || null,
-      endDate: data.end_date || null,
+      start_date: data.start_date || null,
+      end_date: data.end_date || null,
     });
   });
 }
@@ -33,8 +33,8 @@ export async function updatePlan(
       id,
       title: data.title,
       description: data.description,
-      startDate: data.start_date,
-      endDate: data.end_date,
+      start_date: data.start_date,
+      end_date: data.end_date,
       status: data.status,
     });
   });

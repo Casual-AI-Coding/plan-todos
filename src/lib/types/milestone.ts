@@ -38,5 +38,7 @@ export interface CreateMilestoneParams {
 export interface UpdateMilestoneParams {
   title?: string;
   target_date?: string;
+  biz_type?: string;
+  biz_id?: string;
   status?: "pending" | "completed";
 }

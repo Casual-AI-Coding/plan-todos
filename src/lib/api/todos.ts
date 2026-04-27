@@ -21,7 +21,11 @@ export async function getTodos(): Promise<Todo[]> {
 
 export async function getTodosByTag(tagId: string): Promise<Todo[]> {
   return withTauriError("获取标签下的 Todo 列表", async () => {
-    return invoke<Todo[]>("get_todos_by_tag", { tagId });
+    const ids = await invoke<string[]>("get_entities_by_tag", {
+      entity_type: "todo",
+      tag_ids: [tagId],
+    });
+    return Promise.all(ids.map((id) => getTodo(id)));
   });
 }
 
@@ -30,7 +34,7 @@ export async function createTodo(data: CreateTodoParams): Promise<Todo> {
     return invoke<Todo>("create_todo", {
       title: data.title,
       content: data.content || null,
-      dueDate: data.due_date || null,
+      due_date: data.due_date || null,
       priority: data.priority || null,
       recurrence: data.recurrence ? JSON.stringify(data.recurrence) : null,
     });
@@ -46,7 +50,7 @@ export async function updateTodo(
       id,
       title: data.title,
       content: data.content,
-      dueDate: data.due_date,
+      due_date: data.due_date,
       status: data.status,
       priority: data.priority,
       recurrence: data.recurrence ? JSON.stringify(data.recurrence) : null,
