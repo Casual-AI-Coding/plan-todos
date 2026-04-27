@@ -135,27 +135,31 @@ describe("Todo API", () => {
 
     it("should call invoke with get_todos_by_tag command when in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(true);
-      const mockTodos: Todo[] = [
-        {
-          id: "test-id-1",
-          title: "Tagged Todo",
-          content: null,
-          due_date: null,
-          status: "pending",
-          priority: "P1",
-          sort_order: 0,
-          created_at: "2024-01-01",
-          updated_at: "2024-01-01",
-        },
-      ];
-      mockInvoke.mockResolvedValue(mockTodos);
+      const mockTodo: Todo = {
+        id: "test-id-1",
+        title: "Tagged Todo",
+        content: null,
+        due_date: null,
+        status: "pending",
+        priority: "P1",
+        sort_order: 0,
+        created_at: "2024-01-01",
+        updated_at: "2024-01-01",
+      };
+      mockInvoke
+        .mockResolvedValueOnce(["test-id-1"])
+        .mockResolvedValueOnce(mockTodo);
 
       const result = await getTodosByTag("tag-1");
 
-      expect(mockInvoke).toHaveBeenCalledWith("get_todos_by_tag", {
-        tagId: "tag-1",
+      expect(mockInvoke).toHaveBeenCalledWith("get_entities_by_tag", {
+        entity_type: "todo",
+        tag_ids: ["tag-1"],
       });
-      expect(result).toEqual(mockTodos);
+      expect(mockInvoke).toHaveBeenCalledWith("get_todo", {
+        id: "test-id-1",
+      });
+      expect(result).toEqual([mockTodo]);
     });
 
     it("should handle invoke error", async () => {
@@ -204,7 +208,7 @@ describe("Todo API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("create_todo", {
         title: "New Todo",
         content: "Test content",
-        dueDate: "2024-01-01",
+        due_date: "2024-01-01",
         priority: "P1",
         recurrence: null,
       });
@@ -232,7 +236,7 @@ describe("Todo API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("create_todo", {
         title: "Minimal Todo",
         content: null,
-        dueDate: null,
+        due_date: null,
         priority: null,
         recurrence: null,
       });
@@ -289,7 +293,7 @@ describe("Todo API", () => {
         id: "test-id",
         title: "Updated Title",
         content: "Updated content",
-        dueDate: "2024-01-02",
+        due_date: "2024-01-02",
         status: "done",
         priority: "P0",
         recurrence: null,
@@ -319,7 +323,7 @@ describe("Todo API", () => {
         id: "test-id",
         title: "Just Title",
         content: undefined,
-        dueDate: undefined,
+        due_date: undefined,
         status: undefined,
         priority: undefined,
         recurrence: null,
@@ -349,7 +353,7 @@ describe("Todo API", () => {
         id: "test-id",
         title: undefined,
         content: undefined,
-        dueDate: undefined,
+        due_date: undefined,
         status: "in-progress",
         priority: undefined,
         recurrence: null,

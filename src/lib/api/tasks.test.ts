@@ -88,7 +88,7 @@ describe("Task API", () => {
       mockInvoke.mockResolvedValue([]);
       await getTasksByPlan("plan-1");
       expect(mockInvoke).toHaveBeenCalledWith("get_tasks_by_plan", {
-        planId: "plan-1",
+        plan_id: "plan-1",
       });
     });
   });
@@ -123,11 +123,11 @@ describe("Task API", () => {
       await createTask(params);
 
       expect(mockInvoke).toHaveBeenCalledWith("create_task", {
-        planId: "plan-1",
+        plan_id: "plan-1",
         title: "New Task",
         description: "Description",
-        startDate: "2024-01-01",
-        endDate: "2024-01-02",
+        start_date: "2024-01-01",
+        end_date: "2024-01-02",
         priority: "P0",
       });
     });
@@ -139,11 +139,11 @@ describe("Task API", () => {
       await createTask({ plan_id: "plan-1", title: "Minimal" });
 
       expect(mockInvoke).toHaveBeenCalledWith("create_task", {
-        planId: "plan-1",
+        plan_id: "plan-1",
         title: "Minimal",
         description: null,
-        startDate: null,
-        endDate: null,
+        start_date: null,
+        end_date: null,
         priority: null,
       });
     });
@@ -175,8 +175,8 @@ describe("Task API", () => {
         id: "task-1",
         title: "Updated",
         description: "New desc",
-        startDate: "2024-01-01",
-        endDate: "2024-01-02",
+        start_date: "2024-01-01",
+        end_date: "2024-01-02",
         status: "done",
         priority: "P3",
       });

@@ -190,8 +190,8 @@ describe("createPlan", () => {
     expect(invoke).toHaveBeenCalledWith("create_plan", {
       title: "New Plan",
       description: "Test description",
-      startDate: "2024-01-01",
-      endDate: "2024-12-31",
+      start_date: "2024-01-01",
+      end_date: "2024-12-31",
     });
     expect(result).toEqual(mockPlan);
   });
@@ -216,8 +216,8 @@ describe("createPlan", () => {
     expect(invoke).toHaveBeenCalledWith("create_plan", {
       title: "Simple Plan",
       description: null,
-      startDate: null,
-      endDate: null,
+      start_date: null,
+      end_date: null,
     });
   });
 
@@ -244,8 +244,8 @@ describe("createPlan", () => {
     expect(invoke).toHaveBeenCalledWith("create_plan", {
       title: "Plan",
       description: "Only desc",
-      startDate: null,
-      endDate: null,
+      start_date: null,
+      end_date: null,
     });
   });
 
@@ -272,8 +272,8 @@ describe("createPlan", () => {
     expect(invoke).toHaveBeenCalledWith("create_plan", {
       title: "Plan",
       description: null,
-      startDate: "2024-01-01",
-      endDate: null,
+      start_date: "2024-01-01",
+      end_date: null,
     });
   });
 
@@ -297,8 +297,8 @@ describe("createPlan", () => {
     expect(invoke).toHaveBeenCalledWith("create_plan", {
       title: "Plan",
       description: null,
-      startDate: null,
-      endDate: "2024-12-31",
+      start_date: null,
+      end_date: "2024-12-31",
     });
   });
 
@@ -365,8 +365,8 @@ describe("updatePlan", () => {
       id: "plan-1",
       title: "Updated Plan",
       description: "New description",
-      startDate: "2024-01-01",
-      endDate: "2024-12-31",
+      start_date: "2024-01-01",
+      end_date: "2024-12-31",
       status: "completed",
     });
     expect(result).toEqual(mockPlan);
@@ -393,8 +393,8 @@ describe("updatePlan", () => {
       id: "plan-1",
       title: "New Title",
       description: undefined,
-      startDate: undefined,
-      endDate: undefined,
+      start_date: undefined,
+      end_date: undefined,
       status: undefined,
     });
   });
@@ -420,8 +420,8 @@ describe("updatePlan", () => {
       id: "plan-1",
       title: undefined,
       description: undefined,
-      startDate: undefined,
-      endDate: undefined,
+      start_date: undefined,
+      end_date: undefined,
       status: "archived",
     });
   });
@@ -447,8 +447,8 @@ describe("updatePlan", () => {
       id: "plan-1",
       title: undefined,
       description: "New desc",
-      startDate: undefined,
-      endDate: undefined,
+      start_date: undefined,
+      end_date: undefined,
       status: undefined,
     });
   });
@@ -477,8 +477,8 @@ describe("updatePlan", () => {
       id: "plan-1",
       title: undefined,
       description: undefined,
-      startDate: "2024-06-01",
-      endDate: "2024-06-30",
+      start_date: "2024-06-01",
+      end_date: "2024-06-30",
       status: undefined,
     });
   });
