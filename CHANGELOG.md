@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.2] - 2026-04-27
+
+### Refactored
+
+**DDD Architecture Upgrade (Phase 3)**:
+
+- Establish complete domain query layer (`src/domain/`) with service migration across all entity types (Todo, Plan, Target, Milestone, Tag, Circulation)
+- Extract `ViewRouter` and `MobileSidebar` from `page.tsx` god component
+- Consolidate `TodosView` UI state into `useTodoViewState()` with pure selector functions
+- Centralize navigation state in zustand store (`navigation.ts`)
+- Extract shared `entityOperations` and `entityQueries` factory functions
+- Phase 3A: Complete domain layer query extraction for all entities
+- Phase 3B: Consolidate view state into domain layer
+
+**View Routing Refactoring**:
+
+- `ViewRouter` refactoring with improved routing logic and URL sync
+- Route configuration updates (`src/config/routes.ts`) with better i18n support
+- Navigation guards and active state management improvements
+
+### Added
+
+**Documentation**:
+
+- Added comprehensive DDD architecture upgrade plan (`docs/plans/2026-04-27-ddd-architecture-upgrade-plan.md`)
+- Updated DDD frontend upgrade specifications (`docs/specs/ddd-frontend-upgrade.md`)
+- Created release notes standard document (`docs/standards/release-notes-standard.md`)
+- Updated `docs/AGENTS.md` with project taxonomy, release workflow, and version management guidelines
+
+### Changed
+
+**Test Coverage Enhancement**:
+
+- Added 180+ new tests for `milestoneService` (280 lines added)
+- Enhanced `circulationService` and `targetService` test coverage
+- Added `todoFilters` and `todoViewState` unit tests
+- `circulationService.test.ts` expanded from basic to comprehensive coverage
+
+### Fixed
+
+- Align circulations view test imports with domain query boundary after import cleanup
+
 ## [0.8.1] - 2026-04-21
 
 ### Refactored
