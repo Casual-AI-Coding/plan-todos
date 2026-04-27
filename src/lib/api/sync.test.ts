@@ -99,8 +99,8 @@ describe("Sync API", () => {
 
         expect(mockInvoke).toHaveBeenCalledWith("update_sync_config", {
           enabled: true,
-          serverUrl: "https://new.example.com",
-          syncIntervalMinutes: 60,
+          server_url: "https://new.example.com",
+          sync_interval_minutes: 60,
         });
       });
     });
@@ -119,7 +119,7 @@ describe("Sync API", () => {
         );
 
         expect(mockInvoke).toHaveBeenCalledWith("test_sync_connection", {
-          serverUrl: "https://example.com",
+          server_url: "https://example.com",
           username: "user",
           password: "pass",
         });
@@ -318,7 +318,7 @@ describe("Sync API", () => {
         await unregisterDevice("device-1");
 
         expect(mockInvoke).toHaveBeenCalledWith("unregister_device", {
-          deviceId: "device-1",
+          device_id: "device-1",
         });
       });
     });
@@ -355,9 +355,9 @@ describe("Sync API", () => {
         await resolveConflict(1, "local");
 
         expect(mockInvoke).toHaveBeenCalledWith("resolve_conflict", {
-          conflictId: 1,
+          conflict_id: 1,
           resolution: "local",
-          mergedData: undefined,
+          merged_data: undefined,
         });
       });
 
@@ -369,9 +369,9 @@ describe("Sync API", () => {
         await resolveConflict(1, "merge", mergedData);
 
         expect(mockInvoke).toHaveBeenCalledWith("resolve_conflict", {
-          conflictId: 1,
+          conflict_id: 1,
           resolution: "merge",
-          mergedData,
+          merged_data: mergedData,
         });
       });
     });

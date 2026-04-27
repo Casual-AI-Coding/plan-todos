@@ -108,7 +108,7 @@ describe("Target API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("create_target", {
         title: "New Target",
         description: "Description",
-        dueDate: "2024-01-01",
+        due_date: "2024-01-01",
       });
     });
 
@@ -121,7 +121,7 @@ describe("Target API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("create_target", {
         title: "Minimal",
         description: null,
-        dueDate: null,
+        due_date: null,
       });
     });
   });
@@ -150,7 +150,7 @@ describe("Target API", () => {
         id: "target-1",
         title: "Updated",
         description: "New desc",
-        dueDate: "2024-01-02",
+        due_date: "2024-01-02",
         status: "completed",
       });
     });

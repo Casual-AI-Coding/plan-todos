@@ -118,7 +118,7 @@ describe("Milestone API", () => {
       await getMilestonesByTarget("target-1");
 
       expect(mockInvoke).toHaveBeenCalledWith("get_milestones_by_target", {
-        targetId: "target-1",
+        target_id: "target-1",
       });
     });
   });
@@ -157,9 +157,9 @@ describe("Milestone API", () => {
 
       expect(mockInvoke).toHaveBeenCalledWith("create_milestone", {
         title: "New Milestone",
-        targetDate: "2024-01-01",
-        bizType: "plan",
-        bizId: "plan-1",
+        target_date: "2024-01-01",
+        biz_type: "plan",
+        biz_id: "plan-1",
       });
       expect(result).toEqual(mockMilestone);
     });
@@ -183,9 +183,9 @@ describe("Milestone API", () => {
 
       expect(mockInvoke).toHaveBeenCalledWith("create_milestone", {
         title: "Minimal",
-        targetDate: null,
-        bizType: null,
-        bizId: null,
+        target_date: null,
+        biz_type: null,
+        biz_id: null,
       });
     });
   });
@@ -221,7 +221,7 @@ describe("Milestone API", () => {
       expect(mockInvoke).toHaveBeenCalledWith("update_milestone", {
         id: "test-id",
         title: "Updated",
-        targetDate: "2024-01-02",
+        target_date: "2024-01-02",
         status: "completed",
       });
     });
