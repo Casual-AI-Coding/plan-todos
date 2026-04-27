@@ -48,11 +48,10 @@ vi.mock("@dnd-kit/sortable", () => ({
 }));
 
 import {
-  useCirculations,
   useCreateCirculation,
   useCheckinCirculation,
   useUndoCheckinCirculation,
-} from "@/hooks/useCirculations";
+} from "@/domain/circulation/circulationQueries";
 
 describe("CirculationsView", () => {
   beforeEach(() => {
