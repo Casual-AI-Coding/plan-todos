@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card, Button } from "@/components/ui";
 import { Calendar } from "@/components/ui/Calendar";
 import { EmptyStateCard } from "@/components/features";
@@ -14,10 +13,11 @@ import {
 import { useTags } from "@/hooks/useTags";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useEntityOperations } from "@/hooks/useEntityOperations";
-import { useFilteredTodos, useCalendarEvents } from "@/hooks/useEntityFilter";
+import { filterTodos, toCalendarEvents } from "@/domain/todo/todoFilters";
+import { useTodoViewState } from "@/domain/todo/todoViewState";
 import { BatchActionBar } from "@/components/features/BatchActionBar";
 import { SelectableItem } from "@/components/features/SelectableItem";
-import type { Todo, Priority } from "@/lib/types";
+import type { Todo } from "@/lib/types";
 import { TodoItem } from "@/components/features/TodoItem";
 import { TodoForm, type TodoFormData } from "@/components/features/TodoForm";
 import { TodoFilters } from "@/components/features/TodoFilters";
@@ -25,18 +25,7 @@ import { SortableList } from "@/components/features/SortableList";
 import { t } from "@/config/i18n";
 
 export function TodosView() {
-  const [filter, setFilter] = useState<
-    "all" | "today" | "upcoming" | "completed"
-  >("all");
-  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
-  const [tagFilters, setTagFilters] = useState<string[]>([]);
-  const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
-  const [showTagDropdown, setShowTagDropdown] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
-  const [showForm, setShowForm] = useState(false);
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const view = useTodoViewState();
 
   const batchMode = useBatchSelect((s) => s.mode);
   const toggleBatchMode = useBatchSelect((s) => s.toggleMode);
@@ -50,14 +39,14 @@ export function TodosView() {
 
   const todos = todosData || [];
 
-  const calendarEvents = useCalendarEvents(todos);
+  const calendarEvents = toCalendarEvents(todos);
 
-  const filteredTodos = useFilteredTodos({
+  const filteredTodos = filterTodos({
     todos,
-    filter,
-    priorityFilter,
-    tagFilters,
-    searchQuery,
+    filter: view.filter,
+    priorityFilter: view.priorityFilter,
+    tagFilters: view.tagFilters,
+    searchQuery: view.searchQuery,
   });
 
   const operations = useEntityOperations({
@@ -82,12 +71,11 @@ export function TodosView() {
   async function handleSave(data: TodoFormData, tags: string[]) {
     if (!data.title.trim()) return;
     const result = await operations.save(data, tags, {
-      isEditing: !!editingTodo,
-      editingId: editingTodo?.id,
+      isEditing: !!view.editingTodo,
+      editingId: view.editingTodo?.id,
     });
     if (result) {
-      setShowForm(false);
-      setEditingTodo(null);
+      view.closeForm();
     }
   }
 
@@ -104,13 +92,7 @@ export function TodosView() {
   }
 
   function handleEditClick(todo: Todo) {
-    setEditingTodo(todo);
-    setShowForm(true);
-  }
-
-  function handleCloseForm() {
-    setShowForm(false);
-    setEditingTodo(null);
+    view.openEditForm(todo);
   }
 
   async function handleReorder(newItems: Todo[]) {
@@ -142,50 +124,41 @@ export function TodosView() {
           >
             {batchMode ? "退出多选" : "多选"}
           </Button>
-          <Button onClick={() => setShowForm(true)}>+ 新建</Button>
+          <Button onClick={view.openCreateForm}>+ 新建</Button>
         </div>
       </div>
 
       {/* Filters */}
       <TodoFilters
-        filter={filter}
-        priorityFilter={priorityFilter}
-        tagFilters={tagFilters}
-        searchQuery={searchQuery}
-        viewMode={viewMode}
+        filter={view.filter}
+        priorityFilter={view.priorityFilter}
+        tagFilters={view.tagFilters}
+        searchQuery={view.searchQuery}
+        viewMode={view.viewMode}
         allTags={allTags}
-        showPriorityDropdown={showPriorityDropdown}
-        showTagDropdown={showTagDropdown}
-        onFilterChange={setFilter}
-        onPriorityFilterChange={setPriorityFilter}
-        onTagFilterChange={setTagFilters}
-        onSearchChange={setSearchQuery}
-        onViewModeChange={setViewMode}
-        onPriorityDropdownToggle={() => {
-          setShowPriorityDropdown(!showPriorityDropdown);
-          setShowTagDropdown(false);
-        }}
-        onTagDropdownToggle={() => {
-          setShowTagDropdown(!showTagDropdown);
-          setShowPriorityDropdown(false);
-        }}
+        showPriorityDropdown={view.showPriorityDropdown}
+        showTagDropdown={view.showTagDropdown}
+        onFilterChange={view.setFilter}
+        onPriorityFilterChange={view.setPriorityFilter}
+        onTagFilterChange={view.setTagFilters}
+        onSearchChange={view.setSearchQuery}
+        onViewModeChange={view.setViewMode}
+        onPriorityDropdownToggle={view.togglePriorityDropdown}
+        onTagDropdownToggle={view.toggleTagDropdown}
       />
 
       {/* Click outside to close dropdowns */}
-      {(showPriorityDropdown || showTagDropdown) && (
+      {(view.showPriorityDropdown || view.showTagDropdown) && (
         <div
           className="fixed inset-0 z-0"
-          onClick={() => {
-            setShowPriorityDropdown(false);
-            setShowTagDropdown(false);
-          }}
+          onClick={view.closeDropdowns}
         />
       )}
 
       {/* Content */}
       {isLoading ? (
         <div className="text-gray-500">{t.loading.default}</div>
-      ) : viewMode === "list" ? (
+      ) : view.viewMode === "list" ? (
         <>
           {/* Batch Action Bar */}
           {batchMode && (
@@ -198,9 +171,9 @@ export function TodosView() {
             <SortableList
               items={filteredTodos}
               onReorder={handleReorder}
-              getItemId={(todo) => todo.id}
+              getItemId={(todo: Todo) => todo.id}
               layout="vertical"
-              renderItem={(todo) => (
+              renderItem={(todo: Todo) => (
                 <SelectableItem id={todo.id}>
                   <TodoItem
                     todo={todo}
@@ -218,7 +191,7 @@ export function TodosView() {
               title="暂无待办事项"
               description="创建你的第一个待办事项来开始使用"
               action={
-                <Button onClick={() => setShowForm(true)}>+ 创建待办</Button>
+                <Button onClick={view.openCreateForm}>+ 创建待办</Button>
               }
             />
           )}
@@ -235,10 +208,10 @@ export function TodosView() {
 
       {/* Form */}
       <TodoForm
-        open={showForm}
-        editingTodo={editingTodo}
+        open={view.showForm}
+        editingTodo={view.editingTodo}
         allTags={allTags}
-        onClose={handleCloseForm}
+        onClose={view.closeForm}
         onSave={handleSave}
       />
     </div>
