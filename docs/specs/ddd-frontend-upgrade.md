@@ -941,7 +941,7 @@ export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
 
 ---
 
-### Phase 4: Review 和验证 (预计 1h)
+### Phase 4: Review 和验证 (已完成)
 
 #### 4-1: 运行全量测试
 
@@ -1004,6 +1004,8 @@ Phase 2B-1 → commit: refactor: extract filter logic from TodosView
 Phase 2C-1/2/3 → commit: refactor: shared navigation config for Sidebar and BottomNav
 Phase 3-1/2 → commit: refactor: unify type system, remove duplicate type definitions
 Phase 4 → commit: verify: all tests pass, typecheck clean
+
+> 备注：仓库当前环境对 `cargo test` 仍受 GTK/GLib 系统库缺失影响，Rust 后端验证需要在具备这些依赖的环境中补跑；前端 `npm run test`、`npm run typecheck`、`npm run lint`、`npm run build` 已通过。
 ```
 
 ---
