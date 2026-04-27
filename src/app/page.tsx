@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { ViewRouter } from "@/components/layout/ViewRouter";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
+import { useNavigationStore } from "@/stores/navigation";
 import { CirculationDetailView } from "./views";
 
 function getInitialSidebarCollapsed(): boolean {
@@ -15,10 +16,13 @@ function getInitialSidebarCollapsed(): boolean {
 }
 
 export default function Home() {
-  const [activeMenu, setActiveMenu] = useState("dashboard");
+  const activeMenu = useNavigationStore((state) => state.activeMenu);
+  const mobileSidebarOpen = useNavigationStore((state) => state.mobileSidebarOpen);
+  const navigate = useNavigationStore((state) => state.navigate);
+  const openMobileSidebar = useNavigationStore((state) => state.openMobileSidebar);
+  const closeMobileSidebar = useNavigationStore((state) => state.closeMobileSidebar);
   const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
   const [, setSidebarCollapsed] = useState(getInitialSidebarCollapsed);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -37,7 +41,7 @@ export default function Home() {
         <TitleBar />
         <div className="flex flex-1 overflow-hidden">
           <div className="hidden md:block h-full">
-            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} onCollapseChange={setSidebarCollapsed} />
+            <Sidebar activeMenu={activeMenu} onMenuChange={navigate} onCollapseChange={setSidebarCollapsed} />
           </div>
           <main className="flex-1 overflow-auto pb-16 md:pb-0" style={{ backgroundColor: "var(--color-bg)" }}>
             <ViewRouter activeMenu={activeMenu} />
@@ -56,7 +60,7 @@ export default function Home() {
           }}
         >
           <button
-            onClick={() => setMobileSidebarOpen(true)}
+            onClick={openMobileSidebar}
             className="p-2 -ml-2 rounded hover:opacity-80"
             style={{ color: "var(--color-text)" }}
             aria-label="打开菜单"
@@ -86,14 +90,14 @@ export default function Home() {
         {mobileSidebarOpen && (
           <MobileSidebar
             activeMenu={activeMenu}
-            onMenuChange={setActiveMenu}
-            onClose={() => setMobileSidebarOpen(false)}
+            onMenuChange={navigate}
+            onClose={closeMobileSidebar}
             onCollapseChange={setSidebarCollapsed}
           />
         )}
       </div>
 
-      <BottomNav activeMenu={activeMenu} onMenuChange={setActiveMenu} />
+      <BottomNav activeMenu={activeMenu} onMenuChange={navigate} />
 
       {circulationDetailId && (
         <CirculationDetailView id={circulationDetailId} onClose={() => setCirculationDetailId(null)} />
