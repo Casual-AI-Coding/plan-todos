@@ -105,6 +105,31 @@ mod tests {
     }
 
     #[test]
+    fn test_validate_priority_rejects_unknown_value() {
+        let result = crate::commands::validation::validate_priority("PX");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Invalid priority"));
+    }
+
+    #[test]
+    fn test_validate_target_status_accepts_archived() {
+        let result = crate::commands::validation::validate_target_status("archived");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_validate_milestone_status_rejects_cancelled() {
+        let result = crate::commands::validation::validate_milestone_status("cancelled");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_validate_circulation_status_rejects_paused() {
+        let result = crate::commands::validation::validate_circulation_status("paused");
+        assert!(result.is_err());
+    }
+
+    #[test]
     fn test_tables_exist() {
         let conn = Connection::open_in_memory().unwrap();
         init_db(&conn).unwrap();

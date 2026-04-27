@@ -1,5 +1,14 @@
 // Input validation utilities for CRUD commands
 
+pub const VALID_PRIORITIES: [&str; 4] = ["P0", "P1", "P2", "P3"];
+pub const VALID_TODO_STATUSES: [&str; 4] = ["pending", "in-progress", "completed", "cancelled"];
+pub const VALID_PLAN_STATUSES: [&str; 3] = ["active", "completed", "archived"];
+pub const VALID_TARGET_STATUSES: [&str; 3] = ["active", "completed", "archived"];
+pub const VALID_MILESTONE_STATUSES: [&str; 2] = ["pending", "completed"];
+pub const VALID_CIRCULATION_STATUSES: [&str; 2] = ["active", "archived"];
+pub const VALID_CIRCULATION_TYPES: [&str; 2] = ["periodic", "count"];
+pub const VALID_FREQUENCIES: [&str; 3] = ["daily", "weekly", "monthly"];
+
 pub fn validate_title(title: &str) -> Result<(), String> {
     let trimmed = title.trim();
     if trimmed.is_empty() {
@@ -13,24 +22,22 @@ pub fn validate_title(title: &str) -> Result<(), String> {
 
 /// Validates priority: must be one of P0, P1, P2, P3
 pub fn validate_priority(priority: &str) -> Result<(), String> {
-    let valid_priorities = ["P0", "P1", "P2", "P3"];
-    if !valid_priorities.contains(&priority) {
+    if !VALID_PRIORITIES.contains(&priority) {
         return Err(format!(
             "Invalid priority '{}'. Must be one of: {}",
             priority,
-            valid_priorities.join(", ")
+            VALID_PRIORITIES.join(", ")
         ));
     }
     Ok(())
 }
 
 pub fn validate_status(status: &str) -> Result<(), String> {
-    let valid_statuses = ["pending", "in-progress", "completed", "cancelled"];
-    if !valid_statuses.contains(&status) {
+    if !VALID_TODO_STATUSES.contains(&status) {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
             status,
-            valid_statuses.join(", ")
+            VALID_TODO_STATUSES.join(", ")
         ));
     }
     Ok(())
@@ -38,51 +45,47 @@ pub fn validate_status(status: &str) -> Result<(), String> {
 
 /// Validates plan status: must be one of active, completed, archived
 pub fn validate_plan_status(status: &str) -> Result<(), String> {
-    let valid_statuses = ["active", "completed", "archived"];
-    if !valid_statuses.contains(&status) {
+    if !VALID_PLAN_STATUSES.contains(&status) {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
             status,
-            valid_statuses.join(", ")
+            VALID_PLAN_STATUSES.join(", ")
         ));
     }
     Ok(())
 }
 
-/// Validates target status: must be one of active, completed, cancelled
+/// Validates target status: must be one of active, completed, archived
 pub fn validate_target_status(status: &str) -> Result<(), String> {
-    let valid_statuses = ["active", "completed", "cancelled"];
-    if !valid_statuses.contains(&status) {
+    if !VALID_TARGET_STATUSES.contains(&status) {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
             status,
-            valid_statuses.join(", ")
+            VALID_TARGET_STATUSES.join(", ")
         ));
     }
     Ok(())
 }
 
-/// Validates milestone status: must be one of pending, completed, cancelled
+/// Validates milestone status: must be one of pending, completed
 pub fn validate_milestone_status(status: &str) -> Result<(), String> {
-    let valid_statuses = ["pending", "completed", "cancelled"];
-    if !valid_statuses.contains(&status) {
+    if !VALID_MILESTONE_STATUSES.contains(&status) {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
             status,
-            valid_statuses.join(", ")
+            VALID_MILESTONE_STATUSES.join(", ")
         ));
     }
     Ok(())
 }
 
-/// Validates circulation status: must be one of active, paused, completed
+/// Validates circulation status: must be one of active, archived
 pub fn validate_circulation_status(status: &str) -> Result<(), String> {
-    let valid_statuses = ["active", "paused", "completed"];
-    if !valid_statuses.contains(&status) {
+    if !VALID_CIRCULATION_STATUSES.contains(&status) {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
             status,
-            valid_statuses.join(", ")
+            VALID_CIRCULATION_STATUSES.join(", ")
         ));
     }
     Ok(())
@@ -90,12 +93,11 @@ pub fn validate_circulation_status(status: &str) -> Result<(), String> {
 
 /// Validates circulation type: must be one of periodic, count
 pub fn validate_circulation_type(circulation_type: &str) -> Result<(), String> {
-    let valid_types = ["periodic", "count"];
-    if !valid_types.contains(&circulation_type) {
+    if !VALID_CIRCULATION_TYPES.contains(&circulation_type) {
         return Err(format!(
             "Invalid circulation_type '{}'. Must be one of: {}",
             circulation_type,
-            valid_types.join(", ")
+            VALID_CIRCULATION_TYPES.join(", ")
         ));
     }
     Ok(())
@@ -136,12 +138,11 @@ pub fn normalize_color_or_default(color: &str) -> String {
 
 /// Validates frequency: must be one of daily, weekly, monthly
 pub fn validate_frequency(frequency: &str) -> Result<(), String> {
-    let valid_frequencies = ["daily", "weekly", "monthly"];
-    if !valid_frequencies.contains(&frequency) {
+    if !VALID_FREQUENCIES.contains(&frequency) {
         return Err(format!(
             "Invalid frequency '{}'. Must be one of: {}",
             frequency,
-            valid_frequencies.join(", ")
+            VALID_FREQUENCIES.join(", ")
         ));
     }
     Ok(())
