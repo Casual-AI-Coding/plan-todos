@@ -2,6 +2,7 @@
 
 import type { Todo, Task, Target, Milestone } from "@/lib/types";
 import type { EntityItem, HoveredItem } from "@/app/views/views/types";
+import { Icons } from "@/components/ui/Icons";
 
 export interface ViewsCalendarProps {
   todos: Todo[];
@@ -105,20 +106,26 @@ export function ViewsCalendar({
           className="p-2 rounded-lg transition-colors hover:opacity-70"
           style={{ color: "var(--color-text-muted)" }}
         >
-          ◀
+          <Icons.ChevronLeft size={20} />
         </button>
-        <h3
-          className="text-xl font-semibold"
-          style={{ color: "var(--color-text)" }}
-        >
-          {monthNames[currentMonth]} {currentYear}
-        </h3>
+        <div className="flex items-center gap-2">
+          <Icons.CalendarDays
+            size={20}
+            style={{ color: "var(--color-primary)" }}
+          />
+          <h3
+            className="text-xl font-semibold"
+            style={{ color: "var(--color-text)" }}
+          >
+            {monthNames[currentMonth]} {currentYear}
+          </h3>
+        </div>
         <button
           onClick={nextMonth}
           className="p-2 rounded-lg transition-colors hover:opacity-70"
           style={{ color: "var(--color-text-muted)" }}
         >
-          ▶
+          <Icons.ChevronRight size={20} />
         </button>
       </div>
 
@@ -176,7 +183,7 @@ export function ViewsCalendar({
                 {items.map((item, idx) => (
                   <div
                     key={idx}
-                    className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 ${
+                    className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 transition-opacity ${
                       item.type === "todo"
                         ? "bg-blue-100 text-blue-700"
                         : item.type === "task"

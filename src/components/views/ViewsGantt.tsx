@@ -1,6 +1,7 @@
 "use client";
 
 import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
+import { Icons } from "@/components/ui/Icons";
 
 export interface ViewsGanttProps {
   todos: Todo[];
@@ -19,6 +20,14 @@ export interface ViewsGanttProps {
   setGanttZoom: React.Dispatch<React.SetStateAction<number>>;
   onNavigate?: (type: string, id: string) => void;
 }
+
+const typeColors: Record<string, { bg: string; bgCompleted: string }> = {
+  plan: { bg: "bg-purple-400", bgCompleted: "bg-purple-500" },
+  task: { bg: "bg-teal-400", bgCompleted: "bg-teal-500" },
+  target: { bg: "bg-orange-400", bgCompleted: "bg-orange-500" },
+  todo: { bg: "bg-blue-400", bgCompleted: "bg-blue-500" },
+  milestone: { bg: "bg-gray-400", bgCompleted: "bg-gray-500" },
+};
 
 export function ViewsGantt({
   todos,
@@ -219,12 +228,8 @@ export function ViewsGantt({
 
   const getTypeColor = (type: string, status: string) => {
     const completed = status === "done" || status === "completed";
-    if (type === "plan") return completed ? "bg-purple-500" : "bg-purple-400";
-    if (type === "task") return completed ? "bg-teal-500" : "bg-teal-400";
-    if (type === "target") return completed ? "bg-orange-500" : "bg-orange-400";
-    if (type === "todo") return completed ? "bg-blue-500" : "bg-blue-400";
-    if (type === "milestone") return completed ? "bg-pink-500" : "bg-pink-400";
-    return "bg-gray-400";
+    const colors = typeColors[type] || typeColors.todo;
+    return completed ? colors.bgCompleted : colors.bg;
   };
 
   const timelineWidth = Math.max(800, 100 * ganttZoom);
@@ -235,28 +240,39 @@ export function ViewsGantt({
       style={{ backgroundColor: "var(--color-bg-hover)" }}
     >
       <div className="flex items-center gap-3 mb-4 px-2">
-        <span className="text-xs text-gray-500">显示范围:</span>
+        <Icons.GanttChart size={16} style={{ color: "var(--color-primary)" }} />
+        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+          显示范围:
+        </span>
         <input
           type="range"
           min="1"
           max="12"
           value={ganttZoom}
           onChange={(e) => setGanttZoom(Number(e.target.value))}
-          className="w-32 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
+          className="w-32 h-1.5 rounded-lg appearance-none cursor-pointer"
+          style={{ backgroundColor: "var(--color-bg-hover)" }}
         />
-        <span className="text-xs text-gray-600 w-12">{ganttZoom} 个月</span>
+        <span
+          className="text-xs w-12"
+          style={{ color: "var(--color-text)" }}
+        >
+          {ganttZoom} 个月
+        </span>
       </div>
 
       <div className="overflow-hidden">
         <div style={{ width: `${timelineWidth}px` }}>
-          <div className="relative h-8 border-b border-gray-300 mb-2">
+          <div className="relative h-8 border-b mb-2" style={{ borderColor: "var(--color-border)" }}>
             {months.map((month, i) => (
               <div
                 key={i}
-                className="absolute text-xs text-gray-600 border-l border-gray-300 pl-1 font-medium"
+                className="absolute text-xs pl-1 font-medium border-l"
                 style={{
                   left: `${month.startPercent}%`,
                   width: `${month.widthPercent}%`,
+                  borderColor: "var(--color-border)",
+                  color: "var(--color-text)",
                 }}
               >
                 {month.label}
@@ -282,15 +298,16 @@ export function ViewsGantt({
               return (
                 <div
                   key={`${item.type}-${idx}`}
-                  className="flex items-center h-8 group cursor-pointer hover:bg-gray-50 rounded transition-colors"
+                  className="flex items-center h-8 group cursor-pointer rounded transition-colors"
+                  style={{ backgroundColor: "var(--color-bg-hover)" }}
                   onClick={() => onNavigate?.(item.type, item.id || "")}
                 >
                   <div
-                    className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium"
+                    className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium flex items-center gap-1"
                     style={{ color: "var(--color-text)" }}
                   >
                     <span
-                      className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                      className={`inline-block w-2 h-2 rounded-full ${
                         item.type === "plan"
                           ? "bg-purple-500"
                           : item.type === "task"
@@ -299,7 +316,7 @@ export function ViewsGantt({
                               ? "bg-orange-500"
                               : item.type === "todo"
                                 ? "bg-blue-500"
-                                : "bg-pink-500"
+                                : "bg-gray-500"
                       }`}
                     ></span>
                     {item.title}
@@ -329,8 +346,11 @@ export function ViewsGantt({
                     </div>
                     {isToday(item.start || item.due) && (
                       <div
-                        className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
-                        style={{ left: `${startPos}%` }}
+                        className="absolute top-0 bottom-0 w-0.5 z-10"
+                        style={{
+                          left: `${startPos}%`,
+                          backgroundColor: "var(--color-error)",
+                        }}
                       ></div>
                     )}
                   </div>
@@ -339,16 +359,20 @@ export function ViewsGantt({
             })}
           </div>
 
-          <div className="flex items-center mt-4 text-xs text-gray-500">
-            <div className="w-28 flex-shrink-0">📅 今日</div>
+          <div className="flex items-center mt-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
+            <div className="w-28 flex-shrink-0 flex items-center gap-1">
+              <Icons.Calendar size={14} style={{ color: "var(--color-error)" }} />
+              今日
+            </div>
             <div className="flex-1 relative h-4">
               <div
-                className="absolute w-0.5 bg-red-500 top-0 bottom-0 flex flex-col items-center"
+                className="absolute w-0.5 top-0 bottom-0 flex flex-col items-center"
                 style={{
                   left: `${((today.getTime() - startDate.getTime()) / (totalDays * 24 * 60 * 60 * 1000)) * 100}%`,
+                  backgroundColor: "var(--color-error)",
                 }}
               >
-                <span className="text-red-500 -mt-4 text-[10px] whitespace-nowrap">
+                <span className="-mt-4 text-[10px] whitespace-nowrap" style={{ color: "var(--color-error)" }}>
                   今天
                 </span>
               </div>
@@ -358,23 +382,23 @@ export function ViewsGantt({
           <div className="mt-4 flex flex-wrap gap-4 justify-center text-xs">
             <div className="flex items-center gap-1">
               <span className="w-3 h-3 rounded bg-purple-400"></span>
-              <span className="text-gray-600">计划</span>
+              <span style={{ color: "var(--color-text-muted)" }}>计划</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="w-3 h-3 rounded bg-orange-400"></span>
-              <span className="text-gray-600">目标</span>
+              <span style={{ color: "var(--color-text-muted)" }}>目标</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="w-3 h-3 rounded bg-blue-400"></span>
-              <span className="text-gray-600">待办</span>
+              <span style={{ color: "var(--color-text-muted)" }}>待办</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-pink-400"></span>
-              <span className="text-gray-600">里程碑</span>
+              <span className="w-3 h-3 rounded bg-gray-400"></span>
+              <span style={{ color: "var(--color-text-muted)" }}>里程碑</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-3 h-1 rounded bg-red-500"></span>
-              <span className="text-gray-600">今日</span>
+              <span className="w-3 h-1 rounded" style={{ backgroundColor: "var(--color-error)" }}></span>
+              <span style={{ color: "var(--color-text-muted)" }}>今日</span>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
 import { EntityCard } from "@/app/views/views/EntityCard";
 import type { EntityItem, EntityType } from "@/app/views/views/types";
+import { Icons } from "@/components/ui/Icons";
 
 export interface ViewsBoardProps {
   todos: Todo[];
@@ -24,6 +25,36 @@ export interface ViewsBoardProps {
   onNavigate?: (type: string, id: string) => void;
 }
 
+const columns: {
+  id: string;
+  label: string;
+  iconBgColor: string;
+  dotBgColor: string;
+  textColor: string;
+}[] = [
+  {
+    id: "pending",
+    label: "待处理",
+    iconBgColor: "bg-gray-400",
+    dotBgColor: "bg-gray-400",
+    textColor: "text-gray-600",
+  },
+  {
+    id: "in-progress",
+    label: "进行中",
+    iconBgColor: "bg-orange-500",
+    dotBgColor: "bg-orange-500",
+    textColor: "text-orange-600",
+  },
+  {
+    id: "done",
+    label: "已完成",
+    iconBgColor: "bg-green-500",
+    dotBgColor: "bg-green-500",
+    textColor: "text-green-600",
+  },
+];
+
 export function ViewsBoard({
   todos,
   plans,
@@ -35,12 +66,6 @@ export function ViewsBoard({
   setHoverPosition,
   onNavigate,
 }: ViewsBoardProps) {
-  const columns = [
-    { id: "pending", label: "待处理", color: "gray" },
-    { id: "in-progress", label: "进行中", color: "orange" },
-    { id: "done", label: "已完成", color: "green" },
-  ];
-
   const getItemsByStatus = (status: string): EntityItem[] => {
     const items: EntityItem[] = [];
 
@@ -91,53 +116,71 @@ export function ViewsBoard({
   return (
     <div className="relative h-full">
       <div className="grid grid-cols-3 gap-4 h-full">
-        {columns.map((col) => (
-          <div
-            key={col.id}
-            className="rounded-lg p-4 flex flex-col h-[60vh]"
-            style={{ backgroundColor: "var(--color-bg-hover)" }}
-          >
-            <h3
-              className="font-semibold mb-4 flex items-center gap-2 flex-shrink-0"
+        {columns.map((col) => {
+          const items = getItemsByStatus(col.id);
+          const ColumnIcon =
+            col.id === "pending"
+              ? Icons.Circle
+              : col.id === "in-progress"
+                ? Icons.Timer
+                : Icons.CheckCircle;
+
+          return (
+            <div
+              key={col.id}
+              className="rounded-lg p-4 flex flex-col h-[60vh] border"
               style={{
-                color: `#${col.color === "gray" ? "6B7280" : col.color === "orange" ? "F97316" : "22C55E"}`,
+                backgroundColor: "var(--color-bg-hover)",
+                borderColor: "var(--color-border)",
               }}
             >
-              <span
-                className={`w-3 h-3 rounded-full bg-${col.color}-500`}
-              ></span>
-              {col.label}
-              <span
-                className="ml-auto text-sm"
-                style={{ color: "var(--color-text-muted)" }}
-              >
-                {getItemsByStatus(col.id).length}
-              </span>
-            </h3>
-            <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 scroll-smooth scrollbar-hide">
-              {getItemsByStatus(col.id).map((item, idx) => (
-                <EntityCard
-                  key={`${item.type}-${idx}`}
-                  item={item}
-                  onHover={(item, e) => {
-                    setHoveredItem(item);
-                    setHoverPosition({ x: e.clientX, y: e.clientY });
+              <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+                <div
+                  className={`w-6 h-6 rounded ${col.iconBgColor} flex items-center justify-center`}
+                >
+                  <ColumnIcon size={14} className="text-white" />
+                </div>
+                <h3 className={`font-semibold ${col.textColor}`}>{col.label}</h3>
+                <span
+                  className="ml-auto text-sm px-2 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: "var(--color-bg-hover)",
+                    color: "var(--color-text-muted)",
                   }}
-                  onLeave={() => setHoveredItem(null)}
-                  onClick={onNavigate}
-                  progressColor={
-                    col.color === "green"
-                      ? "teal"
-                      : (col.color as "gray" | "orange" | "teal")
-                  }
-                />
-              ))}
-              {getItemsByStatus(col.id).length === 0 && (
-                <p className="text-gray-400 text-sm text-center py-4">无</p>
-              )}
+                >
+                  {items.length}
+                </span>
+              </div>
+              <div className="space-y-2 overflow-y-auto flex-1 min-h-0 scroll-smooth scrollbar-hide">
+                {items.map((item, idx) => (
+                  <EntityCard
+                    key={`${item.type}-${idx}`}
+                    item={item}
+                    onHover={(item, e) => {
+                      setHoveredItem(item);
+                      setHoverPosition({ x: e.clientX, y: e.clientY });
+                    }}
+                    onLeave={() => setHoveredItem(null)}
+                    onClick={onNavigate}
+                    progressColor={
+                      col.id === "done" ? "teal" : col.id === "in-progress" ? "orange" : "gray"
+                    }
+                  />
+                ))}
+                {items.length === 0 && (
+                  <div className="text-center py-8">
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--color-text-muted)" }}
+                    >
+                      无
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

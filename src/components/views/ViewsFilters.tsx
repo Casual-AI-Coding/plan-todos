@@ -1,5 +1,8 @@
 "use client";
 
+import { Icons } from "@/components/ui/Icons";
+import type { LucideIcon } from "lucide-react";
+
 export interface ViewsFiltersProps {
   filters: {
     todo: boolean;
@@ -19,12 +22,54 @@ export interface ViewsFiltersProps {
   >;
 }
 
-const filterOptions = [
-  { id: "plan", label: "计划", color: "purple" },
-  { id: "task", label: "任务", color: "teal" },
-  { id: "target", label: "目标", color: "orange" },
-  { id: "todo", label: "待办", color: "blue" },
-  { id: "milestone", label: "里程碑", color: "pink" },
+const filterOptions: {
+  id: string;
+  label: string;
+  bgColor: string;
+  textColor: string;
+  borderColor: string;
+  icon: LucideIcon;
+}[] = [
+  {
+    id: "plan",
+    label: "计划",
+    bgColor: "bg-purple-100",
+    textColor: "text-purple-700",
+    borderColor: "border-purple-300",
+    icon: Icons.FolderOpen,
+  },
+  {
+    id: "task",
+    label: "任务",
+    bgColor: "bg-teal-100",
+    textColor: "text-teal-700",
+    borderColor: "border-teal-300",
+    icon: Icons.Activity,
+  },
+  {
+    id: "target",
+    label: "目标",
+    bgColor: "bg-orange-100",
+    textColor: "text-orange-700",
+    borderColor: "border-orange-300",
+    icon: Icons.Target,
+  },
+  {
+    id: "todo",
+    label: "待办",
+    bgColor: "bg-blue-100",
+    textColor: "text-blue-700",
+    borderColor: "border-blue-300",
+    icon: Icons.LayoutGrid,
+  },
+  {
+    id: "milestone",
+    label: "里程碑",
+    bgColor: "bg-gray-100",
+    textColor: "text-gray-700",
+    borderColor: "border-gray-300",
+    icon: Icons.Flag,
+  },
 ];
 
 export function ViewsFilters({ filters, setFilters }: ViewsFiltersProps) {
@@ -57,47 +102,61 @@ export function ViewsFilters({ filters, setFilters }: ViewsFiltersProps) {
         <button
           onClick={handleSelectAll}
           disabled={allSelected}
-          className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+          className="px-3 py-1.5 text-xs rounded-lg transition-colors"
+          style={{
+            backgroundColor: allSelected
+              ? "var(--color-bg-hover)"
+              : "var(--color-bg-card)",
+            color: "var(--color-text-muted)",
+            opacity: allSelected ? 0.5 : 1,
+          }}
         >
           全选
         </button>
         <button
           onClick={handleInvert}
           disabled={noneSelected}
-          className="px-2 py-1 text-xs rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+          className="px-3 py-1.5 text-xs rounded-lg transition-colors"
+          style={{
+            backgroundColor: noneSelected
+              ? "var(--color-bg-hover)"
+              : "var(--color-bg-card)",
+            color: "var(--color-text-muted)",
+            opacity: noneSelected ? 0.5 : 1,
+          }}
         >
           取反
         </button>
       </div>
       <div className="flex flex-wrap gap-3">
-        {filterOptions.map((item) => (
-          <label
-            key={item.id}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-sm cursor-pointer transition-all ${
-              filters[item.id as keyof typeof filters]
-                ? `bg-${item.color}-100 text-${item.color}-700 border border-${item.color}-300`
-                : "bg-gray-50 text-gray-400 border border-gray-200"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={filters[item.id as keyof typeof filters]}
-              onChange={() =>
-                setFilters((prev) => ({
-                  ...prev,
-                  [item.id]: !prev[item.id as keyof typeof prev],
-                }))
-              }
-              className="sr-only"
-            />
-            <span className="w-3 h-3 rounded border flex items-center justify-center">
-              {filters[item.id as keyof typeof filters] && (
-                <span className="text-[10px]">✓</span>
-              )}
-            </span>
-            {item.label}
-          </label>
-        ))}
+        {filterOptions.map((item) => {
+          const isSelected = filters[item.id as keyof typeof filters];
+          const IconComponent = item.icon;
+          return (
+            <label
+              key={item.id}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm cursor-pointer transition-all ${
+                isSelected
+                  ? `${item.bgColor} ${item.textColor} ${item.borderColor}`
+                  : "bg-gray-50 text-gray-400 border border-gray-200"
+              } border`}
+            >
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    [item.id]: !prev[item.id as keyof typeof prev],
+                  }))
+                }
+                className="sr-only"
+              />
+              <IconComponent size={14} className="shrink-0" />
+              {item.label}
+            </label>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { ProgressBar } from "@/components/ui";
+import { Icons } from "@/components/ui/Icons";
 import { SectionCard } from "./SectionCard";
 
 interface ActivePlan {
@@ -20,6 +21,8 @@ export function ActivePlansCard({ plans, onClickPlan }: ActivePlansCardProps) {
   return (
     <SectionCard
       title="进行中的计划"
+      icon={Icons.FolderOpen}
+      accentColor="var(--color-secondary)"
       isEmpty={plans.length === 0}
       emptyMessage="暂无进行中的计划"
     >
@@ -27,7 +30,8 @@ export function ActivePlansCard({ plans, onClickPlan }: ActivePlansCardProps) {
         {plans.slice(0, 3).map((plan) => (
           <div
             key={plan.id}
-            className="cursor-pointer hover:opacity-80 transition-opacity"
+            className="cursor-pointer hover:opacity-80 transition-all duration-200 p-2 rounded"
+            style={{ backgroundColor: "var(--color-bg-hover)" }}
             onClick={() => onClickPlan(plan.id)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {

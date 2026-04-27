@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui";
 import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 
 interface SectionCardProps {
   title: string;
@@ -10,6 +11,8 @@ interface SectionCardProps {
   isEmpty?: boolean;
   children: ReactNode;
   headerRight?: ReactNode;
+  icon?: LucideIcon;
+  accentColor?: string;
 }
 
 export function SectionCard({
@@ -19,17 +22,39 @@ export function SectionCard({
   isEmpty = false,
   children,
   headerRight,
+  icon,
+  accentColor,
 }: SectionCardProps) {
+  const IconComponent = icon;
+
   return (
-    <Card>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold" style={{ color: titleColor }}>
-          {title}
-        </h3>
+    <Card className="relative overflow-hidden">
+      {accentColor && (
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1"
+          style={{ backgroundColor: accentColor }}
+        />
+      )}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          {IconComponent && (
+            <IconComponent
+              size={18}
+              style={{ color: titleColor }}
+              className="shrink-0"
+            />
+          )}
+          <h3 className="font-semibold" style={{ color: titleColor }}>
+            {title}
+          </h3>
+        </div>
         {headerRight}
       </div>
       {isEmpty && emptyMessage ? (
-        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+        <p
+          className="text-sm py-2"
+          style={{ color: "var(--color-text-muted)" }}
+        >
           {emptyMessage}
         </p>
       ) : (

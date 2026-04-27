@@ -1,6 +1,7 @@
 "use client";
 
 import { Checkbox } from "@/components/ui";
+import { Icons } from "@/components/ui/Icons";
 import { SectionCard } from "./SectionCard";
 import type { StatisticsTodoStatus } from "@/lib/types";
 
@@ -28,14 +29,19 @@ export function OverdueTodosCard({ todos, onToggle }: OverdueTodosCardProps) {
   if (todos.length === 0) return null;
 
   return (
-    <SectionCard title="已过期" titleColor="var(--color-error)">
+    <SectionCard
+      title="已过期"
+      titleColor="var(--color-error)"
+      icon={Icons.AlertTriangle}
+      accentColor="var(--color-error)"
+    >
       <div className="space-y-2">
         {todos.map((todo) => {
           const days = daysOverdue(todo.due_date);
           return (
             <div
               key={todo.id}
-              className="flex items-center gap-3 p-2 rounded cursor-pointer transition-colors"
+              className="flex items-center gap-3 p-2 rounded cursor-pointer transition-all duration-200 hover:shadow-sm"
               style={{
                 backgroundColor: "var(--color-error-bg, rgba(239,68,68,0.08))",
                 borderLeft: "3px solid var(--color-error)",
@@ -66,8 +72,11 @@ export function OverdueTodosCard({ todos, onToggle }: OverdueTodosCardProps) {
               </div>
               {days > 0 && (
                 <span
-                  className="text-xs font-medium shrink-0"
-                  style={{ color: "var(--color-error)" }}
+                  className="text-xs font-medium shrink-0 px-1.5 py-0.5 rounded"
+                  style={{
+                    backgroundColor: "var(--color-error)",
+                    color: "var(--color-text-inverse)",
+                  }}
                 >
                   超期{days}天
                 </span>

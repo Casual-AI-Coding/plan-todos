@@ -1,6 +1,7 @@
 "use client";
 
 import { ProgressBar } from "@/components/ui";
+import { Icons } from "@/components/ui/Icons";
 import { SectionCard } from "./SectionCard";
 
 interface ActiveTarget {
@@ -22,6 +23,8 @@ export function ActiveTargetsCard({
   return (
     <SectionCard
       title="进行中的目标"
+      icon={Icons.Target}
+      accentColor="var(--color-cta)"
       isEmpty={targets.length === 0}
       emptyMessage="暂无进行中的目标"
     >
@@ -29,7 +32,8 @@ export function ActiveTargetsCard({
         {targets.slice(0, 3).map((target) => (
           <div
             key={target.id}
-            className="cursor-pointer hover:opacity-80 transition-opacity"
+            className="cursor-pointer hover:opacity-80 transition-all duration-200 p-2 rounded"
+            style={{ backgroundColor: "var(--color-bg-hover)" }}
             onClick={() => onClickTarget(target.id)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
