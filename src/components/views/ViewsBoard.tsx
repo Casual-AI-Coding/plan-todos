@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, ProgressBar } from "@/components/ui";
 import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
-import { ItemTooltip } from "./ItemTooltip";
+import { EntityCard } from "@/app/views/views/EntityCard";
+import type { EntityItem, EntityType } from "@/app/views/views/types";
 
 export interface ViewsBoardProps {
   todos: Todo[];
@@ -17,18 +17,11 @@ export interface ViewsBoardProps {
     target: boolean;
     milestone: boolean;
   };
-  hoveredItem: {
-    type: string;
-    data: Todo | Task | Plan | Target | Milestone;
-  } | null;
-  setHoveredItem: (
-    item: {
-      type: string;
-      data: Todo | Task | Plan | Target | Milestone;
-    } | null,
-  ) => void;
+  hoveredItem: EntityItem | null;
+  setHoveredItem: (item: EntityItem | null) => void;
   hoverPosition: { x: number; y: number };
   setHoverPosition: (pos: { x: number; y: number }) => void;
+  onNavigate?: (type: string, id: string) => void;
 }
 
 export function ViewsBoard({
@@ -38,10 +31,9 @@ export function ViewsBoard({
   milestones,
   allTasks,
   filters,
-  hoveredItem,
   setHoveredItem,
-  hoverPosition,
   setHoverPosition,
+  onNavigate,
 }: ViewsBoardProps) {
   const columns = [
     { id: "pending", label: "待处理", color: "gray" },
@@ -49,20 +41,17 @@ export function ViewsBoard({
     { id: "done", label: "已完成", color: "green" },
   ];
 
-  const getItemsByStatus = (status: string) => {
-    const items: {
-      type: string;
-      data: Todo | Task | Plan | Target | Milestone;
-    }[] = [];
+  const getItemsByStatus = (status: string): EntityItem[] => {
+    const items: EntityItem[] = [];
 
     if (filters.todo)
       todos
         .filter((t) => t.status === status)
-        .forEach((t) => items.push({ type: "todo", data: t }));
+        .forEach((t) => items.push({ type: "todo" as EntityType, data: t }));
     if (filters.task)
       allTasks
         .filter((t) => t.status === status)
-        .forEach((t) => items.push({ type: "task", data: t }));
+        .forEach((t) => items.push({ type: "task" as EntityType, data: t }));
     if (filters.plan)
       plans
         .filter(
@@ -74,7 +63,7 @@ export function ViewsBoard({
                 ? "active"
                 : "active"),
         )
-        .forEach((p) => items.push({ type: "plan", data: p }));
+        .forEach((p) => items.push({ type: "plan" as EntityType, data: p }));
     if (filters.target)
       targets
         .filter(
@@ -86,30 +75,21 @@ export function ViewsBoard({
                 ? "active"
                 : "active"),
         )
-        .forEach((t) => items.push({ type: "target", data: t }));
+        .forEach((t) => items.push({ type: "target" as EntityType, data: t }));
     if (filters.milestone)
       milestones
         .filter(
           (m) => m.status === (status === "done" ? "completed" : "pending"),
         )
-        .forEach((m) => items.push({ type: "milestone", data: m }));
+        .forEach((m) =>
+          items.push({ type: "milestone" as EntityType, data: m }),
+        );
 
     return items;
   };
 
-  const handleMouseEnter = (
-    e: React.MouseEvent,
-    item: { type: string; data: Todo | Task | Plan | Target | Milestone },
-  ) => {
-    setHoveredItem(item);
-    setHoverPosition({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseLeave = () => setHoveredItem(null);
-
   return (
     <div className="relative h-full">
-      <ItemTooltip hoveredItem={hoveredItem} hoverPosition={hoverPosition} />
       <div className="grid grid-cols-3 gap-4 h-full">
         {columns.map((col) => (
           <div
@@ -134,64 +114,28 @@ export function ViewsBoard({
                 {getItemsByStatus(col.id).length}
               </span>
             </h3>
-            <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 scroll-smooth scrollbar-hide-column">
+            <div className="space-y-1.5 overflow-y-auto flex-1 min-h-0 scroll-smooth scrollbar-hide">
               {getItemsByStatus(col.id).map((item, idx) => (
-                <div
+                <EntityCard
                   key={`${item.type}-${idx}`}
-                  onMouseEnter={(e) => handleMouseEnter(e, item)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <Card className="p-2 cursor-pointer hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span
-                        className={`text-[10px] px-1 py-0.5 rounded ${
-                          item.type === "todo"
-                            ? "bg-blue-100 text-blue-700"
-                            : item.type === "task"
-                              ? "bg-teal-100 text-teal-700"
-                              : item.type === "plan"
-                                ? "bg-purple-100 text-purple-700"
-                                : item.type === "target"
-                                  ? "bg-orange-100 text-orange-700"
-                                  : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {item.type}
-                      </span>
-                    </div>
-                    <div className="font-medium text-xs">
-                      {"title" in item.data ? item.data.title : ""}
-                    </div>
-                    {"progress" in item.data && (
-                      <div className="mt-1.5">
-                        <ProgressBar
-                          value={item.data.progress}
-                          color={
-                            col.color === "green"
-                              ? "teal"
-                              : (col.color as "gray" | "orange" | "teal")
-                          }
-                          size="sm"
-                        />
-                      </div>
-                    )}
-                  </Card>
-                </div>
+                  item={item}
+                  onHover={(item, e) => {
+                    setHoveredItem(item);
+                    setHoverPosition({ x: e.clientX, y: e.clientY });
+                  }}
+                  onLeave={() => setHoveredItem(null)}
+                  onClick={onNavigate}
+                  progressColor={
+                    col.color === "green"
+                      ? "teal"
+                      : (col.color as "gray" | "orange" | "teal")
+                  }
+                />
               ))}
               {getItemsByStatus(col.id).length === 0 && (
                 <p className="text-gray-400 text-sm text-center py-4">无</p>
               )}
             </div>
-            <style jsx global>{`
-              .scrollbar-hide-column::-webkit-scrollbar {
-                display: none;
-              }
-              .scrollbar-hide-column {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-                scroll-behavior: smooth;
-              }
-            `}</style>
           </div>
         ))}
       </div>

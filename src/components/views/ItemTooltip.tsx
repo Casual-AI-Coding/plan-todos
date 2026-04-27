@@ -1,12 +1,9 @@
 "use client";
 
-import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
+import type { HoveredItem } from "@/app/views/views/types";
 
 interface ItemTooltipProps {
-  hoveredItem: {
-    type: string;
-    data: Todo | Task | Plan | Target | Milestone;
-  } | null;
+  hoveredItem: HoveredItem | null;
   hoverPosition: { x: number; y: number };
 }
 

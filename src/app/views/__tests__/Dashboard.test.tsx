@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Dashboard } from "@/app/views/Dashboard";
 
 vi.mock("@/hooks/useDashboard", () => ({
@@ -9,10 +10,34 @@ vi.mock("@/hooks/useDashboard", () => ({
 
 vi.mock("@/lib/api", () => ({
   getDashboard: vi.fn(),
+  getTodos: vi.fn(() => Promise.resolve([])),
+  getTodo: vi.fn(),
+  createTodo: vi.fn(),
+  updateTodo: vi.fn(),
+  deleteTodo: vi.fn(),
+}));
+
+vi.mock("@/lib/api/reorder", () => ({
+  reorderTodos: vi.fn(),
+}));
+
+vi.mock("@/stores/navigation", () => ({
+  useNavigationStore: vi.fn((selector: (s: { navigate: () => void }) => unknown) =>
+    selector({ navigate: vi.fn() })
+  ),
 }));
 
 import { useDashboard } from "@/hooks/useDashboard";
 import type { Dashboard as DashboardType, Priority } from "@/lib/types";
+
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
+}
 
 describe("Dashboard", () => {
   beforeEach(() => {
@@ -113,8 +138,9 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
-    expect(screen.getByText("加载中...")).toBeInTheDocument();
+    const { container } = renderWithQueryClient(<Dashboard />);
+    const pulseElements = container.querySelectorAll(".animate-pulse");
+    expect(pulseElements.length).toBeGreaterThan(0);
   });
 
   it("renders error state", () => {
@@ -124,7 +150,7 @@ describe("Dashboard", () => {
       error: new Error("Failed to load"),
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText(/加载失败/)).toBeInTheDocument();
   });
 
@@ -135,7 +161,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("今日总览")).toBeInTheDocument();
   });
 
@@ -146,7 +172,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getAllByText("今日待办").length).toBeGreaterThan(0);
   });
 
@@ -157,7 +183,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("即将到期 (3天内)")).toBeInTheDocument();
   });
 
@@ -168,7 +194,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("今日完成")).toBeInTheDocument();
   });
 
@@ -179,7 +205,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("待办")).toBeInTheDocument();
     expect(screen.getByText("计划")).toBeInTheDocument();
     expect(screen.getByText("任务")).toBeInTheDocument();
@@ -193,7 +219,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("Test Todo 1")).toBeInTheDocument();
     expect(screen.getByText("Test Todo 2")).toBeInTheDocument();
   });
@@ -205,7 +231,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("已过期")).toBeInTheDocument();
     expect(screen.getByText("Overdue Todo")).toBeInTheDocument();
   });
@@ -217,7 +243,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("进行中的计划")).toBeInTheDocument();
     expect(screen.getByText("Test Plan")).toBeInTheDocument();
   });
@@ -229,7 +255,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("进行中的目标")).toBeInTheDocument();
     expect(screen.getByText("Test Target")).toBeInTheDocument();
   });
@@ -241,7 +267,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("进行中的里程碑")).toBeInTheDocument();
     expect(screen.getByText("Test Milestone")).toBeInTheDocument();
   });
@@ -257,7 +283,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.queryByText("已过期")).not.toBeInTheDocument();
   });
 
@@ -272,7 +298,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.queryByText("进行中的里程碑")).not.toBeInTheDocument();
   });
 
@@ -283,7 +309,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("今日待打卡")).toBeInTheDocument();
     expect(screen.getByText("今日已完成")).toBeInTheDocument();
   });
@@ -324,7 +350,7 @@ describe("Dashboard", () => {
       error: null,
     } as any);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     expect(screen.getByText("暂无今日待办")).toBeInTheDocument();
     expect(screen.getByText("暂无进行中的计划")).toBeInTheDocument();
     expect(screen.getByText("暂无进行中的目标")).toBeInTheDocument();

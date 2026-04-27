@@ -1,6 +1,7 @@
 "use client";
 
-import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
+import type { Todo, Task, Target, Milestone } from "@/lib/types";
+import type { EntityItem, HoveredItem } from "@/app/views/views/types";
 
 export interface ViewsCalendarProps {
   todos: Todo[];
@@ -16,20 +17,11 @@ export interface ViewsCalendarProps {
   };
   calendarDate: Date;
   setCalendarDate: React.Dispatch<React.SetStateAction<Date>>;
-  hoveredItem: {
-    type: string;
-    data: Todo | Task | Plan | Target | Milestone;
-  } | null;
-  setHoveredItem: React.Dispatch<
-    React.SetStateAction<{
-      type: string;
-      data: Todo | Task | Plan | Target | Milestone;
-    } | null>
-  >;
+  hoveredItem: HoveredItem | null;
+  setHoveredItem: (item: HoveredItem | null) => void;
   hoverPosition: { x: number; y: number };
-  setHoverPosition: React.Dispatch<
-    React.SetStateAction<{ x: number; y: number }>
-  >;
+  setHoverPosition: (pos: { x: number; y: number }) => void;
+  onNavigate?: (type: string, id: string) => void;
 }
 
 export function ViewsCalendar({
@@ -40,6 +32,9 @@ export function ViewsCalendar({
   filters,
   calendarDate,
   setCalendarDate,
+  setHoveredItem,
+  setHoverPosition,
+  onNavigate,
 }: ViewsCalendarProps) {
   const currentMonth = calendarDate.getMonth();
   const currentYear = calendarDate.getFullYear();
@@ -65,10 +60,7 @@ export function ViewsCalendar({
 
   const getItemsForDay = (day: number) => {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    const items: {
-      type: string;
-      data: Todo | Task | Plan | Target | Milestone;
-    }[] = [];
+    const items: EntityItem[] = [];
 
     if (filters.todo)
       todos
@@ -193,6 +185,12 @@ export function ViewsCalendar({
                             ? "bg-orange-100 text-orange-700"
                             : "bg-purple-100 text-purple-700"
                     }`}
+                    onMouseEnter={(e) => {
+                      setHoveredItem(item);
+                      setHoverPosition({ x: e.clientX, y: e.clientY });
+                    }}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => onNavigate?.(item.type, "id" in item.data ? item.data.id : "")}
                   >
                     {"title" in item.data ? item.data.title : ""}
                   </div>

@@ -17,6 +17,7 @@ export interface ViewsGanttProps {
   };
   ganttZoom: number;
   setGanttZoom: React.Dispatch<React.SetStateAction<number>>;
+  onNavigate?: (type: string, id: string) => void;
 }
 
 export function ViewsGantt({
@@ -28,6 +29,7 @@ export function ViewsGantt({
   filters,
   ganttZoom,
   setGanttZoom,
+  onNavigate,
 }: ViewsGanttProps) {
   const today = new Date();
   const monthsToShow = ganttZoom;
@@ -128,6 +130,7 @@ export function ViewsGantt({
     due?: string | null;
     status: string;
     progress?: number;
+    id?: string;
   }[] = [];
 
   if (filters.plan) {
@@ -141,6 +144,23 @@ export function ViewsGantt({
           end: p.end_date,
           status: p.status,
           progress: 100,
+          id: p.id,
+        });
+      }
+    });
+  }
+
+  if (filters.task) {
+    allTasks.forEach((t) => {
+      const pos = getPosition(t.start_date);
+      if (pos !== null) {
+        allItems.push({
+          type: "task",
+          title: t.title,
+          start: t.start_date,
+          end: t.end_date,
+          status: t.status,
+          id: t.id,
         });
       }
     });
@@ -156,6 +176,7 @@ export function ViewsGantt({
           due: t.due_date,
           status: t.status,
           progress: t.progress,
+          id: t.id,
         });
       }
     });
@@ -172,6 +193,7 @@ export function ViewsGantt({
             title: t.title,
             due: t.due_date,
             status: t.status,
+            id: t.id,
           });
         }
       });
@@ -189,6 +211,7 @@ export function ViewsGantt({
             due: m.target_date,
             status: m.status,
             progress: m.progress,
+            id: m.id,
           });
         }
       });
@@ -197,6 +220,7 @@ export function ViewsGantt({
   const getTypeColor = (type: string, status: string) => {
     const completed = status === "done" || status === "completed";
     if (type === "plan") return completed ? "bg-purple-500" : "bg-purple-400";
+    if (type === "task") return completed ? "bg-teal-500" : "bg-teal-400";
     if (type === "target") return completed ? "bg-orange-500" : "bg-orange-400";
     if (type === "todo") return completed ? "bg-blue-500" : "bg-blue-400";
     if (type === "milestone") return completed ? "bg-pink-500" : "bg-pink-400";
@@ -258,7 +282,8 @@ export function ViewsGantt({
               return (
                 <div
                   key={`${item.type}-${idx}`}
-                  className="flex items-center h-8 group"
+                  className="flex items-center h-8 group cursor-pointer hover:bg-gray-50 rounded transition-colors"
+                  onClick={() => onNavigate?.(item.type, item.id || "")}
                 >
                   <div
                     className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium"
@@ -268,11 +293,13 @@ export function ViewsGantt({
                       className={`inline-block w-2 h-2 rounded-full mr-1 ${
                         item.type === "plan"
                           ? "bg-purple-500"
-                          : item.type === "target"
-                            ? "bg-orange-500"
-                            : item.type === "todo"
-                              ? "bg-blue-500"
-                              : "bg-pink-500"
+                          : item.type === "task"
+                            ? "bg-teal-500"
+                            : item.type === "target"
+                              ? "bg-orange-500"
+                              : item.type === "todo"
+                                ? "bg-blue-500"
+                                : "bg-pink-500"
                       }`}
                     ></span>
                     {item.title}

@@ -1,0 +1,55 @@
+"use client";
+
+import { ProgressBar } from "@/components/ui";
+import { SectionCard } from "./SectionCard";
+
+interface ActiveTarget {
+  id: string;
+  title: string;
+  progress: number;
+  due_date: string | null;
+}
+
+interface ActiveTargetsCardProps {
+  targets: ActiveTarget[];
+  onClickTarget: (id: string) => void;
+}
+
+export function ActiveTargetsCard({
+  targets,
+  onClickTarget,
+}: ActiveTargetsCardProps) {
+  return (
+    <SectionCard
+      title="进行中的目标"
+      isEmpty={targets.length === 0}
+      emptyMessage="暂无进行中的目标"
+    >
+      <div className="space-y-3">
+        {targets.slice(0, 3).map((target) => (
+          <div
+            key={target.id}
+            className="cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => onClickTarget(target.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClickTarget(target.id);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="flex justify-between text-sm mb-1">
+              <span style={{ color: "var(--color-text)" }}>{target.title}</span>
+              <span style={{ color: "var(--color-warning)" }}>
+                {target.progress}%
+              </span>
+            </div>
+            <ProgressBar value={target.progress} color="orange" size="sm" />
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}

@@ -1,7 +1,5 @@
 "use client";
 
-import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
-
 export interface ViewsFiltersProps {
   filters: {
     todo: boolean;

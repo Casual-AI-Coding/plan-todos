@@ -17,6 +17,7 @@ export interface ViewsListProps {
     target: boolean;
     milestone: boolean;
   };
+  onNavigate?: (type: string, id: string) => void;
 }
 
 export function ViewsList({
@@ -27,6 +28,7 @@ export function ViewsList({
   tasksByPlan,
   targetSteps,
   filters,
+  onNavigate,
 }: ViewsListProps) {
   return (
     <div className="space-y-6">
@@ -44,7 +46,7 @@ export function ViewsList({
           ) : (
             <div className="space-y-4">
               {plans.map((plan) => (
-                <div key={plan.id} className="border-l-4 border-teal-400 pl-4">
+                <div key={plan.id} className="border-l-4 border-teal-400 pl-4 cursor-pointer hover:bg-gray-50 rounded-r p-2 -mr-2 transition-colors" onClick={() => onNavigate?.("plan", plan.id)}>
                   <div className="flex items-center justify-between">
                     <div className="font-medium">{plan.title}</div>
                     <span
@@ -123,7 +125,8 @@ export function ViewsList({
               {targets.map((target) => (
                 <div
                   key={target.id}
-                  className="border-l-4 border-orange-400 pl-4"
+                  className="border-l-4 border-orange-400 pl-4 cursor-pointer hover:bg-gray-50 rounded-r p-2 -mr-2 transition-colors"
+                  onClick={() => onNavigate?.("target", target.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="font-medium">{target.title}</div>
@@ -203,7 +206,8 @@ export function ViewsList({
                 .map((todo) => (
                   <div
                     key={todo.id}
-                    className="flex items-center gap-3 p-2 bg-gray-50 rounded"
+                    className="flex items-center gap-3 p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => onNavigate?.("todo", todo.id)}
                   >
                     <span
                       className={`w-2 h-2 rounded-full ${
@@ -251,7 +255,8 @@ export function ViewsList({
               {milestones.map((m) => (
                 <div
                   key={m.id}
-                  className="flex items-center gap-3 p-2 bg-gray-50 rounded"
+                  className="flex items-center gap-3 p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => onNavigate?.("milestone", m.id)}
                 >
                   <span
                     className={`w-2 h-2 rounded-full ${
