@@ -1,10 +1,11 @@
 // Commands module - all Tauri commands
 
 pub mod batch;
-pub mod circulations;
 pub mod circulation_notifications;
+pub mod circulations;
 pub mod command_log;
 pub mod dashboard;
+pub mod db;
 pub mod export;
 pub mod google_drive;
 pub mod import;
@@ -20,8 +21,8 @@ pub mod tags;
 pub mod targets;
 pub mod tasks;
 pub mod todos;
-pub mod validation;
 pub mod update;
+pub mod validation;
 
 pub mod data;
 pub mod repositories;

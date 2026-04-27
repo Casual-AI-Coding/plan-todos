@@ -9,12 +9,12 @@ mod sync;
 #[cfg(test)]
 mod tests;
 
+use crate::sync::SyncState;
 use log::info;
 use rusqlite::Connection;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
-use crate::sync::SyncState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -238,6 +238,7 @@ pub fn run() {
             commands::google_drive::google_drive_disconnect,
             commands::google_drive::google_drive_sync,
             commands::google_drive::google_drive_restore,
+            commands::db::db_health_check,
         ])
         .run(tauri::generate_context!())
         .expect("Error while running tauri application");

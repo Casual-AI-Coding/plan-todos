@@ -338,13 +338,11 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
     // Migration: Add biz_type and biz_id columns with data migration from legacy fields
     // Only run migration once - check if already applied
     let migration_id = "milestone_biz_type_migration";
-    let migration_done: bool = conn
-        .query_row(
-            "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE id = ?)",
-            [migration_id],
-            |row| row.get(0),
-        )
-        .unwrap_or(false);
+    let migration_done: bool = conn.query_row(
+        "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE id = ?)",
+        [migration_id],
+        |row| row.get(0),
+    )?;
 
     if !migration_done {
         // Add new columns if they don't exist
@@ -396,13 +394,11 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error> {
 
     // Migration: Add reminder_times column and create notification_history table for v0.6.1
     let migration_id_v061 = "notification_v061_migration";
-    let migration_done_v061: bool = conn
-        .query_row(
-            "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE id = ?)",
-            [migration_id_v061],
-            |row| row.get(0),
-        )
-        .unwrap_or(false);
+    let migration_done_v061: bool = conn.query_row(
+        "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE id = ?)",
+        [migration_id_v061],
+        |row| row.get(0),
+    )?;
 
     if !migration_done_v061 {
         // Step 1: Add reminder_times column (TEXT, JSON array) to notification_settings
@@ -747,8 +743,7 @@ fn add_column_if_not_exists(
     let mut stmt = conn.prepare(&format!("PRAGMA table_info({})", table))?;
     let columns: Vec<String> = stmt
         .query_map([], |row| row.get(1))?
-        .filter_map(|r| r.ok())
-        .collect();
+        .collect::<Result<Vec<String>, _>>()?;
 
     if !columns.contains(&column.to_string()) {
         // Safe: table and column names are validated

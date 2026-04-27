@@ -3,6 +3,7 @@
 import { lazy, Suspense, useMemo } from "react";
 import { ROUTE_VIEW_MAP, ROUTE_PARAMS_MAP } from "@/config/routes";
 import { PageSlide } from "@/components/ui/animations";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 const viewComponents = {
   Dashboard: lazy(() =>
@@ -105,17 +106,33 @@ export function ViewRouter({ activeMenu }: ViewRouterProps) {
   }, [ViewComponent, params]);
 
   return (
-    <Suspense
+    <ErrorBoundary
+      key={activeMenu}
       fallback={
         <div
-          className="flex items-center justify-center h-full"
-          style={{ color: "var(--color-text-secondary)" }}
+          className="flex items-center justify-center h-full p-4"
+          style={{ color: "var(--color-text)" }}
         >
-          ...
+          <div className="text-center">
+            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              视图加载失败
+            </p>
+          </div>
         </div>
       }
     >
-      <PageSlide key={activeMenu}>{content}</PageSlide>
-    </Suspense>
+      <Suspense
+        fallback={
+          <div
+            className="flex items-center justify-center h-full"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            ...
+          </div>
+        }
+      >
+        <PageSlide key={activeMenu}>{content}</PageSlide>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
