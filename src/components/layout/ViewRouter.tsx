@@ -114,7 +114,10 @@ export function ViewRouter({ activeMenu }: ViewRouterProps) {
           style={{ color: "var(--color-text)" }}
         >
           <div className="text-center">
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p
+              className="text-sm"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
               视图加载失败
             </p>
           </div>

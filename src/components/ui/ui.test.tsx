@@ -20,29 +20,37 @@ describe("ProgressBar", () => {
   it("displays correct progress value", () => {
     const { container } = render(<ProgressBar value={75} />);
     const fills = container.querySelectorAll("[style*='width']");
-    const progressFill = Array.from(fills).find(el => (el as HTMLElement).style.width === "75%");
+    const progressFill = Array.from(fills).find(
+      (el) => (el as HTMLElement).style.width === "75%",
+    );
     expect(progressFill).toBeInTheDocument();
   });
 
   it("clamps value to 0 when negative", () => {
     const { container } = render(<ProgressBar value={-10} />);
     const fills = container.querySelectorAll("[style*='width']");
-    const progressFill = Array.from(fills).find(el => (el as HTMLElement).style.width === "0%");
+    const progressFill = Array.from(fills).find(
+      (el) => (el as HTMLElement).style.width === "0%",
+    );
     expect(progressFill).toBeInTheDocument();
   });
 
   it("clamps value to 100 when over 100", () => {
     const { container } = render(<ProgressBar value={150} />);
     const fills = container.querySelectorAll("[style*='width']");
-    const progressFill = Array.from(fills).find(el => (el as HTMLElement).style.width === "100%");
+    const progressFill = Array.from(fills).find(
+      (el) => (el as HTMLElement).style.width === "100%",
+    );
     expect(progressFill).toBeInTheDocument();
   });
 
   it("applies teal color by default", () => {
     const { container } = render(<ProgressBar value={50} />);
     const fills = container.querySelectorAll("[style*='background-color']");
-    const progressFill = Array.from(fills).find(el =>
-      (el as HTMLElement).style.backgroundColor.includes("var(--color-primary)")
+    const progressFill = Array.from(fills).find((el) =>
+      (el as HTMLElement).style.backgroundColor.includes(
+        "var(--color-primary)",
+      ),
     );
     expect(progressFill).toBeInTheDocument();
   });
@@ -50,8 +58,10 @@ describe("ProgressBar", () => {
   it("applies orange color", () => {
     const { container } = render(<ProgressBar value={50} color="orange" />);
     const fills = container.querySelectorAll("[style*='background-color']");
-    const progressFill = Array.from(fills).find(el =>
-      (el as HTMLElement).style.backgroundColor.includes("var(--color-warning)")
+    const progressFill = Array.from(fills).find((el) =>
+      (el as HTMLElement).style.backgroundColor.includes(
+        "var(--color-warning)",
+      ),
     );
     expect(progressFill).toBeInTheDocument();
   });
@@ -59,27 +69,35 @@ describe("ProgressBar", () => {
   it("applies gray color", () => {
     const { container } = render(<ProgressBar value={50} color="gray" />);
     const fills = container.querySelectorAll("[style*='background-color']");
-    const progressFill = Array.from(fills).find(el =>
-      (el as HTMLElement).style.backgroundColor.includes("var(--color-text-muted)")
+    const progressFill = Array.from(fills).find((el) =>
+      (el as HTMLElement).style.backgroundColor.includes(
+        "var(--color-text-muted)",
+      ),
     );
     expect(progressFill).toBeInTheDocument();
   });
 
   it("applies small size", () => {
     const { container } = render(<ProgressBar value={50} size="sm" />);
-    const track = container.querySelector("[style*='background-color']")?.closest("div");
+    const track = container
+      .querySelector("[style*='background-color']")
+      ?.closest("div");
     expect(track).toHaveClass("h-1.5");
   });
 
   it("applies medium size", () => {
     const { container } = render(<ProgressBar value={50} size="md" />);
-    const track = container.querySelector("[style*='background-color']")?.closest("div");
+    const track = container
+      .querySelector("[style*='background-color']")
+      ?.closest("div");
     expect(track).toHaveClass("h-2.5");
   });
 
   it("applies large size", () => {
     const { container } = render(<ProgressBar value={50} size="lg" />);
-    const track = container.querySelector("[style*='background-color']")?.closest("div");
+    const track = container
+      .querySelector("[style*='background-color']")
+      ?.closest("div");
     expect(track).toHaveClass("h-4");
   });
 

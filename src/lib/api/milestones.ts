@@ -36,7 +36,9 @@ export async function getMilestonesByTarget(
     "milestones by target",
     async () => {
       const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Milestone[]>("get_milestones_by_target", { target_id: targetId });
+      return invoke<Milestone[]>("get_milestones_by_target", {
+        target_id: targetId,
+      });
     },
     [],
   );

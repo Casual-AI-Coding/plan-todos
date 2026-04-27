@@ -5,7 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.3] - 2026-04-27
+## [0.8.4] - 2026-04-27
+
+### UI/UX
+
+**Premium Polish Pass on Core UI Components**:
+
+- Add CSS shadow variables (`shadow-xs`, `shadow-sm`, `shadow-md`, `shadow-lg`) across light/dark/system themes
+- Implement `card-hover` class with subtle lift effect for interactive cards
+- Update Dashboard to use CSS variables for theme-consistent colors
+- Enhance `EntityCountCard` with larger `text-xl font-bold` typography and improved padding
+- Add decorative circle overlay to `StatCard` with `opacity-[0.04]` for visual depth
+- Improve `Sidebar` collapse button with rounded hover state and color-mix background
+- Refactor `Badge` component to use `color-mix()` for theme-aware variant styles (default, secondary, destructive, success, warning)
+- Add gradient backgrounds and shadows to `Button` variants (primary, danger) with `shadow-sm`
+- Apply `rounded-xl` corners and enhanced shadows to `Card` with `backdrop-filter: blur(8px)`
+- Enhance `EmptyState` with larger icon container (64x64), gradient background, and `leading-relaxed` description
+- Update `Input` with `rounded-xl` styling, `focus:ring-[var(--color-primary)]/20`, and `shadow-xs` error state
+- Refactor `ProgressBar` to use CSS variables for colors (`var(--color-primary)`, `var(--color-warning)`, `var(--color-text-muted)`) instead of hardcoded Tailwind classes
+
+### Tests
+
+- Update UI component tests to match new theme-aware styling approach (using `color-mix()` and CSS variables)
+- Fix `ProgressBar` tests to query by style attributes instead of utility classes
+- Update `EmptyStateCard` tests to use `[role='img']` selector instead of `.text-5xl`
+- Update `EntityCountCard` tests for `text-xl font-bold` typography changes
+
+
 
 ### Security
 
@@ -14,21 +40,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 **Error Handling Improvements**:
+
 - Add per-view ErrorBoundary component for better error isolation
 - Propagate row parse errors in command handlers instead of silently ignoring them
 - Propagate row parse errors in repositories with proper error messages
 - Improve migration error handling with better diagnostics
 
 **API Parameter Naming**:
+
 - Correct snake_case parameter names for CRUD APIs (sync, bulk, target endpoints)
 - Correct snake_case parameter names for sync/bulk/target operations
 
 **Deep Link Permissions**:
+
 - Add deep-link permissions to Tauri capabilities for desktop OAuth callback
 
 ### Added
 
 **Database Health Check**:
+
 - New `db_health_check` command for verifying database connection health
 - Returns diagnostic info: table count, foreign keys status, SQLite version
 - Useful for sync pre-checks and troubleshooting

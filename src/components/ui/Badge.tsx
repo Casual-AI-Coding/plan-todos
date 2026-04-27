@@ -16,17 +16,20 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
       switch (variant) {
         case "default":
           return {
-            backgroundColor: "color-mix(in srgb, var(--color-primary) 12%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-primary) 12%, transparent)",
             color: "var(--color-primary)",
           };
         case "secondary":
           return {
-            backgroundColor: "color-mix(in srgb, var(--color-secondary) 12%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-secondary) 12%, transparent)",
             color: "var(--color-secondary)",
           };
         case "destructive":
           return {
-            backgroundColor: "color-mix(in srgb, var(--color-error) 12%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-error) 12%, transparent)",
             color: "var(--color-error)",
           };
         case "outline":
@@ -37,12 +40,14 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
           };
         case "success":
           return {
-            backgroundColor: "color-mix(in srgb, var(--color-success) 12%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-success) 12%, transparent)",
             color: "var(--color-success)",
           };
         case "warning":
           return {
-            backgroundColor: "color-mix(in srgb, var(--color-warning) 12%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-warning) 12%, transparent)",
             color: "var(--color-warning)",
           };
         default:

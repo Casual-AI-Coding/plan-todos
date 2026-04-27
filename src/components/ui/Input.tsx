@@ -32,7 +32,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             backgroundColor: "var(--color-bg-card)",
             borderColor: error ? "var(--color-error)" : "var(--color-border)",
             color: "var(--color-text)",
-            boxShadow: error ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "var(--shadow-xs, none)",
+            boxShadow: error
+              ? "0 0 0 3px rgba(239, 68, 68, 0.1)"
+              : "var(--shadow-xs, none)",
           }}
           {...props}
         />

@@ -39,14 +39,16 @@ export function EmptyState({
         ${className}
       `}
       style={{
-        background: "linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-hover) 100%)",
+        background:
+          "linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-hover) 100%)",
       }}
     >
       {/* Icon */}
       <div
         className="w-16 h-16 flex items-center justify-center rounded-2xl text-4xl mb-5"
         style={{
-          backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, transparent)",
+          backgroundColor:
+            "color-mix(in srgb, var(--color-primary) 8%, transparent)",
         }}
         role="img"
         aria-label={icon}

@@ -41,7 +41,10 @@ export function ProgressBar({
       )}
       <div
         className={`w-full rounded-full overflow-hidden ${sizeStyles[size]}`}
-        style={{ backgroundColor: "color-mix(in srgb, var(--color-text-muted) 12%, transparent)" }}
+        style={{
+          backgroundColor:
+            "color-mix(in srgb, var(--color-text-muted) 12%, transparent)",
+        }}
       >
         <div
           className="h-full rounded-full transition-all duration-500 ease-out"
