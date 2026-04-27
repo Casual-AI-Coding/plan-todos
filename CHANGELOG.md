@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-04-28
+
+### Tests
+
+- **Test Coverage Enhancement**: Comprehensive test suite to reach 90% coverage threshold
+  - Added new test files for hooks: `useAutoUpdate`, `useCirculationNotifications`, `useEntityFilter`, `useEntityOperations`, `useFontSettings`, `useFormState`, `useGlobalNotificationSettings`, `useGoogleDrive`, `useHotkey`, `useListNavigation`, `useMilestoneLinkLabel`, `useSystemTheme`, `useTasks`, `useTheme`
+  - Added new test files for lib: `HotkeyProvider`, `api/bulk`, `api/googleDrive`, `api/notifications`, `api/reorder`, `api/update`, `useHotkeyStore`, `utils/cn`, `utils/compare`
+  - Added new test files for services: `recurrenceService`
+  - Removed outdated test files (3775 lines removed)
+  - Fixed branch coverage to meet 90% threshold
+  - Updated `vitest.config.ts` with coverage configuration
+
+---
+
 ## [0.8.4] - 2026-04-27
 
 ### UI/UX
@@ -30,8 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `ProgressBar` tests to query by style attributes instead of utility classes
 - Update `EmptyStateCard` tests to use `[role='img']` selector instead of `.text-5xl`
 - Update `EntityCountCard` tests for `text-xl font-bold` typography changes
-
-
 
 ### Security
 
