@@ -28,7 +28,9 @@ pub fn get_steps(state: tauri::State<AppState>, target_id: String) -> Result<Vec
             })
             .map_err(|e| e.to_string())?;
 
-        Ok(step_iter.filter_map(|s| s.ok()).collect())
+        step_iter
+            .collect::<Result<Vec<Step>, _>>()
+            .map_err(|e| e.to_string())
     })
 }
 

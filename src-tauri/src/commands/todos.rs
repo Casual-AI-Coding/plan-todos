@@ -63,7 +63,9 @@ pub fn get_todos(state: tauri::State<AppState>) -> Result<Vec<Todo>, String> {
             })
             .map_err(|e| e.to_string())?;
 
-        Ok(todo_iter.filter_map(|t| t.ok()).collect())
+        todo_iter
+            .collect::<Result<Vec<Todo>, _>>()
+            .map_err(|e| e.to_string())
     })
 }
 

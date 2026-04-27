@@ -201,7 +201,8 @@ fn export_todos(conn: &rusqlite::Connection) -> Result<Vec<Todo>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Todo>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_tasks(conn: &rusqlite::Connection) -> Result<Vec<Task>, String> {
@@ -226,7 +227,8 @@ fn export_tasks(conn: &rusqlite::Connection) -> Result<Vec<Task>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Task>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_plans(conn: &rusqlite::Connection) -> Result<Vec<Plan>, String> {
@@ -250,7 +252,8 @@ fn export_plans(conn: &rusqlite::Connection) -> Result<Vec<Plan>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Plan>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_targets(conn: &rusqlite::Connection) -> Result<Vec<Target>, String> {
@@ -274,7 +277,8 @@ fn export_targets(conn: &rusqlite::Connection) -> Result<Vec<Target>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Target>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_steps(conn: &rusqlite::Connection) -> Result<Vec<Step>, String> {
@@ -297,7 +301,8 @@ fn export_steps(conn: &rusqlite::Connection) -> Result<Vec<Step>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Step>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_milestones(conn: &rusqlite::Connection) -> Result<Vec<Milestone>, String> {
@@ -321,7 +326,8 @@ fn export_milestones(conn: &rusqlite::Connection) -> Result<Vec<Milestone>, Stri
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Milestone>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_tags(conn: &rusqlite::Connection) -> Result<Vec<TagData>, String> {
@@ -341,7 +347,8 @@ fn export_tags(conn: &rusqlite::Connection) -> Result<Vec<TagData>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<TagData>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_entity_tags(conn: &rusqlite::Connection) -> Result<Vec<EntityTagRow>, String> {
@@ -359,7 +366,8 @@ fn export_entity_tags(conn: &rusqlite::Connection) -> Result<Vec<EntityTagRow>, 
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<EntityTagRow>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_circulations(conn: &rusqlite::Connection) -> Result<Vec<Circulation>, String> {
@@ -392,7 +400,8 @@ fn export_circulations(conn: &rusqlite::Connection) -> Result<Vec<Circulation>, 
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<Circulation>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_circulation_logs(conn: &rusqlite::Connection) -> Result<Vec<CirculationLog>, String> {
@@ -413,7 +422,8 @@ fn export_circulation_logs(conn: &rusqlite::Connection) -> Result<Vec<Circulatio
         })
         .map_err(|e| e.to_string())?;
 
-    Ok(rows.filter_map(|r| r.ok()).collect())
+    rows.collect::<Result<Vec<CirculationLog>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 fn export_settings(conn: &rusqlite::Connection) -> Result<SettingsData, String> {
@@ -456,7 +466,9 @@ fn export_settings(conn: &rusqlite::Connection) -> Result<SettingsData, String> 
         })
         .map_err(|e| e.to_string())?;
 
-    let notification_plugins: Vec<NotificationPluginData> = rows.filter_map(|r| r.ok()).collect();
+    let notification_plugins: Vec<NotificationPluginData> = rows
+        .collect::<Result<Vec<NotificationPluginData>, _>>()
+        .map_err(|e| e.to_string())?;
 
     // Export global notification settings
     let global_notification_settings = conn
@@ -545,8 +557,9 @@ fn export_settings(conn: &rusqlite::Connection) -> Result<SettingsData, String> 
         })
         .map_err(|e| e.to_string())?;
 
-    let circulation_notification_settings: Vec<CirculationNotificationSettingsData> =
-        rows2.filter_map(|r| r.ok()).collect();
+    let circulation_notification_settings: Vec<CirculationNotificationSettingsData> = rows2
+        .collect::<Result<Vec<CirculationNotificationSettingsData>, _>>()
+        .map_err(|e| e.to_string())?;
 
     Ok(SettingsData {
         daily_summary_settings,
