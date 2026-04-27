@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.3] - 2026-04-27
+
+### Security
+
+- **Notification History SQL Injection Prevention**: Use parameterized queries in notification history API to prevent SQL injection attacks
+
+### Fixed
+
+**Error Handling Improvements**:
+- Add per-view ErrorBoundary component for better error isolation
+- Propagate row parse errors in command handlers instead of silently ignoring them
+- Propagate row parse errors in repositories with proper error messages
+- Improve migration error handling with better diagnostics
+
+**API Parameter Naming**:
+- Correct snake_case parameter names for CRUD APIs (sync, bulk, target endpoints)
+- Correct snake_case parameter names for sync/bulk/target operations
+
+**Deep Link Permissions**:
+- Add deep-link permissions to Tauri capabilities for desktop OAuth callback
+
+### Added
+
+**Database Health Check**:
+- New `db_health_check` command for verifying database connection health
+- Returns diagnostic info: table count, foreign keys status, SQLite version
+- Useful for sync pre-checks and troubleshooting
+
+### Performance
+
+- **Milestone Progress Optimization**: Optimize milestone progress queries from N+1 to batched queries, significantly reducing database round trips
+
+### Refactored
+
+- Apply rustfmt to Rust source files for consistent code formatting
+
 ## [0.8.2] - 2026-04-27
 
 ### Refactored
