@@ -31,7 +31,7 @@ vi.mock("@/domain/todo/todoQueries", () => ({
   useReorderTodos: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
 }));
 
-vi.mock("@/hooks/useTags", () => ({
+vi.mock("@/domain/tag/tagQueries", () => ({
   useTags: vi.fn(() => ({ data: [] })),
 }));
 

@@ -2,9 +2,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SettingsTagsView } from "@/app/views/SettingsTagsView";
-import { useTags } from "@/hooks/useTags";
+import { useTags } from "@/domain/tag/tagQueries";
 
-vi.mock("@/hooks/useTags", () => ({
+vi.mock("@/domain/tag/tagQueries", () => ({
   useTags: vi.fn(),
   useCreateTag: vi.fn(() => ({
     mutate: vi.fn(),

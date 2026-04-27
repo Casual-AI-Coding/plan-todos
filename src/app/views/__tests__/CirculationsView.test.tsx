@@ -2,8 +2,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CirculationsView } from "@/app/views/CirculationsView";
+import { useCirculations } from "@/domain/circulation/circulationQueries";
 
-vi.mock("@/hooks/useCirculations", () => ({
+vi.mock("@/domain/circulation/circulationQueries", () => ({
   useCirculations: vi.fn(),
   useCreateCirculation: vi.fn(),
   useUpdateCirculation: vi.fn(),

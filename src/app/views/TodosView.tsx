@@ -10,7 +10,7 @@ import {
   useDeleteTodo,
   useReorderTodos,
 } from "@/domain/todo/todoQueries";
-import { useTags } from "@/hooks/useTags";
+import { useTags } from "@/domain/tag/tagQueries";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useEntityOperations } from "@/hooks/useEntityOperations";
 import { filterTodos, toCalendarEvents } from "@/domain/todo/todoFilters";

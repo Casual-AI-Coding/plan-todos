@@ -24,8 +24,8 @@ import {
   useCreateStep,
   useUpdateStep,
   useDeleteStep,
-} from "@/hooks/useTargets";
-import { useTags } from "@/hooks/useTags";
+} from "@/domain/target/targetQueries";
+import { useTags } from "@/domain/tag/tagQueries";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useToast } from "@/components/ui/Toast";
 import { useEntityOperations } from "@/hooks/useEntityOperations";

@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { Card, Button, Input } from "@/components/ui";
+import type { CreateTagInput, UpdateTagInput } from "@/domain/tag/tagTypes";
 import {
   useTags,
   useCreateTag,
   useUpdateTag,
   useDeleteTag,
-  type CreateTagInput,
-  type UpdateTagInput,
-} from "@/hooks/useTags";
+} from "@/domain/tag/tagQueries";
 
 export function SettingsTagsView() {
   const { data: tags = [], isLoading, error } = useTags();

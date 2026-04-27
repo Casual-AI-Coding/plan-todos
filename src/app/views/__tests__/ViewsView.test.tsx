@@ -2,25 +2,25 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ViewsView } from "@/app/views/ViewsView";
-import { useTodos } from "@/hooks/useTodos";
-import { usePlans } from "@/hooks/usePlans";
-import { useTargets } from "@/hooks/useTargets";
-import { useMilestones } from "@/hooks/useMilestones";
+import { useTodos } from "@/domain/todo/todoQueries";
+import { usePlans } from "@/domain/plan/planQueries";
+import { useTargets } from "@/domain/target/targetQueries";
+import { useMilestones } from "@/domain/milestone/milestoneQueries";
 import { useTasks } from "@/hooks/useTasks";
 
-vi.mock("@/hooks/useTodos", () => ({
+vi.mock("@/domain/todo/todoQueries", () => ({
   useTodos: vi.fn(),
 }));
 
-vi.mock("@/hooks/usePlans", () => ({
+vi.mock("@/domain/plan/planQueries", () => ({
   usePlans: vi.fn(),
 }));
 
-vi.mock("@/hooks/useTargets", () => ({
+vi.mock("@/domain/target/targetQueries", () => ({
   useTargets: vi.fn(),
 }));
 
-vi.mock("@/hooks/useMilestones", () => ({
+vi.mock("@/domain/milestone/milestoneQueries", () => ({
   useMilestones: vi.fn(),
 }));
 

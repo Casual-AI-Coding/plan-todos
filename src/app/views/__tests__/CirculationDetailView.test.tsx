@@ -2,9 +2,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CirculationDetailView } from "@/app/views/CirculationDetailView";
-import { useCirculation, useCirculationLogs } from "@/hooks/useCirculations";
+import { useCirculation, useCirculationLogs } from "@/domain/circulation/circulationQueries";
 
-vi.mock("@/hooks/useCirculations", () => ({
+vi.mock("@/domain/circulation/circulationQueries", () => ({
   useCirculation: vi.fn(),
   useCirculationLogs: vi.fn(),
   useCheckinCirculation: vi.fn(() => ({

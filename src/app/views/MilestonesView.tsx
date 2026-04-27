@@ -18,7 +18,7 @@ import {
   usePlansForMilestone,
   useTargetsForMilestone,
   useCirculationsForMilestone,
-} from "@/hooks/useMilestones";
+} from "@/domain/milestone/milestoneQueries";
 import { useEntityOperations } from "@/hooks/useEntityOperations";
 import { t } from "@/config/i18n";
 import type { Milestone } from "@/lib/api";

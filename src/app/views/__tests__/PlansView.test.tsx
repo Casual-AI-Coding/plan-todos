@@ -14,7 +14,7 @@ vi.mock("@tanstack/react-query", () => ({
     children,
 }));
 
-vi.mock("@/hooks/usePlans", () => ({
+vi.mock("@/domain/plan/planQueries", () => ({
   usePlans: vi.fn(() => ({ data: [], isLoading: false, error: null })),
   usePlanTags: vi.fn(() => ({ data: [] })),
   usePlanTasks: vi.fn(() => ({ data: [] })),
@@ -30,7 +30,7 @@ vi.mock("@/hooks/useTasks", () => ({
   useDeleteTask: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
 }));
 
-vi.mock("@/hooks/useTags", () => ({
+vi.mock("@/domain/tag/tagQueries", () => ({
   useTags: vi.fn(() => ({ data: [] })),
 }));
 

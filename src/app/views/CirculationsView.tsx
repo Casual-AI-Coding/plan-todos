@@ -36,7 +36,7 @@ import {
   useDeleteCirculation,
   useCheckinCirculation,
   useUndoCheckinCirculation,
-} from "@/hooks/useCirculations";
+} from "@/domain/circulation/circulationQueries";
 import {
   type Circulation,
   type CirculationType,

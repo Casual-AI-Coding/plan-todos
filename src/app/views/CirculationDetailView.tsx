@@ -9,7 +9,7 @@ import {
   useCirculationLogs,
   useCheckinCirculation,
   useUndoCheckinCirculation,
-} from "@/hooks/useCirculations";
+} from "@/domain/circulation/circulationQueries";
 import { CheckinConfirm } from "@/components/features";
 
 interface CirculationDetailViewProps {

@@ -2,9 +2,9 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MilestonesView } from "@/app/views/MilestonesView";
-import { useMilestones } from "@/hooks/useMilestones";
+import { useMilestones } from "@/domain/milestone/milestoneQueries";
 
-vi.mock("@/hooks/useMilestones", () => ({
+vi.mock("@/domain/milestone/milestoneQueries", () => ({
   useMilestones: vi.fn(),
   useCreateMilestone: vi.fn(() => ({
     mutate: vi.fn(),

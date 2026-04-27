@@ -18,9 +18,9 @@ import {
   useUpdatePlan,
   useDeletePlan,
   useReorderPlans,
-} from "@/hooks/usePlans";
+} from "@/domain/plan/planQueries";
 import { useCreateTask, useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
-import { useTags } from "@/hooks/useTags";
+import { useTags } from "@/domain/tag/tagQueries";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useEntityOperations } from "@/hooks/useEntityOperations";
 import { useFilteredPlans } from "@/hooks/useEntityFilter";

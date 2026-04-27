@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui";
-import { useTodos } from "@/hooks/useTodos";
-import { usePlans } from "@/hooks/usePlans";
-import { useTargets, targetKeys } from "@/hooks/useTargets";
-import { useMilestones } from "@/hooks/useMilestones";
+import { useTodos } from "@/domain/todo/todoQueries";
+import { usePlans } from "@/domain/plan/planQueries";
+import { useTargets, targetKeys } from "@/domain/target/targetQueries";
+import { useMilestones } from "@/domain/milestone/milestoneQueries";
 import { useTasks } from "@/hooks/useTasks";
 import {
   getSteps,
