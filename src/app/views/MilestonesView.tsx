@@ -125,7 +125,9 @@ export function MilestonesView() {
             MILESTONES
           </h2>
         </div>
-        <div className="text-center py-12 text-gray-500">{t.loading.default}</div>
+        <div className="text-center py-12 text-gray-500">
+          {t.loading.default}
+        </div>
       </div>
     );
   }
@@ -177,7 +179,9 @@ export function MilestonesView() {
                     <span
                       className={`text-sm px-2 py-1 rounded ${m.status === "completed" ? "bg-teal-100 text-teal-700" : "bg-gray-100 text-gray-600"}`}
                     >
-                      {m.status === "completed" ? t.status.completed : t.status.inProgress}
+                      {m.status === "completed"
+                        ? t.status.completed
+                        : t.status.inProgress}
                     </span>
                     <button
                       onClick={() => handleToggle(m)}
@@ -203,7 +207,9 @@ export function MilestonesView() {
             title={t.milestone.noLink}
             description="创建你的第一个里程碑来开始使用"
             action={
-              <Button onClick={() => setShowForm(true)}>+ {t.action.create}</Button>
+              <Button onClick={() => setShowForm(true)}>
+                + {t.action.create}
+              </Button>
             }
           />
         )}

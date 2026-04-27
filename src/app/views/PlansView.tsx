@@ -66,7 +66,9 @@ export function PlansView() {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>([]);
+  const [editingReminderTimes, setEditingReminderTimes] = useState<number[]>(
+    [],
+  );
 
   const selectedTags: string[] = [];
 
@@ -182,7 +184,9 @@ export function PlansView() {
             PLANS
           </h2>
         </div>
-        <div className="text-center py-12 text-gray-500">{t.loading.default}</div>
+        <div className="text-center py-12 text-gray-500">
+          {t.loading.default}
+        </div>
       </div>
     );
   }

@@ -71,10 +71,10 @@ Historical, completed, or obsolete documents. Preserves context without clutteri
 
 ## Quick Reference
 
-| Category     | Purpose                        | Example Files                              |
-| ------------ | ------------------------------ | ------------------------------------------ |
-| standards/   | Long-term reference            | `core-concepts.md`                         |
-| guides/      | How-to and usage               | `packaging-guide.md`                       |
-| plans/       | Process/implementation plans    | `2026-03-22-plan.md`                      |
-| specs/       | Living design documents        | `api-design.md`, `component-design.md`    |
-| archived/    | Historical records             | `0.5.x/`, `iteration-plan.md`             |
+| Category   | Purpose                      | Example Files                          |
+| ---------- | ---------------------------- | -------------------------------------- |
+| standards/ | Long-term reference          | `core-concepts.md`                     |
+| guides/    | How-to and usage             | `packaging-guide.md`                   |
+| plans/     | Process/implementation plans | `2026-03-22-plan.md`                   |
+| specs/     | Living design documents      | `api-design.md`, `component-design.md` |
+| archived/  | Historical records           | `0.5.x/`, `iteration-plan.md`          |

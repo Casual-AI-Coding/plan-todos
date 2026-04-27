@@ -35,7 +35,10 @@ export function MobileSidebar({
             paddingTop: "env(safe-area-inset-top)",
           }}
         >
-          <span className="font-semibold" style={{ color: "var(--color-text)" }}>
+          <span
+            className="font-semibold"
+            style={{ color: "var(--color-text)" }}
+          >
             {t.nav.menu}
           </span>
           <button
@@ -51,8 +54,20 @@ export function MobileSidebar({
               fill="currentColor"
               aria-hidden="true"
             >
-              <rect x="4" y="4" width="12" height="1.5" transform="rotate(45 10 10)" />
-              <rect x="4" y="4" width="12" height="1.5" transform="rotate(-45 10 10)" />
+              <rect
+                x="4"
+                y="4"
+                width="12"
+                height="1.5"
+                transform="rotate(45 10 10)"
+              />
+              <rect
+                x="4"
+                y="4"
+                width="12"
+                height="1.5"
+                transform="rotate(-45 10 10)"
+              />
             </svg>
           </button>
         </div>

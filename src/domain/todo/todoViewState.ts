@@ -31,9 +31,7 @@ export interface TodoViewState {
 
 export function useTodoViewState(): TodoViewState {
   const [filter, setFilter] = useState<TodoFilterMode>("all");
-  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">(
-    "all",
-  );
+  const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
   const [showTagDropdown, setShowTagDropdown] = useState(false);

@@ -2,7 +2,10 @@ import type { Milestone } from "@/lib/types";
 import type { MilestoneStatus } from "../shared/domainTypes";
 
 export const milestoneDomainService = {
-  filterByStatus(milestones: Milestone[], status: MilestoneStatus): Milestone[] {
+  filterByStatus(
+    milestones: Milestone[],
+    status: MilestoneStatus,
+  ): Milestone[] {
     return milestones.filter((m) => m.status === status);
   },
 
@@ -11,7 +14,9 @@ export const milestoneDomainService = {
       if (!a.target_date && !b.target_date) return 0;
       if (!a.target_date) return 1;
       if (!b.target_date) return -1;
-      return new Date(a.target_date).getTime() - new Date(b.target_date).getTime();
+      return (
+        new Date(a.target_date).getTime() - new Date(b.target_date).getTime()
+      );
     });
   },
 

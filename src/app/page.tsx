@@ -17,11 +17,19 @@ function getInitialSidebarCollapsed(): boolean {
 
 export default function Home() {
   const activeMenu = useNavigationStore((state) => state.activeMenu);
-  const mobileSidebarOpen = useNavigationStore((state) => state.mobileSidebarOpen);
+  const mobileSidebarOpen = useNavigationStore(
+    (state) => state.mobileSidebarOpen,
+  );
   const navigate = useNavigationStore((state) => state.navigate);
-  const openMobileSidebar = useNavigationStore((state) => state.openMobileSidebar);
-  const closeMobileSidebar = useNavigationStore((state) => state.closeMobileSidebar);
-  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(null);
+  const openMobileSidebar = useNavigationStore(
+    (state) => state.openMobileSidebar,
+  );
+  const closeMobileSidebar = useNavigationStore(
+    (state) => state.closeMobileSidebar,
+  );
+  const [circulationDetailId, setCirculationDetailId] = useState<string | null>(
+    null,
+  );
   const [, setSidebarCollapsed] = useState(getInitialSidebarCollapsed);
 
   useEffect(() => {
@@ -36,14 +44,24 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: "transparent", fontFamily: "var(--font-sans)" }}>
+    <div
+      className="flex flex-col h-screen"
+      style={{ background: "transparent", fontFamily: "var(--font-sans)" }}
+    >
       <div className="hidden md:flex flex-col h-screen rounded-lg overflow-hidden border border-[var(--color-border)] shadow-lg">
         <TitleBar />
         <div className="flex flex-1 overflow-hidden">
           <div className="hidden md:block h-full">
-            <Sidebar activeMenu={activeMenu} onMenuChange={navigate} onCollapseChange={setSidebarCollapsed} />
+            <Sidebar
+              activeMenu={activeMenu}
+              onMenuChange={navigate}
+              onCollapseChange={setSidebarCollapsed}
+            />
           </div>
-          <main className="flex-1 overflow-auto pb-16 md:pb-0" style={{ backgroundColor: "var(--color-bg)" }}>
+          <main
+            className="flex-1 overflow-auto pb-16 md:pb-0"
+            style={{ backgroundColor: "var(--color-bg)" }}
+          >
             <ViewRouter activeMenu={activeMenu} />
           </main>
         </div>
@@ -65,13 +83,22 @@ export default function Home() {
             style={{ color: "var(--color-text)" }}
             aria-label="打开菜单"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <rect x="2" y="4" width="16" height="1.5" />
               <rect x="2" y="9" width="16" height="1.5" />
               <rect x="2" y="14" width="16" height="1.5" />
             </svg>
           </button>
-          <h1 className="ml-2 text-lg font-semibold" style={{ color: "var(--color-text)" }}>
+          <h1
+            className="ml-2 text-lg font-semibold"
+            style={{ color: "var(--color-text)" }}
+          >
             Plan Todos
           </h1>
         </header>
@@ -100,7 +127,10 @@ export default function Home() {
       <BottomNav activeMenu={activeMenu} onMenuChange={navigate} />
 
       {circulationDetailId && (
-        <CirculationDetailView id={circulationDetailId} onClose={() => setCirculationDetailId(null)} />
+        <CirculationDetailView
+          id={circulationDetailId}
+          onClose={() => setCirculationDetailId(null)}
+        />
       )}
     </div>
   );

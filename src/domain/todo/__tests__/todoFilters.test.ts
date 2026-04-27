@@ -30,7 +30,11 @@ describe("filterTodos", () => {
   it("filters todos by case-insensitive search across title and content", () => {
     const todos = [
       createTodo({ id: "todo-1", title: "Write docs", content: "Alpha notes" }),
-      createTodo({ id: "todo-2", title: "Review PR", content: "Contains BETA feedback" }),
+      createTodo({
+        id: "todo-2",
+        title: "Review PR",
+        content: "Contains BETA feedback",
+      }),
       createTodo({ id: "todo-3", title: "Ship release", content: null }),
     ];
 
@@ -47,9 +51,45 @@ describe("filterTodos", () => {
 
   it("filters todos by priority and tag id", () => {
     const todos = [
-      createTodo({ id: "todo-1", priority: "P1", tags: [{ id: "tag-a", name: "Work", color: "blue", description: null, created_at: "2026-04-27T09:00:00.000Z" }] }),
-      createTodo({ id: "todo-2", priority: "P1", tags: [{ id: "tag-b", name: "Home", color: "green", description: null, created_at: "2026-04-27T09:00:00.000Z" }] }),
-      createTodo({ id: "todo-3", priority: "P2", tags: [{ id: "tag-a", name: "Work", color: "blue", description: null, created_at: "2026-04-27T09:00:00.000Z" }] }),
+      createTodo({
+        id: "todo-1",
+        priority: "P1",
+        tags: [
+          {
+            id: "tag-a",
+            name: "Work",
+            color: "blue",
+            description: null,
+            created_at: "2026-04-27T09:00:00.000Z",
+          },
+        ],
+      }),
+      createTodo({
+        id: "todo-2",
+        priority: "P1",
+        tags: [
+          {
+            id: "tag-b",
+            name: "Home",
+            color: "green",
+            description: null,
+            created_at: "2026-04-27T09:00:00.000Z",
+          },
+        ],
+      }),
+      createTodo({
+        id: "todo-3",
+        priority: "P2",
+        tags: [
+          {
+            id: "tag-a",
+            name: "Work",
+            color: "blue",
+            description: null,
+            created_at: "2026-04-27T09:00:00.000Z",
+          },
+        ],
+      }),
     ];
 
     const result = filterTodos({
@@ -68,10 +108,18 @@ describe("filterTodos", () => {
     vi.setSystemTime(new Date("2026-04-27T10:00:00.000Z"));
 
     const todos = [
-      createTodo({ id: "today", due_date: "2026-04-27T12:00:00.000Z", status: "pending" }),
+      createTodo({
+        id: "today",
+        due_date: "2026-04-27T12:00:00.000Z",
+        status: "pending",
+      }),
       createTodo({ id: "upcoming", due_date: "2026-04-28", status: "pending" }),
       createTodo({ id: "done", due_date: "2026-04-20", status: "done" }),
-      createTodo({ id: "ignored", due_date: "2026-04-27", status: "in-progress" }),
+      createTodo({
+        id: "ignored",
+        due_date: "2026-04-27",
+        status: "in-progress",
+      }),
     ];
 
     expect(
@@ -111,7 +159,11 @@ describe("toCalendarEvents", () => {
     const todos = [
       createTodo({ id: "todo-1", title: "Write docs", due_date: "2026-04-27" }),
       createTodo({ id: "todo-2", title: "No date", due_date: null }),
-      createTodo({ id: "todo-3", title: "Review PR", due_date: "2026-04-28T09:00:00.000Z" }),
+      createTodo({
+        id: "todo-3",
+        title: "Review PR",
+        due_date: "2026-04-28T09:00:00.000Z",
+      }),
     ];
 
     expect(toCalendarEvents(todos)).toEqual([

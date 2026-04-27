@@ -102,7 +102,9 @@ export function TodosView() {
   if (error) {
     return (
       <div className="p-2 sm:p-4 md:p-6">
-        <p className="text-red-500">{t.error.networkError}: {error.message}</p>
+        <p className="text-red-500">
+          {t.error.networkError}: {error.message}
+        </p>
       </div>
     );
   }
@@ -149,10 +151,7 @@ export function TodosView() {
 
       {/* Click outside to close dropdowns */}
       {(view.showPriorityDropdown || view.showTagDropdown) && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={view.closeDropdowns}
-        />
+        <div className="fixed inset-0 z-0" onClick={view.closeDropdowns} />
       )}
 
       {/* Content */}
@@ -190,9 +189,7 @@ export function TodosView() {
               icon="📋"
               title="暂无待办事项"
               description="创建你的第一个待办事项来开始使用"
-              action={
-                <Button onClick={view.openCreateForm}>+ 创建待办</Button>
-              }
+              action={<Button onClick={view.openCreateForm}>+ 创建待办</Button>}
             />
           )}
         </>

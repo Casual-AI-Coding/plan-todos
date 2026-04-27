@@ -1,13 +1,20 @@
 import type { EntityType } from "@/lib/types";
 
 interface EntitySideEffectAdapters {
-  setEntityTags: (entityType: EntityType, entityId: string, tags: string[]) => Promise<void>;
+  setEntityTags: (
+    entityType: EntityType,
+    entityId: string,
+    tags: string[],
+  ) => Promise<void>;
   setNotificationSettings: (
     entityType: EntityType,
     entityId: string,
     times: number[],
   ) => Promise<void>;
-  getNotificationSettings: (entityType: EntityType, entityId: string) => Promise<unknown>;
+  getNotificationSettings: (
+    entityType: EntityType,
+    entityId: string,
+  ) => Promise<unknown>;
 }
 
 export function createEntitySideEffects(adapters: EntitySideEffectAdapters) {

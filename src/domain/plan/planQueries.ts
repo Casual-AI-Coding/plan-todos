@@ -1,7 +1,16 @@
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 
 import { createEntityHooks } from "@/domain/shared/entityQueries";
-import { getPlans, getPlan, createPlan, updatePlan, deletePlan, getEntityTags, setEntityTags, getTasksByPlan } from "@/lib/api";
+import {
+  getPlans,
+  getPlan,
+  createPlan,
+  updatePlan,
+  deletePlan,
+  getEntityTags,
+  setEntityTags,
+  getTasksByPlan,
+} from "@/lib/api";
 import { reorderPlans } from "@/lib/api/reorder";
 import type { Plan, Task, Tag } from "@/lib/types";
 

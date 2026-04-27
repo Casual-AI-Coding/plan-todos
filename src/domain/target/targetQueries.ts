@@ -7,7 +7,18 @@ import {
 } from "@tanstack/react-query";
 
 import { createEntityHooks } from "@/domain/shared/entityQueries";
-import { getTargets, createTarget, updateTarget, deleteTarget, getEntityTags, setEntityTags, createStep, updateStep, deleteStep, getSteps } from "@/lib/api";
+import {
+  getTargets,
+  createTarget,
+  updateTarget,
+  deleteTarget,
+  getEntityTags,
+  setEntityTags,
+  createStep,
+  updateStep,
+  deleteStep,
+  getSteps,
+} from "@/lib/api";
 import { reorderTargets } from "@/lib/api/reorder";
 import type { Target, Step, Tag } from "@/lib/types";
 
@@ -77,15 +88,35 @@ export function useTargetSteps(
 
 export function useCreateStep(
   options?: Omit<
-    UseMutationOptions<Step, Error, { target_id: string; title: string; weight: number; priority?: "P0" | "P1" | "P2" | "P3" }>,
+    UseMutationOptions<
+      Step,
+      Error,
+      {
+        target_id: string;
+        title: string;
+        weight: number;
+        priority?: "P0" | "P1" | "P2" | "P3";
+      }
+    >,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
-  return useMutation<Step, Error, { target_id: string; title: string; weight: number; priority?: "P0" | "P1" | "P2" | "P3" }>({
+  return useMutation<
+    Step,
+    Error,
+    {
+      target_id: string;
+      title: string;
+      weight: number;
+      priority?: "P0" | "P1" | "P2" | "P3";
+    }
+  >({
     mutationFn: createStep,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: targetKeys.targetSteps(data.target_id) });
+      queryClient.invalidateQueries({
+        queryKey: targetKeys.targetSteps(data.target_id),
+      });
     },
     ...options,
   });
@@ -93,12 +124,32 @@ export function useCreateStep(
 
 export function useUpdateStep(
   options?: Omit<
-    UseMutationOptions<Step, Error, { id: string; title?: string; weight?: number; status?: "pending" | "completed"; priority?: "P0" | "P1" | "P2" | "P3" }>,
+    UseMutationOptions<
+      Step,
+      Error,
+      {
+        id: string;
+        title?: string;
+        weight?: number;
+        status?: "pending" | "completed";
+        priority?: "P0" | "P1" | "P2" | "P3";
+      }
+    >,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
-  return useMutation<Step, Error, { id: string; title?: string; weight?: number; status?: "pending" | "completed"; priority?: "P0" | "P1" | "P2" | "P3" }>({
+  return useMutation<
+    Step,
+    Error,
+    {
+      id: string;
+      title?: string;
+      weight?: number;
+      status?: "pending" | "completed";
+      priority?: "P0" | "P1" | "P2" | "P3";
+    }
+  >({
     mutationFn: async ({ id, ...data }) => {
       const result = await updateStep(id, data);
       queryClient.invalidateQueries({ queryKey: ["targets", "steps"] });

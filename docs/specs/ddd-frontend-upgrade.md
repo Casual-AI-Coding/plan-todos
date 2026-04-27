@@ -11,18 +11,18 @@
 
 ### 1.1 核心架构缺陷
 
-| 严重程度 | 问题 | 影响范围 |
-|---------|------|---------|
-| 🔴 P0 | page.tsx 上帝组件 (324行) | 路由、布局、导航、状态全部耦合 |
-| 🔴 P0 | 5个 CRUD Hook 重复模式 (~1175行) | useTodos/usePlans/useTargets/useMilestones/useCirculations 完全相同模式 |
-| 🔴 P0 | 导航配置硬编码两处 (Sidebar 430行 + BottomNav 53行) | 新增/修改导航需改两处 |
-| 🟡 P1 | layout.tsx 硬编码 11 个主题名 (缺 14+ 个) | 新增主题不会生效 |
-| 🟡 P1 | 无路由系统 (useState 管页面切换) | 无法支持 URL、后退、书签 |
-| 🟡 P1 | 服务层极薄 (todoService 仅 5 个 filter 函数) | 业务逻辑散落在 View 和 Hook |
-| 🟡 P1 | reorder.ts 绕过 apiClient 抽象直接调用 invoke | 架构一致性被破坏 |
-| 🟢 P2 | 硬编码常量散落 (localStorage keys, CSS values, 中文UI文本) | 维护困难，无法国际化 |
-| 🟢 P2 | 类型重复 (hooks 定义 CreateInput 与 types/ 定义重复) | 类型不同步风险 |
-| 🟢 P2 | validation.ts 硬编码中文错误消息 | 国际化阻碍 |
+| 严重程度 | 问题                                                       | 影响范围                                                                |
+| -------- | ---------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 🔴 P0    | page.tsx 上帝组件 (324行)                                  | 路由、布局、导航、状态全部耦合                                          |
+| 🔴 P0    | 5个 CRUD Hook 重复模式 (~1175行)                           | useTodos/usePlans/useTargets/useMilestones/useCirculations 完全相同模式 |
+| 🔴 P0    | 导航配置硬编码两处 (Sidebar 430行 + BottomNav 53行)        | 新增/修改导航需改两处                                                   |
+| 🟡 P1    | layout.tsx 硬编码 11 个主题名 (缺 14+ 个)                  | 新增主题不会生效                                                        |
+| 🟡 P1    | 无路由系统 (useState 管页面切换)                           | 无法支持 URL、后退、书签                                                |
+| 🟡 P1    | 服务层极薄 (todoService 仅 5 个 filter 函数)               | 业务逻辑散落在 View 和 Hook                                             |
+| 🟡 P1    | reorder.ts 绕过 apiClient 抽象直接调用 invoke              | 架构一致性被破坏                                                        |
+| 🟢 P2    | 硬编码常量散落 (localStorage keys, CSS values, 中文UI文本) | 维护困难，无法国际化                                                    |
+| 🟢 P2    | 类型重复 (hooks 定义 CreateInput 与 types/ 定义重复)       | 类型不同步风险                                                          |
+| 🟢 P2    | validation.ts 硬编码中文错误消息                           | 国际化阻碍                                                              |
 
 ### 1.2 依赖混乱
 
@@ -31,7 +31,7 @@ View (TodosView)
   → imports from @/lib/api (setEntityTags, setNotificationSettings)  // 跨层！
   → imports useTodos, useCreateTodo, useUpdateTodo, useDeleteTodo...  // 多个hook
   → contains filter/state/business logic inline                   // 业务逻辑！
-  
+
 useMilestones
   → imports getPlans, getTargets, getCirculations (3个跨实体API)  // 跨领域！
 
@@ -151,7 +151,7 @@ import type { LucideIcon } from "lucide-react";
 
 export interface NavItem {
   id: string;
-  label: string;        // i18n key
+  label: string; // i18n key
   icon: string | LucideIcon;
   children?: NavItem[];
 }
@@ -159,44 +159,72 @@ export interface NavItem {
 export interface RouteConfig {
   id: string;
   component: () => import("react").ReactNode; // lazy load
-  parentId?: string;     // routes that map to same view
+  parentId?: string; // routes that map to same view
 }
 
 // 导航菜单 (Sidebar + BottomNav 共享)
 export const NAV_MENU_ITEMS: NavItem[] = [
   { id: "dashboard", icon: "📊", label: "nav.dashboard" },
   { id: "todos", icon: "📋", label: "nav.todos" },
-  { id: "circulations", icon: "🔄", label: "nav.circulations",
+  {
+    id: "circulations",
+    icon: "🔄",
+    label: "nav.circulations",
     children: [
       { id: "circulations-today", icon: "☀️", label: "nav.circulationsToday" },
-      { id: "circulations-settings", icon: "⚙️", label: "nav.circulationsSettings" },
-    ]
+      {
+        id: "circulations-settings",
+        icon: "⚙️",
+        label: "nav.circulationsSettings",
+      },
+    ],
   },
   { id: "plans", icon: "🚀", label: "nav.plans" },
   { id: "goals", icon: "🎯", label: "nav.goals" },
   { id: "milestones", icon: "🏆", label: "nav.milestones" },
   { id: "views", icon: "👁️", label: "nav.views" },
   { id: "statistics", icon: "📈", label: "nav.statistics" },
-  { id: "notifications", icon: "🔔", label: "nav.notifications",
+  {
+    id: "notifications",
+    icon: "🔔",
+    label: "nav.notifications",
     children: [
-      { id: "notification-center", icon: "📨", label: "nav.notificationCenter" },
-      { id: "settings-notifications", icon: "⚙️", label: "nav.notificationSettings" },
+      {
+        id: "notification-center",
+        icon: "📨",
+        label: "nav.notificationCenter",
+      },
+      {
+        id: "settings-notifications",
+        icon: "⚙️",
+        label: "nav.notificationSettings",
+      },
       { id: "settings-channels", icon: "📢", label: "nav.channels" },
       { id: "settings-daily-summary", icon: "📅", label: "nav.dailySummary" },
-      { id: "settings-circulation-notifications", icon: "⏰", label: "nav.circulationNotifications" },
-    ]
+      {
+        id: "settings-circulation-notifications",
+        icon: "⏰",
+        label: "nav.circulationNotifications",
+      },
+    ],
   },
-  { id: "data-management", icon: "💾", label: "nav.dataManagement",
+  {
+    id: "data-management",
+    icon: "💾",
+    label: "nav.dataManagement",
     children: [
       { id: "data-import-export", icon: "🔄", label: "nav.importExport" },
       { id: "settings-sync", icon: "☁️", label: "nav.sync" },
-    ]
+    ],
   },
-  { id: "settings", icon: "⚙️", label: "nav.settings",
+  {
+    id: "settings",
+    icon: "⚙️",
+    label: "nav.settings",
     children: [
       { id: "settings-general", icon: "🎨", label: "nav.general" },
       { id: "settings-tags", icon: "🏷️", label: "nav.tagManagement" },
-    ]
+    ],
   },
   { id: "settings-about", icon: "ℹ️", label: "nav.about" },
 ];
@@ -213,23 +241,34 @@ export const BOTTOM_NAV_ITEMS: NavItem[] = [
 // 路由 → 视图映射 (消除 switch/case)
 export const ROUTE_VIEW_MAP: Record<string, string> = {
   dashboard: "Dashboard",
-  todos: "TodosView", "todos-all": "TodosView", "todos-today": "TodosView",
-  "todos-upcoming": "TodosView", "todos-completed": "TodosView",
-  plans: "PlansView", "plans-active": "PlansView", "plans-archived": "PlansView",
-  goals: "TargetsView", "goals-active": "TargetsView", "goals-completed": "TargetsView",
+  todos: "TodosView",
+  "todos-all": "TodosView",
+  "todos-today": "TodosView",
+  "todos-upcoming": "TodosView",
+  "todos-completed": "TodosView",
+  plans: "PlansView",
+  "plans-active": "PlansView",
+  "plans-archived": "PlansView",
+  goals: "TargetsView",
+  "goals-active": "TargetsView",
+  "goals-completed": "TargetsView",
   milestones: "MilestonesView",
   views: "ViewsView",
-  circulations: "CirculationsView", "circulations-today": "CirculationsView",
+  circulations: "CirculationsView",
+  "circulations-today": "CirculationsView",
   "circulations-settings": "CirculationsView",
   statistics: "StatisticsView",
-  notifications: "NotificationCenterView", "notification-center": "NotificationCenterView",
+  notifications: "NotificationCenterView",
+  "notification-center": "NotificationCenterView",
   "settings-channels": "SettingsChannelsView",
   "settings-daily-summary": "SettingsDailySummaryView",
   "settings-circulation-notifications": "SettingsCirculationNotificationsView",
   "settings-notifications": "SettingsNotificationsView",
-  "data-management": "DataManagementView", "data-import-export": "DataManagementView",
+  "data-management": "DataManagementView",
+  "data-import-export": "DataManagementView",
   "settings-sync": "SettingsSyncView",
-  settings: "SettingsGeneralView", "settings-general": "SettingsGeneralView",
+  settings: "SettingsGeneralView",
+  "settings-general": "SettingsGeneralView",
   "settings-tags": "SettingsTagsView",
   "settings-about": "SettingsAboutView",
 };
@@ -281,7 +320,12 @@ export const PRIORITY_ORDER: Record<string, number> = {
 
 // Valid values (derived from types, not duplicated)
 export const VALID_PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
-export const VALID_STATUSES = ["pending", "in_progress", "completed", "cancelled"] as const;
+export const VALID_STATUSES = [
+  "pending",
+  "in_progress",
+  "completed",
+  "cancelled",
+] as const;
 ```
 
 #### 1A-3: 创建 `src/config/i18n.ts`
@@ -311,7 +355,8 @@ export const MESSAGES = {
     fieldRequired: (field: string) => `${field}不能为空`,
     invalidPriority: "无效的优先级",
     invalidStatus: "无效的状态",
-    fieldMaxLength: (field: string, max: number) => `${field}不能超过${max}个字符`,
+    fieldMaxLength: (field: string, max: number) =>
+      `${field}不能超过${max}个字符`,
   },
 } as const;
 ```
@@ -355,17 +400,20 @@ const initScript = `
 // 消除 useTodos/usePlans/useTargets/useMilestones/useCirculations 重复代码
 
 import {
-  useQuery, useMutation, useQueryClient,
-  type UseQueryOptions, type UseMutationOptions,
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type UseQueryOptions,
+  type UseMutationOptions,
 } from "@tanstack/react-query";
 
 /**
  * 创建实体的完整 CRUD hooks 集合
- * 
+ *
  * @example
  * // 使用前 (44行重复):
  * export const useTodos = ... useCreateTodo = ... useUpdateTodo = ...
- * 
+ *
  * // 使用后 (3行):
  * export const todoHooks = createEntityHooks<Todo, CreateTodoInput, UpdateTodoInput>({
  *   queryKey: "todos",
@@ -375,7 +423,7 @@ import {
  *   updateFn: ({ id, ...data }) => updateTodo(id, data),
  *   deleteFn: deleteTodo,
  * });
- * 
+ *
  * // 在组件中使用:
  * const { useGetAll, useGetOne, useCreate, useUpdate, useDelete } = todoHooks;
  */
@@ -388,14 +436,24 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
   deleteFn: (id: string) => Promise<void>;
   reorderFn?: (orders: { id: string; sort_order: number }[]) => Promise<number>;
 }) {
-  const { queryKey, getAllFn, getOneFn, createFn, updateFn, deleteFn, reorderFn } = config;
-  
+  const {
+    queryKey,
+    getAllFn,
+    getOneFn,
+    createFn,
+    updateFn,
+    deleteFn,
+    reorderFn,
+  } = config;
+
   const keys = {
     all: [queryKey] as const,
     one: (id: string) => [queryKey, id] as const,
   };
 
-  function useGetAll(options?: Omit<UseQueryOptions<TEntity[], Error>, "queryKey" | "queryFn">) {
+  function useGetAll(
+    options?: Omit<UseQueryOptions<TEntity[], Error>, "queryKey" | "queryFn">,
+  ) {
     return useQuery<TEntity[], Error>({
       queryKey: keys.all,
       queryFn: getAllFn,
@@ -403,7 +461,10 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
     });
   }
 
-  function useGetOne(id: string, options?: Omit<UseQueryOptions<TEntity, Error>, "queryKey" | "queryFn">) {
+  function useGetOne(
+    id: string,
+    options?: Omit<UseQueryOptions<TEntity, Error>, "queryKey" | "queryFn">,
+  ) {
     return useQuery<TEntity, Error>({
       queryKey: keys.one(id),
       queryFn: () => getOneFn!(id),
@@ -412,7 +473,12 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
     });
   }
 
-  function useCreate(options?: Omit<UseMutationOptions<TEntity, Error, TCreateInput>, "mutationFn">) {
+  function useCreate(
+    options?: Omit<
+      UseMutationOptions<TEntity, Error, TCreateInput>,
+      "mutationFn"
+    >,
+  ) {
     const queryClient = useQueryClient();
     return useMutation<TEntity, Error, TCreateInput>({
       mutationFn: createFn,
@@ -423,21 +489,30 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
     });
   }
 
-  function useUpdate(options?: Omit<UseMutationOptions<TEntity, Error, TUpdateInput>, "mutationFn">) {
+  function useUpdate(
+    options?: Omit<
+      UseMutationOptions<TEntity, Error, TUpdateInput>,
+      "mutationFn"
+    >,
+  ) {
     const queryClient = useQueryClient();
     return useMutation<TEntity, Error, TUpdateInput>({
       mutationFn: updateFn,
       onSuccess: (data) => {
         queryClient.setQueryData<TEntity[]>(keys.all, (old) => {
           if (!old) return old;
-          return old.map((item) => (item.id === (data as { id: string }).id ? data : item));
+          return old.map((item) =>
+            item.id === (data as { id: string }).id ? data : item,
+          );
         });
       },
       ...options,
     });
   }
 
-  function useDelete(options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">) {
+  function useDelete(
+    options?: Omit<UseMutationOptions<void, Error, string>, "mutationFn">,
+  ) {
     const queryClient = useQueryClient();
     return useMutation<void, Error, string>({
       mutationFn: deleteFn,
@@ -448,9 +523,14 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
     });
   }
 
-  function useReorder(options?: Omit<UseMutationOptions<number, Error, { id: string; sort_order: number }[]>, "mutationFn">) {
+  function useReorder(
+    options?: Omit<
+      UseMutationOptions<number, Error, { id: string; sort_order: number }[]>,
+      "mutationFn"
+    >,
+  ) {
     const queryClient = useQueryClient();
-    
+
     if (!reorderFn) {
       throw new Error(`Reorder not supported for entity: ${queryKey}`);
     }
@@ -462,10 +542,16 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
         const previousData = queryClient.getQueryData<TEntity[]>(keys.all);
         if (previousData) {
           const updated = previousData.map((item) => {
-            const order = newOrders.find((o) => o.id === (item as { id: string }).id);
+            const order = newOrders.find(
+              (o) => o.id === (item as { id: string }).id,
+            );
             return order ? { ...item, sort_order: order.sort_order } : item;
           });
-          updated.sort((a, b) => (a as { sort_order: number }).sort_order - (b as { sort_order: number }).sort_order);
+          updated.sort(
+            (a, b) =>
+              (a as { sort_order: number }).sort_order -
+              (b as { sort_order: number }).sort_order,
+          );
           queryClient.setQueryData(keys.all, updated);
         }
         return { previousData };
@@ -501,11 +587,21 @@ export function createEntityHooks<TEntity, TCreateInput, TUpdateInput>(config: {
 // src/domain/todo/todoQueries.ts (替代 src/hooks/useTodos.ts - 从187行→30行)
 import { createEntityHooks } from "../shared/entityQueries";
 import type { Todo } from "@/lib/types";
-import { getTodo, getTodos, createTodo, updateTodo, deleteTodo } from "@/lib/api";
+import {
+  getTodo,
+  getTodos,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+} from "@/lib/api";
 import { reorderTodos } from "@/lib/api/reorder";
 import type { CreateTodoInput, UpdateTodoInput } from "./todoTypes";
 
-export const todoHooks = createEntityHooks<Todo, CreateTodoInput, UpdateTodoInput>({
+export const todoHooks = createEntityHooks<
+  Todo,
+  CreateTodoInput,
+  UpdateTodoInput
+>({
   queryKey: "todos",
   getAllFn: getTodos,
   getOneFn: getTodo,
@@ -516,8 +612,14 @@ export const todoHooks = createEntityHooks<Todo, CreateTodoInput, UpdateTodoInpu
 });
 
 // Re-export for convenience
-export const { useGetAll: useTodos, useGetOne: useTodo, useCreate: useCreateTodo, 
-               useUpdate: useUpdateTodo, useDelete: useDeleteTodo, useReorder: useReorderTodos } = todoHooks;
+export const {
+  useGetAll: useTodos,
+  useGetOne: useTodo,
+  useCreate: useCreateTodo,
+  useUpdate: useUpdateTodo,
+  useDelete: useDeleteTodo,
+  useReorder: useReorderTodos,
+} = todoHooks;
 export const { keys: todoKeys } = todoHooks;
 ```
 
@@ -535,10 +637,12 @@ export const planHooks = createEntityHooks<Plan, PlanCreateInput, PlanUpdateInpu
 
 ```typescript
 // src/lib/api/reorder.ts - 使用 apiClient 而非直接 invoke
-import { invoke } from "./client";  // 从 client 导入,不是 @tauri-apps
+import { invoke } from "./client"; // 从 client 导入,不是 @tauri-apps
 
 export async function reorderTodos(orders: ReorderItem[]): Promise<number> {
-  const ordersTuple = orders.map((o) => [o.id, o.sort_order] as [string, number]);
+  const ordersTuple = orders.map(
+    (o) => [o.id, o.sort_order] as [string, number],
+  );
   return invoke<number>("reorder_todos", { orders: ordersTuple });
 }
 // ... 同理 reorderPlans, reorderTargets
@@ -593,18 +697,22 @@ export const todoDomainService = {
 
   /** 按状态分组 */
   groupByStatus(todos: Todo[]): Record<TodoStatus, Todo[]> {
-    return todos.reduce((acc, todo) => {
-      const status = (todo.status || "pending") as TodoStatus;
-      if (!acc[status]) acc[status] = [];
-      acc[status].push(todo);
-      return acc;
-    }, {} as Record<TodoStatus, Todo[]>);
+    return todos.reduce(
+      (acc, todo) => {
+        const status = (todo.status || "pending") as TodoStatus;
+        if (!acc[status]) acc[status] = [];
+        acc[status].push(todo);
+        return acc;
+      },
+      {} as Record<TodoStatus, Todo[]>,
+    );
   },
 
   /** 按优先级排序 */
   sortByPriority(todos: Todo[]): Todo[] {
     return [...todos].sort(
-      (a, b) => (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99),
+      (a, b) =>
+        (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99),
     );
   },
 
@@ -622,7 +730,8 @@ export const todoDomainService = {
   validateCreate(input: CreateTodoInput): string[] {
     const errors: string[] = [];
     if (!input.title?.trim()) errors.push("标题不能为空");
-    if (input.title && input.title.length > 500) errors.push("标题不能超过500个字符");
+    if (input.title && input.title.length > 500)
+      errors.push("标题不能超过500个字符");
     return errors;
   },
 };
@@ -640,19 +749,35 @@ export interface ValidationError {
   message: string;
 }
 
-export function required(value: unknown, fieldName: string): ValidationError | null {
+export function required(
+  value: unknown,
+  fieldName: string,
+): ValidationError | null {
   if (value === null || value === undefined || value === "") {
-    return { field: fieldName, message: MESSAGES.error.fieldRequired(fieldName) };
+    return {
+      field: fieldName,
+      message: MESSAGES.error.fieldRequired(fieldName),
+    };
   }
   if (typeof value === "string" && value.trim() === "") {
-    return { field: fieldName, message: MESSAGES.error.fieldRequired(fieldName) };
+    return {
+      field: fieldName,
+      message: MESSAGES.error.fieldRequired(fieldName),
+    };
   }
   return null;
 }
 
-export function maxLength(value: string, max: number, fieldName: string): ValidationError | null {
+export function maxLength(
+  value: string,
+  max: number,
+  fieldName: string,
+): ValidationError | null {
   if (value && value.length > max) {
-    return { field: fieldName, message: MESSAGES.error.fieldMaxLength(fieldName, max) };
+    return {
+      field: fieldName,
+      message: MESSAGES.error.fieldMaxLength(fieldName, max),
+    };
   }
   return null;
 }
@@ -690,7 +815,7 @@ interface NavigationState {
   circulationDetailId: string | null;
   sidebarCollapsed: boolean;
   mobileSidebarOpen: boolean;
-  
+
   // Actions
   setActiveRoute: (route: string) => void;
   setCirculationDetailId: (id: string | null) => void;
@@ -714,7 +839,8 @@ export const useNavigationStore = create<NavigationState>((set) => ({
 
 // 使用方便的 selector
 export const useActiveRoute = () => useNavigationStore((s) => s.activeRoute);
-export const useCirculationDetailId = () => useNavigationStore((s) => s.circulationDetailId);
+export const useCirculationDetailId = () =>
+  useNavigationStore((s) => s.circulationDetailId);
 ```
 
 #### 2A-2: 创建 `src/app/views/ViewRouter.tsx`
@@ -754,7 +880,7 @@ export function ViewRouter() {
   const viewName = ROUTE_VIEW_MAP[activeRoute] ?? "Dashboard";
   const ViewComponent = viewComponents[viewName];
   const params = ROUTE_PARAMS_MAP[activeRoute];
-  
+
   if (!ViewComponent) return <Dashboard />;
 
   return (
@@ -782,8 +908,8 @@ import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { useNavigationStore } from "@/stores/navigation";
 
 export default function Home() {
-  const { activeRoute, circulationDetailId, setCirculationDetailId, 
-          sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen, setActiveRoute, setMobileSidebarOpen } = 
+  const { activeRoute, circulationDetailId, setCirculationDetailId,
+          sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen, setActiveRoute, setMobileSidebarOpen } =
     useNavigationStore();
 
   return (
@@ -810,7 +936,7 @@ export default function Home() {
       </div>
 
       <BottomNav activeMenu={activeRoute} onMenuChange={setActiveRoute} />
-      
+
       {circulationDetailId && (
         <CirculationDetailView id={circulationDetailId} onClose={() => setCirculationDetailId(null)} />
       )}
@@ -828,6 +954,7 @@ export default function Home() {
 #### 2B-1: 提取 TodosView 业务逻辑
 
 从 TodosView.tsx (316行) 提取:
+
 - `useTodosFilter` hook → `src/domain/todo/todoFilterHooks.ts`
 - 筛选/搜索/priority 状态管理 → Zustand store 或 custom hook
 - handleSave/handleToggle/handleDelete → 调用 `todoHooks.useCreate()/.useUpdate()/.useDelete()`
@@ -857,10 +984,18 @@ export function useTodosFilter(todos: Todo[]) {
 
   const filteredTodos = useMemo(() => {
     let result = todos;
-    if (filters.search) result = result.filter(t => t.title.toLowerCase().includes(filters.search.toLowerCase()));
-    if (filters.priorityFilter !== "all") result = result.filter(t => t.priority === filters.priorityFilter);
-    if (filters.tagFilter.length > 0) result = result.filter(t => filters.tagFilter.some(tag => t.tags?.includes(tag)));
-    if (filters.statusFilter !== "all") result = result.filter(t => t.status === filters.statusFilter);
+    if (filters.search)
+      result = result.filter((t) =>
+        t.title.toLowerCase().includes(filters.search.toLowerCase()),
+      );
+    if (filters.priorityFilter !== "all")
+      result = result.filter((t) => t.priority === filters.priorityFilter);
+    if (filters.tagFilter.length > 0)
+      result = result.filter((t) =>
+        filters.tagFilter.some((tag) => t.tags?.includes(tag)),
+      );
+    if (filters.statusFilter !== "all")
+      result = result.filter((t) => t.status === filters.statusFilter);
     return result;
   }, [todos, filters]);
 
@@ -882,7 +1017,12 @@ import { NAV_MENU_ITEMS, ENTITY_ROUTE_MAP } from "@/config/routes";
 import { MESSAGES } from "@/config/i18n";
 import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
 
-export function Sidebar({ activeMenu, onMenuChange, onCollapseChange, isMobile }: SidebarProps) {
+export function Sidebar({
+  activeMenu,
+  onMenuChange,
+  onCollapseChange,
+  isMobile,
+}: SidebarProps) {
   // ... 简化后的 Sidebar 组件
   // menus 不再内联，从 NAV_MENU_ITEMS 读取
   // width = isCollapsed ? LAYOUT.SIDEBAR_WIDTH_COLLAPSED : LAYOUT.SIDEBAR_WIDTH_EXPANDED
@@ -923,16 +1063,16 @@ export function BottomNav({ activeMenu, onMenuChange }: BottomNavProps) {
 
 #### 3-1: 迁移类型到 domain 层
 
-| 当前位置 | 目标位置 | 动作 |
-|---------|---------|------|
-| `hooks/useTodos.ts` CreateTodoInput | `domain/todo/todoTypes.ts` CreateTodoInput | 迁移 |
-| `hooks/useTodos.ts` UpdateTodoInput | `domain/todo/todoTypes.ts` UpdateTodoInput | 迁移 |
-| `hooks/usePlans.ts` CreatePlanInput | `domain/plan/planTypes.ts` CreatePlanInput | 迁移 |
-| `hooks/usePlans.ts` PlanStatus | `domain/plan/planTypes.ts` PlanStatus | 迁移 |
-| `hooks/useTargets.ts` CreateTargetInput | `domain/target/targetTypes.ts` CreateTargetInput | 迁移 |
-| `lib/types/common.ts` Priority, EntityType | 保留不变 (已合理) | - |
-| `lib/services/validation.ts` VALID_PRIORITIES | `config/constants.ts` VALID_PRIORITIES | 迁移 |
-| `lib/services/validation.ts` VALID_STATUSES | `config/constants.ts` VALID_STATUSES | 迁移 |
+| 当前位置                                      | 目标位置                                         | 动作 |
+| --------------------------------------------- | ------------------------------------------------ | ---- |
+| `hooks/useTodos.ts` CreateTodoInput           | `domain/todo/todoTypes.ts` CreateTodoInput       | 迁移 |
+| `hooks/useTodos.ts` UpdateTodoInput           | `domain/todo/todoTypes.ts` UpdateTodoInput       | 迁移 |
+| `hooks/usePlans.ts` CreatePlanInput           | `domain/plan/planTypes.ts` CreatePlanInput       | 迁移 |
+| `hooks/usePlans.ts` PlanStatus                | `domain/plan/planTypes.ts` PlanStatus            | 迁移 |
+| `hooks/useTargets.ts` CreateTargetInput       | `domain/target/targetTypes.ts` CreateTargetInput | 迁移 |
+| `lib/types/common.ts` Priority, EntityType    | 保留不变 (已合理)                                | -    |
+| `lib/services/validation.ts` VALID_PRIORITIES | `config/constants.ts` VALID_PRIORITIES           | 迁移 |
+| `lib/services/validation.ts` VALID_STATUSES   | `config/constants.ts` VALID_STATUSES             | 迁移 |
 
 #### 3-2: 更新所有导入路径
 
@@ -954,26 +1094,26 @@ npm run build          # 构建成功
 
 #### 4-2: 验证代码行数减少
 
-| 文件 | 重构前 | 重构后 (目标) | 减少 |
-|------|--------|-------------|------|
-| page.tsx | 324 | ~50 | -85% |
-| Sidebar.tsx | 430 | ~100 | -77% |
-| BottomNav.tsx | 53 | ~20 | -62% |
-| useTodos.ts | 187 | ~30 | -84% |
-| usePlans.ts | 244 | ~50 | -80% |
-| useTargets.ts | 341 | ~80 | -77% |
-| useMilestones.ts | 181 | ~40 | -78% |
-| useCirculations.ts | 222 | ~50 | -77% |
-| validation.ts | 91 | ~20 (移至domain) | -78% |
-| **新增文件** | | | |
-| entityQueries.ts | 0 | ~110 | - |
-| routes.ts | 0 | ~80 | - |
-| constants.ts | 0 | ~30 | - |
-| i18n.ts | 0 | ~50 | - |
-| todoQueries.ts | 0 | ~30 | - |
-| todoService.ts | 0 | ~60 | - |
-| navigation.ts (store) | 0 | ~30 | - |
-| ViewRouter.tsx | 0 | ~60 | - |
+| 文件                  | 重构前 | 重构后 (目标)    | 减少 |
+| --------------------- | ------ | ---------------- | ---- |
+| page.tsx              | 324    | ~50              | -85% |
+| Sidebar.tsx           | 430    | ~100             | -77% |
+| BottomNav.tsx         | 53     | ~20              | -62% |
+| useTodos.ts           | 187    | ~30              | -84% |
+| usePlans.ts           | 244    | ~50              | -80% |
+| useTargets.ts         | 341    | ~80              | -77% |
+| useMilestones.ts      | 181    | ~40              | -78% |
+| useCirculations.ts    | 222    | ~50              | -77% |
+| validation.ts         | 91     | ~20 (移至domain) | -78% |
+| **新增文件**          |        |                  |      |
+| entityQueries.ts      | 0      | ~110             | -    |
+| routes.ts             | 0      | ~80              | -    |
+| constants.ts          | 0      | ~30              | -    |
+| i18n.ts               | 0      | ~50              | -    |
+| todoQueries.ts        | 0      | ~30              | -    |
+| todoService.ts        | 0      | ~60              | -    |
+| navigation.ts (store) | 0      | ~30              | -    |
+| ViewRouter.tsx        | 0      | ~60              | -    |
 
 #### 4-3: 确认无功能回归
 
@@ -1012,13 +1152,13 @@ Phase 4 → commit: verify: all tests pass, typecheck clean
 
 ## 5. 风险与缓解
 
-| 风险 | 缓解措施 |
-|------|---------|
-| Lazy loading 视图导致加载闪烁 | 使用 Suspense + skeleton loading |
-| Zustand navigation store 与现有 useState 行为不同 | 保留 localStorage sync 行为 |
-| Hook 工厂的泛型类型复杂 | 使用 good generics + JSDoc, 提供 example |
-| 迁移 hooks 后组件导入路径变化 | 保留 re-export 兼容别名 (@deprecated) |
-| 现有测试可能需要更新 | 先跑测试确认 baseline, 逐步更新 |
+| 风险                                              | 缓解措施                                 |
+| ------------------------------------------------- | ---------------------------------------- |
+| Lazy loading 视图导致加载闪烁                     | 使用 Suspense + skeleton loading         |
+| Zustand navigation store 与现有 useState 行为不同 | 保留 localStorage sync 行为              |
+| Hook 工厂的泛型类型复杂                           | 使用 good generics + JSDoc, 提供 example |
+| 迁移 hooks 后组件导入路径变化                     | 保留 re-export 兼容别名 (@deprecated)    |
+| 现有测试可能需要更新                              | 先跑测试确认 baseline, 逐步更新          |
 
 ---
 

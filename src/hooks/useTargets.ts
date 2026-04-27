@@ -1,4 +1,8 @@
-export type { CreateTargetInput, UpdateTargetInput, TargetStatus } from "@/domain/target/targetTypes";
+export type {
+  CreateTargetInput,
+  UpdateTargetInput,
+  TargetStatus,
+} from "@/domain/target/targetTypes";
 export {
   targetKeys,
   useTargets,

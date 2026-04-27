@@ -53,7 +53,11 @@ export type {
 } from "@/lib/types/circulation";
 
 export type { Tag } from "@/lib/types/tag";
-export type { Task, CreateTaskParams, UpdateTaskParams } from "@/lib/types/task";
+export type {
+  Task,
+  CreateTaskParams,
+  UpdateTaskParams,
+} from "@/lib/types/task";
 
 export const TODO_STATUSES = ["pending", "in-progress", "done"] as const;
 export type TodoStatus = (typeof TODO_STATUSES)[number];
@@ -73,8 +77,18 @@ export type CirculationStatus = (typeof CIRCULATION_STATUSES)[number];
 export const STEP_STATUSES = ["pending", "completed"] as const;
 export type StepStatus = (typeof STEP_STATUSES)[number];
 
-export const MILESTONE_BIZ_TYPES = ["plan", "task", "target", "circulation"] as const;
+export const MILESTONE_BIZ_TYPES = [
+  "plan",
+  "task",
+  "target",
+  "circulation",
+] as const;
 export type MilestoneBizType = (typeof MILESTONE_BIZ_TYPES)[number];
 
-export const PROGRESS_CATEGORIES = ["not_started", "in_progress", "near_completion", "completed"] as const;
+export const PROGRESS_CATEGORIES = [
+  "not_started",
+  "in_progress",
+  "near_completion",
+  "completed",
+] as const;
 export type ProgressCategory = (typeof PROGRESS_CATEGORIES)[number];

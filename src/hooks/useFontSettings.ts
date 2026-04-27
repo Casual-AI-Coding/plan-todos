@@ -22,10 +22,10 @@ function getStoredFontSize(): number {
 
   // Then check localStorage
   const stored = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
-    if (stored) {
-      const parsed = parseInt(stored, 10);
-      if (!isNaN(parsed) && parsed >= FONT_SIZE.MIN && parsed <= FONT_SIZE.MAX) {
-        return parsed;
+  if (stored) {
+    const parsed = parseInt(stored, 10);
+    if (!isNaN(parsed) && parsed >= FONT_SIZE.MIN && parsed <= FONT_SIZE.MAX) {
+      return parsed;
     }
   }
 

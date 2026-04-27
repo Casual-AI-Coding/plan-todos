@@ -62,10 +62,7 @@ export function useTargetsForMilestone(
 }
 
 export function useCirculationsForMilestone(
-  options?: Omit<
-    UseQueryOptions<Circulation[], Error>,
-    "queryKey" | "queryFn"
-  >,
+  options?: Omit<UseQueryOptions<Circulation[], Error>, "queryKey" | "queryFn">,
 ) {
   return useQuery<Circulation[], Error>({
     queryKey: ["circulations", "for-milestone"],

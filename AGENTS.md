@@ -428,14 +428,14 @@ For complex git operations, use the `git-master` skill:
 
 **发版本需要修改的文件:**
 
-| 文件                           | 修改内容                          |
-| ------------------------------ | --------------------------------- |
-| `package.json`                 | 更新 `"version": "x.x.x"`         |
-| `src-tauri/tauri.conf.json`    | 更新 `"version": "x.x.x"`         |
-| `src-tauri/Cargo.toml`         | 更新 `version = "x.x.x"`          |
-| `README.md`                    | 更新版本徽章 (version-x.x.x-blue) |
-| `CHANGELOG.md`                 | 添加新版本发布说明                |
-| `docs/plans/`                  | 检查是否需要更新设计文档          |
+| 文件                                       | 修改内容                             |
+| ------------------------------------------ | ------------------------------------ |
+| `package.json`                             | 更新 `"version": "x.x.x"`            |
+| `src-tauri/tauri.conf.json`                | 更新 `"version": "x.x.x"`            |
+| `src-tauri/Cargo.toml`                     | 更新 `version = "x.x.x"`             |
+| `README.md`                                | 更新版本徽章 (version-x.x.x-blue)    |
+| `CHANGELOG.md`                             | 添加新版本发布说明                   |
+| `docs/plans/`                              | 检查是否需要更新设计文档             |
 | `docs/standards/release-notes-standard.md` | 遵循 Release Notes 规范 (新建后引用) |
 
 **发布步骤:**

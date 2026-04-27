@@ -63,7 +63,9 @@ export function createEntityHooks<
   TCreateInput,
   TUpdateInput extends { id: string },
   TReorderInput = { id: string; sort_order: number }[],
->(config: EntityHookConfig<TEntity, TCreateInput, TUpdateInput, TReorderInput>) {
+>(
+  config: EntityHookConfig<TEntity, TCreateInput, TUpdateInput, TReorderInput>,
+) {
   const {
     entityName,
     apiGetAll,
@@ -146,8 +148,10 @@ export function createEntityHooks<
   ) {
     const queryClient = useQueryClient();
     return useMutation<TEntity, Error, TUpdateInput>({
-      mutationFn: customUpdateMutate ??
-        (({ id, ...data }: TUpdateInput) => apiUpdate(id, data as Omit<TUpdateInput, "id">)),
+      mutationFn:
+        customUpdateMutate ??
+        (({ id, ...data }: TUpdateInput) =>
+          apiUpdate(id, data as Omit<TUpdateInput, "id">)),
       onSuccess: (data) => {
         if (config.onUpdateSuccess) {
           config.onUpdateSuccess(data, queryClient, queryKeys.all);
@@ -180,22 +184,28 @@ export function createEntityHooks<
     >,
   ) {
     if (!apiReorder) {
-      throw new Error(`useReorder requires apiReorder in config for "${entityName}".`);
+      throw new Error(
+        `useReorder requires apiReorder in config for "${entityName}".`,
+      );
     }
     const queryClient = useQueryClient();
     return useMutation<number, Error, TReorderInput>({
       mutationFn: apiReorder,
       onMutate: async (newOrders) => {
         await queryClient.cancelQueries({ queryKey: queryKeys.all });
-        const previousItems = queryClient.getQueryData<TEntity[]>(queryKeys.all);
+        const previousItems = queryClient.getQueryData<TEntity[]>(
+          queryKeys.all,
+        );
         if (previousItems) {
           const updatedItems = previousItems.map((item) => {
-            const order = (newOrders as { id: string; sort_order: number }[]).find(
-              (o) => o.id === item.id,
-            );
+            const order = (
+              newOrders as { id: string; sort_order: number }[]
+            ).find((o) => o.id === item.id);
             return order ? { ...item, sort_order: order.sort_order } : item;
           });
-          updatedItems.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+          updatedItems.sort(
+            (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+          );
           queryClient.setQueryData(queryKeys.all, updatedItems);
         }
         return { previousItems };

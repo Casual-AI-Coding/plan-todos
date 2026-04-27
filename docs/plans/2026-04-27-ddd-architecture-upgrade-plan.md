@@ -34,16 +34,16 @@ Because of that current state, the safest execution order is:
 
 ## Phase breakdown and effort
 
-| Phase | Scope | Depends on | Estimated effort |
-| --- | --- | --- | --- |
-| 1 | Navigation store integration | none | 1.5h |
-| 2 | Shared query factory relocation | Phase 1 | 1h |
-| 3 | Todo domain migration | Phase 2 | 1.5h |
-| 4 | Plan and target domain migration | Phase 3 | 2h |
-| 5 | Milestone, circulation, and tag domain migration | Phase 4 | 2h |
-| 6 | Generic hook cleanup and Todos view extraction | Phase 5 | 2.5h |
-| 7 | Rust validation/constants/tests | none | 1.5h |
-| 8 | Full verification and cleanup | Phases 1-7 | 1h |
+| Phase | Scope                                            | Depends on | Estimated effort |
+| ----- | ------------------------------------------------ | ---------- | ---------------- |
+| 1     | Navigation store integration                     | none       | 1.5h             |
+| 2     | Shared query factory relocation                  | Phase 1    | 1h               |
+| 3     | Todo domain migration                            | Phase 2    | 1.5h             |
+| 4     | Plan and target domain migration                 | Phase 3    | 2h               |
+| 5     | Milestone, circulation, and tag domain migration | Phase 4    | 2h               |
+| 6     | Generic hook cleanup and Todos view extraction   | Phase 5    | 2.5h             |
+| 7     | Rust validation/constants/tests                  | none       | 1.5h             |
+| 8     | Full verification and cleanup                    | Phases 1-7 | 1h               |
 
 ## Planned file structure after this plan
 
@@ -66,6 +66,7 @@ Because of that current state, the safest execution order is:
 ### Task 1: Add a navigation store and connect the existing router shell
 
 **Files:**
+
 - Create: `src/stores/navigation.ts`
 - Modify: `src/app/page.tsx`
 - Modify: `src/components/layout/Sidebar.tsx`
@@ -148,32 +149,67 @@ export default function Home() {
   const [, setSidebarCollapsed] = useState(getInitialSidebarCollapsed);
 
   return (
-    <div className="flex flex-col h-screen" style={{ background: "transparent", fontFamily: "var(--font-sans)" }}>
+    <div
+      className="flex flex-col h-screen"
+      style={{ background: "transparent", fontFamily: "var(--font-sans)" }}
+    >
       <div className="hidden md:flex flex-col h-screen rounded-lg overflow-hidden border border-[var(--color-border)] shadow-lg">
         <TitleBar />
         <div className="flex flex-1 overflow-hidden">
           <div className="hidden md:block h-full">
-            <Sidebar activeMenu={activeMenu} onMenuChange={navigate} onCollapseChange={setSidebarCollapsed} />
+            <Sidebar
+              activeMenu={activeMenu}
+              onMenuChange={navigate}
+              onCollapseChange={setSidebarCollapsed}
+            />
           </div>
-          <main className="flex-1 overflow-auto pb-16 md:pb-0" style={{ backgroundColor: "var(--color-bg)" }}>
+          <main
+            className="flex-1 overflow-auto pb-16 md:pb-0"
+            style={{ backgroundColor: "var(--color-bg)" }}
+          >
             <ViewRouter activeMenu={activeMenu} />
           </main>
         </div>
       </div>
 
       <div className="md:hidden flex flex-col h-full">
-        <header className="flex items-center px-4 border-b fixed top-0 left-0 right-0 z-40" style={{ height: LAYOUT.MOBILE_HEADER_CALC, paddingTop: "env(safe-area-inset-top)", backgroundColor: "var(--color-bg-card)", borderColor: "var(--color-border)" }}>
-          <button onClick={openMobileSidebar} className="p-2 -ml-2 rounded hover:opacity-80" style={{ color: "var(--color-text)" }} aria-label="打开菜单">
+        <header
+          className="flex items-center px-4 border-b fixed top-0 left-0 right-0 z-40"
+          style={{
+            height: LAYOUT.MOBILE_HEADER_CALC,
+            paddingTop: "env(safe-area-inset-top)",
+            backgroundColor: "var(--color-bg-card)",
+            borderColor: "var(--color-border)",
+          }}
+        >
+          <button
+            onClick={openMobileSidebar}
+            className="p-2 -ml-2 rounded hover:opacity-80"
+            style={{ color: "var(--color-text)" }}
+            aria-label="打开菜单"
+          >
             {/* svg stays unchanged */}
           </button>
         </header>
 
-        <main className="flex-1 overflow-auto" style={{ backgroundColor: "var(--color-bg)", paddingTop: LAYOUT.MOBILE_HEADER_CALC, paddingBottom: LAYOUT.MOBILE_FOOTER_CALC }}>
+        <main
+          className="flex-1 overflow-auto"
+          style={{
+            backgroundColor: "var(--color-bg)",
+            paddingTop: LAYOUT.MOBILE_HEADER_CALC,
+            paddingBottom: LAYOUT.MOBILE_FOOTER_CALC,
+          }}
+        >
           <ViewRouter activeMenu={activeMenu} />
         </main>
 
         {mobileSidebarOpen && (
-          <MobileSidebar activeMenu={activeMenu} onMenuChange={navigate} onClose={closeMobileSidebar} onCollapseChange={setSidebarCollapsed} />
+          <MobileSidebar
+            activeMenu={activeMenu}
+            onMenuChange={navigate}
+            onClose={closeMobileSidebar}
+            onCollapseChange={setSidebarCollapsed}
+          />
         )}
       </div>
 
@@ -220,6 +256,7 @@ git commit -m "refactor(navigation): centralize active menu state in zustand"
 ### Task 2: Move the generic entity hook factory into the domain layer
 
 **Files:**
+
 - Create: `src/domain/shared/entityQueries.ts`
 - Modify: `src/hooks/createEntityHooks.ts`
 - Test: `src/domain/shared/__tests__/entityQueries.test.ts`
@@ -297,7 +334,9 @@ export function createEntityHooks<
   TCreateInput,
   TUpdateInput extends { id: string },
   TReorderInput = { id: string; sort_order: number }[],
->(config: EntityHookConfig<TEntity, TCreateInput, TUpdateInput, TReorderInput>) {
+>(
+  config: EntityHookConfig<TEntity, TCreateInput, TUpdateInput, TReorderInput>,
+) {
   // copy the existing implementation body from src/hooks/createEntityHooks.ts
   // without changing behavior in this task
 }
@@ -330,6 +369,7 @@ git commit -m "refactor(domain): move generic entity query factory into shared d
 ### Task 3: Migrate todos to domain-owned types, queries, and service orchestration
 
 **Files:**
+
 - Create: `src/domain/todo/todoTypes.ts`
 - Create: `src/domain/todo/todoQueries.ts`
 - Modify: `src/domain/todo/todoService.ts`
@@ -400,7 +440,13 @@ export interface UpdateTodoInput {
 - [ ] **Step 4: Create `src/domain/todo/todoQueries.ts` and move hook ownership there**
 
 ```ts
-import { getTodo, getTodos, createTodo, updateTodo, deleteTodo } from "@/lib/api";
+import {
+  getTodo,
+  getTodos,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+} from "@/lib/api";
 import { reorderTodos } from "@/lib/api/reorder";
 import type { Todo } from "@/lib/types";
 
@@ -430,7 +476,14 @@ export const todoKeys = {
   todo: queryKeys.one,
 };
 
-export { useTodos, useTodo, useCreateTodo, useUpdateTodo, useDeleteTodo, useReorderTodos };
+export {
+  useTodos,
+  useTodo,
+  useCreateTodo,
+  useUpdateTodo,
+  useDeleteTodo,
+  useReorderTodos,
+};
 ```
 
 - [ ] **Step 5: Extend `src/domain/todo/todoService.ts` with orchestration helpers used by views and hooks**
@@ -442,7 +495,9 @@ export const todoDomainService = {
     return todos.filter((t) => t.priority === priority);
   },
 
-  toReorderInput(todos: Array<Pick<Todo, "id">>): Array<{ id: string; sort_order: number }> {
+  toReorderInput(
+    todos: Array<Pick<Todo, "id">>,
+  ): Array<{ id: string; sort_order: number }> {
     return todos.map((todo, index) => ({
       id: todo.id,
       sort_order: index,
@@ -498,6 +553,7 @@ git commit -m "refactor(todo): move todo hooks and input types into domain layer
 ### Task 4: Migrate plans and targets to domain-owned types and queries
 
 **Files:**
+
 - Create: `src/domain/plan/planTypes.ts`
 - Create: `src/domain/plan/planQueries.ts`
 - Create: `src/domain/target/targetTypes.ts`
@@ -590,7 +646,16 @@ export interface UpdateTargetInput {
 ```ts
 // src/domain/plan/planQueries.ts
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
-import { getEntityTags, getPlan, getPlans, getTasksByPlan, createPlan, updatePlan, deletePlan, setEntityTags } from "@/lib/api";
+import {
+  getEntityTags,
+  getPlan,
+  getPlans,
+  getTasksByPlan,
+  createPlan,
+  updatePlan,
+  deletePlan,
+  setEntityTags,
+} from "@/lib/api";
 import { reorderPlans } from "@/lib/api/reorder";
 import type { Plan, Tag, Task } from "@/lib/types";
 import { createEntityHooks } from "@/domain/shared/entityQueries";
@@ -672,8 +737,25 @@ export { usePlans, usePlan, useDeletePlan, useReorderPlans };
 
 ```ts
 // src/domain/target/targetQueries.ts
-import { useMutation, useQuery, useQueryClient, type UseMutationOptions, type UseQueryOptions } from "@tanstack/react-query";
-import { createStep, createTarget, deleteStep, deleteTarget, getEntityTags, getSteps, getTargets, setEntityTags, updateStep, updateTarget } from "@/lib/api";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationOptions,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
+import {
+  createStep,
+  createTarget,
+  deleteStep,
+  deleteTarget,
+  getEntityTags,
+  getSteps,
+  getTargets,
+  setEntityTags,
+  updateStep,
+  updateTarget,
+} from "@/lib/api";
 import { reorderTargets } from "@/lib/api/reorder";
 import type { Step, Tag, Target } from "@/lib/types";
 import { createEntityHooks } from "@/domain/shared/entityQueries";
@@ -743,15 +825,35 @@ export function useTargetSteps(
 
 export function useCreateStep(
   options?: Omit<
-    UseMutationOptions<Step, Error, { target_id: string; title: string; weight: number; priority?: "P0" | "P1" | "P2" | "P3" }>,
+    UseMutationOptions<
+      Step,
+      Error,
+      {
+        target_id: string;
+        title: string;
+        weight: number;
+        priority?: "P0" | "P1" | "P2" | "P3";
+      }
+    >,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
-  return useMutation<Step, Error, { target_id: string; title: string; weight: number; priority?: "P0" | "P1" | "P2" | "P3" }>({
+  return useMutation<
+    Step,
+    Error,
+    {
+      target_id: string;
+      title: string;
+      weight: number;
+      priority?: "P0" | "P1" | "P2" | "P3";
+    }
+  >({
     mutationFn: createStep,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: targetKeys.targetSteps(data.target_id) });
+      queryClient.invalidateQueries({
+        queryKey: targetKeys.targetSteps(data.target_id),
+      });
     },
     ...options,
   });
@@ -759,12 +861,32 @@ export function useCreateStep(
 
 export function useUpdateStep(
   options?: Omit<
-    UseMutationOptions<Step, Error, { id: string; title?: string; weight?: number; status?: "pending" | "completed"; priority?: "P0" | "P1" | "P2" | "P3" }>,
+    UseMutationOptions<
+      Step,
+      Error,
+      {
+        id: string;
+        title?: string;
+        weight?: number;
+        status?: "pending" | "completed";
+        priority?: "P0" | "P1" | "P2" | "P3";
+      }
+    >,
     "mutationFn"
   >,
 ) {
   const queryClient = useQueryClient();
-  return useMutation<Step, Error, { id: string; title?: string; weight?: number; status?: "pending" | "completed"; priority?: "P0" | "P1" | "P2" | "P3" }>({
+  return useMutation<
+    Step,
+    Error,
+    {
+      id: string;
+      title?: string;
+      weight?: number;
+      status?: "pending" | "completed";
+      priority?: "P0" | "P1" | "P2" | "P3";
+    }
+  >({
     mutationFn: async ({ id, ...data }) => {
       const result = await updateStep(id, data);
       queryClient.invalidateQueries({ queryKey: ["targets", "steps"] });
@@ -833,7 +955,11 @@ export const targetDomainService = {
 
 ```ts
 // src/hooks/usePlans.ts
-export type { CreatePlanInput, UpdatePlanInput, PlanStatus } from "@/domain/plan/planTypes";
+export type {
+  CreatePlanInput,
+  UpdatePlanInput,
+  PlanStatus,
+} from "@/domain/plan/planTypes";
 export {
   planKeys,
   usePlans,
@@ -849,7 +975,11 @@ export {
 
 ```ts
 // src/hooks/useTargets.ts
-export type { CreateTargetInput, UpdateTargetInput, TargetStatus } from "@/domain/target/targetTypes";
+export type {
+  CreateTargetInput,
+  UpdateTargetInput,
+  TargetStatus,
+} from "@/domain/target/targetTypes";
 export {
   targetKeys,
   useTargets,
@@ -886,6 +1016,7 @@ git commit -m "refactor(domain): move plan and target hooks into entity modules"
 ### Task 5: Migrate milestones, circulations, and tags; remove the last direct CRUD hook islands
 
 **Files:**
+
 - Create: `src/domain/milestone/milestoneTypes.ts`
 - Create: `src/domain/milestone/milestoneQueries.ts`
 - Create: `src/domain/circulation/circulationTypes.ts`
@@ -917,7 +1048,11 @@ describe("milestoneKeys", () => {
 
 describe("circulationKeys", () => {
   it("includes circulation logs in subkeys", () => {
-    expect(circulationKeys.circulationLogs("c1")).toEqual(["circulations", "c1", "logs"]);
+    expect(circulationKeys.circulationLogs("c1")).toEqual([
+      "circulations",
+      "c1",
+      "logs",
+    ]);
   });
 });
 
@@ -1043,7 +1178,8 @@ export function useCreateTag(
   const queryClient = useQueryClient();
 
   return useMutation<Tag, Error, CreateTagInput>({
-    mutationFn: ({ name, color, description }) => createTag(name, color, description),
+    mutationFn: ({ name, color, description }) =>
+      createTag(name, color, description),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tagKeys.tags });
     },
@@ -1090,7 +1226,14 @@ Copy the entire current `useMilestones.ts` body into `src/domain/milestone/miles
 ```ts
 // src/hooks/useTags.ts
 export type { CreateTagInput, UpdateTagInput } from "@/domain/tag/tagTypes";
-export { tagKeys, useTags, useTag, useCreateTag, useUpdateTag, useDeleteTag } from "@/domain/tag/tagQueries";
+export {
+  tagKeys,
+  useTags,
+  useTag,
+  useCreateTag,
+  useUpdateTag,
+  useDeleteTag,
+} from "@/domain/tag/tagQueries";
 ```
 
 ```ts
@@ -1098,7 +1241,9 @@ export { tagKeys, useTags, useTag, useCreateTag, useUpdateTag, useDeleteTag } fr
 import { apiClient } from "./client";
 
 export async function reorderTodos(orders: ReorderItem[]): Promise<number> {
-  const ordersTuple = orders.map((o) => [o.id, o.sort_order] as [string, number]);
+  const ordersTuple = orders.map(
+    (o) => [o.id, o.sort_order] as [string, number],
+  );
   return apiClient.invoke<number>("reorder_todos", { orders: ordersTuple });
 }
 ```
@@ -1125,6 +1270,7 @@ git commit -m "refactor(domain): migrate remaining entity hooks and align reorde
 ### Task 6: Move cross-layer side effects out of `useEntityOperations`
 
 **Files:**
+
 - Create: `src/domain/shared/entityOperations.ts`
 - Modify: `src/hooks/useEntityOperations.ts`
 - Modify: `src/domain/todo/todoService.ts`
@@ -1166,9 +1312,20 @@ Expected: FAIL because `entityOperations.ts` does not exist.
 import type { EntityType } from "@/lib/types";
 
 interface EntitySideEffectAdapters {
-  setEntityTags: (entityType: EntityType, entityId: string, tags: string[]) => Promise<void>;
-  setNotificationSettings: (entityType: EntityType, entityId: string, times: number[]) => Promise<void>;
-  getNotificationSettings: (entityType: EntityType, entityId: string) => Promise<unknown>;
+  setEntityTags: (
+    entityType: EntityType,
+    entityId: string,
+    tags: string[],
+  ) => Promise<void>;
+  setNotificationSettings: (
+    entityType: EntityType,
+    entityId: string,
+    times: number[],
+  ) => Promise<void>;
+  getNotificationSettings: (
+    entityType: EntityType,
+    entityId: string,
+  ) => Promise<unknown>;
 }
 
 export function createEntitySideEffects(adapters: EntitySideEffectAdapters) {
@@ -1190,7 +1347,11 @@ export function createEntitySideEffects(adapters: EntitySideEffectAdapters) {
 
 ```ts
 import { useToast } from "@/components/ui/Toast";
-import { getNotificationSettings, setEntityTags, setNotificationSettings } from "@/lib/api";
+import {
+  getNotificationSettings,
+  setEntityTags,
+  setNotificationSettings,
+} from "@/lib/api";
 import { createEntitySideEffects } from "@/domain/shared/entityOperations";
 
 const sideEffects = createEntitySideEffects({
@@ -1229,6 +1390,7 @@ git commit -m "refactor(domain): isolate entity side effects behind shared servi
 ### Task 7: Extract Todos view state and todo-specific selectors from `TodosView`
 
 **Files:**
+
 - Create: `src/domain/todo/todoViewState.ts`
 - Create: `src/domain/todo/todoFilters.ts`
 - Modify: `src/hooks/useEntityFilter.ts`
@@ -1247,8 +1409,20 @@ describe("filterTodos", () => {
   it("filters by completed status and search query", () => {
     const result = filterTodos({
       todos: [
-        { id: "1", title: "Ship feature", content: "", status: "done", priority: "P1" },
-        { id: "2", title: "Draft plan", content: "", status: "pending", priority: "P2" },
+        {
+          id: "1",
+          title: "Ship feature",
+          content: "",
+          status: "done",
+          priority: "P1",
+        },
+        {
+          id: "2",
+          title: "Draft plan",
+          content: "",
+          status: "pending",
+          priority: "P2",
+        },
       ],
       filter: "completed",
       priorityFilter: "all",
@@ -1263,7 +1437,13 @@ describe("filterTodos", () => {
 describe("toCalendarEvents", () => {
   it("maps todos with due dates into calendar events", () => {
     const result = toCalendarEvents([
-      { id: "1", title: "Ship feature", due_date: "2026-04-27", status: "pending", priority: "P1" },
+      {
+        id: "1",
+        title: "Ship feature",
+        due_date: "2026-04-27",
+        status: "pending",
+        priority: "P1",
+      },
     ]);
 
     expect(result).toEqual([
@@ -1293,13 +1473,22 @@ export interface TodoFilterCriteria {
   searchQuery: string;
 }
 
-export function filterTodos({ todos, filter, priorityFilter, tagFilters, searchQuery }: TodoFilterCriteria) {
+export function filterTodos({
+  todos,
+  filter,
+  priorityFilter,
+  tagFilters,
+  searchQuery,
+}: TodoFilterCriteria) {
   const today = new Date().toISOString().split("T")[0];
 
   return todos.filter((todo) => {
     if (searchQuery) {
       const normalized = searchQuery.toLowerCase();
-      if (!todo.title.toLowerCase().includes(normalized) && !todo.content?.toLowerCase().includes(normalized)) {
+      if (
+        !todo.title.toLowerCase().includes(normalized) &&
+        !todo.content?.toLowerCase().includes(normalized)
+      ) {
         return false;
       }
     }
@@ -1309,7 +1498,9 @@ export function filterTodos({ todos, filter, priorityFilter, tagFilters, searchQ
     }
 
     if (tagFilters.length > 0) {
-      const hasTag = tagFilters.some((tagId) => todo.tags?.some((tag) => tag.id === tagId));
+      const hasTag = tagFilters.some((tagId) =>
+        todo.tags?.some((tag) => tag.id === tagId),
+      );
       if (!hasTag) return false;
     }
 
@@ -1340,7 +1531,9 @@ import { useState } from "react";
 import type { Priority, Todo } from "@/lib/types";
 
 export function useTodoViewState() {
-  const [filter, setFilter] = useState<"all" | "today" | "upcoming" | "completed">("all");
+  const [filter, setFilter] = useState<
+    "all" | "today" | "upcoming" | "completed"
+  >("all");
   const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
@@ -1421,7 +1614,11 @@ export function TodosView() {
     <div className="p-2 sm:p-4 md:p-6">
       <div className="flex justify-between items-center mb-4">
         <div className="flex gap-2">
-          <Button variant={batchMode ? "primary" : "secondary"} size="sm" onClick={toggleBatchMode}>
+          <Button
+            variant={batchMode ? "primary" : "secondary"}
+            size="sm"
+            onClick={toggleBatchMode}
+          >
             {batchMode ? "退出多选" : "多选"}
           </Button>
           <Button onClick={view.openCreateForm}>+ 新建</Button>
@@ -1490,6 +1687,7 @@ git commit -m "refactor(todo): extract todo view state and selectors from todos 
 ### Task 8: Unify Rust validation constants and add backend validation coverage
 
 **Files:**
+
 - Modify: `src-tauri/src/commands/validation.rs`
 - Modify: `src-tauri/src/tests.rs`
 
@@ -1577,6 +1775,7 @@ git commit -m "test(validation): unify backend status constants and add coverage
 ### Task 9: Remove stale `lib/services` usage and finish import cleanup
 
 **Files:**
+
 - Modify: `src/lib/services/todoService.ts`
 - Modify: `src/lib/services/planService.ts`
 - Modify: `src/lib/services/targetService.ts`
@@ -1593,7 +1792,13 @@ Expected: a concrete list of remaining compatibility imports.
 - [ ] **Step 2: Replace view-level imports with direct domain imports**
 
 ```tsx
-import { useTodos, useCreateTodo, useUpdateTodo, useDeleteTodo, useReorderTodos } from "@/domain/todo/todoQueries";
+import {
+  useTodos,
+  useCreateTodo,
+  useUpdateTodo,
+  useDeleteTodo,
+  useReorderTodos,
+} from "@/domain/todo/todoQueries";
 import { useTags } from "@/domain/tag/tagQueries";
 ```
 
@@ -1638,6 +1843,7 @@ git commit -m "refactor(imports): switch feature views to domain-owned hooks and
 ### Task 10: Run full verification and capture the final architecture check
 
 **Files:**
+
 - Modify: `docs/specs/architecture-upgrade-design.md`
 - Modify: `docs/specs/ddd-frontend-upgrade.md`
 

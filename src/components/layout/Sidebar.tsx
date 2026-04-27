@@ -5,7 +5,11 @@ import { SearchBar } from "@/components/features";
 import { ChevronRight, LucideIcon } from "lucide-react";
 import { ComponentType } from "react";
 import { STORAGE_KEYS, LAYOUT } from "@/config/constants";
-import { NAV_MENU_ITEMS_RESOLVED, ENTITY_ROUTE_MAP, DEFAULT_EXPANDED_GROUPS } from "@/config/routes";
+import {
+  NAV_MENU_ITEMS_RESOLVED,
+  ENTITY_ROUTE_MAP,
+  DEFAULT_EXPANDED_GROUPS,
+} from "@/config/routes";
 import type { NavItem } from "@/config/routes";
 import { t } from "@/config/i18n";
 
@@ -294,7 +298,11 @@ export function Sidebar({
     <aside
       className={`${isMobile ? "" : "border-r"} flex flex-col h-full transition-all duration-300`}
       style={{
-        width: isMobile ? "100%" : isCollapsed ? LAYOUT.SIDEBAR_WIDTH_COLLAPSED : LAYOUT.SIDEBAR_WIDTH_EXPANDED,
+        width: isMobile
+          ? "100%"
+          : isCollapsed
+            ? LAYOUT.SIDEBAR_WIDTH_COLLAPSED
+            : LAYOUT.SIDEBAR_WIDTH_EXPANDED,
         backgroundColor: "var(--color-bg-card)",
         borderColor: "var(--color-border)",
       }}
@@ -321,7 +329,9 @@ export function Sidebar({
             className="p-1 rounded hover:opacity-80 transition-opacity cursor-pointer"
             style={{ color: "var(--color-text-muted)" }}
             title={isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
-            aria-label={isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar}
+            aria-label={
+              isCollapsed ? t.nav.expandSidebar : t.nav.collapseSidebar
+            }
           >
             {isCollapsed ? "→" : "←"}
           </button>
@@ -332,7 +342,7 @@ export function Sidebar({
       {!isMobile && !isCollapsed && (
         <div className="px-2 pb-2">
           <SearchBar
-onResultClick={(entityType, id) => {
+            onResultClick={(entityType, id) => {
               const menu = ENTITY_ROUTE_MAP[entityType];
               if (menu) {
                 onMenuChange(menu);

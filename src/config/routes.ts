@@ -28,7 +28,9 @@ function resolveLabel(label: string): string {
   return label;
 }
 
-function resolveNavItems<T extends { label: string; children?: T[] }>(items: T[]): T[] {
+function resolveNavItems<T extends { label: string; children?: T[] }>(
+  items: T[],
+): T[] {
   return items.map((item) => ({
     ...item,
     label: resolveLabel(item.label),
@@ -45,7 +47,11 @@ export const NAV_MENU_ITEMS: NavItem[] = [
     label: "nav.circulations",
     children: [
       { id: "circulations-today", icon: "☀️", label: "nav.circulationsToday" },
-      { id: "circulations-settings", icon: "⚙️", label: "nav.circulationsSettings" },
+      {
+        id: "circulations-settings",
+        icon: "⚙️",
+        label: "nav.circulationsSettings",
+      },
     ],
   },
   { id: "plans", icon: "🚀", label: "nav.plans" },
@@ -58,11 +64,23 @@ export const NAV_MENU_ITEMS: NavItem[] = [
     icon: "🔔",
     label: "nav.notifications",
     children: [
-      { id: "notification-center", icon: "📨", label: "nav.notificationCenter" },
-      { id: "settings-notifications", icon: "⚙️", label: "nav.notificationSettings" },
+      {
+        id: "notification-center",
+        icon: "📨",
+        label: "nav.notificationCenter",
+      },
+      {
+        id: "settings-notifications",
+        icon: "⚙️",
+        label: "nav.notificationSettings",
+      },
       { id: "settings-channels", icon: "📢", label: "nav.channels" },
       { id: "settings-daily-summary", icon: "📅", label: "nav.dailySummary" },
-      { id: "settings-circulation-notifications", icon: "⏰", label: "nav.circulationNotifications" },
+      {
+        id: "settings-circulation-notifications",
+        icon: "⏰",
+        label: "nav.circulationNotifications",
+      },
     ],
   },
   {
@@ -99,23 +117,34 @@ export const BOTTOM_NAV_ITEMS_RESOLVED = resolveNavItems(BOTTOM_NAV_ITEMS);
 
 export const ROUTE_VIEW_MAP: Record<string, string> = {
   dashboard: "Dashboard",
-  todos: "TodosView", "todos-all": "TodosView", "todos-today": "TodosView",
-  "todos-upcoming": "TodosView", "todos-completed": "TodosView",
-  plans: "PlansView", "plans-active": "PlansView", "plans-archived": "PlansView",
-  goals: "TargetsView", "goals-active": "TargetsView", "goals-completed": "TargetsView",
+  todos: "TodosView",
+  "todos-all": "TodosView",
+  "todos-today": "TodosView",
+  "todos-upcoming": "TodosView",
+  "todos-completed": "TodosView",
+  plans: "PlansView",
+  "plans-active": "PlansView",
+  "plans-archived": "PlansView",
+  goals: "TargetsView",
+  "goals-active": "TargetsView",
+  "goals-completed": "TargetsView",
   milestones: "MilestonesView",
   views: "ViewsView",
-  circulations: "CirculationsView", "circulations-today": "CirculationsView",
+  circulations: "CirculationsView",
+  "circulations-today": "CirculationsView",
   "circulations-settings": "CirculationsView",
   statistics: "StatisticsView",
-  notifications: "NotificationCenterView", "notification-center": "NotificationCenterView",
+  notifications: "NotificationCenterView",
+  "notification-center": "NotificationCenterView",
   "settings-channels": "SettingsChannelsView",
   "settings-daily-summary": "SettingsDailySummaryView",
   "settings-circulation-notifications": "SettingsCirculationNotificationsView",
   "settings-notifications": "SettingsNotificationsView",
-  "data-management": "DataManagementView", "data-import-export": "DataManagementView",
+  "data-management": "DataManagementView",
+  "data-import-export": "DataManagementView",
   "settings-sync": "SettingsSyncView",
-  settings: "SettingsGeneralView", "settings-general": "SettingsGeneralView",
+  settings: "SettingsGeneralView",
+  "settings-general": "SettingsGeneralView",
   "settings-tags": "SettingsTagsView",
   "settings-about": "SettingsAboutView",
 };

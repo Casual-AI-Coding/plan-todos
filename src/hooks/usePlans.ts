@@ -1,4 +1,8 @@
-export type { CreatePlanInput, UpdatePlanInput, PlanStatus } from "@/domain/plan/planTypes";
+export type {
+  CreatePlanInput,
+  UpdatePlanInput,
+  PlanStatus,
+} from "@/domain/plan/planTypes";
 export {
   planKeys,
   usePlans,

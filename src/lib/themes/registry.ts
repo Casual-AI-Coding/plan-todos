@@ -1468,7 +1468,10 @@ export const themes: Omit<Record<ThemeId, Theme>, "system"> = {
 export const themeList = Object.values(themes);
 
 /** All valid theme IDs including system - used for validation */
-export const allThemeIds: ThemeId[] = [...(Object.keys(themes) as ThemeId[]), "system"];
+export const allThemeIds: ThemeId[] = [
+  ...(Object.keys(themes) as ThemeId[]),
+  "system",
+];
 
 // Helper function to get theme by id (does not handle 'system' - use activeTheme in useTheme hook)
 export function getTheme(id: ThemeId): Theme {

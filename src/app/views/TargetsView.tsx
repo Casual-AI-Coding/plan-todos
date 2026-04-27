@@ -359,7 +359,9 @@ export function TargetsView() {
             GOALS
           </h2>
         </div>
-        <div className="text-center py-12 text-gray-500">{t.loading.default}</div>
+        <div className="text-center py-12 text-gray-500">
+          {t.loading.default}
+        </div>
       </div>
     );
   }
