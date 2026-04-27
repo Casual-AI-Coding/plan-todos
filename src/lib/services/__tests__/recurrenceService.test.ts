@@ -427,19 +427,13 @@ describe("hasRecurrenceEnded", () => {
 
   it("returns true when max occurrences has been reached", () => {
     expect(
-      hasRecurrenceEnded(
-        { type: "daily", interval: 1, maxOccurrences: 3 },
-        3,
-      ),
+      hasRecurrenceEnded({ type: "daily", interval: 1, maxOccurrences: 3 }, 3),
     ).toBe(true);
   });
 
   it("returns false when max occurrences has not been reached", () => {
     expect(
-      hasRecurrenceEnded(
-        { type: "daily", interval: 1, maxOccurrences: 3 },
-        2,
-      ),
+      hasRecurrenceEnded({ type: "daily", interval: 1, maxOccurrences: 3 }, 2),
     ).toBe(false);
   });
 
@@ -480,9 +474,7 @@ describe("hasRecurrenceEnded", () => {
   });
 
   it("returns false when no end condition is configured", () => {
-    expect(hasRecurrenceEnded({ type: "daily", interval: 1 }, 99)).toBe(
-      false,
-    );
+    expect(hasRecurrenceEnded({ type: "daily", interval: 1 }, 99)).toBe(false);
   });
 });
 
