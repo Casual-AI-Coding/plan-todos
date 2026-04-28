@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2026-04-28
+
+### Refactored
+
+**DDD 架构重构 (Dashboard & ViewsView)**:
+
+- Dashboard.tsx 从 360 行重构为 30 行，采用 DDD 架构分解
+- ViewsView.tsx 从 173 行重构为 21 行，采用 DDD 架构分解
+- 新增 Dashboard 子组件：StatsRow, EntityCountsRow, CirculationSection, ProgressSection, TodayTodosCard, OverdueTodosCard, ActivePlansCard, ActiveTargetsCard, ActiveMilestonesCard, SectionCard, DashboardSkeleton, DashboardError
+- 新增 ViewsView 子组件：ViewHeader, ViewContainer, EntityCard, useViewsViewModel
+- 新增 useDashboardViewModel hook，统一管理 Dashboard 视图状态
+
+### UI/UX
+
+**Dashboard 视觉增强**:
+
+- 统一卡片样式，使用 SectionCard 组件提供一致的视觉体验
+- 优化骨架屏 DashboardSkeleton 加载状态
+- 优化错误状态 DashboardError 展示
+- 改进今日待办、过期待办、进行中计划/目标/里程碑卡片布局
+
+**ViewsView 视觉增强**:
+
+- 优化 Checkbox、EmptyState、ProgressBar 组件样式
+- 新增 Icons/index.tsx 图标组件库
+- ViewsBoard、ViewsCalendar、ViewsFilters、ViewsGantt、ViewsList 组件样式优化
+
+**动画与微交互**:
+
+- 新增 FadeIn 动画组件，提供淡入动画效果
+- 优化 StaggeredList 交错列表动画
+- UI 组件微交互改进
+
+### Tests
+
+- 更新 Dashboard 测试以适配新的 DDD 架构
+- 更新 ViewsView 测试以适配新的 DDD 架构
+
+---
+
 ## [0.9.0] - 2026-04-28
 
 ### Tests
