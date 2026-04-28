@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ProgressBar } from "@/components/ui";
 import { ENTITY_TYPE_CONFIG } from "./types";
 import type { EntityItem } from "./types";
@@ -30,8 +31,17 @@ export function EntityCard({
   const IconComponent = config.icon;
 
   return (
-    <div
-      className="p-2.5 rounded-lg border cursor-pointer hover:shadow-md transition-all duration-200 hover:border-opacity-80"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{
+        scale: 1.03,
+        y: -2,
+        transition: { duration: 0.15 },
+      }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      className="p-2.5 rounded-lg border cursor-pointer"
       style={{
         backgroundColor: "var(--color-bg-card)",
         borderColor: config.borderColor,
@@ -40,20 +50,30 @@ export function EntityCard({
       onMouseLeave={() => onLeave?.()}
       onClick={() => onClick?.(item.type, id)}
     >
-      <div className="flex items-center gap-2 mb-1.5">
+      <motion.div
+        className="flex items-center gap-2 mb-1.5"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
         {showIcon && IconComponent && (
-          <IconComponent
-            size={14}
-            style={{ color: config.accentColor }}
-            className="shrink-0"
-          />
+          <motion.div
+            whileHover={{ rotate: [0, -10, 10, 0] }}
+            transition={{ duration: 0.3 }}
+          >
+            <IconComponent
+              size={14}
+              style={{ color: config.accentColor }}
+              className="shrink-0"
+            />
+          </motion.div>
         )}
         <span
           className={`text-[10px] px-1.5 py-0.5 rounded ${config.bgColor} ${config.textColor}`}
         >
           {config.label}
         </span>
-      </div>
+      </motion.div>
       <div
         className="font-medium text-sm truncate"
         style={{ color: "var(--color-text)" }}
@@ -61,14 +81,19 @@ export function EntityCard({
         {title}
       </div>
       {showProgress && hasProgress && (
-        <div className="mt-2">
+        <motion.div
+          className="mt-2"
+          initial={{ opacity: 0, width: 0 }}
+          animate={{ opacity: 1, width: "100%" }}
+          transition={{ delay: 0.15, duration: 0.3 }}
+        >
           <ProgressBar
             value={(item.data as { progress: number }).progress}
             color={progressColor}
             size="sm"
           />
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

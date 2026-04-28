@@ -2,6 +2,7 @@
 
 import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
 import { Icons } from "@/components/ui/Icons";
+import { motion } from "framer-motion";
 
 export interface ViewsGanttProps {
   todos: Todo[];
@@ -296,17 +297,25 @@ export function ViewsGantt({
               if (startPos === null) return null;
 
               return (
-                <div
+                <motion.div
                   key={`${item.type}-${idx}`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.03, duration: 0.2 }}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
                   className="flex items-center h-8 group cursor-pointer rounded transition-colors"
                   style={{ backgroundColor: "var(--color-bg-hover)" }}
                   onClick={() => onNavigate?.(item.type, item.id || "")}
                 >
-                  <div
+                  <motion.div
                     className="w-28 flex-shrink-0 text-xs truncate pr-2 font-medium flex items-center gap-1"
                     style={{ color: "var(--color-text)" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: idx * 0.03 + 0.1 }}
                   >
-                    <span
+                    <motion.span
                       className={`inline-block w-2 h-2 rounded-full ${
                         item.type === "plan"
                           ? "bg-purple-500"
@@ -318,32 +327,43 @@ export function ViewsGantt({
                                 ? "bg-blue-500"
                                 : "bg-gray-500"
                       }`}
-                    ></span>
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 + idx * 0.1 }}
+                    ></motion.span>
                     {item.title}
-                  </div>
+                  </motion.div>
                   <div
                     className="flex-1 h-full relative rounded"
                     style={{ backgroundColor: "var(--color-bg-hover)" }}
                   >
-                    <div
+                    <motion.div
                       className={`absolute h-6 top-1 rounded ${getTypeColor(item.type, item.status)}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.max(width || 5, 5)}%` }}
+                      transition={{ delay: idx * 0.03 + 0.15, duration: 0.3, type: "spring", stiffness: 100 }}
                       style={{
                         left: `${startPos}%`,
-                        width: `${Math.max(width || 5, 5)}%`,
                         minWidth: "20px",
                         boxShadow: "var(--shadow-sm)",
                       }}
+                      whileHover={{ boxShadow: "0 0 12px rgba(0,0,0,0.2)" }}
                     >
+                      {/* Progress shine effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded"
+                        animate={{ x: ["-100%", "200%"] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
+                      />
                       {item.progress !== undefined && item.progress < 100 && (
-                        <div
+                        <motion.div
                           className="absolute h-full bg-white/30 rounded-sm"
-                          style={{
-                            width: `${100 - item.progress}%`,
-                            right: 0,
-                          }}
-                        ></div>
+                          initial={{ width: "100%" }}
+                          animate={{ width: `${100 - item.progress}%` }}
+                          transition={{ delay: idx * 0.03 + 0.2, duration: 0.3 }}
+                          style={{ right: 0 }}
+                        ></motion.div>
                       )}
-                    </div>
+                    </motion.div>
                     {isToday(item.start || item.due) && (
                       <div
                         className="absolute top-0 bottom-0 w-0.5 z-10"
@@ -354,7 +374,7 @@ export function ViewsGantt({
                       ></div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

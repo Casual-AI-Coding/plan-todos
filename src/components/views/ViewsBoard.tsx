@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import type { Todo, Task, Plan, Target, Milestone } from "@/lib/types";
 import { EntityCard } from "@/app/views/views/EntityCard";
 import type { EntityItem, EntityType } from "@/app/views/views/types";
@@ -116,7 +117,7 @@ export function ViewsBoard({
   return (
     <div className="relative h-full">
       <div className="grid grid-cols-3 gap-4 h-full">
-        {columns.map((col) => {
+        {columns.map((col, colIdx) => {
           const items = getItemsByStatus(col.id);
           const ColumnIcon =
             col.id === "pending"
@@ -126,59 +127,86 @@ export function ViewsBoard({
                 : Icons.CheckCircle;
 
           return (
-            <div
+            <motion.div
               key={col.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: colIdx * 0.1 }}
+              whileHover={{ scale: 1.01 }}
               className="rounded-lg p-4 flex flex-col h-[60vh] border"
               style={{
                 backgroundColor: "var(--color-bg-hover)",
                 borderColor: "var(--color-border)",
               }}
             >
-              <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+              <motion.div
+                className="flex items-center gap-2 mb-4 flex-shrink-0"
+                whileHover={{ scale: 1.02 }}
+              >
                 <div
                   className={`w-6 h-6 rounded ${col.iconBgColor} flex items-center justify-center`}
                 >
                   <ColumnIcon size={14} className="text-white" />
                 </div>
                 <h3 className={`font-semibold ${col.textColor}`}>{col.label}</h3>
-                <span
+                <motion.span
                   className="ml-auto text-sm px-2 py-0.5 rounded-full"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: colIdx * 0.1 + 0.1 }}
                   style={{
                     backgroundColor: "var(--color-bg-hover)",
                     color: "var(--color-text-muted)",
                   }}
                 >
                   {items.length}
-                </span>
-              </div>
+                </motion.span>
+              </motion.div>
               <div className="space-y-2 overflow-y-auto flex-1 min-h-0 scroll-smooth scrollbar-hide">
-                {items.map((item, idx) => (
-                  <EntityCard
-                    key={`${item.type}-${idx}`}
-                    item={item}
-                    onHover={(item, e) => {
-                      setHoveredItem(item);
-                      setHoverPosition({ x: e.clientX, y: e.clientY });
-                    }}
-                    onLeave={() => setHoveredItem(null)}
-                    onClick={onNavigate}
-                    progressColor={
-                      col.id === "done" ? "teal" : col.id === "in-progress" ? "orange" : "gray"
-                    }
-                  />
-                ))}
-                {items.length === 0 && (
-                  <div className="text-center py-8">
-                    <p
-                      className="text-sm"
-                      style={{ color: "var(--color-text-muted)" }}
+                <AnimatePresence mode="popLayout">
+                  {items.map((item, idx) => (
+                    <motion.div
+                      key={`${item.type}-${idx}`}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ delay: idx * 0.05 }}
                     >
-                      无
-                    </p>
-                  </div>
-                )}
+                      <EntityCard
+                        item={item}
+                        onHover={(item, e) => {
+                          setHoveredItem(item);
+                          setHoverPosition({ x: e.clientX, y: e.clientY });
+                        }}
+                        onLeave={() => setHoveredItem(null)}
+                        onClick={onNavigate}
+                        progressColor={
+                          col.id === "done" ? "teal" : col.id === "in-progress" ? "orange" : "gray"
+                        }
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                <AnimatePresence>
+                  {items.length === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-center py-8"
+                    >
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
+                        无
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>

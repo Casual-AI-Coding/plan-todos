@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { Todo, Task, Target, Milestone } from "@/lib/types";
 import type { EntityItem, HoveredItem } from "@/app/views/views/types";
 import { Icons } from "@/components/ui/Icons";
@@ -45,18 +46,8 @@ export function ViewsCalendar({
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const monthNames = [
-    "一月",
-    "二月",
-    "三月",
-    "四月",
-    "五月",
-    "六月",
-    "七月",
-    "八月",
-    "九月",
-    "十月",
-    "十一月",
-    "十二月",
+    "一月", "二月", "三月", "四月", "五月", "六月",
+    "七月", "八月", "九月", "十月", "十一月", "十二月",
   ];
 
   const getItemsForDay = (day: number) => {
@@ -64,21 +55,13 @@ export function ViewsCalendar({
     const items: EntityItem[] = [];
 
     if (filters.todo)
-      todos
-        .filter((t) => t.due_date === dateStr)
-        .forEach((t) => items.push({ type: "todo", data: t }));
+      todos.filter((t) => t.due_date === dateStr).forEach((t) => items.push({ type: "todo", data: t }));
     if (filters.task)
-      allTasks
-        .filter((t) => t.end_date === dateStr)
-        .forEach((t) => items.push({ type: "task", data: t }));
+      allTasks.filter((t) => t.end_date === dateStr).forEach((t) => items.push({ type: "task", data: t }));
     if (filters.target)
-      targets
-        .filter((t) => t.due_date === dateStr)
-        .forEach((t) => items.push({ type: "target", data: t }));
+      targets.filter((t) => t.due_date === dateStr).forEach((t) => items.push({ type: "target", data: t }));
     if (filters.milestone)
-      milestones
-        .filter((m) => m.target_date === dateStr)
-        .forEach((m) => items.push({ type: "milestone", data: m }));
+      milestones.filter((m) => m.target_date === dateStr).forEach((m) => items.push({ type: "milestone", data: m }));
 
     return items;
   };
@@ -86,10 +69,8 @@ export function ViewsCalendar({
   const dayNames = ["一", "二", "三", "四", "五", "六", "日"];
   const today = new Date();
 
-  const prevMonth = () =>
-    setCalendarDate(new Date(currentYear, currentMonth - 1, 1));
-  const nextMonth = () =>
-    setCalendarDate(new Date(currentYear, currentMonth + 1, 1));
+  const prevMonth = () => setCalendarDate(new Date(currentYear, currentMonth - 1, 1));
+  const nextMonth = () => setCalendarDate(new Date(currentYear, currentMonth + 1, 1));
 
   const isWeekend = (day: number) => {
     const date = new Date(currentYear, currentMonth, day);
@@ -100,34 +81,36 @@ export function ViewsCalendar({
   return (
     <div className="space-y-4">
       {/* Header with navigation */}
-      <div className="flex items-center justify-center gap-4">
-        <button
+      <motion.div
+        className="flex items-center justify-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <motion.button
           onClick={prevMonth}
-          className="p-2 rounded-lg transition-colors hover:opacity-70"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="p-2 rounded-lg"
           style={{ color: "var(--color-text-muted)" }}
         >
           <Icons.ChevronLeft size={20} />
-        </button>
+        </motion.button>
         <div className="flex items-center gap-2">
-          <Icons.CalendarDays
-            size={20}
-            style={{ color: "var(--color-primary)" }}
-          />
-          <h3
-            className="text-xl font-semibold"
-            style={{ color: "var(--color-text)" }}
-          >
+          <Icons.CalendarDays size={20} style={{ color: "var(--color-primary)" }} />
+          <h3 className="text-xl font-semibold" style={{ color: "var(--color-text)" }}>
             {monthNames[currentMonth]} {currentYear}
           </h3>
         </div>
-        <button
+        <motion.button
           onClick={nextMonth}
-          className="p-2 rounded-lg transition-colors hover:opacity-70"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="p-2 rounded-lg"
           style={{ color: "var(--color-text-muted)" }}
         >
           <Icons.ChevronRight size={20} />
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Day names header */}
       <div className="grid grid-cols-7 gap-1">
@@ -135,9 +118,7 @@ export function ViewsCalendar({
           <div
             key={day}
             className="text-center text-sm font-medium py-2"
-            style={{
-              color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)",
-            }}
+            style={{ color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)" }}
           >
             {day}
           </div>
@@ -147,11 +128,13 @@ export function ViewsCalendar({
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: firstDay }).map((_, i) => (
-          <div
+          <motion.div
             key={`empty-${i}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             className="h-24 rounded"
             style={{ backgroundColor: "var(--color-bg-hover)" }}
-          ></div>
+          />
         ))}
 
         {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -164,34 +147,50 @@ export function ViewsCalendar({
           const isWeekendDay = isWeekend(day);
 
           return (
-            <div
+            <motion.div
               key={day}
-              className={`h-24 p-1 border rounded transition-colors ${
-                isToday
-                  ? "bg-teal-50 border-teal-300"
-                  : isWeekendDay
-                    ? "bg-red-50/50 border-red-100"
-                    : "bg-white border-gray-200"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.02 }}
+              whileHover={{
+                scale: 1.05,
+                backgroundColor: isToday
+                  ? "color-mix(in srgb, var(--color-primary) 15%, transparent)"
+                  : "var(--color-bg-hover)",
+              }}
+              whileTap={{ scale: 0.95 }}
+              className={`h-24 p-1 border rounded ${
+                isToday ? "bg-teal-50 border-teal-300" : isWeekendDay ? "bg-red-50/50 border-red-100" : "bg-white border-gray-200"
               }`}
             >
-              <div
-                className={`text-sm font-medium ${isToday ? "text-teal-600" : isWeekendDay ? "text-red-500" : "text-gray-700"}`}
-              >
-                {day}
+              <div className="flex justify-between items-start">
+                <span
+                  className={`text-sm font-medium ${isToday ? "text-teal-600" : isWeekendDay ? "text-red-500" : "text-gray-700"}`}
+                >
+                  {day}
+                </span>
+                {isToday && (
+                  <motion.div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: "var(--color-primary)" }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
               </div>
               <div className="mt-1 space-y-1 overflow-y-auto max-h-14">
                 {items.map((item, idx) => (
-                  <div
+                  <motion.div
                     key={idx}
-                    className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 transition-opacity ${
-                      item.type === "todo"
-                        ? "bg-blue-100 text-blue-700"
-                        : item.type === "task"
-                          ? "bg-teal-100 text-teal-700"
-                          : item.type === "target"
-                            ? "bg-orange-100 text-orange-700"
-                            : "bg-purple-100 text-purple-700"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer ${
+                      item.type === "todo" ? "bg-blue-100 text-blue-700"
+                      : item.type === "task" ? "bg-teal-100 text-teal-700"
+                      : item.type === "target" ? "bg-orange-100 text-orange-700"
+                      : "bg-purple-100 text-purple-700"
                     }`}
+                    whileHover={{ scale: 1.05 }}
                     onMouseEnter={(e) => {
                       setHoveredItem(item);
                       setHoverPosition({ x: e.clientX, y: e.clientY });
@@ -200,16 +199,21 @@ export function ViewsCalendar({
                     onClick={() => onNavigate?.(item.type, "id" in item.data ? item.data.id : "")}
                   >
                     {"title" in item.data ? item.data.title : ""}
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-4 justify-center text-xs">
+      <motion.div
+        className="flex flex-wrap gap-4 justify-center text-xs"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
         <div className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-blue-100"></span>
           <span style={{ color: "var(--color-text-muted)" }}>待办</span>
@@ -230,7 +234,7 @@ export function ViewsCalendar({
           <span className="w-3 h-3 rounded bg-red-50 border border-red-100"></span>
           <span style={{ color: "var(--color-text-muted)" }}>周末</span>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

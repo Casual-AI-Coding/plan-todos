@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Checkbox } from "@/components/ui";
 import { Icons } from "@/components/ui/Icons";
 import { SectionCard } from "./SectionCard";
@@ -39,9 +40,17 @@ export function OverdueTodosCard({ todos, onToggle }: OverdueTodosCardProps) {
         {todos.map((todo) => {
           const days = daysOverdue(todo.due_date);
           return (
-            <div
+            <motion.div
               key={todo.id}
-              className="flex items-center gap-3 p-2 rounded cursor-pointer transition-all duration-200 hover:shadow-sm"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.2 }}
+              whileHover={{
+                scale: 1.02,
+                boxShadow: "0 0 8px rgba(239, 68, 68, 0.3)",
+              }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-3 p-2 rounded cursor-pointer"
               style={{
                 backgroundColor: "var(--color-error-bg, rgba(239,68,68,0.08))",
                 borderLeft: "3px solid var(--color-error)",
@@ -58,30 +67,36 @@ export function OverdueTodosCard({ todos, onToggle }: OverdueTodosCardProps) {
             >
               <Checkbox checked={todo.status === "done"} />
               <div className="flex-1 min-w-0">
-                <span
-                  className={todo.status === "done" ? "line-through" : ""}
-                  style={{
-                    color:
-                      todo.status === "done"
-                        ? "var(--color-text-muted)"
-                        : "var(--color-text)",
+                <motion.span
+                  animate={todo.status === "done" ? "done" : "pending"}
+                  variants={{
+                    done: {
+                      textDecorationLine: "line-through",
+                      color: "var(--color-text-muted)",
+                    },
+                    pending: {
+                      textDecorationLine: "none",
+                      color: "var(--color-text)",
+                    },
                   }}
                 >
                   {todo.title}
-                </span>
+                </motion.span>
               </div>
               {days > 0 && (
-                <span
+                <motion.span
                   className="text-xs font-medium shrink-0 px-1.5 py-0.5 rounded"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
                   style={{
                     backgroundColor: "var(--color-error)",
                     color: "var(--color-text-inverse)",
                   }}
                 >
                   超期{days}天
-                </span>
+                </motion.span>
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>

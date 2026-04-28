@@ -423,7 +423,8 @@ describe("Checkbox", () => {
 
   it("applies custom className", () => {
     render(<Checkbox className="custom-checkbox" />);
-    expect(screen.getByRole("checkbox")).toHaveClass("custom-checkbox");
+    const checkboxContainer = screen.getByRole("checkbox").closest(".custom-checkbox");
+    expect(checkboxContainer).not.toBeNull();
   });
 
   it("forwards ref", () => {

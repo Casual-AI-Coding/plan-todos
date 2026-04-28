@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ProgressBar } from "@/components/ui";
 import { Icons } from "@/components/ui/Icons";
 import { SectionCard } from "./SectionCard";
@@ -30,9 +31,14 @@ export function ActiveMilestonesCard({
     >
       <div className="space-y-3">
         {milestones.slice(0, 3).map((milestone) => (
-          <div
+          <motion.div
             key={milestone.id}
-            className="cursor-pointer hover:opacity-80 transition-all duration-200 p-2 rounded"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.99 }}
+            transition={{ duration: 0.2 }}
+            className="cursor-pointer p-2 rounded"
             style={{ backgroundColor: "var(--color-bg-hover)" }}
             onClick={() => onClickMilestone(milestone.id)}
             onKeyDown={(e) => {
@@ -57,7 +63,7 @@ export function ActiveMilestonesCard({
               color="teal"
               size="sm"
             />
-          </div>
+          </motion.div>
         ))}
       </div>
     </SectionCard>

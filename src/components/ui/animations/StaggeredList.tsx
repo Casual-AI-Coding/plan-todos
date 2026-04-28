@@ -9,17 +9,6 @@ interface StaggeredListProps {
   staggerDelay?: number;
 }
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-      delayChildren: 0.1,
-    },
-  },
-};
-
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -63,12 +52,14 @@ export function StaggeredList({
 export function StaggeredListItem({
   children,
   className = "",
+  customKey,
 }: {
   children: ReactNode;
   className?: string;
+  customKey?: string;
 }) {
   return (
-    <motion.div className={className} variants={itemVariants}>
+    <motion.div key={customKey} className={className} variants={itemVariants}>
       {children}
     </motion.div>
   );

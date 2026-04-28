@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ProgressBar } from "@/components/ui";
 import { Icons } from "@/components/ui/Icons";
 import { SectionCard } from "./SectionCard";
@@ -30,9 +31,14 @@ export function ActiveTargetsCard({
     >
       <div className="space-y-3">
         {targets.slice(0, 3).map((target) => (
-          <div
+          <motion.div
             key={target.id}
-            className="cursor-pointer hover:opacity-80 transition-all duration-200 p-2 rounded"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.99 }}
+            transition={{ duration: 0.2 }}
+            className="cursor-pointer p-2 rounded"
             style={{ backgroundColor: "var(--color-bg-hover)" }}
             onClick={() => onClickTarget(target.id)}
             onKeyDown={(e) => {
@@ -51,7 +57,7 @@ export function ActiveTargetsCard({
               </span>
             </div>
             <ProgressBar value={target.progress} color="orange" size="sm" />
-          </div>
+          </motion.div>
         ))}
       </div>
     </SectionCard>

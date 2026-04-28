@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 interface ProgressBarProps {
   value: number;
   showLabel?: boolean;
@@ -40,18 +42,25 @@ export function ProgressBar({
         </div>
       )}
       <div
-        className={`w-full rounded-full overflow-hidden ${sizeStyles[size]}`}
+        className={`w-full rounded-full overflow-hidden relative ${sizeStyles[size]}`}
         style={{
           backgroundColor:
             "color-mix(in srgb, var(--color-text-muted) 12%, transparent)",
         }}
       >
-        <div
-          className="h-full rounded-full transition-all duration-500 ease-out"
-          style={{
-            width: `${clampedValue}%`,
-            backgroundColor: colorMap[color],
-          }}
+        {clampedValue > 80 && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          />
+        )}
+        <motion.div
+          className="h-full rounded-full"
+          initial={false}
+          animate={{ width: `${clampedValue}%` }}
+          transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          style={{ backgroundColor: colorMap[color] }}
         />
       </div>
     </div>
