@@ -13,9 +13,9 @@ interface CheckboxProps extends Omit<
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, className = "", checked, onChange, ...props }, ref) => {
     const [isChecked, setIsChecked] = useState(checked ?? false);
-    
+
     return (
-      <motion.label 
+      <motion.label
         className="inline-flex items-center gap-2 cursor-pointer"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -25,13 +25,13 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           className={`relative w-5 h-5 rounded border-2 ${className}`}
           animate={isChecked ? "checked" : "unchecked"}
           variants={{
-            checked: { 
-              scale: [1, 1.2, 1], 
+            checked: {
+              scale: [1, 1.2, 1],
               backgroundColor: "var(--color-primary)",
               borderColor: "var(--color-primary)",
             },
-            unchecked: { 
-              scale: 1, 
+            unchecked: {
+              scale: 1,
               backgroundColor: "transparent",
               borderColor: "var(--color-border)",
             },

@@ -22,8 +22,9 @@ vi.mock("@/lib/api/reorder", () => ({
 }));
 
 vi.mock("@/stores/navigation", () => ({
-  useNavigationStore: vi.fn((selector: (s: { navigate: () => void }) => unknown) =>
-    selector({ navigate: vi.fn() })
+  useNavigationStore: vi.fn(
+    (selector: (s: { navigate: () => void }) => unknown) =>
+      selector({ navigate: vi.fn() }),
   ),
 }));
 
@@ -35,7 +36,7 @@ function renderWithQueryClient(ui: React.ReactElement) {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   return render(
-    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
   );
 }
 

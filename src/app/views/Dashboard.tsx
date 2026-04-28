@@ -59,10 +59,7 @@ export function Dashboard() {
         streakProgress={vm.progressMetrics.streakProgress}
       />
 
-      <TodayTodosCard
-        todos={vm.todayTodos}
-        onToggle={vm.handleToggleTodo}
-      />
+      <TodayTodosCard todos={vm.todayTodos} onToggle={vm.handleToggleTodo} />
 
       <OverdueTodosCard
         todos={vm.overdueTodos}

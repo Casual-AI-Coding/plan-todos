@@ -423,7 +423,9 @@ describe("Checkbox", () => {
 
   it("applies custom className", () => {
     render(<Checkbox className="custom-checkbox" />);
-    const checkboxContainer = screen.getByRole("checkbox").closest(".custom-checkbox");
+    const checkboxContainer = screen
+      .getByRole("checkbox")
+      .closest(".custom-checkbox");
     expect(checkboxContainer).not.toBeNull();
   });
 

@@ -38,7 +38,7 @@ export function TodayTodosCard({ todos, onToggle }: TodayTodosCardProps) {
               transition={{
                 duration: 0.2,
                 delay: idx * 0.05,
-                layout: { type: "spring", stiffness: 500, damping: 30 }
+                layout: { type: "spring", stiffness: 500, damping: 30 },
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

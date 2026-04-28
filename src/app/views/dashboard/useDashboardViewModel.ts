@@ -88,10 +88,7 @@ export function useDashboardViewModel(): DashboardViewModel {
     todayProgress:
       todayTotal > 0 ? Math.min(100, (todayCompleted / todayTotal) * 100) : 0,
     streakProgress: dashboard?.circulation_stats
-      ? Math.min(
-          100,
-          (dashboard.circulation_stats.current_streak / 30) * 100,
-        )
+      ? Math.min(100, (dashboard.circulation_stats.current_streak / 30) * 100)
       : 0,
   };
 

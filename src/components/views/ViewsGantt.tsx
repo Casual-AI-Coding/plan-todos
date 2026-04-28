@@ -254,17 +254,17 @@ export function ViewsGantt({
           className="w-32 h-1.5 rounded-lg appearance-none cursor-pointer"
           style={{ backgroundColor: "var(--color-bg-hover)" }}
         />
-        <span
-          className="text-xs w-12"
-          style={{ color: "var(--color-text)" }}
-        >
+        <span className="text-xs w-12" style={{ color: "var(--color-text)" }}>
           {ganttZoom} 个月
         </span>
       </div>
 
       <div className="overflow-hidden">
         <div style={{ width: `${timelineWidth}px` }}>
-          <div className="relative h-8 border-b mb-2" style={{ borderColor: "var(--color-border)" }}>
+          <div
+            className="relative h-8 border-b mb-2"
+            style={{ borderColor: "var(--color-border)" }}
+          >
             {months.map((month, i) => (
               <div
                 key={i}
@@ -328,7 +328,11 @@ export function ViewsGantt({
                                 : "bg-gray-500"
                       }`}
                       animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 + idx * 0.1 }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 1 + idx * 0.1,
+                      }}
                     ></motion.span>
                     {item.title}
                   </motion.div>
@@ -340,7 +344,12 @@ export function ViewsGantt({
                       className={`absolute h-6 top-1 rounded ${getTypeColor(item.type, item.status)}`}
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.max(width || 5, 5)}%` }}
-                      transition={{ delay: idx * 0.03 + 0.15, duration: 0.3, type: "spring", stiffness: 100 }}
+                      transition={{
+                        delay: idx * 0.03 + 0.15,
+                        duration: 0.3,
+                        type: "spring",
+                        stiffness: 100,
+                      }}
                       style={{
                         left: `${startPos}%`,
                         minWidth: "20px",
@@ -352,14 +361,21 @@ export function ViewsGantt({
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded"
                         animate={{ x: ["-100%", "200%"] }}
-                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 0.5,
+                        }}
                       />
                       {item.progress !== undefined && item.progress < 100 && (
                         <motion.div
                           className="absolute h-full bg-white/30 rounded-sm"
                           initial={{ width: "100%" }}
                           animate={{ width: `${100 - item.progress}%` }}
-                          transition={{ delay: idx * 0.03 + 0.2, duration: 0.3 }}
+                          transition={{
+                            delay: idx * 0.03 + 0.2,
+                            duration: 0.3,
+                          }}
                           style={{ right: 0 }}
                         ></motion.div>
                       )}
@@ -379,9 +395,15 @@ export function ViewsGantt({
             })}
           </div>
 
-          <div className="flex items-center mt-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
+          <div
+            className="flex items-center mt-4 text-xs"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             <div className="w-28 flex-shrink-0 flex items-center gap-1">
-              <Icons.Calendar size={14} style={{ color: "var(--color-error)" }} />
+              <Icons.Calendar
+                size={14}
+                style={{ color: "var(--color-error)" }}
+              />
               今日
             </div>
             <div className="flex-1 relative h-4">
@@ -392,7 +414,10 @@ export function ViewsGantt({
                   backgroundColor: "var(--color-error)",
                 }}
               >
-                <span className="-mt-4 text-[10px] whitespace-nowrap" style={{ color: "var(--color-error)" }}>
+                <span
+                  className="-mt-4 text-[10px] whitespace-nowrap"
+                  style={{ color: "var(--color-error)" }}
+                >
                   今天
                 </span>
               </div>
@@ -417,7 +442,10 @@ export function ViewsGantt({
               <span style={{ color: "var(--color-text-muted)" }}>里程碑</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-3 h-1 rounded" style={{ backgroundColor: "var(--color-error)" }}></span>
+              <span
+                className="w-3 h-1 rounded"
+                style={{ backgroundColor: "var(--color-error)" }}
+              ></span>
               <span style={{ color: "var(--color-text-muted)" }}>今日</span>
             </div>
           </div>

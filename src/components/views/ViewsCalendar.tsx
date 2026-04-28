@@ -46,8 +46,18 @@ export function ViewsCalendar({
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const monthNames = [
-    "一月", "二月", "三月", "四月", "五月", "六月",
-    "七月", "八月", "九月", "十月", "十一月", "十二月",
+    "一月",
+    "二月",
+    "三月",
+    "四月",
+    "五月",
+    "六月",
+    "七月",
+    "八月",
+    "九月",
+    "十月",
+    "十一月",
+    "十二月",
   ];
 
   const getItemsForDay = (day: number) => {
@@ -55,13 +65,21 @@ export function ViewsCalendar({
     const items: EntityItem[] = [];
 
     if (filters.todo)
-      todos.filter((t) => t.due_date === dateStr).forEach((t) => items.push({ type: "todo", data: t }));
+      todos
+        .filter((t) => t.due_date === dateStr)
+        .forEach((t) => items.push({ type: "todo", data: t }));
     if (filters.task)
-      allTasks.filter((t) => t.end_date === dateStr).forEach((t) => items.push({ type: "task", data: t }));
+      allTasks
+        .filter((t) => t.end_date === dateStr)
+        .forEach((t) => items.push({ type: "task", data: t }));
     if (filters.target)
-      targets.filter((t) => t.due_date === dateStr).forEach((t) => items.push({ type: "target", data: t }));
+      targets
+        .filter((t) => t.due_date === dateStr)
+        .forEach((t) => items.push({ type: "target", data: t }));
     if (filters.milestone)
-      milestones.filter((m) => m.target_date === dateStr).forEach((m) => items.push({ type: "milestone", data: m }));
+      milestones
+        .filter((m) => m.target_date === dateStr)
+        .forEach((m) => items.push({ type: "milestone", data: m }));
 
     return items;
   };
@@ -69,8 +87,10 @@ export function ViewsCalendar({
   const dayNames = ["一", "二", "三", "四", "五", "六", "日"];
   const today = new Date();
 
-  const prevMonth = () => setCalendarDate(new Date(currentYear, currentMonth - 1, 1));
-  const nextMonth = () => setCalendarDate(new Date(currentYear, currentMonth + 1, 1));
+  const prevMonth = () =>
+    setCalendarDate(new Date(currentYear, currentMonth - 1, 1));
+  const nextMonth = () =>
+    setCalendarDate(new Date(currentYear, currentMonth + 1, 1));
 
   const isWeekend = (day: number) => {
     const date = new Date(currentYear, currentMonth, day);
@@ -96,8 +116,14 @@ export function ViewsCalendar({
           <Icons.ChevronLeft size={20} />
         </motion.button>
         <div className="flex items-center gap-2">
-          <Icons.CalendarDays size={20} style={{ color: "var(--color-primary)" }} />
-          <h3 className="text-xl font-semibold" style={{ color: "var(--color-text)" }}>
+          <Icons.CalendarDays
+            size={20}
+            style={{ color: "var(--color-primary)" }}
+          />
+          <h3
+            className="text-xl font-semibold"
+            style={{ color: "var(--color-text)" }}
+          >
             {monthNames[currentMonth]} {currentYear}
           </h3>
         </div>
@@ -118,7 +144,9 @@ export function ViewsCalendar({
           <div
             key={day}
             className="text-center text-sm font-medium py-2"
-            style={{ color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)" }}
+            style={{
+              color: i >= 5 ? "var(--color-error)" : "var(--color-text-muted)",
+            }}
           >
             {day}
           </div>
@@ -160,7 +188,11 @@ export function ViewsCalendar({
               }}
               whileTap={{ scale: 0.95 }}
               className={`h-24 p-1 border rounded ${
-                isToday ? "bg-teal-50 border-teal-300" : isWeekendDay ? "bg-red-50/50 border-red-100" : "bg-white border-gray-200"
+                isToday
+                  ? "bg-teal-50 border-teal-300"
+                  : isWeekendDay
+                    ? "bg-red-50/50 border-red-100"
+                    : "bg-white border-gray-200"
               }`}
             >
               <div className="flex justify-between items-start">
@@ -185,10 +217,13 @@ export function ViewsCalendar({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer ${
-                      item.type === "todo" ? "bg-blue-100 text-blue-700"
-                      : item.type === "task" ? "bg-teal-100 text-teal-700"
-                      : item.type === "target" ? "bg-orange-100 text-orange-700"
-                      : "bg-purple-100 text-purple-700"
+                      item.type === "todo"
+                        ? "bg-blue-100 text-blue-700"
+                        : item.type === "task"
+                          ? "bg-teal-100 text-teal-700"
+                          : item.type === "target"
+                            ? "bg-orange-100 text-orange-700"
+                            : "bg-purple-100 text-purple-700"
                     }`}
                     whileHover={{ scale: 1.05 }}
                     onMouseEnter={(e) => {
@@ -196,7 +231,12 @@ export function ViewsCalendar({
                       setHoverPosition({ x: e.clientX, y: e.clientY });
                     }}
                     onMouseLeave={() => setHoveredItem(null)}
-                    onClick={() => onNavigate?.(item.type, "id" in item.data ? item.data.id : "")}
+                    onClick={() =>
+                      onNavigate?.(
+                        item.type,
+                        "id" in item.data ? item.data.id : "",
+                      )
+                    }
                   >
                     {"title" in item.data ? item.data.title : ""}
                   </motion.div>

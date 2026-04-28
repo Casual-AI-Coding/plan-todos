@@ -103,7 +103,10 @@ export function ViewsList({
               </h3>
             </div>
             {plans.length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 暂无计划
               </p>
             ) : (
@@ -116,7 +119,10 @@ export function ViewsList({
                     onClick={() => onNavigate?.("plan", plan.id)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="font-medium" style={{ color: "var(--color-text)" }}>
+                      <div
+                        className="font-medium"
+                        style={{ color: "var(--color-text)" }}
+                      >
                         {plan.title}
                       </div>
                       <span
@@ -132,39 +138,57 @@ export function ViewsList({
                       </span>
                     </div>
                     {plan.description && (
-                      <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>
+                      <p
+                        className="text-sm mt-1"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
                         {plan.description}
                       </p>
                     )}
                     {plan.start_date && (
-                      <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-                        📅 {plan.start_date} {plan.end_date && `~ ${plan.end_date}`}
+                      <p
+                        className="text-xs mt-1"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
+                        📅 {plan.start_date}{" "}
+                        {plan.end_date && `~ ${plan.end_date}`}
                       </p>
                     )}
                     {/* Tasks under plan */}
-                    {filters.task && (tasksByPlan[plan.id] || []).length > 0 && (
-                      <div className="mt-3 pl-4 space-y-2">
-                        {(tasksByPlan[plan.id] || []).map((task) => (
-                          <div key={task.id} className="flex items-center gap-2 text-sm">
-                            <span
-                              className={`w-2 h-2 rounded-full ${
-                                task.status === "done"
-                                  ? "bg-green-500"
-                                  : task.status === "in-progress"
-                                    ? "bg-orange-500"
-                                    : "bg-gray-300"
-                              }`}
-                            ></span>
-                            <span
-                              className={task.status === "done" ? "line-through" : ""}
-                              style={{ color: task.status === "done" ? "var(--color-text-muted)" : "var(--color-text)" }}
+                    {filters.task &&
+                      (tasksByPlan[plan.id] || []).length > 0 && (
+                        <div className="mt-3 pl-4 space-y-2">
+                          {(tasksByPlan[plan.id] || []).map((task) => (
+                            <div
+                              key={task.id}
+                              className="flex items-center gap-2 text-sm"
                             >
-                              {task.title}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                              <span
+                                className={`w-2 h-2 rounded-full ${
+                                  task.status === "done"
+                                    ? "bg-green-500"
+                                    : task.status === "in-progress"
+                                      ? "bg-orange-500"
+                                      : "bg-gray-300"
+                                }`}
+                              ></span>
+                              <span
+                                className={
+                                  task.status === "done" ? "line-through" : ""
+                                }
+                                style={{
+                                  color:
+                                    task.status === "done"
+                                      ? "var(--color-text-muted)"
+                                      : "var(--color-text)",
+                                }}
+                              >
+                                {task.title}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 ))}
               </div>
@@ -200,7 +224,10 @@ export function ViewsList({
               </h3>
             </div>
             {targets.length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 暂无目标
               </p>
             ) : (
@@ -213,20 +240,32 @@ export function ViewsList({
                     onClick={() => onNavigate?.("target", target.id)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="font-medium" style={{ color: "var(--color-text)" }}>
+                      <div
+                        className="font-medium"
+                        style={{ color: "var(--color-text)" }}
+                      >
                         {target.title}
                       </div>
-                      <span className="font-medium" style={{ color: "var(--color-warning)" }}>
+                      <span
+                        className="font-medium"
+                        style={{ color: "var(--color-warning)" }}
+                      >
                         {target.progress}%
                       </span>
                     </div>
                     {target.description && (
-                      <p className="text-sm mt-1" style={{ color: "var(--color-text-muted)" }}>
+                      <p
+                        className="text-sm mt-1"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
                         {target.description}
                       </p>
                     )}
                     {target.due_date && (
-                      <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+                      <p
+                        className="text-xs mt-1"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
                         📅 {target.due_date}
                       </p>
                     )}
@@ -240,21 +279,38 @@ export function ViewsList({
                     {(targetSteps[target.id] || []).length > 0 && (
                       <div className="mt-3 pl-4 space-y-2">
                         {(targetSteps[target.id] || []).map((step) => (
-                          <div key={step.id} className="flex items-center gap-2 text-sm">
+                          <div
+                            key={step.id}
+                            className="flex items-center gap-2 text-sm"
+                          >
                             <span
                               className={`w-2 h-2 rounded-full ${
-                                step.status === "completed" ? "bg-green-500" : "bg-gray-300"
+                                step.status === "completed"
+                                  ? "bg-green-500"
+                                  : "bg-gray-300"
                               }`}
                             ></span>
                             <span
-                              className={step.status === "completed" ? "line-through" : ""}
-                              style={{ color: step.status === "completed" ? "var(--color-text-muted)" : "var(--color-text)" }}
+                              className={
+                                step.status === "completed"
+                                  ? "line-through"
+                                  : ""
+                              }
+                              style={{
+                                color:
+                                  step.status === "completed"
+                                    ? "var(--color-text-muted)"
+                                    : "var(--color-text)",
+                              }}
                             >
                               {step.title}
                             </span>
                             <span
                               className="text-xs px-1 rounded"
-                              style={{ backgroundColor: "var(--color-bg-hover)", color: "var(--color-text-muted)" }}
+                              style={{
+                                backgroundColor: "var(--color-bg-hover)",
+                                color: "var(--color-text-muted)",
+                              }}
                             >
                               {step.weight}%
                             </span>
@@ -297,7 +353,10 @@ export function ViewsList({
               </h3>
             </div>
             {todos.filter((t) => t.status !== "done").length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 暂无待办
               </p>
             ) : (
@@ -321,13 +380,25 @@ export function ViewsList({
                         }`}
                       ></span>
                       <span
-                        className={todo.status === "done" ? "line-through flex-1" : "flex-1"}
-                        style={{ color: todo.status === "done" ? "var(--color-text-muted)" : "var(--color-text)" }}
+                        className={
+                          todo.status === "done"
+                            ? "line-through flex-1"
+                            : "flex-1"
+                        }
+                        style={{
+                          color:
+                            todo.status === "done"
+                              ? "var(--color-text-muted)"
+                              : "var(--color-text)",
+                        }}
                       >
                         {todo.title}
                       </span>
                       {todo.due_date && (
-                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                        <span
+                          className="text-xs"
+                          style={{ color: "var(--color-text-muted)" }}
+                        >
                           📅 {todo.due_date}
                         </span>
                       )}
@@ -366,7 +437,10 @@ export function ViewsList({
               </h3>
             </div>
             {milestones.length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
                 暂无里程碑
               </p>
             ) : (
@@ -380,17 +454,28 @@ export function ViewsList({
                   >
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        m.status === "completed" ? "bg-green-500" : "bg-gray-300"
+                        m.status === "completed"
+                          ? "bg-green-500"
+                          : "bg-gray-300"
                       }`}
                     ></span>
-                    <span className="flex-1" style={{ color: "var(--color-text)" }}>
+                    <span
+                      className="flex-1"
+                      style={{ color: "var(--color-text)" }}
+                    >
                       {m.title}
                     </span>
-                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                    <span
+                      className="text-xs"
+                      style={{ color: "var(--color-text-muted)" }}
+                    >
                       {m.progress}%
                     </span>
                     {m.target_date && (
-                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                      <span
+                        className="text-xs"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
                         📅 {m.target_date}
                       </span>
                     )}

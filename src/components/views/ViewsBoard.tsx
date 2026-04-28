@@ -148,7 +148,9 @@ export function ViewsBoard({
                 >
                   <ColumnIcon size={14} className="text-white" />
                 </div>
-                <h3 className={`font-semibold ${col.textColor}`}>{col.label}</h3>
+                <h3 className={`font-semibold ${col.textColor}`}>
+                  {col.label}
+                </h3>
                 <motion.span
                   className="ml-auto text-sm px-2 py-0.5 rounded-full"
                   initial={{ scale: 0.8 }}
@@ -182,7 +184,11 @@ export function ViewsBoard({
                         onLeave={() => setHoveredItem(null)}
                         onClick={onNavigate}
                         progressColor={
-                          col.id === "done" ? "teal" : col.id === "in-progress" ? "orange" : "gray"
+                          col.id === "done"
+                            ? "teal"
+                            : col.id === "in-progress"
+                              ? "orange"
+                              : "gray"
                         }
                       />
                     </motion.div>

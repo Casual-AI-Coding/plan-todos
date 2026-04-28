@@ -1,6 +1,10 @@
 "use client";
 
-import { StaggeredList, StaggeredListItem, HoverCard } from "@/components/ui/animations";
+import {
+  StaggeredList,
+  StaggeredListItem,
+  HoverCard,
+} from "@/components/ui/animations";
 import { EntityCountCard } from "@/components/features/EntityCountCard";
 
 interface EntityCountsRowProps {

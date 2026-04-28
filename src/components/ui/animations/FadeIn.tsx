@@ -6,7 +6,14 @@ import { ReactNode } from "react";
 interface FadeInProps {
   children: ReactNode;
   className?: string;
-  direction?: "up" | "down" | "left" | "right" | "none" | "scale-up" | "scale-down";
+  direction?:
+    | "up"
+    | "down"
+    | "left"
+    | "right"
+    | "none"
+    | "scale-up"
+    | "scale-down";
   delay?: number;
   duration?: number;
 }

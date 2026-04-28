@@ -58,11 +58,7 @@ export function ActiveMilestonesCard({
                 {milestone.progress}%
               </span>
             </div>
-            <ProgressBar
-              value={milestone.progress}
-              color="teal"
-              size="sm"
-            />
+            <ProgressBar value={milestone.progress} color="teal" size="sm" />
           </motion.div>
         ))}
       </div>

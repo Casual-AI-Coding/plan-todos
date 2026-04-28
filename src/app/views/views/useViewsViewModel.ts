@@ -51,7 +51,8 @@ export function useViewsViewModel(): ViewsViewModel {
   const { data: todos = [], isLoading: todosLoading } = useTodos();
   const { data: plans = [], isLoading: plansLoading } = usePlans();
   const { data: targets = [], isLoading: targetsLoading } = useTargets();
-  const { data: milestones = [], isLoading: milestonesLoading } = useMilestones();
+  const { data: milestones = [], isLoading: milestonesLoading } =
+    useMilestones();
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks();
 
   const tasksByPlan = useMemo(() => {
@@ -113,7 +114,11 @@ export function useViewsViewModel(): ViewsViewModel {
   );
 
   const isLoading =
-    todosLoading || plansLoading || targetsLoading || milestonesLoading || tasksLoading;
+    todosLoading ||
+    plansLoading ||
+    targetsLoading ||
+    milestonesLoading ||
+    tasksLoading;
 
   return {
     viewMode,
