@@ -118,44 +118,28 @@ describe("API Functions - Read operations (non-Tauri)", () => {
     );
   });
 
-  it("getTasks returns empty array when not in Tauri", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await getTasks();
-    expect(result).toEqual([]);
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getTasks throws error when not in Tauri", async () => {
+    await expect(getTasks()).rejects.toThrow(
+      "This app must run in Tauri to get tasks",
     );
-    loggerSpy.mockRestore();
   });
 
-  it("getTasksByPlan returns empty array when not in Tauri", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await getTasksByPlan("plan-1");
-    expect(result).toEqual([]);
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getTasksByPlan throws error when not in Tauri", async () => {
+    await expect(getTasksByPlan("plan-1")).rejects.toThrow(
+      "This app must run in Tauri to get tasks by plan",
     );
-    loggerSpy.mockRestore();
   });
 
-  it("getTargets returns empty array when not in Tauri", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await getTargets();
-    expect(result).toEqual([]);
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getTargets throws error when not in Tauri", async () => {
+    await expect(getTargets()).rejects.toThrow(
+      "此操作需要在 Tauri 环境中运行: 获取 Target 列表",
     );
-    loggerSpy.mockRestore();
   });
 
-  it("getSteps returns empty array when not in Tauri", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await getSteps("target-1");
-    expect(result).toEqual([]);
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getSteps throws error when not in Tauri", async () => {
+    await expect(getSteps("target-1")).rejects.toThrow(
+      "This app must run in Tauri to get steps",
     );
-    loggerSpy.mockRestore();
   });
 
   it("getTodos throws error when not in Tauri", async () => {
@@ -164,14 +148,10 @@ describe("API Functions - Read operations (non-Tauri)", () => {
     );
   });
 
-  it("getMilestones returns empty array when not in Tauri", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await getMilestones();
-    expect(result).toEqual([]);
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
+  it("getMilestones throws error when not in Tauri", async () => {
+    await expect(getMilestones()).rejects.toThrow(
+      "This app must run in Tauri to get milestones",
     );
-    loggerSpy.mockRestore();
   });
 });
 
@@ -368,17 +348,10 @@ describe("API Functions - Dashboard (non-Tauri)", () => {
     });
   });
 
-  it("getDashboard returns mock data when not in Tauri", async () => {
-    const dashboard = await getDashboard();
-    expect(dashboard).toHaveProperty("today_todos");
-    expect(dashboard).toHaveProperty("overdue_todos");
-    expect(dashboard).toHaveProperty("completed_today");
-    expect(dashboard).toHaveProperty("active_plans");
-    expect(dashboard).toHaveProperty("active_targets");
-    expect(dashboard).toHaveProperty("active_milestones");
-    expect(dashboard).toHaveProperty("overview");
-    expect(dashboard.overview).toHaveProperty("today_todos_count");
-    expect(dashboard.overview).toHaveProperty("completed_today_count");
+  it("getDashboard throws error when not in Tauri", async () => {
+    await expect(getDashboard()).rejects.toThrow(
+      "This app must run in Tauri to get dashboard",
+    );
   });
 });
 
@@ -589,9 +562,10 @@ describe("API Functions - Tags (non-Tauri)", () => {
     });
   });
 
-  it("getTags returns empty array when not in Tauri", async () => {
-    const tags = await getTags();
-    expect(tags).toEqual([]);
+  it("getTags throws error when not in Tauri", async () => {
+    await expect(getTags()).rejects.toThrow(
+      "This app must run in Tauri to get tags",
+    );
   });
 
   it("createTag rejects when not in Tauri", async () => {
@@ -612,9 +586,10 @@ describe("API Functions - Tags (non-Tauri)", () => {
     );
   });
 
-  it("getEntityTags returns empty array when not in Tauri", async () => {
-    const tags = await getEntityTags("todo", "entity-1");
-    expect(tags).toEqual([]);
+  it("getEntityTags throws error when not in Tauri", async () => {
+    await expect(getEntityTags("todo", "entity-1")).rejects.toThrow(
+      "This app must run in Tauri to get entity tags",
+    );
   });
 
   it("setEntityTags rejects when not in Tauri", async () => {
@@ -623,9 +598,10 @@ describe("API Functions - Tags (non-Tauri)", () => {
     );
   });
 
-  it("getEntitiesByTag returns empty array when not in Tauri", async () => {
-    const entities = await getEntitiesByTag("todo", ["tag-1"]);
-    expect(entities).toEqual([]);
+  it("getEntitiesByTag throws error when not in Tauri", async () => {
+    await expect(getEntitiesByTag("todo", ["tag-1"])).rejects.toThrow(
+      "This app must run in Tauri to get entities by tag",
+    );
   });
 });
 
@@ -872,9 +848,10 @@ describe("API Functions - Notification Plugins (non-Tauri)", () => {
     });
   });
 
-  it("getNotificationPlugins returns empty array when not in Tauri", async () => {
-    const result = await getNotificationPlugins();
-    expect(result).toEqual([]);
+  it("getNotificationPlugins throws error when not in Tauri", async () => {
+    await expect(getNotificationPlugins()).rejects.toThrow(
+      "This app must run in Tauri to get notification plugins",
+    );
   });
 
   it("createNotificationPlugin throws error when not in Tauri", async () => {
