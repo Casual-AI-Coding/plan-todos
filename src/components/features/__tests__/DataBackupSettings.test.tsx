@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { DataBackupSettings } from "../DataBackupSettings";
 
@@ -10,17 +10,20 @@ vi.mock("@/components/ui/Button", () => ({
       onClick,
       variant,
       className,
+      disabled,
       ...props
     }: {
       children: React.ReactNode;
       onClick?: () => void;
       variant?: string;
       className?: string;
+      disabled?: boolean;
     }) => (
       <button
         data-testid="button"
         data-variant={variant}
         className={className}
+        disabled={disabled}
         onClick={onClick}
         {...props}
       >
@@ -30,353 +33,148 @@ vi.mock("@/components/ui/Button", () => ({
   ),
 }));
 
-// Mock Input component
-vi.mock("@/components/ui/Input", () => ({
-  Input: vi.fn(
-    ({
-      value,
-      onChange,
-      placeholder,
-      className,
-      ...props
-    }: {
-      value: string;
-      onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-      placeholder?: string;
-      className?: string;
-    }) => (
-      <input
-        data-testid="input"
-        type="text"
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={className}
-        {...props}
-      />
-    ),
-  ),
-}));
-
 describe("DataBackupSettings", () => {
-  const mockOnAutoBackupChange = vi.fn();
-  const mockOnBackupPathChange = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe("渲染测试", () => {
     it("组件正确渲染", () => {
-      const { container } = render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
+      const { container } = render(<DataBackupSettings />);
       expect(container.firstChild).toBeInTheDocument();
     });
 
-    it("渲染自动备份开关", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      expect(screen.getByText("自动备份")).toBeInTheDocument();
-    });
-
-    it("渲染备份路径输入框", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      expect(screen.getByText("备份路径")).toBeInTheDocument();
-    });
-
     it("渲染导出和导入按钮", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
+      render(<DataBackupSettings />);
 
       expect(screen.getByText("导出数据 (JSON)")).toBeInTheDocument();
       expect(screen.getByText("导入数据")).toBeInTheDocument();
     });
-  });
 
-  describe("自动备份开关", () => {
-    it("autoBackup=true 时开关选中", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={true}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
-    });
-
-    it("autoBackup=false 时开关未选中", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
-      expect(checkbox.checked).toBe(false);
-    });
-
-    it("点击开关触发 onAutoBackupChange", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const checkbox = screen.getByRole("checkbox");
-      fireEvent.click(checkbox);
-
-      expect(mockOnAutoBackupChange).toHaveBeenCalledWith(true);
-    });
-
-    it("显示自动备份说明", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      expect(screen.getByText("每次打开应用时自动备份")).toBeInTheDocument();
-    });
-  });
-
-  describe("备份路径", () => {
-    it("显示当前备份路径", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/custom/backup/path"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const input = screen.getByTestId("input") as HTMLInputElement;
-      expect(input.value).toBe("/custom/backup/path");
-    });
-
-    it("显示正确的 placeholder", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath=""
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const input = screen.getByTestId("input") as HTMLInputElement;
-      expect(input.placeholder).toBe("选择备份目录...");
-    });
-
-    it("输入变化时触发 onBackupPathChange", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath=""
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const input = screen.getByTestId("input");
-      fireEvent.change(input, { target: { value: "/new/path" } });
-
-      expect(mockOnBackupPathChange).toHaveBeenCalledWith("/new/path");
-    });
-
-    it("渲染浏览按钮", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      expect(screen.getByText("浏览")).toBeInTheDocument();
-    });
-  });
-
-  describe("导出导入按钮", () => {
-    it("导出按钮有 flex-1 className", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
+    it("没有 onExport 时导出按钮禁用", () => {
+      render(<DataBackupSettings />);
 
       const exportButton = screen.getByText("导出数据 (JSON)");
-      expect(exportButton).toHaveClass("flex-1");
+      expect(exportButton).toBeDisabled();
     });
 
-    it("导入按钮有 flex-1 className", () => {
+    it("没有 onImport 时导入按钮禁用", () => {
+      render(<DataBackupSettings />);
+
+      const importButton = screen.getByText("导入数据");
+      expect(importButton).toBeDisabled();
+    });
+
+    it("提供回调时按钮可用", () => {
       render(
         <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
+          onExport={vi.fn()}
+          onImport={vi.fn()}
         />,
       );
 
+      expect(screen.getByText("导出数据 (JSON)")).not.toBeDisabled();
+      expect(screen.getByText("导入数据")).not.toBeDisabled();
+    });
+  });
+
+  describe("导出功能", () => {
+    it("点击导出按钮调用 onExport", async () => {
+      const mockExport = vi.fn().mockResolvedValue(undefined);
+      render(<DataBackupSettings onExport={mockExport} />);
+
+      fireEvent.click(screen.getByText("导出数据 (JSON)"));
+
+      await waitFor(() => {
+        expect(mockExport).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it("导出成功显示成功消息", async () => {
+      const mockExport = vi.fn().mockResolvedValue(undefined);
+      render(<DataBackupSettings onExport={mockExport} />);
+
+      fireEvent.click(screen.getByText("导出数据 (JSON)"));
+
+      await waitFor(() => {
+        expect(screen.getByText("导出成功")).toBeInTheDocument();
+      });
+    });
+
+    it("导出失败显示错误消息", async () => {
+      const mockExport = vi
+        .fn()
+        .mockRejectedValue(new Error("导出出错"));
+      render(<DataBackupSettings onExport={mockExport} />);
+
+      fireEvent.click(screen.getByText("导出数据 (JSON)"));
+
+      await waitFor(() => {
+        expect(screen.getByText("导出失败: 导出出错")).toBeInTheDocument();
+      });
+    });
+
+    it("导出中显示加载状态", async () => {
+      let resolveExport: () => void;
+      const exportPromise = new Promise<void>((resolve) => {
+        resolveExport = resolve;
+      });
+      const mockExport = vi.fn().mockReturnValue(exportPromise);
+      render(<DataBackupSettings onExport={mockExport} />);
+
+      fireEvent.click(screen.getByText("导出数据 (JSON)"));
+
+      await waitFor(() => {
+        expect(screen.getByText("导出中...")).toBeInTheDocument();
+      });
+
+      resolveExport!();
+    });
+  });
+
+  describe("导入功能", () => {
+    it("导入按钮点击触发文件选择", () => {
+      const mockImport = vi.fn();
+      render(<DataBackupSettings onImport={mockImport} />);
+
+      const fileInput = document.querySelector(
+        'input[type="file"]',
+      ) as HTMLInputElement;
+      const clickSpy = vi.spyOn(fileInput, "click");
+
+      fireEvent.click(screen.getByText("导入数据"));
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    it("没有 onImport 时导入按钮禁用", () => {
+      render(<DataBackupSettings />);
+
       const importButton = screen.getByText("导入数据");
-      expect(importButton).toHaveClass("flex-1");
+      expect(importButton).toBeDisabled();
+    });
+  });
+
+  describe("布局测试", () => {
+    it("使用 space-y-3 布局", () => {
+      const { container } = render(<DataBackupSettings />);
+
+      const containerDiv = container.firstChild;
+      expect(containerDiv).toHaveClass("space-y-3");
     });
 
     it("导出按钮是 secondary 变体", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
+      render(<DataBackupSettings />);
 
       const exportButton = screen.getByText("导出数据 (JSON)");
       expect(exportButton).toHaveAttribute("data-variant", "secondary");
     });
 
     it("导入按钮是 secondary 变体", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
+      render(<DataBackupSettings />);
 
       const importButton = screen.getByText("导入数据");
       expect(importButton).toHaveAttribute("data-variant", "secondary");
-    });
-  });
-
-  describe("布局测试", () => {
-    it("使用 space-y-4 布局", () => {
-      const { container } = render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const containerDiv = container.firstChild;
-      expect(containerDiv).toHaveClass("space-y-4");
-    });
-
-    it("备份路径部分有 flex gap-2", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath="/backup"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      const buttonsContainer =
-        screen.getByText("导出数据 (JSON)").parentElement;
-      expect(buttonsContainer).toHaveClass("flex");
-      expect(buttonsContainer).toHaveClass("gap-3");
-    });
-  });
-
-  describe("组合场景", () => {
-    it("完整配置渲染正确", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={true}
-          backupPath="/home/user/backups"
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      // 验证所有元素都存在
-      expect(screen.getByText("自动备份")).toBeInTheDocument();
-      expect(screen.getByText("备份路径")).toBeInTheDocument();
-      expect(screen.getByText("导出数据 (JSON)")).toBeInTheDocument();
-      expect(screen.getByText("导入数据")).toBeInTheDocument();
-
-      // 验证开关状态
-      const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
-
-      // 验证输入框值
-      const input = screen.getByTestId("input") as HTMLInputElement;
-      expect(input.value).toBe("/home/user/backups");
-    });
-
-    it("空配置渲染正确", () => {
-      render(
-        <DataBackupSettings
-          autoBackup={false}
-          backupPath=""
-          onAutoBackupChange={mockOnAutoBackupChange}
-          onBackupPathChange={mockOnBackupPathChange}
-        />,
-      );
-
-      // 验证所有元素都存在
-      expect(screen.getByText("自动备份")).toBeInTheDocument();
-      expect(screen.getByText("备份路径")).toBeInTheDocument();
-      expect(screen.getByText("导出数据 (JSON)")).toBeInTheDocument();
-      expect(screen.getByText("导入数据")).toBeInTheDocument();
-
-      // 验证开关状态
-      const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
-      expect(checkbox.checked).toBe(false);
-
-      // 验证输入框为空
-      const input = screen.getByTestId("input") as HTMLInputElement;
-      expect(input.value).toBe("");
     });
   });
 });
