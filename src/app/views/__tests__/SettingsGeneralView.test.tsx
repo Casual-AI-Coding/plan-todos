@@ -7,10 +7,29 @@ import { ToastProvider } from "@/components/ui/Toast";
 vi.mock("@/lib/api", () => ({
   seedTestData: vi.fn(),
   resetData: vi.fn(),
+  exportData: vi.fn(),
+  importData: vi.fn(),
 }));
 
 vi.mock("@/components/features", () => ({
   ThemeSelector: () => <div data-testid="theme-selector">Theme Selector</div>,
+  DataBackupSettings: ({
+    onExport,
+    onImport,
+  }: {
+    onExport?: () => Promise<void>;
+    onImport?: (file: File) => Promise<void>;
+  }) => (
+    <div data-testid="data-backup-settings">
+      Data Backup Settings
+      <button data-testid="mock-export" onClick={() => onExport?.()}>
+        Export
+      </button>
+      <button data-testid="mock-import" onClick={() => onImport?.(new File([], "test.json"))}>
+        Import
+      </button>
+    </div>
+  ),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
@@ -90,5 +109,11 @@ describe("SettingsGeneralView", () => {
   it("renders restore default hotkeys button", () => {
     renderWithProvider(<SettingsGeneralView />);
     expect(screen.getByText("恢复默认")).toBeInTheDocument();
+  });
+
+  it("renders data backup section", () => {
+    renderWithProvider(<SettingsGeneralView />);
+    expect(screen.getByText("数据备份")).toBeInTheDocument();
+    expect(screen.getByTestId("data-backup-settings")).toBeInTheDocument();
   });
 });

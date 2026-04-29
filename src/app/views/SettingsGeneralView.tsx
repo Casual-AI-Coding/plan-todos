@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui";
-import { ThemeSelector } from "@/components/features";
+import { ThemeSelector, DataBackupSettings } from "@/components/features";
 import { useFontSettings } from "@/hooks/useFontSettings";
+import { exportData, importData, type ExportData, type ImportResult } from "@/lib/api";
 import {
   useHotkeyStore,
   DEFAULT_HOTKEYS,
@@ -454,7 +455,37 @@ export function SettingsGeneralView() {
               <option value="en">English</option>
             </select>
           </div>
-        </div>
+          </div>
+        </Card>
+
+      {/* Data Backup */}
+      <Card className="mb-6">
+        <h3 className="font-medium mb-4" style={{ color: "var(--color-text)" }}>
+          数据备份
+        </h3>
+        <DataBackupSettings
+          onExport={async () => {
+            const data = await exportData();
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `plan-todos-backup-${new Date().toISOString().split("T")[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }}
+          onImport={async (file: File) => {
+            const text = await file.text();
+            const data = JSON.parse(text) as ExportData;
+            const result = (await importData(data, "update")) as ImportResult;
+            if (result.imported > 0) {
+              setTimeout(() => window.location.reload(), 1500);
+            }
+          }}
+        />
       </Card>
 
       {/* Hotkeys */}
