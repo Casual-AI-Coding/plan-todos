@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { logger } from "@/lib/utils/logger";
 import type { Statistics } from "@/lib/types";
 import { getStatistics } from "./statistics";
 
@@ -34,90 +33,10 @@ describe("getStatistics", () => {
   // Non-Tauri Environment Tests
   // ==========================================================================
   describe("Non-Tauri environment", () => {
-    it("returns mock data when not in Tauri environment", async () => {
-      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-      const result = await getStatistics();
-
-      // Verify counts structure
-      expect(result).toHaveProperty("counts");
-      expect(result.counts).toHaveProperty("todo");
-      expect(result.counts).toHaveProperty("plan");
-      expect(result.counts).toHaveProperty("task");
-      expect(result.counts).toHaveProperty("target");
-      expect(result.counts).toHaveProperty("step");
-      expect(result.counts).toHaveProperty("milestone");
-
-      // All counts should be 0 in mock
-      expect(result.counts.todo).toBe(0);
-      expect(result.counts.plan).toBe(0);
-      expect(result.counts.task).toBe(0);
-      expect(result.counts.target).toBe(0);
-      expect(result.counts.step).toBe(0);
-      expect(result.counts.milestone).toBe(0);
-
-      // Verify completion structure
-      expect(result).toHaveProperty("completion");
-      expect(result.completion).toHaveProperty("todo_done");
-      expect(result.completion).toHaveProperty("todo_total");
-      expect(result.completion).toHaveProperty("task_done");
-      expect(result.completion).toHaveProperty("task_total");
-      expect(result.completion).toHaveProperty("step_completed");
-      expect(result.completion).toHaveProperty("step_total");
-      expect(result.completion).toHaveProperty("milestone_done");
-      expect(result.completion).toHaveProperty("milestone_total");
-      expect(result.completion).toHaveProperty("todo_completion_rate");
-      expect(result.completion).toHaveProperty("task_completion_rate");
-      expect(result.completion).toHaveProperty("step_completion_rate");
-      expect(result.completion).toHaveProperty("milestone_completion_rate");
-
-      // All completion values should be 0 in mock
-      expect(result.completion.todo_done).toBe(0);
-      expect(result.completion.todo_total).toBe(0);
-      expect(result.completion.task_done).toBe(0);
-      expect(result.completion.task_total).toBe(0);
-      expect(result.completion.step_completed).toBe(0);
-      expect(result.completion.step_total).toBe(0);
-      expect(result.completion.milestone_done).toBe(0);
-      expect(result.completion.milestone_total).toBe(0);
-      expect(result.completion.todo_completion_rate).toBe(0);
-      expect(result.completion.task_completion_rate).toBe(0);
-      expect(result.completion.step_completion_rate).toBe(0);
-      expect(result.completion.milestone_completion_rate).toBe(0);
-
-      // Verify trends structure
-      expect(result).toHaveProperty("trends");
-      expect(result.trends).toHaveProperty("daily");
-      expect(result.trends.daily).toEqual([]);
-
-      // Verify efficiency structure
-      expect(result).toHaveProperty("efficiency");
-      expect(result.efficiency).toHaveProperty("streak_days");
-      expect(result.efficiency).toHaveProperty("today_completed");
-      expect(result.efficiency).toHaveProperty("week_completed");
-      expect(result.efficiency).toHaveProperty("month_completed");
-      expect(result.efficiency).toHaveProperty("productivity_score");
-
-      // All efficiency values should be 0 in mock
-      expect(result.efficiency.streak_days).toBe(0);
-      expect(result.efficiency.today_completed).toBe(0);
-      expect(result.efficiency.week_completed).toBe(0);
-      expect(result.efficiency.month_completed).toBe(0);
-      expect(result.efficiency.productivity_score).toBe(0);
-
-      // Verify warning was logged
-      expect(loggerSpy).toHaveBeenCalledWith(
-        "Running outside Tauri - returning mock data",
+    it("throws error when not in Tauri environment", async () => {
+      await expect(getStatistics()).rejects.toThrow(
+        "This app must run in Tauri to get statistics",
       );
-      loggerSpy.mockRestore();
-    });
-
-    it("logs warning when not in Tauri environment", async () => {
-      const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-      await getStatistics();
-      expect(loggerSpy).toHaveBeenCalledWith(
-        "Running outside Tauri - returning mock data",
-      );
-      loggerSpy.mockRestore();
     });
   });
 

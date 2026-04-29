@@ -24,42 +24,11 @@ describe("Dashboard API", () => {
   });
 
   describe("getDashboard", () => {
-    it("should return mock data when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-
-      const result = await getDashboard();
-
-      expect(result).toEqual({
-        overview: {
-          today_todos_count: 0,
-          upcoming_3days_count: 0,
-          completed_today_count: 0,
-          overdue_count: 0,
-          streak_days: 0,
-          productivity_score: 0,
-        },
-        week: { completed_count: 0 },
-        counts: {
-          todo: 0,
-          plan: 0,
-          task: 0,
-          target: 0,
-          step: 0,
-          milestone: 0,
-          circulation: 0,
-        },
-        circulation_stats: {
-          today_pending: 0,
-          today_completed: 0,
-          current_streak: 0,
-        },
-        today_todos: [],
-        overdue_todos: [],
-        completed_today: [],
-        active_plans: [],
-        active_targets: [],
-        active_milestones: [],
-      });
+      await expect(getDashboard()).rejects.toThrow(
+        "This app must run in Tauri to get dashboard",
+      );
       expect(mockInvoke).not.toHaveBeenCalled();
     });
 

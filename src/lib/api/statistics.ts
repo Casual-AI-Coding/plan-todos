@@ -5,17 +5,11 @@
  */
 
 import type { Statistics } from "@/lib/types";
-import { MOCK_STATISTICS_DATA } from "./constants";
-import { withTauriFallback } from "./utils";
+import { withTauriError } from "./utils";
 
 export async function getStatistics(): Promise<Statistics> {
-  return withTauriFallback(
-    "statistics",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Statistics>("get_statistics");
-    },
-    MOCK_STATISTICS_DATA,
-    "Running outside Tauri - returning mock data",
-  );
+  return withTauriError("get statistics", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Statistics>("get_statistics");
+  });
 }
