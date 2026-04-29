@@ -9,7 +9,7 @@ import type {
   CreateMilestoneParams,
   UpdateMilestoneParams,
 } from "@/lib/types";
-import { withTauriError, withTauriFallback } from "./utils";
+import { withTauriError } from "./utils";
 
 export async function getMilestone(id: string): Promise<Milestone> {
   return withTauriError("get milestones", async () => {
@@ -19,29 +19,21 @@ export async function getMilestone(id: string): Promise<Milestone> {
 }
 
 export async function getMilestones(): Promise<Milestone[]> {
-  return withTauriFallback(
-    "milestones",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Milestone[]>("get_milestones");
-    },
-    [],
-  );
+  return withTauriError("get milestones", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Milestone[]>("get_milestones");
+  });
 }
 
 export async function getMilestonesByTarget(
   targetId: string,
 ): Promise<Milestone[]> {
-  return withTauriFallback(
-    "milestones by target",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Milestone[]>("get_milestones_by_target", {
-        target_id: targetId,
-      });
-    },
-    [],
-  );
+  return withTauriError("get milestones by target", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Milestone[]>("get_milestones_by_target", {
+      target_id: targetId,
+    });
+  });
 }
 
 export async function createMilestone(

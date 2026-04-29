@@ -73,11 +73,11 @@ describe("Milestone API", () => {
   });
 
   describe("getMilestones", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getMilestones();
-      expect(result).toEqual([]);
-      expect(mockInvoke).not.toHaveBeenCalled();
+      await expect(getMilestones()).rejects.toThrow(
+        "This app must run in Tauri to get milestones",
+      );
     });
 
     it("should call invoke with get_milestones command when in Tauri", async () => {
@@ -105,10 +105,11 @@ describe("Milestone API", () => {
   });
 
   describe("getMilestonesByTarget", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getMilestonesByTarget("target-1");
-      expect(result).toEqual([]);
+      await expect(getMilestonesByTarget("target-1")).rejects.toThrow(
+        "This app must run in Tauri to get milestones by target",
+      );
     });
 
     it("should call invoke with get_milestones_by_target command", async () => {

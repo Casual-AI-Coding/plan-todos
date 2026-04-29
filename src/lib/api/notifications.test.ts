@@ -251,10 +251,11 @@ describe("Notification API", () => {
   });
 
   describe("getNotificationPlugins", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getNotificationPlugins();
-      expect(result).toEqual([]);
+      await expect(getNotificationPlugins()).rejects.toThrow(
+        "This app must run in Tauri to get notification plugins",
+      );
     });
 
     it("should call invoke with get_notification_plugins command", async () => {

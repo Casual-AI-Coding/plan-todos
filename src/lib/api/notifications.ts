@@ -21,7 +21,7 @@ import type {
   GlobalCirculationNotificationSettingsInput,
   CirculationWithNotificationSettings,
 } from "@/lib/types";
-import { withTauriError, withTauriFallback } from "./utils";
+import { withTauriError } from "./utils";
 
 export async function getNotificationSettings(
   entityType: string,
@@ -172,14 +172,10 @@ export async function resetGlobalNotificationSettings(): Promise<GlobalNotificat
 // Notification Plugin APIs
 
 export async function getNotificationPlugins(): Promise<NotificationPlugin[]> {
-  return withTauriFallback(
-    "get notification plugins",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<NotificationPlugin[]>("get_notification_plugins");
-    },
-    [],
-  );
+  return withTauriError("get notification plugins", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<NotificationPlugin[]>("get_notification_plugins");
+  });
 }
 
 export async function createNotificationPlugin(
