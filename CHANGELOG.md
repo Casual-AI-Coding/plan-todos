@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2] - 2026-04-29
+
+### Refactored
+
+**API 层 Fail-Fast 重构**:
+
+- 重构所有 API 模块（search, milestones, notifications, tasks, steps, tags, targets, statistics, dashboard）：当 Tauri 不可用时快速失败，不再使用 mock 数据降级
+- 删除 `lib/api/constants.ts` mock 数据常量文件（45 行）
+- 删除 `lib/api/utils.ts` fallback 工具函数（37 行）
+- 删除 `lib/api/utils.test.ts` 测试文件（100 行）
+- 更新所有 API 模块的测试文件以适配新的 fail-fast 行为
+- 新增 barrel API 测试文件 `lib/api.test.ts` 验证 fail-fast 行为
+
+**Settings 页面 DataBackupSettings 重构**:
+
+- 重构 `DataBackupSettings.tsx` 组件，添加 export/import 回调函数集成
+- 将 `DataBackupSettings` 整合到 `SettingsGeneralView` 通用设置页面
+- 更新 `DataBackupSettings.test.tsx` 测试文件以适配新的组件结构
+
+### UI/UX
+
+**Dashboard 和 ViewsView 第三轮微交互与动画**:
+
+- **FadeIn 组件**: 新增 `scale-up` 和 `scale-down` 方向变体
+- **StaggeredList 组件**: 修正 stagger 行为，添加 `staggerDelay` 自定义参数和 `customKey` 支持
+- **Checkbox 组件**: 添加 Framer Motion 动画，勾选时有弹性动画（spring bounce），hover 时 scale(1.05)
+- **ProgressBar 组件**: 添加 Framer Motion，进度变化时使用弹性动画
+- **SectionCard 组件**: 添加 hover lift 效果和卡片入场动画
+- **TodayTodosCard 组件**: 优化列表项入场动画、交互动画和删除动画
+- **OverdueTodosCard 组件**: 添加红色脉冲动画提示
+- **ActivePlansCard/ActiveTargetsCard/ActiveMilestonesCard 组件**: 统一使用 StaggeredList，添加 hover lift 效果
+- **EntityCard 组件**: 统一卡片动画封装
+- **ViewsBoard 组件**: Kanban column 动画优化
+- **ViewsCalendar 组件**: Calendar cell 动画优化
+- **ViewsGantt 组件**: Gantt bar 动画优化
+- **ItemTooltip 组件**: Tooltip 动画增强
+
+**Views 视图增强**:
+
+- 优化 `ViewsCalendar.tsx`：启用 hover tooltip，添加日期格子点击，增加 "+N" 溢出提示
+- 优化 `ViewsList.tsx`：添加点击导航，使用 Badge 组件替代内联样式
+- 优化 `ViewsGantt.tsx`：渲染 tasks（按 plan 分组），添加 tooltip 悬停，月份中文显示
+- 优化 `ViewsBoard.tsx`：使用 Tailwind scrollbar-hide，移除 `<style jsx global>`
+
+---
+
 ## [0.9.1] - 2026-04-28
 
 ### Refactored
