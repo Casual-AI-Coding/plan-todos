@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { logger } from "@/lib/utils/logger";
 import {
   ensureTauri,
   withTauriError,
-  withTauriFallback,
   isTauri,
 } from "./utils";
 
@@ -117,104 +115,6 @@ describe("withTauriError", () => {
         throw new Error("错误");
       }),
     ).rejects.toThrow("操作失败: 错误");
-  });
-});
-
-// ============================================================================
-// withTauriFallback Tests
-// ============================================================================
-describe("withTauriFallback", () => {
-  const originalWindow = global.window;
-
-  beforeEach(() => {
-    Object.defineProperty(global, "window", {
-      value: {},
-      writable: true,
-    });
-  });
-
-  afterEach(() => {
-    global.window = originalWindow;
-  });
-
-  it("returns default value when not in Tauri environment", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await withTauriFallback(
-      "test operation",
-      async () => "success",
-      "default",
-    );
-    expect(result).toBe("default");
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
-    );
-    loggerSpy.mockRestore();
-  });
-
-  it("uses custom fallback message when provided", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    const result = await withTauriFallback(
-      "test operation",
-      async () => "success",
-      "default",
-      "Custom fallback message",
-    );
-    expect(result).toBe("default");
-    expect(loggerSpy).toHaveBeenCalledWith("Custom fallback message");
-    loggerSpy.mockRestore();
-  });
-
-  it("returns result when in Tauri environment and success", async () => {
-    (global.window as Window & { __TAURI__?: object }).__TAURI__ = {};
-    const result = await withTauriFallback(
-      "test operation",
-      async () => "success",
-      "default",
-    );
-    expect(result).toBe("success");
-  });
-
-  it("throws error when in Tauri environment and function fails", async () => {
-    (global.window as Window & { __TAURI__?: object }).__TAURI__ = {};
-    await expect(
-      withTauriFallback(
-        "test operation",
-        async () => {
-          throw new Error("Original error");
-        },
-        "default",
-      ),
-    ).rejects.toThrow("Operation failed: Original error");
-  });
-
-  it("does not warn when in Tauri environment", async () => {
-    (global.window as Window & { __TAURI__?: object }).__TAURI__ = {};
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    await withTauriFallback("test operation", async () => "success", "default");
-    expect(loggerSpy).not.toHaveBeenCalled();
-    loggerSpy.mockRestore();
-  });
-
-  it("handles null error in Tauri environment", async () => {
-    (global.window as Window & { __TAURI__?: object }).__TAURI__ = {};
-    await expect(
-      withTauriFallback(
-        "test operation",
-        async () => {
-          throw null;
-        },
-        "default",
-      ),
-    ).rejects.toThrow("Null error");
-  });
-
-  it("handles Chinese operation name in fallback", async () => {
-    const loggerSpy = vi.spyOn(logger, "warn").mockImplementation(() => {});
-    await withTauriFallback("测试操作", async () => "success", "默认值");
-    expect(loggerSpy).toHaveBeenCalledWith(
-      "Running outside Tauri - data not available",
-    );
-    loggerSpy.mockRestore();
   });
 });
 

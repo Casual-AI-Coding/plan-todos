@@ -5,7 +5,6 @@
  */
 
 import { isTauri as checkTauri, invoke as tauriInvoke } from "./client";
-import { logger } from "@/lib/utils/logger";
 
 // Re-export isTauri for convenience
 export const isTauri = checkTauri;
@@ -46,42 +45,6 @@ export async function withTauriError<T>(
   fn: () => Promise<T>,
 ): Promise<T> {
   ensureTauri(operation);
-  try {
-    return await fn();
-  } catch (error: unknown) {
-    // Convert null/undefined to Error for consistent handling
-    if (error === null || error === undefined) {
-      throw new Error(error === null ? "Null error" : "Undefined error");
-    }
-    const prefix = isChineseOperation(operation)
-      ? "操作失败"
-      : "Operation failed";
-    throw new Error(
-      `${prefix}: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-}
-
-/**
- * Wrap Tauri API calls with fallback to default value when not in Tauri.
- * @param operation - Description of the operation for error messages
- * @param fn - Async function to execute
- * @param defaultValue - Default value to return when not in Tauri
- * @param fallbackMessage - Optional custom warning message
- * @returns Result of the async function or default value
- */
-export async function withTauriFallback<T>(
-  operation: string,
-  fn: () => Promise<T>,
-  defaultValue: T,
-  fallbackMessage?: string,
-): Promise<T> {
-  if (!isTauri()) {
-    const message =
-      fallbackMessage ?? "Running outside Tauri - data not available";
-    logger.warn(message);
-    return defaultValue;
-  }
   try {
     return await fn();
   } catch (error: unknown) {
