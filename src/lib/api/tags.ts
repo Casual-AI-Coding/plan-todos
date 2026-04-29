@@ -5,7 +5,7 @@
  */
 
 import type { Tag, EntityType } from "@/lib/types";
-import { withTauriError, withTauriFallback } from "./utils";
+import { withTauriError } from "./utils";
 
 export async function getTag(id: string): Promise<Tag> {
   return withTauriError("get tag", async () => {
@@ -15,14 +15,10 @@ export async function getTag(id: string): Promise<Tag> {
 }
 
 export async function getTags(): Promise<Tag[]> {
-  return withTauriFallback(
-    "tags",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Tag[]>("get_tags");
-    },
-    [],
-  );
+  return withTauriError("get tags", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Tag[]>("get_tags");
+  });
 }
 
 export async function createTag(
@@ -66,14 +62,10 @@ export async function getEntityTags(
   entityType: EntityType,
   entityId: string,
 ): Promise<Tag[]> {
-  return withTauriFallback(
-    "entity tags",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Tag[]>("get_entity_tags", { entityType, entityId });
-    },
-    [],
-  );
+  return withTauriError("get entity tags", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Tag[]>("get_entity_tags", { entityType, entityId });
+  });
 }
 
 export async function setEntityTags(
@@ -91,12 +83,8 @@ export async function getEntitiesByTag(
   entityType: EntityType,
   tagIds: string[],
 ): Promise<string[]> {
-  return withTauriFallback(
-    "entities by tag",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<string[]>("get_entities_by_tag", { entityType, tagIds });
-    },
-    [],
-  );
+  return withTauriError("get entities by tag", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<string[]>("get_entities_by_tag", { entityType, tagIds });
+  });
 }

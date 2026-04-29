@@ -59,10 +59,11 @@ describe("Tag API", () => {
   });
 
   describe("getTags", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getTags();
-      expect(result).toEqual([]);
+      await expect(getTags()).rejects.toThrow(
+        "This app must run in Tauri to get tags",
+      );
     });
 
     it("should call invoke with get_tags command", async () => {
@@ -173,10 +174,11 @@ describe("Tag API", () => {
   });
 
   describe("getEntityTags", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getEntityTags("todo", "entity-1");
-      expect(result).toEqual([]);
+      await expect(getEntityTags("todo", "entity-1")).rejects.toThrow(
+        "This app must run in Tauri to get entity tags",
+      );
     });
 
     it("should call invoke with get_entity_tags command", async () => {
@@ -211,10 +213,11 @@ describe("Tag API", () => {
   });
 
   describe("getEntitiesByTag", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getEntitiesByTag("todo", ["tag-1"]);
-      expect(result).toEqual([]);
+      await expect(getEntitiesByTag("todo", ["tag-1"])).rejects.toThrow(
+        "This app must run in Tauri to get entities by tag",
+      );
     });
 
     it("should call invoke with get_entities_by_tag command", async () => {

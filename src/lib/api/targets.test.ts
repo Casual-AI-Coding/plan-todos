@@ -64,10 +64,11 @@ describe("Target API", () => {
   });
 
   describe("getTargets", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getTargets();
-      expect(result).toEqual([]);
+      await expect(getTargets()).rejects.toThrow(
+        "此操作需要在 Tauri 环境中运行: 获取 Target 列表",
+      );
     });
 
     it("should call invoke with get_targets command", async () => {

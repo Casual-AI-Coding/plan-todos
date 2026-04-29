@@ -3,7 +3,7 @@ import type {
   CreateTargetParams,
   UpdateTargetParams,
 } from "@/lib/types";
-import { invoke, withTauriError, withTauriFallback } from "./utils";
+import { invoke, withTauriError } from "./utils";
 
 export async function getTarget(id: string): Promise<Target> {
   return withTauriError("获取 Target", async () => {
@@ -12,13 +12,9 @@ export async function getTarget(id: string): Promise<Target> {
 }
 
 export async function getTargets(): Promise<Target[]> {
-  return withTauriFallback(
-    "获取 Target 列表",
-    async () => {
-      return invoke<Target[]>("get_targets");
-    },
-    [],
-  );
+  return withTauriError("获取 Target 列表", async () => {
+    return invoke<Target[]>("get_targets");
+  });
 }
 
 export async function createTarget(data: CreateTargetParams): Promise<Target> {
