@@ -5,21 +5,17 @@
  */
 
 import type { Step, CreateStepParams, UpdateStepParams } from "@/lib/types";
-import { withTauriError, withTauriFallback } from "./utils";
+import { withTauriError } from "./utils";
 
 export async function getSteps(targetId: string): Promise<Step[]> {
   return getStepsByTarget(targetId);
 }
 
 export async function getStepsByTarget(targetId: string): Promise<Step[]> {
-  return withTauriFallback(
-    "steps",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Step[]>("get_steps", { targetId });
-    },
-    [],
-  );
+  return withTauriError("get steps", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Step[]>("get_steps", { targetId });
+  });
 }
 
 export async function createStep(data: CreateStepParams): Promise<Step> {

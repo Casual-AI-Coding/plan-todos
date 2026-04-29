@@ -31,10 +31,11 @@ describe("Step API", () => {
   });
 
   describe("getSteps", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getSteps("target-1");
-      expect(result).toEqual([]);
+      await expect(getSteps("target-1")).rejects.toThrow(
+        "This app must run in Tauri to get steps",
+      );
     });
 
     it("should call getStepsByTarget internally", async () => {
@@ -63,10 +64,11 @@ describe("Step API", () => {
   });
 
   describe("getStepsByTarget", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getStepsByTarget("target-1");
-      expect(result).toEqual([]);
+      await expect(getStepsByTarget("target-1")).rejects.toThrow(
+        "This app must run in Tauri to get steps",
+      );
     });
 
     it("should call invoke with get_steps command", async () => {

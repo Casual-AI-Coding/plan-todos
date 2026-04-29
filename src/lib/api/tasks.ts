@@ -5,7 +5,7 @@
  */
 
 import type { Task, CreateTaskParams, UpdateTaskParams } from "@/lib/types";
-import { withTauriError, withTauriFallback } from "./utils";
+import { withTauriError } from "./utils";
 
 export async function getTask(id: string): Promise<Task> {
   return withTauriError("get tasks", async () => {
@@ -15,25 +15,17 @@ export async function getTask(id: string): Promise<Task> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  return withTauriFallback(
-    "tasks",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Task[]>("get_tasks");
-    },
-    [],
-  );
+  return withTauriError("get tasks", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Task[]>("get_tasks");
+  });
 }
 
 export async function getTasksByPlan(planId: string): Promise<Task[]> {
-  return withTauriFallback(
-    "tasks by plan",
-    async () => {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return invoke<Task[]>("get_tasks_by_plan", { plan_id: planId });
-    },
-    [],
-  );
+  return withTauriError("get tasks by plan", async () => {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<Task[]>("get_tasks_by_plan", { plan_id: planId });
+  });
 }
 
 export async function createTask(data: CreateTaskParams): Promise<Task> {

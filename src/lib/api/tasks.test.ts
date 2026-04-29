@@ -62,10 +62,11 @@ describe("Task API", () => {
   });
 
   describe("getTasks", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getTasks();
-      expect(result).toEqual([]);
+      await expect(getTasks()).rejects.toThrow(
+        "This app must run in Tauri to get tasks",
+      );
     });
 
     it("should call invoke with get_tasks command", async () => {
@@ -77,10 +78,11 @@ describe("Task API", () => {
   });
 
   describe("getTasksByPlan", () => {
-    it("should return empty array when not running in Tauri", async () => {
+    it("should throw error when not running in Tauri", async () => {
       vi.mocked(isTauri).mockReturnValue(false);
-      const result = await getTasksByPlan("plan-1");
-      expect(result).toEqual([]);
+      await expect(getTasksByPlan("plan-1")).rejects.toThrow(
+        "This app must run in Tauri to get tasks by plan",
+      );
     });
 
     it("should call invoke with get_tasks_by_plan command", async () => {
