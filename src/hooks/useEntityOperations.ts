@@ -1,5 +1,6 @@
 import { useToast } from "@/components/ui/Toast";
 import { createEntitySideEffects } from "@/domain/shared/entityOperations";
+import type { EntityReorderInput } from "@/domain/shared/entityReorder";
 import {
   setEntityTags,
   setNotificationSettings,
@@ -7,6 +8,11 @@ import {
 } from "@/lib/api";
 import type { EntityType } from "@/lib/types";
 import type { UseMutationResult } from "@tanstack/react-query";
+
+type ReorderMutation = {
+  readonly mutateAsync: (variables: EntityReorderInput) => Promise<unknown>;
+  readonly isPending: boolean;
+};
 
 const sideEffects = createEntitySideEffects({
   setEntityTags,
@@ -21,11 +27,7 @@ export interface EntityOperationsConfig<TEntity, TCreateInput, TUpdateInput> {
   createMutation: UseMutationResult<TEntity, Error, TCreateInput>;
   updateMutation: UseMutationResult<TEntity, Error, TUpdateInput>;
   deleteMutation: UseMutationResult<void, Error, string>;
-  reorderMutation?: UseMutationResult<
-    unknown,
-    Error,
-    Array<{ id: string; sort_order: number }>
-  >;
+  reorderMutation?: ReorderMutation;
   completedStatus: string;
   pendingStatus: string;
   messages: {

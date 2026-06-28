@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import type { UseMutationResult } from "@tanstack/react-query";
+import type { EntityReorderInput } from "@/domain/shared/entityReorder";
 import type { EntityType, NotificationSettings } from "@/lib/types";
 
 const { mockToast, mockSideEffects } = vi.hoisted(() => ({
@@ -67,7 +68,7 @@ function createConfig(overrides?: {
   reorderMutation?: UseMutationResult<
     unknown,
     Error,
-    Array<{ id: string; sort_order: number }>
+    EntityReorderInput
   >;
 }) {
   return {
@@ -87,7 +88,7 @@ function createConfig(overrides?: {
     }),
     reorderMutation: createMutationResult<
       unknown,
-      Array<{ id: string; sort_order: number }>
+      EntityReorderInput
     >(async (_orders) => undefined),
     completedStatus: "completed",
     pendingStatus: "pending",
@@ -344,7 +345,7 @@ describe("useEntityOperations", () => {
   it("reorders items and exposes pending state flags", async () => {
     const reorderMutation = createMutationResult<
       unknown,
-      Array<{ id: string; sort_order: number }>
+      EntityReorderInput
     >(async () => undefined, true);
     const config = createConfig({
       reorderMutation,
