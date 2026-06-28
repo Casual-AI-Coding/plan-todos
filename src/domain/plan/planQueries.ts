@@ -42,9 +42,9 @@ const {
     }
     return plan;
   },
-  apiUpdate: updatePlan,
+  apiUpdate: async ({ id, ...data }) => updatePlan(id, data),
   apiDelete: deletePlan,
-  apiReorder: reorderPlans,
+  apiReorder: async (orders) => reorderPlans([...orders]),
   customUpdateMutate: async ({ id, tagIds, ...data }) => {
     const plan = await updatePlan(id, data);
     if (tagIds !== undefined) {

@@ -45,7 +45,7 @@ const {
   apiGetAll: getCirculations,
   apiGetOne: getCirculation,
   apiCreate: createCirculation,
-  apiUpdate: updateCirculation,
+  apiUpdate: async ({ id, ...data }) => updateCirculation(id, data),
   apiDelete: deleteCirculation,
 });
 

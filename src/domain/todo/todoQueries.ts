@@ -24,9 +24,9 @@ const {
   apiGetAll: getTodos,
   apiGetOne: getTodo,
   apiCreate: createTodo,
-  apiUpdate: updateTodo,
+  apiUpdate: async ({ id, ...data }) => updateTodo(id, data),
   apiDelete: deleteTodo,
-  apiReorder: reorderTodos,
+  apiReorder: async (orders) => reorderTodos([...orders]),
 });
 
 export const todoKeys = {

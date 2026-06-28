@@ -11,7 +11,7 @@
  *     apiGetAll: getTodos,
  *     apiGetOne: getTodo,
  *     apiCreate: createTodo,
- *     apiUpdate: updateTodo,
+ *     apiUpdate: async ({ id, ...data }) => updateTodo(id, data),
  *     apiDelete: deleteTodo,
  *   });
  */
@@ -24,34 +24,43 @@ import {
   type UseMutationOptions,
 } from "@tanstack/react-query";
 
+import { EntityNotFoundError, MissingReorderApiError } from "./entityErrors";
+import { invalidateEntityLists, replaceEntityInList } from "./entityQueryCache";
+import { createEntityQueryKeys } from "./entityQueryKeys";
+import {
+  applyOptimisticReorder,
+  type EntityReorderInput,
+  type ReorderMutationContext,
+} from "./entityReorder";
+
 export interface EntityHookConfig<
   TEntity,
   TCreateInput,
   TUpdateInput,
-  TReorderInput = { id: string; sort_order: number }[],
+  TReorderInput = EntityReorderInput,
 > {
   /** Entity name used for query keys (e.g., "todos", "plans") */
-  entityName: string;
-  apiGetAll: () => Promise<TEntity[]>;
-  apiGetOne?: (id: string) => Promise<TEntity>;
-  apiCreate: (input: TCreateInput) => Promise<TEntity>;
-  apiUpdate: (id: string, data: Omit<TUpdateInput, "id">) => Promise<TEntity>;
-  apiDelete: (id: string) => Promise<void>;
-  apiReorder?: (orders: TReorderInput) => Promise<number>;
+  readonly entityName: string;
+  readonly apiGetAll: () => Promise<TEntity[]>;
+  readonly apiGetOne?: (id: string) => Promise<TEntity>;
+  readonly apiCreate: (input: TCreateInput) => Promise<TEntity>;
+  readonly apiUpdate: (input: TUpdateInput) => Promise<TEntity>;
+  readonly apiDelete: (id: string) => Promise<void>;
+  readonly apiReorder?: (orders: TReorderInput) => Promise<number>;
   /** Additional query keys to invalidate after mutations (e.g., tag sub-queries) */
-  extraInvalidateKeys?: string[][];
+  readonly extraInvalidateKeys?: readonly (readonly string[])[];
   /** Override the default create mutation (e.g., for side effects like setting tags) */
-  customCreateMutate?: (input: TCreateInput) => Promise<TEntity>;
+  readonly customCreateMutate?: (input: TCreateInput) => Promise<TEntity>;
   /** Override the default update mutation (e.g., for side effects like updating tags) */
-  customUpdateMutate?: (input: TUpdateInput) => Promise<TEntity>;
+  readonly customUpdateMutate?: (input: TUpdateInput) => Promise<TEntity>;
   /** Override default create success handler (default: invalidate all) */
-  onCreateSuccess?: (
+  readonly onCreateSuccess?: (
     data: TEntity,
     queryClient: ReturnType<typeof useQueryClient>,
     queryKey: readonly string[],
   ) => void;
   /** Override default update success handler (default: update item in cache) */
-  onUpdateSuccess?: (
+  readonly onUpdateSuccess?: (
     data: TEntity,
     queryClient: ReturnType<typeof useQueryClient>,
     queryKey: readonly string[],
@@ -62,7 +71,7 @@ export function createEntityHooks<
   TEntity extends { id: string; sort_order?: number },
   TCreateInput,
   TUpdateInput extends { id: string },
-  TReorderInput = { id: string; sort_order: number }[],
+  TReorderInput extends EntityReorderInput = EntityReorderInput,
 >(
   config: EntityHookConfig<TEntity, TCreateInput, TUpdateInput, TReorderInput>,
 ) {
@@ -79,16 +88,10 @@ export function createEntityHooks<
     extraInvalidateKeys = [],
   } = config;
 
-  const queryKeys = {
-    all: [entityName] as const,
-    one: (id: string) => [entityName, id] as const,
-  };
+  const queryKeys = createEntityQueryKeys(entityName);
 
   function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {
-    queryClient.invalidateQueries({ queryKey: queryKeys.all });
-    for (const extraKey of extraInvalidateKeys) {
-      queryClient.invalidateQueries({ queryKey: extraKey });
-    }
+    invalidateEntityLists(queryClient, queryKeys.all, extraInvalidateKeys);
   }
 
   function useGetAll(
@@ -110,8 +113,8 @@ export function createEntityHooks<
       queryFn: () => {
         if (apiGetOne) return apiGetOne(id);
         return apiGetAll().then((items) => {
-          const item = items.find((i) => i.id === id);
-          if (!item) throw new Error(`${entityName} with id "${id}" not found`);
+          const item = items.find((candidate) => candidate.id === id);
+          if (!item) throw new EntityNotFoundError(entityName, id);
           return item;
         });
       },
@@ -148,18 +151,14 @@ export function createEntityHooks<
   ) {
     const queryClient = useQueryClient();
     return useMutation<TEntity, Error, TUpdateInput>({
-      mutationFn:
-        customUpdateMutate ??
-        (({ id, ...data }: TUpdateInput) =>
-          apiUpdate(id, data as Omit<TUpdateInput, "id">)),
+      mutationFn: customUpdateMutate ?? apiUpdate,
       onSuccess: (data) => {
         if (config.onUpdateSuccess) {
           config.onUpdateSuccess(data, queryClient, queryKeys.all);
         } else {
-          queryClient.setQueryData<TEntity[]>(queryKeys.all, (old) => {
-            if (!old) return old;
-            return old.map((item) => (item.id === data.id ? data : item));
-          });
+          queryClient.setQueryData<TEntity[]>(queryKeys.all, (old) =>
+            replaceEntityInList(old, data),
+          );
         }
       },
       ...options,
@@ -179,17 +178,25 @@ export function createEntityHooks<
 
   function useReorder(
     options?: Omit<
-      UseMutationOptions<number, Error, TReorderInput>,
+      UseMutationOptions<
+        number,
+        Error,
+        TReorderInput,
+        ReorderMutationContext<TEntity>
+      >,
       "mutationFn"
     >,
   ) {
     if (!apiReorder) {
-      throw new Error(
-        `useReorder requires apiReorder in config for "${entityName}".`,
-      );
+      throw new MissingReorderApiError(entityName);
     }
     const queryClient = useQueryClient();
-    return useMutation<number, Error, TReorderInput>({
+    return useMutation<
+      number,
+      Error,
+      TReorderInput,
+      ReorderMutationContext<TEntity>
+    >({
       mutationFn: apiReorder,
       onMutate: async (newOrders) => {
         await queryClient.cancelQueries({ queryKey: queryKeys.all });
@@ -197,23 +204,16 @@ export function createEntityHooks<
           queryKeys.all,
         );
         if (previousItems) {
-          const updatedItems = previousItems.map((item) => {
-            const order = (
-              newOrders as { id: string; sort_order: number }[]
-            ).find((o) => o.id === item.id);
-            return order ? { ...item, sort_order: order.sort_order } : item;
-          });
-          updatedItems.sort(
-            (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+          queryClient.setQueryData(
+            queryKeys.all,
+            applyOptimisticReorder(previousItems, newOrders),
           );
-          queryClient.setQueryData(queryKeys.all, updatedItems);
         }
         return { previousItems };
       },
       onError: (_err, _newOrders, context) => {
-        const ctx = context as { previousItems?: TEntity[] } | undefined;
-        if (ctx?.previousItems) {
-          queryClient.setQueryData(queryKeys.all, ctx.previousItems);
+        if (context?.previousItems) {
+          queryClient.setQueryData(queryKeys.all, context.previousItems);
         }
       },
       onSettled: () => {

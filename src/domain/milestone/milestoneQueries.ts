@@ -37,7 +37,7 @@ const {
   apiGetAll: getMilestones,
   apiGetOne: getMilestone,
   apiCreate: createMilestone,
-  apiUpdate: updateMilestone,
+  apiUpdate: async ({ id, ...data }) => updateMilestone(id, data),
   apiDelete: deleteMilestone,
 });
 

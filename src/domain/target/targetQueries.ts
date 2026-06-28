@@ -49,9 +49,9 @@ const {
     }
     return target;
   },
-  apiUpdate: updateTarget,
+  apiUpdate: async ({ id, ...data }) => updateTarget(id, data),
   apiDelete: deleteTarget,
-  apiReorder: reorderTargets,
+  apiReorder: async (orders) => reorderTargets([...orders]),
   customUpdateMutate: async ({ id, tagIds, ...data }) => {
     const target = await updateTarget(id, data);
     if (tagIds !== undefined) {
