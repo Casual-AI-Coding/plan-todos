@@ -52,13 +52,21 @@ describe("ViewsView", () => {
     vi.clearAllMocks();
   });
 
+  const visibleGanttDate = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    15,
+  )
+    .toISOString()
+    .slice(0, 10);
+
   const mockTodos = [
     {
       id: "todo-1",
       title: "Test Todo",
       status: "pending" as const,
       priority: "P1" as const,
-      due_date: "2026-03-14",
+      due_date: visibleGanttDate,
       created_at: "2026-01-01",
       updated_at: "2026-03-14",
     },
