@@ -27,9 +27,10 @@ describe("domain status type sources", () => {
   it("uses canonical Rust todo status validation sources", () => {
     const validationSource = readSource("src-tauri/src/commands/validation.rs");
     const batchSource = readSource("src-tauri/src/commands/batch.rs");
+    const batchTodoSource = readSource("src-tauri/src/commands/batch/todo.rs");
 
     expect(validationSource).toContain("todo_status::TODO_STATUSES");
-    expect(batchSource).toContain("todo_status::validate_todo_status");
+    expect(batchTodoSource).toContain("todo_status::validate_todo_status");
     expect(validationSource).not.toContain(
       '["pending", "in-progress", "completed", "cancelled"]',
     );
@@ -49,5 +50,17 @@ describe("domain status type sources", () => {
     expect(configSource).not.toContain("VALID_STATUSES");
     expect(configSource).not.toContain("in_progress");
     expect(configSource).not.toContain("cancelled");
+  });
+
+  it("keeps Rust batch command ownership split by aggregate", () => {
+    const batchSource = readSource("src-tauri/src/commands/batch.rs");
+
+    expect(batchSource).toContain("mod todo;");
+    expect(batchSource).toContain("mod plan;");
+    expect(batchSource).toContain("mod target;");
+    expect(batchSource).toContain("mod task;");
+    expect(batchSource).not.toContain("UPDATE todos SET");
+    expect(batchSource).not.toContain("DELETE FROM plans");
+    expect(batchSource).not.toContain("DELETE FROM targets");
   });
 });
