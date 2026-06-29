@@ -5,7 +5,6 @@ export interface BulkTodoUpdates {
   status?: string;
   priority?: string;
   due_date?: string;
-  archived?: boolean;
 }
 
 export interface BulkUpdateResult {
@@ -24,12 +23,6 @@ export async function bulkDeleteTodos(
   ids: string[],
 ): Promise<BulkUpdateResult> {
   return await invoke<BulkUpdateResult>("bulk_delete_todos", { ids });
-}
-
-export async function bulkArchiveTodos(
-  ids: string[],
-): Promise<BulkUpdateResult> {
-  return await invoke<BulkUpdateResult>("bulk_archive_todos", { ids });
 }
 
 export async function bulkUpdatePlans(

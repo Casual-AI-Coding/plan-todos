@@ -3,7 +3,6 @@ import type { BulkUpdateResult } from "@/lib/api/bulk";
 import {
   bulkUpdateTodos,
   bulkDeleteTodos,
-  bulkArchiveTodos,
   bulkUpdatePlans,
   bulkDeletePlans,
   bulkUpdateTargets,
@@ -166,41 +165,6 @@ describe("Bulk API Functions", () => {
 
       expect(result.updated).toBe(1);
       expect(result.failed[0].error).toBe("Permission denied");
-    });
-  });
-
-  // ============================================================================
-  // bulkArchiveTodos Tests
-  // ============================================================================
-  describe("bulkArchiveTodos", () => {
-    it("should call invoke with correct parameters", async () => {
-      const mockResult: BulkUpdateResult = {
-        updated: 3,
-        failed: [],
-      };
-      mockInvoke.mockResolvedValue(mockResult);
-
-      const result = await bulkArchiveTodos(["todo-1", "todo-2", "todo-3"]);
-
-      expect(mockInvoke).toHaveBeenCalledWith("bulk_archive_todos", {
-        ids: ["todo-1", "todo-2", "todo-3"],
-      });
-      expect(result).toEqual(mockResult);
-    });
-
-    it("should handle empty ids array", async () => {
-      const mockResult: BulkUpdateResult = {
-        updated: 0,
-        failed: [],
-      };
-      mockInvoke.mockResolvedValue(mockResult);
-
-      const result = await bulkArchiveTodos([]);
-
-      expect(mockInvoke).toHaveBeenCalledWith("bulk_archive_todos", {
-        ids: [],
-      });
-      expect(result.updated).toBe(0);
     });
   });
 

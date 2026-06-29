@@ -8,7 +8,6 @@ import { useShallow } from "zustand/react/shallow";
 import {
   bulkUpdateTodos,
   bulkDeleteTodos,
-  bulkArchiveTodos,
   bulkUpdatePlans,
   bulkDeletePlans,
   bulkUpdateTargets,
@@ -22,12 +21,15 @@ import { Button } from "@/components/ui/Button";
 import { useBatchSelect } from "@/hooks/useBatchSelect";
 import { useToast } from "@/components/ui/Toast";
 import { TagSelector } from "./TagSelector";
-import type { Tag } from "@/lib/types";
 
 interface BatchActionBarProps {
   entityType: "todo" | "plan" | "target";
   allIds: string[];
 }
+
+type BatchEntityUpdates = BulkTodoUpdates & {
+  readonly archived?: boolean;
+};
 
 const STATUS_OPTIONS = {
   todo: [
@@ -78,12 +80,14 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async (
-      updates: BulkTodoUpdates | { status?: string; archived?: boolean },
-    ) => {
+    mutationFn: async (updates: BatchEntityUpdates) => {
       switch (entityType) {
         case "todo":
-          return bulkUpdateTodos(selectedIds, updates as BulkTodoUpdates);
+          return bulkUpdateTodos(selectedIds, {
+            status: updates.status,
+            priority: updates.priority,
+            due_date: updates.due_date,
+          });
         case "plan":
           return bulkUpdatePlans(selectedIds, updates.status, updates.archived);
         case "target":
@@ -108,24 +112,6 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
     },
     onError: (error: Error) => {
       toast.error(`更新失败: ${error.message}`);
-    },
-  });
-
-  // Archive mutation
-  const archiveMutation = useMutation({
-    mutationFn: async () => {
-      return bulkArchiveTodos(selectedIds);
-    },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: [entityType + "s"] });
-      toast.success(`已归档 ${result.updated} 项`);
-      if (result.failed.length > 0) {
-        toast.error(`${result.failed.length} 项归档失败`);
-      }
-      deselectAll();
-    },
-    onError: (error: Error) => {
-      toast.error(`归档失败: ${error.message}`);
     },
   });
 
@@ -226,11 +212,7 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
   };
 
   const handleArchive = () => {
-    if (entityType === "todo") {
-      archiveMutation.mutate();
-    } else {
-      updateMutation.mutate({ archived: true });
-    }
+    updateMutation.mutate({ archived: true });
   };
 
   const handleAddTag = (tagId: string) => {
@@ -250,7 +232,6 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
   const isLoading =
     updateMutation.isPending ||
     deleteMutation.isPending ||
-    archiveMutation.isPending ||
     addTagMutation.isPending ||
     removeTagMutation.isPending;
 
@@ -389,15 +370,17 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
       <div className="flex-1" />
 
       {/* Archive button */}
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={handleArchive}
-        disabled={!hasSelection || isLoading || archiveMutation.isPending}
-        loading={archiveMutation.isPending}
-      >
-        归档
-      </Button>
+      {entityType !== "todo" && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleArchive}
+          disabled={!hasSelection || isLoading || updateMutation.isPending}
+          loading={updateMutation.isPending}
+        >
+          归档
+        </Button>
+      )}
 
       {/* Delete button */}
       <Button
