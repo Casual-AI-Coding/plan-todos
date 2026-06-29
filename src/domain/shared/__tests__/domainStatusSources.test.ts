@@ -39,4 +39,15 @@ describe("domain status type sources", () => {
     expect(batchSource).not.toContain("bulk_archive_todos");
     expect(batchSource).not.toContain("UPDATE todos SET status = 'archived'");
   });
+
+  it("keeps frontend validation statuses inside the domain boundary", () => {
+    const configSource = readSource("src/config/constants.ts");
+    const validationSource = readSource("src/domain/shared/validation.ts");
+
+    expect(validationSource).toContain("@/domain/shared/domainTypes");
+    expect(validationSource).not.toContain("@/config/constants");
+    expect(configSource).not.toContain("VALID_STATUSES");
+    expect(configSource).not.toContain("in_progress");
+    expect(configSource).not.toContain("cancelled");
+  });
 });
