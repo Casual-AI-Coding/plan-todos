@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.3] - 2026-06-30
+
+### Refactored
+
+**实体查询核心层重构 (Entity Query Core Refactoring)**:
+
+- 分离实体查询工厂策略：新增 `entityErrors.ts`（类型化错误）、`entityQueryCache.ts`（缓存策略）、`entityQueryKeys.ts`（查询键工厂）、`entityReorder.ts`（乐观排序工具）
+- `EntityHookConfig` 接口添加 `readonly` 修饰符，`extraInvalidateKeys` 改为只读元组
+- `createEntityHooks` 的 `apiUpdate` 签名从 `(id, data)` 改为接收整个输入对象 `(input: TUpdateInput)`，统一调用约定
+- 各实体查询（circulation, milestone, plan, target, todo）适配新的 `apiUpdate` 签名
+- `useEntityOperations` reorder 操作契约收窄，减少不必要的重渲染
+
+### Tests
+
+- **新增实体查询策略测试**: `entityQueryPolicies.test.ts` 覆盖 query keys、cache replacement、乐观排序、类型化错误（5 个测试用例）
+
+### Docs
+
+- 归档自动代码审查报告（2026-05-05, 2026-05-06），含手动验证结论
+- 新增架构升级计划文档（2026-06-29）
+
+### Chore
+
+- `.gitignore` 添加 `.omo/` 目录
+
+---
+
 ## [0.9.2] - 2026-04-29
 
 ### Refactored

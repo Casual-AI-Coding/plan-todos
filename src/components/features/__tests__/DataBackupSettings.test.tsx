@@ -66,12 +66,7 @@ describe("DataBackupSettings", () => {
     });
 
     it("提供回调时按钮可用", () => {
-      render(
-        <DataBackupSettings
-          onExport={vi.fn()}
-          onImport={vi.fn()}
-        />,
-      );
+      render(<DataBackupSettings onExport={vi.fn()} onImport={vi.fn()} />);
 
       expect(screen.getByText("导出数据 (JSON)")).not.toBeDisabled();
       expect(screen.getByText("导入数据")).not.toBeDisabled();
@@ -102,9 +97,7 @@ describe("DataBackupSettings", () => {
     });
 
     it("导出失败显示错误消息", async () => {
-      const mockExport = vi
-        .fn()
-        .mockRejectedValue(new Error("导出出错"));
+      const mockExport = vi.fn().mockRejectedValue(new Error("导出出错"));
       render(<DataBackupSettings onExport={mockExport} />);
 
       fireEvent.click(screen.getByText("导出数据 (JSON)"));

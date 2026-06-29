@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-  ensureTauri,
-  withTauriError,
-  isTauri,
-} from "./utils";
+import { ensureTauri, withTauriError, isTauri } from "./utils";
 
 // ============================================================================
 // ensureTauri Tests

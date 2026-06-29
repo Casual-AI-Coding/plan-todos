@@ -4,7 +4,12 @@ import { useState } from "react";
 import { Card } from "@/components/ui";
 import { ThemeSelector, DataBackupSettings } from "@/components/features";
 import { useFontSettings } from "@/hooks/useFontSettings";
-import { exportData, importData, type ExportData, type ImportResult } from "@/lib/api";
+import {
+  exportData,
+  importData,
+  type ExportData,
+  type ImportResult,
+} from "@/lib/api";
 import {
   useHotkeyStore,
   DEFAULT_HOTKEYS,
@@ -455,8 +460,8 @@ export function SettingsGeneralView() {
               <option value="en">English</option>
             </select>
           </div>
-          </div>
-        </Card>
+        </div>
+      </Card>
 
       {/* Data Backup */}
       <Card className="mb-6">

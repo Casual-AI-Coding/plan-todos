@@ -65,11 +65,7 @@ function createConfig(overrides?: {
   createMutation?: UseMutationResult<TestEntity, Error, TestCreateInput>;
   updateMutation?: UseMutationResult<TestEntity, Error, TestUpdateInput>;
   deleteMutation?: UseMutationResult<void, Error, string>;
-  reorderMutation?: UseMutationResult<
-    unknown,
-    Error,
-    EntityReorderInput
-  >;
+  reorderMutation?: UseMutationResult<unknown, Error, EntityReorderInput>;
 }) {
   return {
     entityType: "todo" as EntityType,
@@ -86,10 +82,9 @@ function createConfig(overrides?: {
     deleteMutation: createMutationResult<void, string>(async (_id: string) => {
       return undefined;
     }),
-    reorderMutation: createMutationResult<
-      unknown,
-      EntityReorderInput
-    >(async (_orders) => undefined),
+    reorderMutation: createMutationResult<unknown, EntityReorderInput>(
+      async (_orders) => undefined,
+    ),
     completedStatus: "completed",
     pendingStatus: "pending",
     messages: {
@@ -343,10 +338,10 @@ describe("useEntityOperations", () => {
   });
 
   it("reorders items and exposes pending state flags", async () => {
-    const reorderMutation = createMutationResult<
-      unknown,
-      EntityReorderInput
-    >(async () => undefined, true);
+    const reorderMutation = createMutationResult<unknown, EntityReorderInput>(
+      async () => undefined,
+      true,
+    );
     const config = createConfig({
       reorderMutation,
       createMutation: createMutationResult(

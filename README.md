@@ -2,7 +2,7 @@
 
 > 本地优先的跨平台任务管理应用
 
-![Version](https://img.shields.io/badge/version-0.9.2-blue)
+![Version](https://img.shields.io/badge/version-0.9.3-blue)
 ![Platform](<https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android%20%7C%20iOS%20(Experimental)-green>)
 ![Framework](https://img.shields.io/badge/framework-Tauri%20v2-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)

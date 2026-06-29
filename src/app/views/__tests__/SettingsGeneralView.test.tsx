@@ -25,7 +25,10 @@ vi.mock("@/components/features", () => ({
       <button data-testid="mock-export" onClick={() => onExport?.()}>
         Export
       </button>
-      <button data-testid="mock-import" onClick={() => onImport?.(new File([], "test.json"))}>
+      <button
+        data-testid="mock-import"
+        onClick={() => onImport?.(new File([], "test.json"))}
+      >
         Import
       </button>
     </div>

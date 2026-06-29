@@ -61,9 +61,7 @@ export function DataBackupSettings({
         type="file"
         ref={fileInputRef}
         accept=".json"
-        onChange={(e) =>
-          e.target.files?.[0] && handleImport(e.target.files[0])
-        }
+        onChange={(e) => e.target.files?.[0] && handleImport(e.target.files[0])}
         className="hidden"
       />
 
