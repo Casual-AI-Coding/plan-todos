@@ -1,4 +1,6 @@
-export type PlanStatus = "active" | "completed" | "archived";
+import type { PlanStatus } from "@/domain/shared/domainTypes";
+
+export type { PlanStatus } from "@/domain/shared/domainTypes";
 
 export interface CreatePlanInput {
   title: string;

@@ -1,4 +1,5 @@
 import type { Priority, Recurrence } from "@/lib/types";
+import type { TodoStatus } from "@/domain/shared/domainTypes";
 
 export interface CreateTodoInput {
   title: string;
@@ -13,7 +14,7 @@ export interface UpdateTodoInput {
   title?: string;
   content?: string;
   due_date?: string;
-  status?: "pending" | "in-progress" | "done";
+  status?: TodoStatus;
   priority?: Priority;
   recurrence?: Recurrence;
 }
