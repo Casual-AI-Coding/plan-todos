@@ -8,6 +8,8 @@ mod models;
 mod sync;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod todo_status_contract_tests;
 
 use crate::sync::SyncState;
 use log::info;
@@ -187,7 +189,6 @@ pub fn run() {
             commands::batch::bulk_delete_todos,
             commands::batch::bulk_delete_tasks,
             commands::batch::bulk_update_todos,
-            commands::batch::bulk_archive_todos,
             commands::batch::bulk_update_plans,
             commands::batch::bulk_delete_plans,
             commands::batch::bulk_update_targets,

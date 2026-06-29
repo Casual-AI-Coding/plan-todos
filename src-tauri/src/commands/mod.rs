@@ -20,6 +20,7 @@ pub mod sync;
 pub mod tags;
 pub mod targets;
 pub mod tasks;
+pub mod todo_status;
 pub mod todos;
 pub mod update;
 pub mod validation;

@@ -1,7 +1,9 @@
 // Input validation utilities for CRUD commands
 
+use crate::commands::todo_status;
+
 pub const VALID_PRIORITIES: [&str; 4] = ["P0", "P1", "P2", "P3"];
-pub const VALID_TODO_STATUSES: [&str; 4] = ["pending", "in-progress", "completed", "cancelled"];
+pub const VALID_TODO_STATUSES: [&str; 3] = todo_status::TODO_STATUSES;
 pub const VALID_PLAN_STATUSES: [&str; 3] = ["active", "completed", "archived"];
 pub const VALID_TARGET_STATUSES: [&str; 3] = ["active", "completed", "archived"];
 pub const VALID_MILESTONE_STATUSES: [&str; 2] = ["pending", "completed"];
@@ -33,7 +35,7 @@ pub fn validate_priority(priority: &str) -> Result<(), String> {
 }
 
 pub fn validate_status(status: &str) -> Result<(), String> {
-    if !VALID_TODO_STATUSES.contains(&status) {
+    if todo_status::validate_todo_status(status).is_err() {
         return Err(format!(
             "Invalid status '{}'. Must be one of: {}",
             status,
