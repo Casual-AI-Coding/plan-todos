@@ -1,5 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ensureTauri, withTauriError, isTauri } from "./utils";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import {
+  ensureTauri,
+  withTauriError,
+  isTauri,
+  TauriOperationError,
+  TauriUnavailableError,
+} from "./utils";
 
 // ============================================================================
 // ensureTauri Tests
@@ -22,6 +28,19 @@ describe("ensureTauri", () => {
     expect(() => ensureTauri("test operation")).toThrow(
       "This app must run in Tauri to test operation",
     );
+  });
+
+  it("throws typed unavailable error with operation metadata", () => {
+    expect(() => ensureTauri("test operation")).toThrow(
+      TauriUnavailableError,
+    );
+
+    try {
+      ensureTauri("test operation");
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(TauriUnavailableError);
+      expect(error).toMatchObject({ operation: "test operation" });
+    }
   });
 
   it("throws error with Chinese message when operation is in Chinese", () => {
@@ -75,6 +94,26 @@ describe("withTauriError", () => {
         throw new Error("Original error");
       }),
     ).rejects.toThrow("Operation failed: Original error");
+  });
+
+  it("wraps Error from function with typed operation metadata and cause", async () => {
+    (global.window as Window & { __TAURI__?: object }).__TAURI__ = {};
+    const originalError = new Error("Original error");
+
+    await expect(
+      withTauriError("test operation", async () => {
+        throw originalError;
+      }),
+    ).rejects.toMatchObject({
+      operation: "test operation",
+      cause: originalError,
+    });
+
+    await expect(
+      withTauriError("test operation", async () => {
+        throw originalError;
+      }),
+    ).rejects.toBeInstanceOf(TauriOperationError);
   });
 
   it("wraps string error from function with message", async () => {

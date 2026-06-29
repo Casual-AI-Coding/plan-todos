@@ -14,11 +14,55 @@ export const isTauri = checkTauri;
  */
 export const invoke = tauriInvoke;
 
+export class TauriUnavailableError extends Error {
+  readonly operation: string;
+
+  constructor(operation: string) {
+    super(createUnavailableMessage(operation));
+    this.name = "TauriUnavailableError";
+    this.operation = operation;
+  }
+}
+
+export class TauriOperationError extends Error {
+  readonly operation: string;
+
+  override readonly cause: unknown;
+
+  constructor(operation: string, cause: unknown) {
+    super(createOperationFailureMessage(operation, cause), { cause });
+    this.name = "TauriOperationError";
+    this.operation = operation;
+    this.cause = cause;
+  }
+}
+
 /**
  * Check if operation name is Chinese
  */
 function isChineseOperation(operation: string): boolean {
   return /[\u4e00-\u9fa5]/.test(operation);
+}
+
+function createUnavailableMessage(operation: string): string {
+  return isChineseOperation(operation)
+    ? `此操作需要在 Tauri 环境中运行: ${operation}`
+    : `This app must run in Tauri to ${operation}`;
+}
+
+function createOperationFailureMessage(
+  operation: string,
+  cause: unknown,
+): string {
+  if (cause === null) {
+    return "Null error";
+  }
+  if (cause === undefined) {
+    return "Undefined error";
+  }
+
+  const prefix = isChineseOperation(operation) ? "操作失败" : "Operation failed";
+  return `${prefix}: ${cause instanceof Error ? cause.message : String(cause)}`;
 }
 
 /**
@@ -27,10 +71,7 @@ function isChineseOperation(operation: string): boolean {
  */
 export function ensureTauri(operation: string): void {
   if (!isTauri()) {
-    const message = isChineseOperation(operation)
-      ? `此操作需要在 Tauri 环境中运行: ${operation}`
-      : `This app must run in Tauri to ${operation}`;
-    throw new Error(message);
+    throw new TauriUnavailableError(operation);
   }
 }
 
@@ -48,15 +89,6 @@ export async function withTauriError<T>(
   try {
     return await fn();
   } catch (error: unknown) {
-    // Convert null/undefined to Error for consistent handling
-    if (error === null || error === undefined) {
-      throw new Error(error === null ? "Null error" : "Undefined error");
-    }
-    const prefix = isChineseOperation(operation)
-      ? "操作失败"
-      : "Operation failed";
-    throw new Error(
-      `${prefix}: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    throw new TauriOperationError(operation, error);
   }
 }
