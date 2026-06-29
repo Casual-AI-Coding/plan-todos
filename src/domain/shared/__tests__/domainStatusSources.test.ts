@@ -23,4 +23,20 @@ describe("domain status type sources", () => {
     expect(source).toContain("@/domain/shared/domainTypes");
     expect(source).not.toContain('"pending" | "in-progress" | "done"');
   });
+
+  it("uses canonical Rust todo status validation sources", () => {
+    const validationSource = readSource("src-tauri/src/commands/validation.rs");
+    const batchSource = readSource("src-tauri/src/commands/batch.rs");
+
+    expect(validationSource).toContain("todo_status::TODO_STATUSES");
+    expect(batchSource).toContain("todo_status::validate_todo_status");
+    expect(validationSource).not.toContain(
+      '["pending", "in-progress", "completed", "cancelled"]',
+    );
+    expect(batchSource).not.toContain(
+      '["pending", "in-progress", "done", "archived"]',
+    );
+    expect(batchSource).not.toContain("bulk_archive_todos");
+    expect(batchSource).not.toContain("UPDATE todos SET status = 'archived'");
+  });
 });

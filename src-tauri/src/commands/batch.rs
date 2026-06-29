@@ -1,26 +1,15 @@
 // Batch operations commands
 
+use crate::commands::todo_status;
 use crate::log_command;
 use crate::AppState;
 use serde::Deserialize;
 use serde::Serialize;
 
 // Valid values for status and priority
-const VALID_TODO_STATUSES: &[&str] = &["pending", "in-progress", "done", "archived"];
 const VALID_PLAN_STATUSES: &[&str] = &["draft", "active", "completed", "archived"];
 const VALID_TARGET_STATUSES: &[&str] = &["active", "completed", "abandoned", "archived"];
 const VALID_PRIORITIES: &[&str] = &["P0", "P1", "P2", "P3"];
-
-fn validate_todo_status(status: &str) -> Result<(), String> {
-    if !VALID_TODO_STATUSES.contains(&status) {
-        Err(format!(
-            "Invalid todo status: '{}'. Valid values: {:?}",
-            status, VALID_TODO_STATUSES
-        ))
-    } else {
-        Ok(())
-    }
-}
 
 fn validate_plan_status(status: &str) -> Result<(), String> {
     if !VALID_PLAN_STATUSES.contains(&status) {
@@ -74,7 +63,7 @@ pub fn bulk_update_todo_status(
     status: String,
 ) -> Result<BatchUpdateResult, String> {
     // Validate status
-    validate_todo_status(&status)?;
+    todo_status::validate_todo_status(&status)?;
 
     log_command!("bulk_update_todo_status", {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -251,7 +240,6 @@ pub struct BulkTodoUpdates {
     pub status: Option<String>,
     pub priority: Option<String>,
     pub due_date: Option<String>,
-    pub archived: Option<bool>,
 }
 
 #[tauri::command]
@@ -262,7 +250,7 @@ pub fn bulk_update_todos(
 ) -> Result<BatchUpdateResult, String> {
     // Validate inputs
     if let Some(ref status) = updates.status {
-        validate_todo_status(status)?;
+        todo_status::validate_todo_status(status)?;
     }
     if let Some(ref priority) = updates.priority {
         validate_priority(priority)?;
@@ -295,54 +283,12 @@ pub fn bulk_update_todos(
                 params.push(Box::new(due_date.clone()));
             }
 
-            if let Some(archived) = updates.archived {
-                if archived {
-                    set_clauses.push("status = ?");
-                    params.push(Box::new("archived".to_string()));
-                }
-            }
-
             let sql = format!("UPDATE todos SET {} WHERE id = ?", set_clauses.join(", "));
             params.push(Box::new(id.clone()));
 
             let result = conn.execute(
                 &sql,
                 rusqlite::params_from_iter(params.iter().map(|p| p.as_ref())),
-            );
-
-            match result {
-                Ok(rows) if rows > 0 => updated += 1,
-                Ok(_) => failed.push(BatchFailedItem {
-                    id,
-                    error: "Not found".to_string(),
-                }),
-                Err(e) => failed.push(BatchFailedItem {
-                    id,
-                    error: e.to_string(),
-                }),
-            }
-        }
-
-        Ok(BatchUpdateResult { updated, failed })
-    })
-}
-
-#[tauri::command]
-pub fn bulk_archive_todos(
-    state: tauri::State<AppState>,
-    ids: Vec<String>,
-) -> Result<BatchUpdateResult, String> {
-    log_command!("bulk_archive_todos", {
-        let conn = state.db.lock().map_err(|e| e.to_string())?;
-        let now = chrono::Utc::now().to_rfc3339();
-
-        let mut updated = 0;
-        let mut failed: Vec<BatchFailedItem> = Vec::new();
-
-        for id in ids {
-            let result = conn.execute(
-                "UPDATE todos SET status = 'archived', updated_at = ? WHERE id = ?",
-                rusqlite::params![now, id],
             );
 
             match result {
