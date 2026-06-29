@@ -5,7 +5,10 @@ export type BatchActionOption = {
   readonly label: string;
 };
 
-export const STATUS_OPTIONS: Record<BatchEntityType, readonly BatchActionOption[]> = {
+export const STATUS_OPTIONS: Record<
+  BatchEntityType,
+  readonly BatchActionOption[]
+> = {
   todo: [
     { value: "pending", label: "待处理" },
     { value: "in-progress", label: "进行中" },

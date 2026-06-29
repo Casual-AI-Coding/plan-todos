@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.4] - 2026-06-30
+
+### Refactored
+
+**API 层类型化边界错误**:
+
+- `src/lib/api/utils.ts` 新增 `TauriUnavailableError` 和 `TauriOperationError` 类型化错误类，替代裸 `Error` 抛出
+- 类型化错误暴露 `operation` 和 `cause` 元数据，便于调用方分类处理
+- 提取 `createUnavailableMessage` 和 `createOperationFailureMessage` 工厂函数
+
+**Domain 状态类型收敛**:
+
+- `src/domain/plan/planTypes.ts` 从 `domainTypes.ts` 导入 `PlanStatus` 类型，消除重复定义
+- `src/domain/todo/todoTypes.ts` `UpdateTodoInput.status` 使用 `TodoStatus` 类型替代字面量联合
+- `src/domain/shared/validation.ts` 从 `domainTypes` 引用验证常量，删除对 `@/config/constants` 的依赖
+- 物理删除 `src/config/constants.ts` 中已迁移的验证常量
+
+**Todo 状态验证集中化（Rust）**:
+
+- 新增 `commands/todo_status.rs` 模块，统一定义 `TODO_STATUSES` 和 `validate_todo_status`
+- `commands/validation.rs` 引用 `todo_status::TODO_STATUSES`，消除三处重复的状态常量定义
+- `batch.rs` 拆分为 `batch/` 子模块（common/plan/target/task/todo），移除内联验证函数
+- 移除 `bulk_archive_todos` 命令及其前端的 `bulkArchiveTodos` API（`archived` 不是 canonical todo status）
+
+**BatchActionBar 组件重构**:
+
+- `BatchActionBar.tsx` 从 ~258 行瘦身，提取业务逻辑到 `useBatchActionController` hook
+- 提取 `batchActionBarOptions.ts` 配置常量，所有 UI 组件通过 hook 统一管理状态
+
+### Tests
+
+- **Rust todo status 契约测试**: 验证 Rust/前端状态常量一致性，拒绝 `archived`/`completed`/`cancelled` 别名
+- **Domain 状态源测试**: `domainStatusSources.test.ts` 覆盖 Plan/Todo 类型收敛的正确性
+- **BatchActionBar 组件结构测试**: `BatchActionBar.structure.test.ts` 验证组件所有权和渲染结构
+- **ViewsGantt 测试修复**: 修复 fixture 数据超出可视范围的问题
+- **类型化边界错误测试**: 验证 typed error 的类身份、operation 元数据和 cause 传递
+
+### Docs
+
+- 新增架构升级计划 `docs/plans/2026-06-30-architecture-upgrade-ultrawork-plan.md`
+
+### Chore
+
+- 更新 `Cargo.lock` 以匹配 v0.9.3 依赖版本
+
+---
+
 ## [0.9.3] - 2026-06-30
 
 ### Refactored

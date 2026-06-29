@@ -61,7 +61,9 @@ function createOperationFailureMessage(
     return "Undefined error";
   }
 
-  const prefix = isChineseOperation(operation) ? "操作失败" : "Operation failed";
+  const prefix = isChineseOperation(operation)
+    ? "操作失败"
+    : "Operation failed";
   return `${prefix}: ${cause instanceof Error ? cause.message : String(cause)}`;
 }
 

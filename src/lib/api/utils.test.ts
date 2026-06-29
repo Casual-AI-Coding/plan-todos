@@ -31,9 +31,7 @@ describe("ensureTauri", () => {
   });
 
   it("throws typed unavailable error with operation metadata", () => {
-    expect(() => ensureTauri("test operation")).toThrow(
-      TauriUnavailableError,
-    );
+    expect(() => ensureTauri("test operation")).toThrow(TauriUnavailableError);
 
     try {
       ensureTauri("test operation");

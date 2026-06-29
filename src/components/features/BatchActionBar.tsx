@@ -58,7 +58,9 @@ export function BatchActionBar({ entityType, allIds }: BatchActionBarProps) {
         style={{ color: "var(--color-text-secondary)" }}
       >
         已选中{" "}
-        <span style={{ color: "var(--color-primary)" }}>{selectedIds.length}</span>{" "}
+        <span style={{ color: "var(--color-primary)" }}>
+          {selectedIds.length}
+        </span>{" "}
         项
       </span>
 

@@ -110,7 +110,8 @@ export function useBatchActionController({
   });
 
   const addTagMutation = useMutation({
-    mutationFn: async (tagId: string) => bulkAddTags(entityType, selectedIds, tagId),
+    mutationFn: async (tagId: string) =>
+      bulkAddTags(entityType, selectedIds, tagId),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: [`${entityType}s`] });
       queryClient.invalidateQueries({ queryKey: ["entityTags"] });
@@ -164,7 +165,9 @@ export function useBatchActionController({
   };
 
   const handleDelete = () => {
-    if (confirm(`确定要删除选中的 ${selectedIds.length} 项吗？此操作不可撤销。`)) {
+    if (
+      confirm(`确定要删除选中的 ${selectedIds.length} 项吗？此操作不可撤销。`)
+    ) {
       deleteMutation.mutate();
     }
   };

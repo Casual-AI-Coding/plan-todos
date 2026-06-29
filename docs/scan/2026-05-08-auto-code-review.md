@@ -52,6 +52,7 @@ plan-todos 是一个全栈计划与任务管理应用，结合 Next.js 前端和
    - **建议**: 完成实现后移除 `#[allow(dead_code)]`
 
 4. **`bulk_update_todos` 中动态 SQL 拼接** — `batch.rs:305`
+
    ```rust
    let sql = format!("UPDATE todos SET {} WHERE id = ?", set_clauses.join(", "));
    ```
