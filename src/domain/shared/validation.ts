@@ -1,12 +1,17 @@
-import { VALID_PRIORITIES, VALID_STATUSES } from "@/config/constants";
 import { requiredMessage, maxLengthMessage, t } from "@/config/i18n";
+import { PRIORITIES, TODO_STATUSES } from "@/domain/shared/domainTypes";
 
 export interface ValidationError {
   field: string;
   message: string;
 }
 
-export { VALID_PRIORITIES, VALID_STATUSES };
+export const VALID_PRIORITIES = PRIORITIES;
+export const VALID_STATUSES = TODO_STATUSES;
+
+function includesValue(values: readonly string[], value: string): boolean {
+  return values.includes(value);
+}
 
 export function required(
   value: unknown,
@@ -33,16 +38,14 @@ export function maxLength(
 }
 
 export function validatePriority(priority: string): ValidationError | null {
-  if (
-    !VALID_PRIORITIES.includes(priority as (typeof VALID_PRIORITIES)[number])
-  ) {
+  if (!includesValue(VALID_PRIORITIES, priority)) {
     return { field: "priority", message: t.validation.invalidPriority };
   }
   return null;
 }
 
 export function validateStatus(status: string): ValidationError | null {
-  if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
+  if (!includesValue(VALID_STATUSES, status)) {
     return { field: "status", message: t.validation.invalidStatus };
   }
   return null;

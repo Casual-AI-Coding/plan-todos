@@ -1,7 +1,3 @@
-/**
- * Application Constants - CSS layout values, priority ordering, valid values.
- */
-
 export const STORAGE_KEYS = {
   SIDEBAR_COLLAPSED: "sidebar-collapsed",
   THEME: "plan-todos-theme",
@@ -25,14 +21,6 @@ export const PRIORITY_ORDER: Record<string, number> = {
   P2: 2,
   P3: 3,
 } as const;
-
-export const VALID_PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
-export const VALID_STATUSES = [
-  "pending",
-  "in_progress",
-  "completed",
-  "cancelled",
-] as const;
 
 export const FONT_SIZE = {
   MIN: 12,

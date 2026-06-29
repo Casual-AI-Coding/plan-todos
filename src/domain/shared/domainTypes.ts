@@ -59,6 +59,8 @@ export type {
   UpdateTaskParams,
 } from "@/lib/types/task";
 
+export const PRIORITIES = ["P0", "P1", "P2", "P3"] as const;
+
 export const TODO_STATUSES = ["pending", "in-progress", "done"] as const;
 export type TodoStatus = (typeof TODO_STATUSES)[number];
 
