@@ -64,5 +64,8 @@ Thumbs.db
 # Worktrees
 .worktrees/
 
+# OpenCode omo artifacts
+.omo/
+
 # Sisyphus
 .sisyphus/
